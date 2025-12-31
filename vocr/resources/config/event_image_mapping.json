@@ -1,0 +1,3411 @@
+{
+  "Abel": {
+    "gyfo1r": {
+      "default":"01w2.png",
+      "special":{"Betti":"01w2.png"}
+    },
+    "gyfo1": {
+      "default":"01d.png",
+      "special":{"Betti":"01w3.png"}
+    },
+    "gyho2": {"default":"01w3.png"},
+    "qfgsw3": {"default":"01n.png",
+      "special":{"Betti":"01n.png"}},
+    "gkgsw4": {"default":"01n.png",
+      "special":{"Betti":"01n.png"}},
+    "qfjcqr5r": {"default":"01d.png",
+      "special":{"Betti":"01t2.png"}},
+    "qfjc5": {"default":"01d.png",
+      "special":{"Betti":"01w2.png"}},
+    "gycx6": {"default":"01n.png",
+      "special":{"Betti":"01n2.png"}
+    },
+    "zco7": {"default":"01i.png"},
+    "jhdh8b": {"default":"01i.png",
+      "special":{"Betti":"01o2.png"}
+    },
+    "zjgh8b": {"default":"01i.png",
+      "special":{"Betti":"01k2.png"}
+    },
+    "jbdh8r": {"default":"01o2.png",
+      "special":{"Betti":"01t.png"}
+    },
+    "zjgb8": {"default":"01d.png",
+      "special":{"Betti":"01w2.png"}
+    },
+    "zrzbjg9": {"default":"01d.png"},
+    "zbdxsw10": {"default":"01k2.png",
+      "special":{"Betti":"01n.png"}
+    },
+    "gprz11p": {"default":"01w2.png",
+      "special":{"Betti":"01o2.png"}
+    },
+    "gprz11r": {"default":"01w3.png",
+      "special":{"Betti":"01i.png"}
+    },
+    "zcrh12r": {"default":"01o2.png",
+      "special":{"Betti":"01o2.png"}
+    },
+    "zcrh12": {"default":"01i.png",
+      "special":{"Betti":"01n.png"}
+    },
+    "gyzs13": {"default":"01i.png"},
+    "zs14": {"default":"01w3.png",
+      "special":{"Betti":"01k.png"}
+    },
+    "zspz15": {"default":"01o2.png"},
+    "szsm16": {"default":"01d.png",
+      "special":{"Betti":"01k.png"}
+    },
+    "wz17": {"default":"01n.png"},
+    "lnco18": {"default":"01w.png"},
+    "ljgh19b": {"default":"01w3.png",
+      "special":{"Betti":"01k2.png"}
+    },
+    "ljgb19": {"default":"01k2.png",
+      "special":{"Betti":"01n.png"}
+    },
+    "cxs": {"default":["01n.png","01syokei.png"]},
+    "crsl": {"default":"01t.png"},
+    "rlsl": {"default":"01wolf.png"},
+    "yhsl": {"default":"01fox.png"},
+    "krsl": {"default":"01mad.png"},
+    "hblr": {"default":"01k.png"},
+    "hbg": {"default":"01o2.png"},
+    "hbln": {"default":"01k.png"},
+    "hbz": {"default":"01k.png"},
+    "hbm": {"default":"01t2.png"},
+    "lrco": {"default":"01d.png"},
+    "mco": {"default":"01t2.png"},
+    "yjsw": {"default":["01d.png","01higai.png"]},
+    "hzsw": {"default":["01d.png","01h.png"]},
+    "mzsw": {"default":["01d.png","01syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Erich": {
+    "gyfo1r": {
+      "default":"02d.png",
+      "special":{"Otfried":"02i2.png"}
+    },
+    "gyfo1": {"default":"02d.png",
+      "special":{"Otfried":"02i2.png"}
+    },
+    "gyho2": {"default":"02d2.png"},
+    "qfgsw3": {"default":"02d.png",
+      "special":{"Otfried":"02w.png"}
+    },
+    "gkgsw4": {"default":"02d2.png",
+      "special":{"Otfried":"02w.png"}
+    },
+    "qfjcqr5r": {"default":"02d.png",
+      "special":{"Otfried":"02i2.png"}
+    },
+    "qfjc5": {"default":"02d2.png",
+      "special":{"Otfried":"02i2.png"}
+    },
+    "gycx6": {"default":"02i.png",
+      "special":{"Otfried":"02w2.png"}
+
+    },
+    "zco7": {"default":"02w.png"},
+    "jhdh8b": {"default":"02w2.png",
+      "special":{"Otfried":"02w2.png"}
+    },
+    "zjgh8b": {"default":"02w.png",
+      "special":{"Otfried":"02i3.png"}
+    },
+    "jbdh8r": {"default":"02d.png",
+      "special":{"Otfried":"02i2.png"}
+    },
+    "zjgb8": {"default":"02d.png",
+      "special":{"Otfried":"02i2.png"}
+    },
+    "zrzbjg9": {"default":"02d.png"},
+    "zbdxsw10": {"default":"02d2.png",
+      "special":{"Otfried":"02w2.png"}
+    },
+    "gprz11p": {"default":"02w.png",
+      "special":{"Otfried":"02i2.png"}
+    },
+    "gprz11r": {"default":"02i3.png",
+      "special":{"Otfried":"02i3.png"}
+    },
+    "zcrh12r": {"default":"02i2.png",
+      "special":{"Otfried":"02i2.png"}
+    },
+    "zcrh12": {"default":"02w.png",
+      "special":{"Otfried":"02i3.png"}
+    },
+    "gyzs13": {"default":"02d2.png"},
+    "zs14": {"default":"02i3.png",
+      "special":{"Otfried":"02i3.png"}
+    },
+    "zspz15": {"default":"02i2.png"},
+    "szsm16": {"default":"02i2.png",
+      "special":{"Otfried":"02w.png"}
+    },
+    "wz17": {"default":"02w2.png"},
+    "lnco18": {"default":"02i2.png"},
+    "ljgh19b": {"default":"02w.png",
+      "special":{"Otfried":"02w.png"}
+    },
+    "ljgb19": {"default":"02w.png",
+      "special":{"Otfried":"02w.png"}
+    },
+    "cxs": {"default":["02i2.png","02syokei.png"]},
+    "crsl": {"default":"02w.png"},
+    "rlsl": {"default":"02wolf.png"},
+    "yhsl": {"default":"02fox.png"},
+    "krsl": {"default":"02mad.png"},
+    "hblr": {"default":"02i.png"},
+    "hbg": {"default":"02w.png"},
+    "hbln": {"default":"02i.png"},
+    "hbz": {"default":"02i.png"},
+    "hbm": {"default":"02t.png"},
+    "lrco": {"default":"02w2.png"},
+    "mco": {"default":"02t.png"},
+    "yjsw": {"default":["02d.png","02higai.png"]},
+    "hzsw": {"default":["02d.png","02h.png"]},
+    "mzsw": {"default":["02d.png","02syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Matthäus": {
+    "gyfo1r": {
+      "default":"03d.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "gyfo1": {"default":"03d.png",
+      "special":{"Samuel":"03i3.png"}
+    },
+    "gyho2": {"default":"03d.png"},
+    "qfgsw3": {"default":"03i3.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "gkgsw4": {"default":"03i2.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "qfjcqr5r": {"default":"03i.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "qfjc5": {"default":"03i2.png",
+      "special":{"Samuel":"03i.png"}
+    },
+    "gycx6": {"default":"03n.png",
+      "special":{"Samuel":"03n.png"}
+    },
+    "zco7": {"default":"03d.png"},
+    "jhdh8b": {"default":"03i.png",
+      "special":{"Samuel":"03o.png"}
+    },
+    "zjgh8b": {"default":"03i.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "jbdh8r": {"default":"03i2.png",
+      "special":{"Samuel":"03i.png"}
+    },
+    "zjgb8": {"default":"03i3.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "zrzbjg9": {"default":"03d.png"},
+    "zbdxsw10": {"default":"03i3.png",
+      "special":{"Samuel":"03n.png"}
+
+    },
+    "gprz11p": {"default":"03i.png",
+      "special":{"Samuel":"03i.png"}
+    },
+    "gprz11r": {"default":"03i.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "zcrh12r": {"default":"03i2.png",
+      "special":{"Samuel":"03o.png"}
+    },
+    "zcrh12": {"default":"03i2.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "gyzs13": {"default":"03d.png"},
+    "zs14": {"default":"03i.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "zspz15": {"default":"03n.png"},
+    "szsm16": {"default":"03w.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "wz17": {"default":"03i2.png"},
+    "lnco18": {"default":"03i2.png"},
+    "ljgh19b": {"default":"03i.png",
+      "special":{"Samuel":"03i3.png"}
+    },
+    "ljgb19": {"default":"03k.png",
+      "special":{"Samuel":"03i2.png"}
+    },
+    "cxs": {"default":["03n.png","03syokei.png"]},
+    "crsl": {"default":"03w.png"},
+    "rlsl": {"default":"03wolf.png"},
+    "yhsl": {"default":"03fox.png"},
+    "krsl": {"default":"03mad.png"},
+    "hblr": {"default":"03i3.png"},
+    "hbg": {"default":"03k.png"},
+    "hbln": {"default":"03i3.png"},
+    "hbz": {"default":"03i3.png"},
+    "hbm": {"default":"03n.png"},
+    "lrco": {"default":"03d.png"},
+    "mco": {"default":"03k.png"},
+    "yjsw": {"default":["03d.png","03higai.png"]},
+    "hzsw": {"default":["03d.png","03h.png"]},
+    "mzsw": {"default":["03d.png","03syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Otfried": {
+    "gyfo1r": {
+      "default": "04d.png",
+      "special":{"Erich":"04w.png"}
+    },
+    "gyfo1": {"default":"04d.png",
+      "special":{"Erich":"04w.png"}
+    },
+    "gyho2": {"default":"04d.png"},
+    "qfgsw3": {"default":"04i.png",
+      "special":{"Erich":"04k2.png"}
+    },
+    "gkgsw4": {"default":"04d.png",
+      "special":{"Erich":"04n.png"}
+    },
+    "qfjcqr5r": {"default":"04d.png",
+      "special":{"Erich":"04w.png"}
+    },
+    "qfjc5": {"default":"04d.png",
+      "special":{"Erich":"04w.png"}
+    },
+    "gycx6": {"default":"04k2.png",
+      "special":{"Erich":"04n.png"}
+    },
+    "zco7": {"default":"04d.png"},
+    "jhdh8b": {"default":"04i.png",
+      "special":{"Erich":"04i.png"}
+    },
+    "zjgh8b": {"default":"04w.png",
+      "special":{"Erich":"04k2.png"}
+    },
+    "jbdh8r": {"default":"04w.png",
+      "special":{"Erich":"04t.png"}
+    },
+    "zjgb8": {"default":"04i.png",
+      "special":{"Erich":"04d.png"}
+    },
+    "zrzbjg9": {"default":"04d.png"},
+    "zbdxsw10": {"default":"04i.png",
+      "special":{"Erich":"04k.png"}
+    },
+    "gprz11p": {"default":"04t.png",
+      "special":{"Erich":"04t.png"}
+    },
+    "gprz11r": {"default":"04w.png",
+      "special":{"Erich":"04t.png"}
+    },
+    "zcrh12r": {"default":"04o1.png",
+      "special":{"Erich":"04o2.png"}
+    },
+    "zcrh12": {"default":"04i2.png",
+      "special":{"Erich":"04i2.png"}
+    },
+    "gyzs13": {"default":"04i.png"},
+    "zs14": {"default":"04w.png",
+      "special":{"Erich":"04d.png"}
+    },
+    "zspz15": {"default":"04o2.png"},
+    "szsm16": {"default":"04o1.png",
+      "special":{"Erich":"04o1.png"}
+    },
+    "wz17": {"default":"04t.png"},
+    "lnco18": {"default":"04d.png"},
+    "ljgh19b": {"default":"04w.png",
+      "special":{"Erich":"04k2.png"}
+    },
+    "ljgb19": {"default":"04k2.png",
+      "special":{"Erich":"04k2.png"}
+    },
+    "cxs": {"default":["04k2.png","04syokei.png"]},
+    "crsl": {"default":"04k2.png"},
+    "rlsl": {"default":"04wolf.png"},
+    "yhsl": {"default":"04fox.png"},
+    "krsl": {"default":"04mad.png"},
+    "hblr": {"default":"04k.png"},
+    "hbg": {"default":"04t.png"},
+    "hbln": {"default":"04d.png"},
+    "hbz": {"default":"04d.png"},
+    "hbm": {"default":"04t.png"},
+    "lrco": {"default":"04i2.png"},
+    "mco": {"default":"04t.png"},
+    "yjsw": {"default":["04d.png","04higai.png"]},
+    "hzsw": {"default":["04d.png","04h.png"]},
+    "mzsw": {"default":["04d.png","04syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Karl": {
+    "gyfo1r": {"default":"05d.png"},
+    "gyfo1": {"default":"05d.png"},
+    "gyho2": {"default":"05d.png"},
+    "qfgsw3": {"default":"05k2.png"},
+    "gkgsw4": {"default":"05i.png"},
+    "qfjcqr5r": {"default":"05w2.png"},
+    "qfjc5": {"default":"05d.png"},
+    "gycx6": {"default":"05o.png"},
+    "zco7": {"default":"05w.png"},
+    "jhdh8b": {"default":"05i.png"},
+    "zjgh8b": {"default":"05w4.png"},
+    "jbdh8r": {"default":"05w.png"},
+    "zjgb8": {"default":"05i.png"},
+    "zrzbjg9": {"default":"05d.png"},
+    "zbdxsw10": {"default":"05k.png"},
+    "gprz11p": {"default":"05w2.png"},
+    "gprz11r": {"default":"05w4.png"},
+    "zcrh12r": {"default":"05o.png"},
+    "zcrh12": {"default":"05w.png"},
+    "gyzs13": {"default":"05d.png"},
+    "zs14": {"default":"05w4.png"},
+    "zspz15": {"default":"05o2.png"},
+    "szsm16": {"default":"05w4.png"},
+    "wz17": {"default":"05i.png"},
+    "lnco18": {"default":"05d.png"},
+    "ljgh19b": {"default":"05w2.png"},
+    "ljgb19": {"default":"05i3.png"},
+    "cxs": {"default":["05n.png","05syokei.png"]},
+    "crsl": {"default":"05w2.png"},
+    "rlsl": {"default":"05wolf.png"},
+    "yhsl": {"default":"05fox.png"},
+    "krsl": {"default":"05mad.png"},
+    "hblr": {"default":"05i.png"},
+    "hbg": {"default":"05n.png"},
+    "hbln": {"default":"05i.png"},
+    "hbz": {"default":"05i.png"},
+    "hbm": {"default":"05w.png"},
+    "lrco": {"default":"05w2.png"},
+    "mco": {"default":"05w.png"},
+    "yjsw": {"default":["05d.png","05higai.png"]},
+    "hzsw": {"default":["05d.png","05h.png"]},
+    "mzsw": {"default":["05d.png","05syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Till": {
+    "gyfo1r": {"default": "06d.png",
+      "special":{"Beatrice":"06t.png"}
+    },
+    "gyfo1": {"default":"06d.png",
+      "special":{"Beatrice":"06t2.png"}
+    },
+    "gyho2": {"default":"06k.png"},
+    "qfgsw3": {"default":"06n2.png",
+      "special":{"Beatrice":"06d.png"}
+    },
+    "gkgsw4": {"default":"06k.png",
+      "special":{"Beatrice":"06n.png"}
+    },
+    "qfjcqr5r": {"default":"06i2.png",
+      "special":{"Beatrice":"06i.png"}
+    },
+    "qfjc5": {"default":"06t2.png",
+      "special":{"Beatrice":"06i.png"}
+    },
+    "gycx6": {"default":"06n2.png",
+      "special":{"Beatrice":"06o.png"}
+    },
+    "zco7": {"default":"06d.png"},
+    "jhdh8b": {"default":"06i.png",
+      "special":{"Beatrice":"06o.png"}
+    },
+    "zjgh8b": {"default":"06t2.png",
+      "special":{"Beatrice":"06o.png"}
+    },
+    "jbdh8r": {"default":"06k.png",
+      "special":{"Beatrice":"06w.png"}
+    },
+    "zjgb8": {"default":"06k.png",
+      "special":{"Beatrice":"06i.png"}
+    },
+    "zrzbjg9": {"default":"06d.png"},
+    "zbdxsw10": {"default":"06k.png",
+      "special":{"Beatrice":"06n.png"}
+    },
+    "gprz11p": {"default":"06w.png",
+      "special":{"Beatrice":"06o2.png"}
+    },
+    "gprz11r": {"default":"06t2.png",
+      "special":{"Beatrice":"06i.png"}
+    },
+    "zcrh12r": {"default":"06o.png",
+      "special":{"Beatrice":"06o.png"}
+    },
+    "zcrh12": {"default":"06t2.png",
+      "special":{"Beatrice":"06o.png"}
+    },
+    "gyzs13": {"default":"06i.png"},
+    "zs14": {"default":"06t2.png",
+      "special":{"Beatrice":"06k.png"}
+    },
+    "zspz15": {"default":"06o2.png"},
+    "szsm16": {"default":"06k.png",
+      "special":{"Beatrice":"06k.png"}
+    },
+    "wz17": {"default":"06i2.png"},
+    "lnco18": {"default":"06d.png"},
+    "ljgh19b": {"default":"06w.png",
+      "special":{"Beatrice":"06o.png"}
+    },
+    "ljgb19": {"default":"06k.png",
+      "special":{"Beatrice":"06n2.png"}
+    },
+    "cxs": {"default":["06n.png","06syokei.png"]},
+    "crsl": {"default":"06w.png"},
+    "rlsl": {"default":"06wolf.png"},
+    "yhsl": {"default":"06fox.png"},
+    "krsl": {"default":"06mad.png"},
+    "hblr": {"default":"06k.png"},
+    "hbg": {"default":"06i2.png"},
+    "hbln": {"default":"06k.png"},
+    "hbz": {"default":"06k.png"},
+    "hbm": {"default":"06t.png"},
+    "lrco": {"default":"06d.png"},
+    "mco": {"default":"06t2.png"},
+    "yjsw": {"default":["06d.png","06higai.png"]},
+    "hzsw": {"default":["06d.png","06h.png"]},
+    "mzsw": {"default":["06d.png","06syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Samuel": {
+    "gyfo1r": {"default": "07d2.png",
+      "special": {"Matthäus": "07i2.png"}
+    },
+    "gyfo1": {"default": "07d.png",
+      "special": {"Matthäus": "07d.png"}
+    },
+    "gyho2": {"default": "07d.png"},
+    "qfgsw3": {"default": "07d2.png",
+      "special": {"Matthäus": "07d2.png"}
+    },
+    "gkgsw4": {"default": "07d2.png",
+      "special": {"Matthäus": "07w.png"}
+    },
+    "qfjcqr5r": {"default": "07d2.png",
+      "special": {"Matthäus": "07i2.png"}
+    },
+    "qfjc5": {"default": "07d.png",
+      "special": {"Matthäus": "07d2.png"}
+    },
+    "gycx6": {"default": "07i2.png",
+      "special": {"Matthäus": "07i2.png"}
+    },
+    "zco7": {"default": "07d.png"},
+    "jhdh8b": {"default": "07i2.png",
+      "special": {"Matthäus": "07i.png"}
+    },
+    "zjgh8b": {"default": "07w.png",
+      "special": {"Matthäus": "07i.png"}
+    },
+    "jbdh8r": {"default": "07d.png",
+      "special": {"Matthäus": "07w.png"}
+    },
+    "zjgb8": {"default": "07d2.png",
+      "special": {"Matthäus": "07i2.png"}
+    },
+    "zrzbjg9": {"default": "07d2.png"},
+    "zbdxsw10": {"default": "07d.png",
+      "special": {"Matthäus": "07d2.png"}
+    },
+    "gprz11p": {"default": "07w.png",
+      "special": {"Matthäus": "07w.png"}
+    },
+    "gprz11r": {"default": "07w.png",
+      "special": {"Matthäus": "07i.png"}
+    },
+    "zcrh12r": {"default": "07i2.png",
+      "special": {"Matthäus": "07i.png"}
+    },
+    "zcrh12": {"default": "07w.png",
+      "special": {"Matthäus": "07i2.png"}
+    },
+    "gyzs13": {"default": "07d2.png"},
+    "zs14": {"default": "07w.png",
+      "special": {"Matthäus": "07i2.png"}
+    },
+    "zspz15": {"default": "07w2.png"},
+    "szsm16": {"default": "07d2.png",
+      "special": {"Matthäus": "07i2.png"}
+    },
+    "wz17": {"default": "07i2.png"},
+    "lnco18": {"default": "07d.png"},
+    "ljgh19b": {"default": "07w.png",
+      "special": {"Matthäus": "07d.png"}
+    },
+    "ljgb19": {"default": "07d2.png",
+      "special": {"Matthäus": "07d2.png"}
+    },
+    "cxs": {"default": ["07k.png","07syokei.png"]},
+    "crsl": {"default": "07w2.png"},
+    "rlsl": {"default": "07wolf.png"},
+    "yhsl": {"default": "07fox.png"},
+    "krsl": {"default": "07mad.png"},
+    "hblr": {"default": "07d2.png"},
+    "hbg": {"default": "07i2.png"},
+    "hbln": {"default": "07d2.png"},
+    "hbz": {"default": "07d2.png"},
+    "hbm": {"default": "07n2.png"},
+    "lrco": {"default": "07d.png"},
+    "mco": {"default": "07n2.png"},
+    "yjsw": {"default":["07d.png","07higai.png"]},
+    "hzsw": {"default":["07d.png","07h.png"]},
+    "mzsw": {"default":["07d.png","07syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Hans": {
+    "gyfo1r": {"default":"08d.png",
+      "special":{"Liddi":"08t.png"}
+    },
+    "gyfo1": {"default":"08d.png",
+      "special":{"Liddi":"08d.png"}
+    },
+    "gyho2": {"default":"08t.png"},
+    "qfgsw3": {"default":"08k.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "gkgsw4": {"default":"08i1.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "qfjcqr5r": {"default":"08d.png",
+      "special":{"Liddi":"08t.png"}
+    },
+    "qfjc5": {"default":"08t.png",
+      "special":{"Liddi":"08i1.png"}
+    },
+    "gycx6": {"default":"08k.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "zco7": {"default":"08d.png"},
+    "jhdh8b": {"default":"08k.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "zjgh8b": {"default":"08i1.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "jbdh8r": {"default":"08w2.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "zjgb8": {"default":"08w2.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "zrzbjg9": {"default":"08d.png"},
+    "zbdxsw10": {"default":"08k.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "gprz11p": {"default":"08w.png",
+      "special":{"Liddi":"08w.png"}
+    },
+    "gprz11r": {"default":"08i1.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "zcrh12r": {"default":"08o.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "zcrh12": {"default":"08i1.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "gyzs13": {"default":"08i1.png"},
+    "zs14": {"default":"08w2.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "zspz15": {"default":"08t2.png"},
+    "szsm16": {"default":"08w2.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "wz17": {"default":"08k.png"},
+    "lnco18": {"default":"08d.png"},
+    "ljgh19b": {"default":"08w.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "ljgb19": {"default":"08k.png",
+      "special":{"Liddi":"08k.png"}
+    },
+    "cxs": {"default":["08k.png","08syokei.png"]},
+    "crsl": {"default":"08w.png"},
+    "rlsl": {"default":"08wolf.png"},
+    "yhsl": {"default":"08fox.png"},
+    "krsl": {"default":"08mad.png"},
+    "hblr": {"default":"08w2.png"},
+    "hbg": {"default":"08o.png"},
+    "hbln": {"default":"08w2.png"},
+    "hbz": {"default":"08w2.png"},
+    "hbm": {"default":"08t2.png"},
+    "lrco": {"default":"08i1.png"},
+    "mco": {"default":"08t2.png"},
+    "yjsw": {"default":["08d.png","08higai.png"]},
+    "hzsw": {"default":["08d.png","08h.png"]},
+    "mzsw": {"default":["08d.png","08syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Beatrice": {
+    "gyfo1r": {"default":"09w2.png",
+      "special":{"Till":"09t2.png"}
+    },
+    "gyfo1": {"default":"09w.png",
+      "special":{"Till":"09t2.png"}
+    },
+    "gyho2": {"default":"09i2.png"},
+    "qfgsw3": {"default":"09n.png",
+      "special":{"Till":"09n.png"}
+    },
+    "gkgsw4": {"default":"09o.png",
+      "special":{"Till":"09i.png"}
+    },
+    "qfjcqr5r": {"default":"09o.png",
+      "special":{"Till":"09t2.png"}
+    },
+    "qfjc5": {"default":"09o.png",
+      "special":{"Till":"09t2.png"}
+    },
+    "gycx6": {"default":"09n.png",
+      "special":{"Till":"09o2.png"}
+    },
+    "zco7": {"default":"09i.png"},
+    "jhdh8b": {"default":"09i.png",
+      "special":{"Till":"09o.png"}
+    },
+    "zjgh8b": {"default":"09w.png",
+      "special":{"Till":"09t.png"}
+    },
+    "jbdh8r": {"default":"09w.png",
+      "special":{"Till":"09t2.png"}
+    },
+    "zjgb8": {"default":"09d.png",
+      "special":{"Till":"09w.png"}
+    },
+    "zrzbjg9": {"default":"09d.png"},
+    "zbdxsw10": {"default":"09i2.png",
+      "special":{"Till":"09d.png"}
+    },
+    "gprz11p": {"default":"09w.png",
+      "special":{"Till":"09w.png"}
+    },
+    "gprz11r": {"default":"09t.png",
+      "special":{"Till":"09t.png"}
+    },
+    "zcrh12r": {"default":"09o.png",
+      "special":{"Till":"09o2.png"}
+    },
+    "zcrh12": {"default":"09t2.png",
+      "special":{"Till":"09t.png"}
+    },
+    "gyzs13": {"default":"09o.png"},
+    "zs14": {"default":"09t2.png",
+      "special":{"Till":"09t.png"}
+    },
+    "zspz15": {"default":"09o2.png"},
+    "szsm16": {"default":"09d.png",
+      "special":{"Till":"09d.png"}
+    },
+    "wz17": {"default":"09i.png"},
+    "lnco18": {"default":"09i.png"},
+    "ljgh19b": {"default":"09w.png",
+      "special":{"Till":"09t.png"}
+    },
+    "ljgb19": {"default":"09n.png",
+      "special":{"Till":"09d.png"}
+    },
+    "cxs": {"default":["09n.png","09syokei.png"]},
+    "crsl": {"default":"09w.png"},
+    "rlsl": {"default":"09wolf.png"},
+    "yhsl": {"default":"09fox.png"},
+    "krsl": {"default":"09mad.png"},
+    "hblr": {"default":"09o.png"},
+    "hbg": {"default":"09o2.png"},
+    "hbln": {"default":"09o.png"},
+    "hbz": {"default":"09o.png"},
+    "hbm": {"default":"09t.png"},
+    "lrco": {"default":"09i.png"},
+    "mco": {"default":"09t2.png"},
+    "yjsw": {"default":["09d.png","09higai.png"]},
+    "hzsw": {"default":["09d.png","09h.png"]},
+    "mzsw": {"default":["09d.png","09syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Amanda": {
+    "gyfo1r": {"default":"10d.png"},
+    "gyfo1": {"default":"10d.png"},
+    "gyho2": {"default":"10d.png"},
+    "qfgsw3": {"default":"10i.png"},
+    "gkgsw4": {"default":"10i.png"},
+    "qfjcqr5r": {"default":"10d.png"},
+    "qfjc5": {"default":"10w.png"},
+    "gycx6": {"default":"10n.png"},
+    "zco7": {"default":"10d.png"},
+    "jhdh8b": {"default":"10i2.png"},
+    "zjgh8b": {"default":"10i.png"},
+    "jbdh8r": {"default":"10d.png"},
+    "zjgb8": {"default":"10d.png"},
+    "zrzbjg9": {"default":"10d.png"},
+    "zbdxsw10": {"default":"10i.png"},
+    "gprz11p": {"default":"10w.png"},
+    "gprz11r": {"default":"10w.png"},
+    "zcrh12r": {"default":"10o2.png"},
+    "zcrh12": {"default":"10i2.png"},
+    "gyzs13": {"default":"10i.png"},
+    "zs14": {"default":"10w.png"},
+    "zspz15": {"default":"10i2.png"},
+    "szsm16": {"default":"10d.png"},
+    "wz17": {"default":"10k.png"},
+    "lnco18": {"default":"10d.png"},
+    "ljgh19b": {"default":"10w.png"},
+    "ljgb19": {"default":"10k2.png"},
+    "cxs": {"default":["10k2.png","10syokei.png"]},
+    "crsl": {"default":"10w.png"},
+    "rlsl": {"default":"10wolf.png"},
+    "yhsl": {"default":"10fox.png"},
+    "krsl": {"default":"10mad.png"},
+    "hblr": {"default":"10o.png"},
+    "hbg": {"default":"10w.png"},
+    "hbln": {"default":"10o.png"},
+    "hbz": {"default":"10o.png"},
+    "hbm": {"default":"10t.png"},
+    "lrco": {"default":"10w.png"},
+    "mco": {"default":"10t.png"},
+    "yjsw": {"default":["10d.png","10higai.png"]},
+    "hzsw": {"default":["10d.png","10h.png"]},
+    "mzsw": {"default":["10d.png","10syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Irene": {
+    "gyfo1r": {"default":"11d2.png",
+      "special":{"Willy":"11d6.png"}
+    },
+    "gyfo1": {"default":"11d5.png",
+      "special":{"Willy":"11d3.png"}
+    },
+    "gyho2": {"default":"11d4.png"},
+    "qfgsw3": {"default":"11d6.png",
+      "special":{"Willy":"11d4.png"}
+    },
+    "gkgsw4": {"default":"11d2.png",
+      "special":{"Willy":"11d4.png"}
+    },
+    "qfjcqr5r": {"default":"11d6.png",
+      "special":{"Willy":"11w.png"}
+    },
+    "qfjc5": {"default":"11d5.png",
+      "special":{"Willy":"11d3.png"}
+    },
+    "gycx6": {"default":"11d.png",
+      "special":{"Willy":"11n.png"}
+    },
+    "zco7": {"default":"11d4.png"},
+    "jhdh8b": {"default":"11d.png",
+      "special":{"Willy":"11o1.png"}
+    },
+    "zjgh8b": {"default":"11d.png",
+      "special":{"Willy":"11k.png"}
+    },
+    "jbdh8r": {"default":"11d6.png",
+      "special":{"Willy":"11d5.png"}
+    },
+    "zjgb8": {"default":"11d5.png",
+      "special":{"Willy":"11w.png"}
+    },
+    "zrzbjg9": {"default":"11d4.png"},
+    "zbdxsw10": {"default":"11d.png",
+      "special":{"Willy":"11k.png"}
+    },
+    "gprz11p": {"default":"11d2.png",
+      "special":{"Willy":"11t.png"}
+    },
+    "gprz11r": {"default":"11d.png",
+      "special":{"Willy":"11k.png"}
+    },
+    "zcrh12r": {"default":"11d4.png",
+      "special":{"Willy":"11o3.png"}
+    },
+    "zcrh12": {"default":"11d.png",
+      "special":{"Willy":"11i3.png"}
+    },
+    "gyzs13": {"default":"11d.png"},
+    "zs14": {"default":"11d4.png",
+      "special":{"Willy":"11i2.png"}
+    },
+    "zspz15": {"default":"11o2.png"},
+    "szsm16": {"default":"11d4.png",
+      "special":{"Willy":"11i2.png"}
+    },
+    "wz17": {"default":"11d.png"},
+    "lnco18": {"default":"11d4.png"},
+    "ljgh19b": {"default":"11d3.png",
+      "special":{"Willy":"11n.png"}
+    },
+    "ljgb19": {"default":"11d5.png",
+      "special":{"Willy":"11n.png"}
+    },
+    "cxs": {"default":["11k.png","11syokei.png"]},
+    "crsl": {"default":"11n.png"},
+    "rlsl": {"default":"11wolf.png"},
+    "yhsl": {"default":"11fox.png"},
+    "krsl": {"default":"11mad.png"},
+    "hblr": {"default":"11d5.png"},
+    "hbg": {"default":"11d.png"},
+    "hbln": {"default":"11d5.png"},
+    "hbz": {"default":"11d5.png"},
+    "hbm": {"default":"11t.png"},
+    "lrco": {"default":"11i3.png"},
+    "mco": {"default":"11t.png"},
+    "yjsw": {"default":["11d.png","11higai.png"]},
+    "hzsw": {"default":["11d.png","11h.png"]},
+    "mzsw": {"default":["11d.png","11syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Elsa": {
+    "gyfo1r": {"default":"12k.png"},
+    "gyfo1": {"default":"12k.png"},
+    "gyho2": {"default":"12k2.png"},
+    "qfgsw3": {"default":"12k.png"},
+    "gkgsw4": {"default":"12k2.png"},
+    "qfjcqr5r": {"default":"12k.png"},
+    "qfjc5": {"default":"12k.png"},
+    "gycx6": {"default":"12k.png"},
+    "zco7": {"default":"12d.png"},
+    "jhdh8b": {"default":"12o.png"},
+    "zjgh8b": {"default":"12i.png"},
+    "jbdh8r": {"default":"12d.png"},
+    "zjgb8": {"default":"12i.png"},
+    "zrzbjg9": {"default":"12d.png"},
+    "zbdxsw10": {"default":"12d.png"},
+    "gprz11p": {"default":"12w.png"},
+    "gprz11r": {"default":"12w.png"},
+    "zcrh12r": {"default":"12o.png"},
+    "zcrh12": {"default":"12i.png"},
+    "gyzs13": {"default":"12k.png"},
+    "zs14": {"default":"12i.png"},
+    "zspz15": {"default":"12o2.png"},
+    "szsm16": {"default":"12i.png"},
+    "wz17": {"default":"12i.png"},
+    "lnco18": {"default":"12k.png"},
+    "ljgh19b": {"default":"12w.png"},
+    "ljgb19": {"default":"12k2.png"},
+    "cxs": {"default":["12n.png","12syokei.png"]},
+    "crsl": {"default":"12k.png"},
+    "rlsl": {"default":"12wolf.png"},
+    "yhsl": {"default":"12fox.png"},
+    "krsl": {"default":"12mad.png"},
+    "hblr": {"default":"12i.png"},
+    "hbg": {"default":"12o.png"},
+    "hbln": {"default":"12i.png"},
+    "hbz": {"default":"12i.png"},
+    "hbm": {"default":"12t.png"},
+    "lrco": {"default":"12i.png"},
+    "mco": {"default":"12t.png"},
+    "yjsw": {"default":["12d.png","12higai.png"]},
+    "hzsw": {"default":["12d.png","12h.png"]},
+    "mzsw": {"default":["12d.png","12syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Nora": {
+    "gyfo1r": {"default":"13d.png",
+      "special":{"Günther":"13i.png"}
+    },
+    "gyfo1": {"default":"13d.png",
+      "special":{"Günther":"13i.png"}
+    },
+    "gyho2": {"default":"13d2.png"},
+    "qfgsw3": {"default":"13d.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "gkgsw4": {"default":"13d2.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "qfjcqr5r": {"default":"13d.png",
+      "special":{"Günther":"13i2.png"}
+    },
+    "qfjc5": {"default":"13d2.png",
+      "special":{"Günther":"13i.png"}
+    },
+    "gycx6": {"default":"13d2.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "zco7": {"default":"13d.png"},
+    "jhdh8b": {"default":"13d2.png",
+      "special":{"Günther":"13i3.png"}
+    },
+    "zjgh8b": {"default":"13w.png",
+      "special":{"Günther":"13i3.png"}
+    },
+    "jbdh8r": {"default":"13d.png",
+      "special":{"Günther":"13i.png"}
+    },
+    "zjgb8": {"default":"13d.png",
+      "special":{"Günther":"13i.png"}
+    },
+    "zrzbjg9": {"default":"13d.png"},
+    "zbdxsw10": {"default":"13d.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "gprz11p": {"default":"13w.png",
+      "special":{"Günther":"13i.png"}
+    },
+    "gprz11r": {"default":"13w.png",
+      "special":{"Günther":"13i2.png"}
+    },
+    "zcrh12r": {"default":"13i.png",
+      "special":{"Günther":"13i3.png"}
+    },
+    "zcrh12": {"default":"13d2.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "gyzs13": {"default":"13d2.png"},
+    "zs14": {"default":"13o1.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "zspz15": {"default":"13o1.png"},
+    "szsm16": {"default":"13o1.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "wz17": {"default":"13d2.png"},
+    "lnco18": {"default":"13w.png"},
+    "ljgh19b": {"default":"13w.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "ljgb19": {"default":"13d.png",
+      "special":{"Günther":"13w.png"}
+    },
+    "cxs": {"default":["13i.png","13syokei.png"]},
+    "crsl": {"default":"13w.png"},
+    "rlsl": {"default":"13wolf.png"},
+    "yhsl": {"default":"13fox.png"},
+    "krsl": {"default":"13mad.png"},
+    "hblr": {"default":"13d.png"},
+    "hbg": {"default":"13w.png"},
+    "hbln": {"default":"13d.png"},
+    "hbz": {"default":"13d.png"},
+    "hbm": {"default":"13i.png"},
+    "lrco": {"default":"13d2.png"},
+    "mco": {"default":"13i.png"},
+    "yjsw": {"default":["13d.png","13higai.png"]},
+    "hzsw": {"default":["13d.png","13h.png"]},
+    "mzsw": {"default":["13d.png","13syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Johanna": {
+    "gyfo1r": {"default":"14d.png",
+      "special":{"Wendel":"14w2.png"}
+    },
+    "gyfo1": {"default":"14d.png",
+      "special":{"Wendel":"14w.png"}
+    },
+    "gyho2": {"default":"14d.png"},
+    "qfgsw3": {"default":"14i.png",
+      "special":{"Wendel":"14n.png"}
+    },
+    "gkgsw4": {"default":"14i.png",
+      "special":{"Wendel":"14k2.png"}
+    },
+    "qfjcqr5r": {"default":"14d.png",
+      "special":{"Wendel":"14w2.png"}
+    },
+    "qfjc5": {"default":"14d3.png",
+      "special":{"Wendel":"14w2.png"}
+    },
+    "gycx6": {"default":"14k2.png",
+      "special":{"Wendel":"14n.png"}
+    },
+    "zco7": {"default":"14w.png"},
+    "jhdh8b": {
+      "default": "14w2.png",
+      "special":{"Wendel":"14k2.png"}
+    },
+    "zjgh8b": {"default":"14w.png",
+      "special":{"Wendel":"14k2.png"}
+    },
+    "jbdh8r": {"default":"14d.png",
+      "special":{"Wendel":"14w3.png"}
+    },
+    "zjgb8": {"default":"14d.png",
+      "special":{"Wendel":"14w2.png"}
+    },
+    "zrzbjg9": {"default":"14d3.png"},
+    "zbdxsw10": {"default":"14d2.png",
+      "special":{"Wendel":"14k.png"}
+    },
+    "gprz11p": {"default":"14w3.png",
+      "special":{"Wendel":"14w3.png"}
+    },
+    "gprz11r": {"default":"14w2.png",
+      "special":{"Wendel":"14k.png"}
+    },
+    "zcrh12r": {"default":"14o.png",
+      "special":{"Wendel":"14o.png"}
+    },
+    "zcrh12": {"default":"14i.png",
+      "special":{"Wendel":"14k2.png"}
+    },
+    "gyzs13": {"default":"14d3.png"},
+    "zs14": {"default":"14w.png",
+      "special":{"Wendel":"14k.png"}
+    },
+    "zspz15": {"default":"14w2.png"},
+    "szsm16": {"default":"14w.png",
+      "special":{"Wendel":"14k.png"}
+    },
+    "wz17": {"default":"14w.png"},
+    "lnco18": {"default":"14n.png"},
+    "ljgh19b": {"default":"14w3.png",
+      "special":{"Wendel":"14k2.png"}
+    },
+    "ljgb19": {"default":"14k2.png",
+      "special":{"Wendel":"14n.png"}
+    },
+    "cxs": {"default":["14k2.png","14syokei.png"]},
+    "crsl": {"default":"14k2.png"},
+    "rlsl": {"default":"14wolf.png"},
+    "yhsl": {"default":"14fox.png"},
+    "krsl": {"default":"14mad.png"},
+    "hblr": {"default":"14k.png"},
+    "hbg": {"default":"14w3.png"},
+    "hbln": {"default":"14k.png"},
+    "hbz": {"default":"14k.png"},
+    "hbm": {"default":"14w2.png"},
+    "lrco": {"default":"14w.png"},
+    "mco": {"default":"14w2.png"},
+    "yjsw": {"default":["14d.png","14higai.png"]},
+    "hzsw": {"default":["14d.png","14h.png"]},
+    "mzsw": {"default":["14d.png","14syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Milli": {
+    "gyfo1r": {"default":"15d.png",
+      "special":{"Brigitte":"15w3.png",
+        "Eva":"15d2.png"}
+    },
+    "gyfo1": {"default":"15d.png",
+      "special":{"Brigitte":"15w3.png",
+        "Eva":"15d2.png"}
+    },
+    "gyho2": {"default":"15d2.png"},
+    "qfgsw3": {"default":"15d2.png",
+      "special":{"Brigitte":"15n.png",
+        "Eva":"15o1.png"}
+    },
+    "gkgsw4": {"default":"15w.png",
+      "special":{"Brigitte":"15i2.png",
+        "Eva":"15i1.png"}
+    },
+    "qfjcqr5r": {"default":"15i1.png",
+      "special":{"Brigitte":"15w2.png",
+        "Eva":"15w2.png"}
+    },
+    "qfjc5": {"default":"15d2.png",
+      "special":{"Brigitte":"15w3.png",
+        "Eva":"15w.png"}
+    },
+    "gycx6": {"default":"15d2.png",
+      "special":{"Brigitte":"15i2.png",
+        "Eva":"15i1.png"}
+    },
+    "zco7": {"default":"15d2.png"},
+    "jhdh8b": {"default":"15d2.png",
+      "special":{"Brigitte":"15n.png",
+        "Eva":"15i1.png"}
+    },
+    "zjgh8b": {"default":"15w.png",
+      "special":{"Brigitte":"15k.png",
+        "Eva":"15k.png"}
+    },
+    "jbdh8r": {"default":"15d.png",
+      "special":{"Brigitte":"15w2.png",
+        "Eva":"15d2.png"}
+    },
+    "zjgb8": {"default":"15d.png",
+      "special":{"Brigitte":"15w3.png",
+        "Eva":"15d2.png"}
+    },
+    "zrzbjg9": {"default":"15d2.png"},
+    "zbdxsw10": {"default":"15w.png",
+      "special":{"Brigitte":"15i1.png",
+        "Eva":"15d2.png"}
+    },
+    "gprz11p": {"default":"15d2.png",
+      "special":{"Brigitte":"15w3.png",
+        "Eva":"15w.png"}
+    },
+    "gprz11r": {"default":"15w.png",
+      "special":{"Brigitte":"15k.png",
+        "Eva":"15d2.png"}
+    },
+    "zcrh12r": {"default":"15d2.png",
+      "special":{"Brigitte":"15n.png",
+        "Eva":"15o1.png"}
+    },
+    "zcrh12": {"default":"15w.png",
+      "special":{"Brigitte":"15k.png",
+        "Eva":"15k.png"}
+    },
+    "gyzs13": {"default":"15d2.png"},
+    "zs14": {"default":"15w.png",
+      "special":{"Brigitte":"15k.png",
+        "Eva":"15d2.png"}
+    },
+    "zspz15": {"default":"15i1.png"},
+    "szsm16": {"default":"15d2.png",
+      "special":{"Brigitte":"15k.png",
+        "Eva":"15d2.png"}
+    },
+    "wz17": {"default":"15d2.png"},
+    "lnco18": {"default":"15d2.png"},
+    "ljgh19b": {"default":"15d2.png",
+      "special":{"Brigitte":"15k.png"}
+    },
+    "ljgb19": {"default":"15d2.png",
+      "special":{"Brigitte":"15i2.png",
+        "Eva":"15d2.png"}
+    },
+    "cxs": {"default":["15w.png","15syokei.png"]},
+    "crsl": {"default":"15w.png"},
+    "rlsl": {"default":"15wolf.png"},
+    "yhsl": {"default":"15fox.png"},
+    "krsl": {"default":"15mad.png"},
+    "hblr": {"default":"15d2.png"},
+    "hbg": {"default":"15w.png"},
+    "hbln": {"default":"15d2.png"},
+    "hbz": {"default":"15d2.png"},
+    "hbm": {"default":"15i1.png"},
+    "lrco": {"default":"15d2.png"},
+    "mco": {"default":"15i1.png"},
+    "yjsw": {"default":["15d.png","15higai.png"]},
+    "hzsw": {"default":["15d.png","15h.png"]},
+    "mzsw": {"default":["15d.png","15syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Judith": {
+    "gyfo1r": {"default":"16d.png",
+      "special":{"Michael":"16d.png"}
+    },
+    "gyfo1": {"default":"16d.png",
+      "special":{"Michael":"16d.png"}
+    },
+    "gyho2": {"default":"16d.png"},
+    "qfgsw3": {"default":"16k3.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "gkgsw4": {"default":"16i2.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "qfjcqr5r": {"default":"16d.png",
+      "special":{"Michael":"16d.png"}
+    },
+    "qfjc5": {"default":"16i.png",
+      "special":{"Michael":"16d.png"}
+    },
+    "gycx6": {"default":"16k3.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "zco7": {"default":"16w.png"},
+    "jhdh8b": {"default":"16i2.png",
+      "special":{"Michael":"16k2.png"}
+    },
+    "zjgh8b": {"default":"16i.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "jbdh8r": {"default":"16d.png",
+      "special":{"Michael":"16d.png"}
+    },
+    "zjgb8": {"default":"16d.png",
+      "special":{"Michael":"16d.png"}
+    },
+    "zrzbjg9": {"default":"16i.png"},
+    "zbdxsw10": {"default":"16k2.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "gprz11p": {"default":"16w.png",
+      "special":{"Michael":"16d.png"}
+    },
+    "gprz11r": {"default":"16i2.png",
+      "special":{"Michael":"16d.png"}
+    },
+    "zcrh12r": {"default":"16n.png",
+      "special":{"Michael":"16n.png"}
+    },
+    "zcrh12": {"default":"16i2.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "gyzs13": {"default":"16i.png"},
+    "zs14": {"default":"16d.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "zspz15": {"default":"16w.png"},
+    "szsm16": {"default":"16d.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "wz17": {"default":"16k3.png"},
+    "lnco18": {"default":"16d.png"},
+    "ljgh19b": {"default":"16d.png",
+      "special":{"Michael":"16k2.png"}
+    },
+    "ljgb19": {"default":"16k3.png",
+      "special":{"Michael":"16k3.png"}
+    },
+    "cxs": {"default":["16k3.png","16syokei.png"]},
+    "crsl": {"default":"16k3.png"},
+    "rlsl": {"default":"16wolf.png"},
+    "yhsl": {"default":"16fox.png"},
+    "krsl": {"default":"16mad.png"},
+    "hblr": {"default":"16i2.png"},
+    "hbg": {"default":"16o.png"},
+    "hbln": {"default":"16i2.png"},
+    "hbz": {"default":"16i2.png"},
+    "hbm": {"default":"16w.png"},
+    "lrco": {"default":"16i.png"},
+    "mco": {"default":"16w.png"},
+    "yjsw": {"default":["16d.png","16higai.png"]},
+    "hzsw": {"default":["16d.png","16h.png"]},
+    "mzsw": {"default":["16d.png","16syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Michael": {
+    "gyfo1r": {"default":"17d.png",
+      "special":{"Judith":"17w.png"}
+    },
+    "gyfo1": {"default":"17d.png",
+      "special":{"Judith":"17w.png"}
+    },
+    "gyho2": {"default":"17d.png"},
+    "qfgsw3": {"default":"17i2.png",
+      "special":{"Judith":"17i4.png"}
+    },
+    "gkgsw4": {"default":"17i.png",
+      "special":{"Judith":"17i4.png"}
+    },
+    "qfjcqr5r": {"default":"17i.png",
+      "special":{"Judith":"17w.png"}
+    },
+    "qfjc5": {"default":"17i.png",
+      "special":{"Judith":"17w.png"}
+    },
+    "gycx6": {"default":"17o.png",
+      "special":{"Judith":"17i4.png"}
+    },
+    "zco7": {"default":"17d.png"},
+    "jhdh8b": {"default":"17i3.png",
+      "special":{"Judith":"17i3.png"}
+    },
+    "zjgh8b": {"default":"17w.png",
+      "special":{"Judith":"17i4.png"}
+    },
+    "jbdh8r": {"default":"17w.png",
+      "special":{"Judith":"17w.png"}
+    },
+    "zjgb8": {"default":"17i3.png",
+      "special":{"Judith":"17i.png"}
+    },
+    "zrzbjg9": {"default":"17d.png"},
+    "zbdxsw10": {"default":"17i2.png",
+      "special":{"Judith":"17i4.png"}
+    },
+    "gprz11p": {"default":"17i.png",
+      "special":{"Judith":"17w.png"}
+    },
+    "gprz11r": {"default":"17w.png",
+      "special":{"Judith":"17i3.png"}
+    },
+    "zcrh12r": {"default":"17i3.png",
+      "special":{"Judith":"17k2.png"}
+    },
+    "zcrh12": {"default":"17w.png",
+      "special":{"Judith":"17i2.png"}
+    },
+    "gyzs13": {"default":"17i.png"},
+    "zs14": {"default":"17w.png",
+      "special":{"Judith":"17i2.png"}
+    },
+    "zspz15": {"default":"17i4.png"},
+    "szsm16": {"default":"17w.png",
+      "special":{"Judith":"17i2.png"}
+    },
+    "wz17": {"default":"17i2.png"},
+    "lnco18": {"default":"17d.png"},
+    "ljgh19b": {"default":"17w.png",
+      "special":{"Judith":"17k.png"}
+    },
+    "ljgb19": {"default":"17i.png",
+      "special":{"Judith":"17i4.png"}
+    },
+    "cxs": {"default":["17i4.png","17syokei.png"]},
+    "crsl": {"default":"17w.png"},
+    "rlsl": {"default":"17wolf.png"},
+    "yhsl": {"default":"17fox.png"},
+    "krsl": {"default":"17mad.png"},
+    "hblr": {"default":"17i2.png"},
+    "hbg": {"default":"17i.png"},
+    "hbln": {"default":"17i2.png"},
+    "hbz": {"default":"17i2.png"},
+    "hbm": {"default":"17i4.png"},
+    "lrco": {"default":"17w.png"},
+    "mco": {"default":"17i2.png"},
+    "yjsw": {"default":["17d.png","17higai.png"]},
+    "hzsw": {"default":["17d.png","17h.png"]},
+    "mzsw": {"default":["17d.png","17syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Günther": {
+    "gyfo1r": {"default":"18d.png",
+      "special":{"Nora":"18k3.png"}
+    },
+    "gyfo1": {"default":"18d.png",
+      "special":{"Nora":"18k3.png"}
+    },
+    "gyho2": {"default":"18d.png"},
+    "qfgsw3": {"default":"18k.png",
+      "special":{"Nora":"18k2.png"}
+    },
+    "gkgsw4": {"default":"18k.png",
+      "special":{"Nora":"18k2.png"}
+    },
+    "qfjcqr5r": {"default":"18d.png",
+      "special":{"Nora":"18d.png"}
+    },
+    "qfjc5": {"default":"18d.png",
+      "special":{"Nora":"18d2.png"}
+    },
+    "gycx6": {"default":"18k2.png",
+      "special":{"Nora":"18n.png"}
+    },
+    "zco7": {"default":"18d2.png"},
+    "jhdh8b": {"default":"18o.png",
+      "special":{"Nora":"18i.png"}
+    },
+    "zjgh8b": {"default":"18o.png",
+      "special":{"Nora":"18o.png"}
+    },
+    "jbdh8r": {"default":"18d2.png",
+      "special":{"Nora":"18k3.png"}
+    },
+    "zjgb8": {"default":"18d.png",
+      "special":{"Nora":"18k.png"}
+    },
+    "zrzbjg9": {"default":"18d2.png"},
+    "zbdxsw10": {"default":"18d2.png",
+      "special":{"Nora":"18k3.png"}
+    },
+    "gprz11p": {"default":"18o.png",
+      "special":{"Nora":"18o.png"}
+    },
+    "gprz11r": {"default":"18o.png",
+      "special":{"Nora":"18k.png"}
+    },
+    "zcrh12r": {"default":"18o.png",
+      "special":{"Nora":"18o.png"}
+    },
+    "zcrh12": {"default":"18i.png",
+      "special":{"Nora":"18o.png"}
+    },
+    "gyzs13": {"default":"18d2.png"},
+    "zs14": {"default":"18d.png",
+      "special":{"Nora":"18k.png"}
+    },
+    "zspz15": {"default":"18o.png"},
+    "szsm16": {"default":"18d.png",
+      "special":{"Nora":"18k.png"}
+    },
+    "wz17": {"default":"18k3.png"},
+    "lnco18": {"default":"18d.png"},
+    "ljgh19b": {"default":"18d.png",
+      "special":{"Nora":"18k3.png"}
+    },
+    "ljgb19": {"default":"18k3.png",
+      "special":{"Nora":"18n.png"}
+    },
+    "cxs": {"default":["18k3.png","18syokei.png"]},
+    "crsl": {"default":"18k2.png"},
+    "rlsl": {"default":"18wolf.png"},
+    "yhsl": {"default":"18fox.png"},
+    "krsl": {"default":"18mad.png"},
+    "hblr": {"default":"18k.png"},
+    "hbg": {"default":"18k3.png"},
+    "hbln": {"default":"18k.png"},
+    "hbz": {"default":"18k.png"},
+    "hbm": {"default":"18o.png"},
+    "lrco": {"default":"18d2.png"},
+    "mco": {"default":"18o.png"},
+    "yjsw": {"default":["18d.png","18higai.png"]},
+    "hzsw": {"default":["18d.png","18h.png"]},
+    "mzsw": {"default":["18d.png","18syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "David": {
+    "gyfo1r": {"default":"19d.png"},
+    "gyfo1": {"default":"19d.png"},
+    "gyho2": {"default":"19d.png"},
+    "qfgsw3": {"default":"19i.png"},
+    "gkgsw4": {"default":"19d2.png"},
+    "qfjcqr5r": {"default":"19w2.png"},
+    "qfjc5": {"default":"19d.png"},
+    "gycx6": {"default":"19k.png"},
+    "zco7": {"default":"19w2.png"},
+    "jhdh8b": {"default":"19w2.png"},
+    "zjgh8b": {"default":"19w2.png"},
+    "jbdh8r": {"default":"19k.png"},
+    "zjgb8": {"default":"19i.png"},
+    "zrzbjg9": {"default":"19d.png"},
+    "zbdxsw10": {"default":"19i.png"},
+    "gprz11p": {"default":"19d.png"},
+    "gprz11r": {"default":"19w2.png"},
+    "zcrh12r": {"default":"19i.png"},
+    "zcrh12": {"default":"19w2.png"},
+    "gyzs13": {"default":"19d2.png"},
+    "zs14": {"default":"19w2.png"},
+    "zspz15": {"default":"19i.png"},
+    "szsm16": {"default":"19w2.png"},
+    "wz17": {"default":"19w2.png"},
+    "lnco18": {"default":"19d.png"},
+    "ljgh19b": {"default":"19w.png"},
+    "ljgb19": {"default":"19d2.png"},
+    "cxs": {"default":["19n.png","19syokei.png"]},
+    "crsl": {"default":"19d.png"},
+    "rlsl": {"default":"19wolf.png"},
+    "yhsl": {"default":"19fox.png"},
+    "krsl": {"default":"19mad.png"},
+    "hblr": {"default":"19d2.png"},
+    "hbg": {"default":"19w2.png"},
+    "hbln": {"default":"19d2.png"},
+    "hbz": {"default":"19d2.png"},
+    "hbm": {"default":"19i.png"},
+    "lrco": {"default":"19w2.png"},
+    "mco": {"default":"19i.png"},
+    "yjsw": {"default":["19d.png","19higai.png"]},
+    "hzsw": {"default":["19d.png","19h.png"]},
+    "mzsw": {"default":["19d.png","19syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Julian": {
+    "gyfo1r": {"default":"20w.png",
+      "special":{"Kaja":"20w.png"}
+    },
+    "gyfo1": {"default":"20w.png",
+      "special":{"Kaja":"20d.png"}
+    },
+    "gyho2": {"default":"20w.png"},
+    "qfgsw3": {"default":"20o.png",
+      "special":{"Kaja":"20n.png"}
+    },
+    "gkgsw4": {"default":"20i.png",
+      "special":{"Kaja":"20n.png"}
+    },
+    "qfjcqr5r": {"default":"20w.png",
+      "special":{"Kaja":"20t.png"}
+    },
+    "qfjc5": {"default":"20w.png",
+      "special":{"Kaja":"20w.png"}
+    },
+    "gycx6": {"default":"20k.png",
+      "special":{"Kaja":"20n.png"}
+    },
+    "zco7": {"default":"20w2.png"},
+    "jhdh8b": {"default":"20o2.png",
+      "special":{"Kaja":"20o.png"}
+    },
+    "zjgh8b": {"default":"20i.png",
+      "special":{"Kaja":"20o.png"}
+    },
+    "jbdh8r": {"default":"20w.png",
+      "special":{"Kaja":"20t.png"}
+    },
+    "zjgb8": {"default":"20d.png",
+      "special":{"Kaja":"20w.png"}
+    },
+    "zrzbjg9": {"default":"20d.png"},
+    "zbdxsw10": {"default":"20k.png",
+      "special":{"Kaja":"20k.png"}
+    },
+    "gprz11p": {"default":"20w.png",
+      "special":{"Kaja":"20w.png"}
+    },
+    "gprz11r": {"default":"20o.png",
+      "special":{"Kaja":"20i.png"}
+    },
+    "zcrh12r": {"default":"20o.png",
+      "special":{"Kaja":"20o.png"}
+    },
+    "zcrh12": {"default":"20i.png",
+      "special":{"Kaja":"20i.png"}
+    },
+    "gyzs13": {"default":"20d.png"},
+    "zs14": {"default":"20w.png",
+      "special":{"Kaja":"20k.png"}
+    },
+    "zspz15": {"default":"20o2.png"},
+    "szsm16": {"default":"20d.png",
+      "special":{"Kaja":"20k.png"}
+    },
+    "wz17": {"default":"20k.png"},
+    "lnco18": {"default":"20d.png"},
+    "ljgh19b": {"default":"20w.png",
+      "special":{"Kaja":"20k.png"}
+    },
+    "ljgb19": {"default":"20k.png",
+      "special":{"Kaja":"20n.png"}
+    },
+    "cxs": {"default":["20n.png","20syokei.png"]},
+    "crsl": {"default":"20w.png"},
+    "rlsl": {"default":"20wolf.png"},
+    "yhsl": {"default":"20fox.png"},
+    "krsl": {"default":"20mad.png"},
+    "hblr": {"default":"20o2.png"},
+    "hbg": {"default":"20t.png"},
+    "hbln": {"default":"20o2.png"},
+    "hbz": {"default":"20o2.png"},
+    "hbm": {"default":"20t.png"},
+    "lrco": {"default":"20i.png"},
+    "mco": {"default":"20t.png"},
+    "yjsw": {"default":["20d.png","20higai.png"]},
+    "hzsw": {"default":["20d.png","20h.png"]},
+    "mzsw": {"default":["20d.png","20syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Klemens": {
+    "gyfo1r": {"default":"21d.png",
+      "special":{"Natalie":"21w.png"}
+    },
+    "gyfo1": {"default":"21w.png",
+      "special":{"Natalie":"21w.png"}
+    },
+    "gyho2": {"default":"21w.png"},
+    "qfgsw3": {"default":"21d2.png",
+      "special":{"Natalie":"21i.png"}
+    },
+    "gkgsw4": {"default":"21w.png",
+      "special":{"Natalie":"21n.png"}
+    },
+    "qfjcqr5r": {"default":"21i.png",
+      "special":{"Natalie":"21w.png"}
+    },
+    "qfjc5": {"default":"21d2.png",
+      "special":{"Natalie":"21w.png"}
+    },
+    "gycx6": {"default":"21k.png",
+      "special":{"Natalie":"21i.png"}
+    },
+    "zco7": {"default":"21i.png"},
+    "jhdh8b": {"default":"21k.png",
+      "special":{"Natalie":"21o.png"}
+    },
+    "zjgh8b": {"default":"21k.png",
+      "special":{"Natalie":"21i.png"}
+    },
+    "jbdh8r": {"default":"21d.png",
+      "special":{"Natalie":"21w.png"}
+    },
+    "zjgb8": {"default":"21w.png",
+      "special":{"Natalie":"21d2.png"}
+    },
+    "zrzbjg9": {"default":"21d.png"},
+    "zbdxsw10": {"default":"21d2.png",
+      "special":{"Natalie":"21n.png"}
+    },
+    "gprz11p": {"default":"21w.png",
+      "special":{"Natalie":"21w.png"}
+    },
+    "gprz11r": {"default":"21w.png",
+      "special":{"Natalie":"21i.png"}
+    },
+    "zcrh12r": {"default":"21i.png",
+      "special":{"Natalie":"21o.png"}
+    },
+    "zcrh12": {"default":"21w.png",
+      "special":{"Natalie":"21i.png"}
+    },
+    "gyzs13": {"default":"21d.png"},
+    "zs14": {"default":"21i2.png",
+      "special":{"Natalie":"21o.png"}
+    },
+    "zspz15": {"default":"21k.png"},
+    "szsm16": {"default":"21i2.png",
+      "special":{"Natalie":"21o.png"}
+    },
+    "wz17": {"default":"21w.png"},
+    "lnco18": {"default":"21w.png"},
+    "ljgh19b": {"default":"21w.png",
+      "special":{"Natalie":"21k.png"}
+    },
+    "ljgb19": {"default":"21k.png",
+      "special":{"Natalie":"21i.png"}
+    },
+    "cxs": {"default":["21k.png","21syokei.png"]},
+    "crsl": {"default":"21w.png"},
+    "rlsl": {"default":"21wolf.png"},
+    "yhsl": {"default":"21fox.png"},
+    "krsl": {"default":"21mad.png"},
+    "hblr": {"default":"21k.png"},
+    "hbg": {"default":"21d2.png"},
+    "hbln": {"default":"21k.png"},
+    "hbz": {"default":"21k.png"},
+    "hbm": {"default":"21i.png"},
+    "lrco": {"default":"21w.png"},
+    "mco": {"default":"21i.png"},
+    "yjsw": {"default":["21d.png","21higai.png"]},
+    "hzsw": {"default":["21d.png","21h.png"]},
+    "mzsw": {"default":["21d.png","21syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Heinrich": {
+    "gyfo1r": {"default":"22d.png",
+      "special":{"Chloe":"22i2.png"}
+    },
+    "gyfo1": {"default":"22d.png",
+      "special":{"Chloe":"22w.png"}
+    },
+    "gyho2": {"default":"22d.png"},
+    "qfgsw3": {"default":"22i2.png",
+      "special":{"Chloe":"22o2.png"}
+    },
+    "gkgsw4": {"default":"22i2.png",
+      "special":{"Chloe":"22i.png"}
+    },
+    "qfjcqr5r": {"default":"22k.png",
+      "special":{"Chloe":"22o2.png"}
+    },
+    "qfjc5": {"default":"22i2.png",
+      "special":{"Chloe":"22w.png"}
+    },
+    "gycx6": {"default":"22n.png",
+      "special":{"Chloe":"22o.png"}
+    },
+    "zco7": {"default":"22w.png"},
+    "jhdh8b": {"default":"22i2.png",
+      "special":{"Chloe":"22o2.png"}
+    },
+    "zjgh8b": {"default":"22i2.png",
+      "special":{"Chloe":"22n.png"}
+    },
+    "jbdh8r": {"default":"22d.png",
+      "special":{"Chloe":"22w.png"}
+    },
+    "zjgb8": {"default":"22k.png",
+      "special":{"Chloe":"22w.png"}
+    },
+    "zrzbjg9": {"default":"22d.png"},
+    "zbdxsw10": {"default":"22i2.png",
+      "special":{"Chloe":"22n.png"}
+    },
+    "gprz11p": {"default":"22i2.png",
+      "special":{"Chloe":"22w.png"}
+    },
+    "gprz11r": {"default":"22w.png",
+      "special":{"Chloe":"22i2.png"}
+    },
+    "zcrh12r": {"default":"22o2.png",
+      "special":{"Chloe":"22o.png"}
+    },
+    "zcrh12": {"default":"22i2.png",
+      "special":{"Chloe":"22k.png"}
+    },
+    "gyzs13": {"default":"22i.png"},
+    "zs14": {"default":"22i2.png",
+      "special":{"Chloe":"22d.png"}
+    },
+    "zspz15": {"default":"22o.png"},
+    "szsm16": {"default":"22d.png",
+      "special":{"Chloe":"22k.png"}
+    },
+    "wz17": {"default":"22w.png"},
+    "lnco18": {"default":"22k.png"},
+    "ljgh19b": {"default":"22i2.png",
+      "special":{"Chloe":"22o2.png"}
+    },
+    "ljgb19": {"default":"22d.png",
+      "special":{"Chloe":"22n.png"}
+    },
+    "cxs": {"default":["22n.png","22syokei.png"]},
+    "crsl": {"default":"22w.png"},
+    "rlsl": {"default":"22wolf.png"},
+    "yhsl": {"default":"22fox.png"},
+    "krsl": {"default":"22mad.png"},
+    "hblr": {"default":"22i2.png"},
+    "hbg": {"default":"22o2.png"},
+    "hbln": {"default":"22i2.png"},
+    "hbz": {"default":"22i2.png"},
+    "hbm": {"default":"22t.png"},
+    "lrco": {"default":"22i.png"},
+    "mco": {"default":"22t.png"},
+    "yjsw": {"default":["22d.png","22higai.png"]},
+    "hzsw": {"default":["22d.png","22h.png"]},
+    "mzsw": {"default":["22d.png","22syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Liddi": {
+    "gyfo1r": {"default":"23w.png",
+      "special":{"Hans":"23w3.png"}
+    },
+    "gyfo1": {"default":"23d.png",
+      "special":{"Hans":"23d.png"}
+    },
+    "gyho2": {"default":"23d.png"},
+    "qfgsw3": {"default":"23k.png",
+      "special":{"Hans":"23k.png"}
+    },
+    "gkgsw4": {"default":"23k.png",
+      "special":{"Hans":"23o2.png"}
+    },
+    "qfjcqr5r": {"default":"23w.png",
+      "special":{"Hans":"23o2.png"}
+    },
+    "qfjc5": {"default":"23w.png",
+      "special":{"Hans":"23w.png"}
+    },
+    "gycx6": {"default":"23n.png",
+      "special":{"Hans":"23n.png"}
+    },
+    "zco7": {"default":"23d.png"},
+    "jhdh8b": {"default":"23o2.png",
+      "special":{"Hans":"23w4.png"}
+    },
+    "zjgh8b": {"default":"23w3.png",
+      "special":{"Hans":"23w3.png"}
+    },
+    "jbdh8r": {"default":"23w.png",
+      "special":{"Hans":"23w4.png"}
+    },
+    "zjgb8": {"default":"23o2.png",
+      "special":{"Hans":"23o2.png"}
+    },
+    "zrzbjg9": {"default":"23d.png"},
+    "zbdxsw10": {"default":"23o2.png",
+      "special":{"Hans":"23o2.png"}
+    },
+    "gprz11p": {"default":"23w.png",
+      "special":{"Hans":"23w.png"}
+    },
+    "gprz11r": {"default":"23w4.png",
+      "special":{"Hans":"23w4.png"}
+    },
+    "zcrh12r": {"default":"23o2.png",
+      "special":{"Hans":"23o2.png"}
+    },
+    "zcrh12": {"default":"23w3.png",
+      "special":{"Hans":"23w3.png"}
+    },
+    "gyzs13": {"default":"23w2.png"},
+    "zs14": {"default":"23w4.png",
+      "special":{"Hans":"23w4.png"}
+    },
+    "zspz15": {"default":"23w.png"},
+    "szsm16": {"default":"23w4.png",
+      "special":{"Hans":"23w4.png"}
+    },
+    "wz17": {"default":"23i.png"},
+    "lnco18": {"default":"23w4.png"},
+    "ljgh19b": {"default":"23w4.png",
+      "special":{"Hans":"23w4.png"}
+    },
+    "ljgb19": {"default":"23o2.png",
+      "special":{"Hans":"23k.png"}
+    },
+    "cxs": {"default":["23n.png","23syokei.png"]},
+    "crsl": {"default":"23w.png"},
+    "rlsl": {"default":"23wolf.png"},
+    "yhsl": {"default":"23fox.png"},
+    "krsl": {"default":"23mad.png"},
+    "hblr": {"default":"23o2.png"},
+    "hbg": {"default":"23i.png"},
+    "hbln": {"default":"23o2.png"},
+    "hbz": {"default":"23o2.png"},
+    "hbm": {"default":"23t.png"},
+    "lrco": {"default":"23w3.png"},
+    "mco": {"default":"23w3.png"},
+    "yjsw": {"default":["23d.png","23higai.png"]},
+    "hzsw": {"default":["23d.png","23h.png"]},
+    "mzsw": {"default":["23d.png","23syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Brigitte": {
+    "gyfo1r": {"default":"24w.png",
+      "special":{"Milli":"24w2.png"}
+    },
+    "gyfo1": {"default":"24w.png",
+      "special":{"Milli":"24w.png"}
+    },
+    "gyho2": {"default":"24w.png"},
+    "qfgsw3": {"default":"24k.png",
+      "special":{"Milli":"24k.png"}
+    },
+    "gkgsw4": {"default":"24w.png",
+      "special":{"Milli":"24w.png"}
+    },
+    "qfjcqr5r": {"default":"24w.png",
+      "special":{"Milli":"24w2.png"}
+    },
+    "qfjc5": {"default":"24d.png",
+      "special":{"Milli":"24d.png"}
+    },
+    "gycx6": {"default":"24n.png",
+      "special":{"Milli":"24n.png"}
+    },
+    "zco7": {"default":"24w4.png"},
+    "jhdh8b": {"default":"24d.png",
+      "special":{"Milli":"24o1.png"}
+    },
+    "zjgh8b": {"default":"24t.png",
+      "special":{"Milli":"24t.png"}
+    },
+    "jbdh8r": {"default":"24w.png",
+      "special":{"Milli":"24w2.png"}
+    },
+    "zjgb8": {"default":"24d.png",
+      "special":{"Milli":"24k.png"}
+    },
+    "zrzbjg9": {"default":"24d.png"},
+    "zbdxsw10": {"default":"24k.png",
+      "special":{"Milli":"24k.png"}
+    },
+    "gprz11p": {"default":"24w.png",
+      "special":{"Milli":"24d.png"}
+    },
+    "gprz11r": {"default":"24d.png",
+      "special":{"Milli":"24d.png"}
+    },
+    "zcrh12r": {"default":"24o1.png",
+      "special":{"Milli":"24d.png"}
+    },
+    "zcrh12": {"default":"24w.png",
+      "special":{"Milli":"24t.png"}
+    },
+    "gyzs13": {"default":"24i1.png"},
+    "zs14": {"default":"24d.png",
+      "special":{"Milli":"24d.png"}
+    },
+    "zspz15": {"default":"24i2.png"},
+    "szsm16": {"default":"24d.png",
+      "special":{"Milli":"24d.png"}
+    },
+    "wz17": {"default":"24d.png"},
+    "lnco18": {"default":"24w.png"},
+    "ljgh19b": {"default":"24k.png",
+      "special":{"Milli":"24k.png"}
+    },
+    "ljgb19": {"default":"24k.png",
+      "special":{"Milli":"24k.png"}
+    },
+    "cxs": {"default":["24o1.png","24syokei.png"]},
+    "crsl": {"default":"24d.png"},
+    "rlsl": {"default":"24wolf.png"},
+    "yhsl": {"default":"24fox.png"},
+    "krsl": {"default":"24mad.png"},
+    "hblr": {"default":"24k.png"},
+    "hbg": {"default":"24d.png"},
+    "hbln": {"default":"24k.png"},
+    "hbz": {"default":"24k.png"},
+    "hbm": {"default":"24w2.png"},
+    "lrco": {"default":"24w.png"},
+    "mco": {"default":"24w2.png"},
+    "yjsw": {"default":["24d.png","24higai.png"]},
+    "hzsw": {"default":["24d.png","24h.png"]},
+    "mzsw": {"default":["24d.png","24syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Helga": {
+    "gyfo1r": {"default":"25d.png"},
+    "gyfo1": {"default":"25d.png"},
+    "gyho2": {"default":"25d.png"},
+    "qfgsw3": {"default":"25i.png"},
+    "gkgsw4": {"default":"25i.png"},
+    "qfjcqr5r": {"default":"25d.png"},
+    "qfjc5": {"default":"25d.png"},
+    "gycx6": {"default":"25n.png"},
+    "zco7": {"default":"25w.png"},
+    "jhdh8b": {"default":"25i.png"},
+    "zjgh8b": {"default":"25i2.png"},
+    "jbdh8r": {"default":"25d.png"},
+    "zjgb8": {"default":"25w.png"},
+    "zrzbjg9": {"default":"25d.png"},
+    "zbdxsw10": {"default":"25k.png"},
+    "gprz11p": {"default":"25w2.png"},
+    "gprz11r": {"default":"25n.png"},
+    "zcrh12r": {"default":"25o.png"},
+    "zcrh12": {"default":"25i2.png"},
+    "gyzs13": {"default":"25i.png"},
+    "zs14": {"default":"25w.png"},
+    "zspz15": {"default":"25o.png"},
+    "szsm16": {"default":"25d.png"},
+    "wz17": {"default":"25i2.png"},
+    "lnco18": {"default":"25d.png"},
+    "ljgh19b": {"default":"25w2.png"},
+    "ljgb19": {"default":"25k.png"},
+    "cxs": {"default":["25k.png","25syokei.png"]},
+    "crsl": {"default":"25w2.png"},
+    "rlsl": {"default":"25wolf.png"},
+    "yhsl": {"default":"25fox.png"},
+    "krsl": {"default":"25mad.png"},
+    "hblr": {"default":"25i.png"},
+    "hbg": {"default":"25n.png"},
+    "hbln": {"default":"25i.png"},
+    "hbz": {"default":"25i.png"},
+    "hbm": {"default":"25w2.png"},
+    "lrco": {"default":"25k.png"},
+    "mco": {"default":"25w2.png"},
+    "yjsw": {"default":["25d.png","25higai.png"]},
+    "hzsw": {"default":["25d.png","25h.png"]},
+    "mzsw": {"default":["25d.png","25syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Natalie": {
+    "gyfo1r": {"default":"26d.png",
+      "special":{"Klemens":"26w4.png"}
+    },
+    "gyfo1": {"default":"26i.png",
+      "special":{"Klemens":"26w4.png"}
+    },
+    "gyho2": {"default":"26i.png"},
+    "qfgsw3": {"default":"26n.png",
+      "special":{"Klemens":"26n.png"}
+    },
+    "gkgsw4": {"default":"26n.png",
+      "special":{"Klemens":"26n.png"}
+    },
+    "qfjcqr5r": {"default":"26d.png",
+      "special":{"Klemens":"26w2.png"}
+    },
+    "qfjc5": {"default":"26w.png",
+      "special":{"Klemens":"26w2.png"}
+    },
+    "gycx6": {"default":"26n.png",
+      "special":{"Klemens":"26w4.png"}
+    },
+    "zco7": {"default":"26w2.png"},
+    "jhdh8b": {"default":"26w4.png",
+      "special":{"Klemens":"26w4.png"}
+    },
+    "zjgh8b": {"default":"26n.png",
+      "special":{"Klemens":"26n.png"}
+    },
+    "jbdh8r": {"default":"26w2.png",
+      "special":{"Klemens":"26w3.png"}
+    },
+    "zjgb8": {"default":"26w3.png",
+      "special":{"Klemens":"26w.png"}
+    },
+    "zrzbjg9": {"default":"26d.png"},
+    "zbdxsw10": {"default":"26k2.png",
+      "special":{"Klemens":"26n.png"}
+    },
+    "gprz11p": {"default":"26w4.png",
+      "special":{"Klemens":"26w4.png"}
+    },
+    "gprz11r": {"default":"26w4.png",
+      "special":{"Klemens":"26w4.png"}
+    },
+    "zcrh12r": {"default":"26w4.png",
+      "special":{"Klemens":"26w4.png"}
+    },
+    "zcrh12": {"default":"26n.png",
+      "special":{"Klemens":"26n.png"}
+    },
+    "gyzs13": {"default":"26i.png"},
+    "zs14": {"default":"26w4.png",
+      "special":{"Klemens":"26o.png"}
+    },
+    "zspz15": {"default":"26w4.png"},
+    "szsm16": {"default":"26w4.png",
+      "special":{"Klemens":"26o.png"}
+    },
+    "wz17": {"default":"26w3.png"},
+    "lnco18": {"default":"26w3.png"},
+    "ljgh19b": {"default":"26w3.png",
+      "special":{"Klemens":"26i.png"}
+    },
+    "ljgb19": {"default":"26w.png",
+      "special":{"Klemens":"26w4.png"}
+    },
+    "cxs": {"default":["26w4.png","26syokei.png"]},
+    "crsl": {"default":"26w3.png"},
+    "rlsl": {"default":"26wolf.png"},
+    "yhsl": {"default":"26fox.png"},
+    "krsl": {"default":"26mad.png"},
+    "hblr": {"default":"26k.png"},
+    "hbg": {"default":"26i.png"},
+    "hbln": {"default":"26k.png"},
+    "hbz": {"default":"26k.png"},
+    "hbm": {"default":"26o.png"},
+    "lrco": {"default":"26i.png"},
+    "mco": {"default":"26o.png"},
+    "yjsw": {"default":["26d.png","26higai.png"]},
+    "hzsw": {"default":["26d.png","26h.png"]},
+    "mzsw": {"default":["26d.png","26syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Volker": {
+    "gyfo1r": {"default":"27d.png",
+      "special":{"Eva":"27i.png"}
+    },
+    "gyfo1": {"default":"27d.png",
+      "special":{"Eva":"27i.png"}
+    },
+    "gyho2": {"default":"27w.png"},
+    "qfgsw3": {"default":"27d.png",
+      "special":{"Eva":"27o.png"}
+    },
+    "gkgsw4": {"default":"27w.png",
+      "special":{"Eva":"27i3.png"}
+    },
+    "qfjcqr5r": {"default":"27i2.png",
+      "special":{"Eva":"27o.png"}
+    },
+    "qfjc5": {"default":"27w.png",
+      "special":{"Eva":"27i.png"}
+    },
+    "gycx6": {"default":"27i2.png",
+      "special":{"Eva":"27i3.png"}
+    },
+    "zco7": {"default":"27d.png"},
+    "jhdh8b": {"default":"27i.png",
+      "special":{"Eva":"27o.png"}
+    },
+    "zjgh8b": {"default":"27i.png",
+      "special":{"Eva":"27o.png"}
+    },
+    "jbdh8r": {"default":"27i2.png",
+      "special":{"Eva":"27w.png"}
+    },
+    "zjgb8": {"default":"27d.png",
+      "special":{"Eva":"27w.png"}
+    },
+    "zrzbjg9": {"default":"27d.png"},
+    "zbdxsw10": {"default":"27d.png",
+      "special":{"Eva":"27k2.png"}
+    },
+    "gprz11p": {"default":"27i.png",
+      "special":{"Eva":"27w.png"}
+    },
+    "gprz11r": {"default":"27i.png",
+      "special":{"Eva":"27k2.png"}
+    },
+    "zcrh12r": {"default":"27i.png",
+      "special":{"Eva":"27o.png"}
+    },
+    "zcrh12": {"default":"27i.png",
+      "special":{"Eva":"27o.png"}
+    },
+    "gyzs13": {"default":"27i2.png"},
+    "zs14": {"default":"27d.png",
+      "special":{"Eva":"27k.png"}
+    },
+    "zspz15": {"default":"27o.png"},
+    "szsm16": {"default":"27d.png",
+      "special":{"Eva":"27k.png"}
+    },
+    "wz17": {"default":"27i2.png"},
+    "lnco18": {"default":"27d.png"},
+    "ljgh19b": {"default":"27i.png",
+      "special":{"Eva":"27o.png"}
+    },
+    "ljgb19": {"default":"27d.png",
+      "special":{"Eva":"27i2.png"}
+    },
+    "cxs": {"default":["27k2.png","27syokei.png"]},
+    "crsl": {"default":"27w.png"},
+    "rlsl": {"default":"27wolf.png"},
+    "yhsl": {"default":"27fox.png"},
+    "krsl": {"default":"27mad.png"},
+    "hblr": {"default":"27d.png"},
+    "hbg": {"default":"27i2.png"},
+    "hbln": {"default":"27d.png"},
+    "hbz": {"default":"27d.png"},
+    "hbm": {"default":"27k2.png"},
+    "lrco": {"default":"27i.png"},
+    "mco": {"default":"27k.png"},
+    "yjsw": {"default":["27d.png","27higai.png"]},
+    "hzsw": {"default":["27d.png","27h.png"]},
+    "mzsw": {"default":["27d.png","27syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Eva": {
+    "gyfo1r": {"default":"28d.png",
+      "special":{"Volker":"28i.png",
+        "Milli":"28i.png"}
+    },
+    "gyfo1": {"default":"28d.png",
+      "special":{"Volker":"28i.png",
+        "Milli":"28w2.png"}
+    },
+    "gyho2": {"default":"28w.png"},
+    "qfgsw3": {"default":"28d.png",
+      "special":{"Volker":"28o.png",
+        "Milli":"28i2.png"}
+    },
+    "gkgsw4": {"default":"28w2.png",
+      "special":{"Volker":"28n.png",
+        "Milli":"28i2.png"}
+    },
+    "qfjcqr5r": {"default":"28i2.png",
+      "special":{"Volker":"28w.png",
+        "Milli":"28i.png"}
+    },
+    "qfjc5": {"default":"28w.png",
+      "special":{"Volker":"28i2.png",
+        "Milli":"28i.png"}
+    },
+    "gycx6": {"default":"28d.png",
+      "special":{"Volker":"28i2.png"}
+    },
+    "zco7": {"default":"28d.png"},
+    "jhdh8b": {"default":"28i.png",
+      "special":{"Volker":"28i2.png"}
+    },
+    "zjgh8b": {"default":"28d.png",
+      "special":{"Volker":"28w.png"}
+    },
+    "jbdh8r": {"default":"28i.png",
+      "special":{"Volker":"28w.png"}
+    },
+    "zjgb8": {"default":"28d.png",
+      "special":{"Volker":"28k.png"}
+    },
+    "zrzbjg9": {"default":"28d.png"},
+    "zbdxsw10": {"default":"28d.png",
+      "special":{"Volker":"28i2.png"}
+    },
+    "gprz11p": {"default":"28i.png",
+      "special":{"Volker":"28w.png"}
+    },
+    "gprz11r": {"default":"28i.png",
+      "special":{"Volker":"28w2.png"}
+    },
+    "zcrh12r": {"default":"28i.png",
+      "special":{"Volker":"28i2.png"}
+    },
+    "zcrh12": {"default":"28i.png",
+      "special":{"Volker":"28w.png"}
+    },
+    "gyzs13": {"default":"28d.png"},
+    "zs14": {"default":"28d.png",
+      "special":{"Volker":"28d.png"}
+    },
+    "zspz15": {"default":"28d.png"},
+    "szsm16": {"default":"28d.png",
+      "special":{"Volker":"28d.png"}
+    },
+    "wz17": {"default":"28i2.png"},
+    "lnco18": {"default":"28d.png"},
+    "ljgh19b": {"default":"28d.png",
+      "special":{"Volker":"28w.png"}
+    },
+    "ljgb19": {"default":"28d.png",
+      "special":{"Volker":"28i.png"}
+    },
+    "cxs": {"default":["28i.png","28syokei.png"]},
+    "crsl": {"default":"28w2.png"},
+    "rlsl": {"default":"28wolf.png"},
+    "yhsl": {"default":"28fox.png"},
+    "krsl": {"default":"28mad.png"},
+    "hblr": {"default":"28i.png"},
+    "hbg": {"default":"28d.png"},
+    "hbln": {"default":"28i.png"},
+    "hbz": {"default":"28i.png"},
+    "hbm": {"default":"28i.png"},
+    "lrco": {"default":"28i.png"},
+    "mco": {"default":"28i2.png"},
+    "yjsw": {"default":["28d.png","28higai.png"]},
+    "hzsw": {"default":["28d.png","28h.png"]},
+    "mzsw": {"default":["28d.png","28syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Willy": {
+    "gyfo1r": {"default":"29k.png",
+      "special":{"Irene":"29i2.png"}
+    },
+    "gyfo1": {"default":"29i.png",
+      "special":{"Irene":"29i.png"}
+    },
+    "gyho2": {"default":"29i.png"},
+    "qfgsw3": {"default":"29i2.png",
+      "special":{"Irene":"29i2.png"}
+    },
+    "gkgsw4": {"default":"29d.png",
+      "special":{"Irene":"29i2.png"}
+    },
+    "qfjcqr5r": {"default":"29i.png",
+      "special":{"Irene":"29w.png"}
+    },
+    "qfjc5": {"default":"29d.png",
+      "special":{"Irene":"29w.png"}
+    },
+    "gycx6": {"default":"29k.png",
+      "special":{"Irene":"29i2.png"}
+    },
+    "zco7": {"default":"29i.png"},
+    "jhdh8b": {"default":"29i2.png",
+      "special":{"Irene":"29o.png"}
+    },
+    "zjgh8b": {"default":"29i2.png",
+      "special":{"Irene":"29k.png"}
+    },
+    "jbdh8r": {"default":"29k2.png",
+      "special":{"Irene":"29w.png"}
+    },
+    "zjgb8": {"default":"29d.png",
+      "special":{"Irene":"29w.png"}
+    },
+    "zrzbjg9": {"default":"29d.png"},
+    "zbdxsw10": {"default":"29k.png",
+      "special":{"Irene":"29i2.png"}
+    },
+    "gprz11p": {"default":"29w.png",
+      "special":{"Irene":"29w.png"}
+    },
+    "gprz11r": {"default":"29i.png",
+      "special":{"Irene":"29k.png"}
+    },
+    "zcrh12r": {"default":"29o.png",
+      "special":{"Irene":"29o.png"}
+    },
+    "zcrh12": {"default":"29i2.png",
+      "special":{"Irene":"29k.png"}
+    },
+    "gyzs13": {"default":"29i.png"},
+    "zs14": {"default":"29w.png",
+      "special":{"Irene":"29k.png"}
+    },
+    "zspz15": {"default":"29o.png"},
+    "szsm16": {"default":"29d.png",
+      "special":{"Irene":"29k.png"}
+    },
+    "wz17": {"default":"29d.png"},
+    "lnco18": {"default":"29i.png"},
+    "ljgh19b": {"default":"29i.png",
+      "special":{"Irene":"29k.png"}
+    },
+    "ljgb19": {"default":"29d.png",
+      "special":{"Irene":"29i2.png"}
+    },
+    "cxs": {"default":["29i2.png","29syokei.png"]},
+    "crsl": {"default":"29d.png"},
+    "rlsl": {"default":"29wolf.png"},
+    "yhsl": {"default":"29fox.png"},
+    "krsl": {"default":"29mad.png"},
+    "hblr": {"default":"29k.png"},
+    "hbg": {"default":"29i2.png"},
+    "hbln": {"default":"29i.png"},
+    "hbz": {"default":"29i.png"},
+    "hbm": {"default":"29k2.png"},
+    "lrco": {"default":"29i.png"},
+    "mco": {"default":"29k2.png"},
+    "yjsw": {"default":["29d.png","29higai.png"]},
+    "hzsw": {"default":["29d.png","29h.png"]},
+    "mzsw": {"default":["29d.png","29syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Reichard": {
+    "gyfo1r": {"default":"30d.png",
+      "special":{"Romi":"30d.png"}
+    },
+    "gyfo1": {"default":"30d.png",
+      "special":{"Romi":"30d.png"}
+    },
+    "gyho2": {"default":"30i.png"},
+    "qfgsw3": {"default":"30w.png",
+      "special":{"Romi":"30i2.png"}
+    },
+    "gkgsw4": {"default":"30i.png",
+      "special":{"Romi":"30i2.png"}
+    },
+    "qfjcqr5r": {"default":"30i2.png",
+      "special":{"Romi":"30o2.png"}
+    },
+    "qfjc5": {"default":"30w.png",
+      "special":{"Romi":"30d.png"}
+    },
+    "gycx6": {"default":"30i.png",
+      "special":{"Romi":"30i2.png"}
+    },
+    "zco7": {"default":"30d.png"},
+    "jhdh8b": {"default":"30w.png",
+      "special":{"Romi":"30n.png"}
+    },
+    "zjgh8b": {"default":"30i.png",
+      "special":{"Romi":"30n.png"}
+    },
+    "jbdh8r": {"default":"30o.png",
+      "special":{"Romi":"30d.png"}
+    },
+    "zjgb8": {"default":"30k.png",
+      "special":{"Romi":"30d.png"}
+    },
+    "zrzbjg9": {"default":"30d.png"},
+    "zbdxsw10": {"default":"30i.png",
+      "special":{"Romi":"30i2.png"}
+    },
+    "gprz11p": {"default":"30i2.png",
+      "special":{"Romi":"30i.png"}
+    },
+    "gprz11r": {"default":"30w3.png",
+      "special":{"Romi":"30n.png"}
+    },
+    "zcrh12r": {"default":"30o2.png",
+      "special":{"Romi":"30n.png"}
+    },
+    "zcrh12": {"default":"30i.png",
+      "special":{"Romi":"30n.png"}
+    },
+    "gyzs13": {"default":"30d.png"},
+    "zs14": {"default":"30w.png",
+      "special":{"Romi":"30o.png"}
+    },
+    "zspz15": {"default":"30w3.png"},
+    "szsm16": {"default":"30w.png",
+      "special":{"Romi":"30o.png"}
+    },
+    "wz17": {"default":"30o.png"},
+    "lnco18": {"default":"30d.png"},
+    "ljgh19b": {"default":"30i.png",
+      "special":{"Romi":"30n.png"}
+    },
+    "ljgb19": {"default":"30d.png",
+      "special":{"Romi":"30i2.png"}
+    },
+    "cxs": {"default":["30d.png","30syokei.png"]},
+    "crsl": {"default":"30n.png"},
+    "rlsl": {"default":"30wolf.png"},
+    "yhsl": {"default":"30fox.png"},
+    "krsl": {"default":"30mad.png"},
+    "hblr": {"default":"30n.png"},
+    "hbg": {"default":"30w3.png"},
+    "hbln": {"default":"30n.png"},
+    "hbz": {"default":"30n.png"},
+    "hbm": {"default":"30t.png"},
+    "lrco": {"default":"30i.png"},
+    "mco": {"default":"30t.png"},
+    "yjsw": {"default":["30d.png","30higai.png"]},
+    "hzsw": {"default":["30d.png","30h.png"]},
+    "mzsw": {"default":["30d.png","30syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Hugo": {
+    "gyfo1r": {"default":"31d.png"},
+    "gyfo1": {"default":"31d.png"},
+    "gyho2": {"default":"31d.png"},
+    "qfgsw3": {"default":"31i.png"},
+    "gkgsw4": {"default":"31d.png"},
+    "qfjcqr5r": {"default":"31d.png"},
+    "qfjc5": {"default":"31d.png"},
+    "gycx6": {"default":"31k.png"},
+    "zco7": {"default":"31d.png"},
+    "jhdh8b": {"default":"31i.png"},
+    "zjgh8b": {"default":"31i.png"},
+    "jbdh8r": {"default":"31i.png"},
+    "zjgb8": {"default":"31d.png"},
+    "zrzbjg9": {"default":"31d.png"},
+    "zbdxsw10": {"default":"31i.png"},
+    "gprz11p": {"default":"31d.png"},
+    "gprz11r": {"default":"31o.png"},
+    "zcrh12r": {"default":"31o2.png"},
+    "zcrh12": {"default":"31i.png"},
+    "gyzs13": {"default":"31i.png"},
+    "zs14": {"default":"31o.png"},
+    "zspz15": {"default":"31o.png"},
+    "szsm16": {"default":"31o.png"},
+    "wz17": {"default":"31k.png"},
+    "lnco18": {"default":"31d.png"},
+    "ljgh19b": {"default":"31i.png"},
+    "ljgb19": {"default":"31k2.png"},
+    "cxs": {"default":["31k2.png","31syokei.png"]},
+    "crsl": {"default":"31k2.png"},
+    "rlsl": {"default":"31wolf.png"},
+    "yhsl": {"default":"31fox.png"},
+    "krsl": {"default":"31mad.png"},
+    "hblr": {"default":"31d.png"},
+    "hbg": {"default":"31o.png"},
+    "hbln": {"default":"31d.png"},
+    "hbz": {"default":"31d.png"},
+    "hbm": {"default":"31i.png"},
+    "lrco": {"default":"31i.png"},
+    "mco": {"default":"31o.png"},
+    "yjsw": {"default":["31d.png","31higai.png"]},
+    "hzsw": {"default":["31d.png","31h.png"]},
+    "mzsw": {"default":["31d.png","31syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Rosa": {
+    "gyfo1r": {"default":"32d.png"},
+    "gyfo1": {"default":"32w.png"},
+    "gyho2": {"default":"32i4.png"},
+    "qfgsw3": {"default":"32o.png"},
+    "gkgsw4": {"default":"32i3.png"},
+    "qfjcqr5r": {"default":"32i2.png"},
+    "qfjc5": {"default":"32w.png"},
+    "gycx6": {"default":"32i2.png"},
+    "zco7": {"default":"32w.png"},
+    "jhdh8b": {"default":"32i3.png"},
+    "zjgh8b": {"default":"32w2.png"},
+    "jbdh8r": {"default":"32w2.png"},
+    "zjgb8": {"default":"32i3.png"},
+    "zrzbjg9": {"default":"32i3.png"},
+    "zbdxsw10": {"default":"32o.png"},
+    "gprz11p": {"default":"32w.png"},
+    "gprz11r": {"default":"32w3.png"},
+    "zcrh12r": {"default":"32o.png"},
+    "zcrh12": {"default":"32i4.png"},
+    "gyzs13": {"default":"32i.png"},
+    "zs14": {"default":"32i4.png"},
+    "zspz15": {"default":"32n.png"},
+    "szsm16": {"default":"32i4.png"},
+    "wz17": {"default":"32i2.png"},
+    "lnco18": {"default":"32w.png"},
+    "ljgh19b": {"default":"32w2.png"},
+    "ljgb19": {"default":"32i2.png"},
+    "cxs": {"default":["32i4.png","32syokei.png"]},
+    "crsl": {"default":"32k.png"},
+    "rlsl": {"default":"32wolf.png"},
+    "yhsl": {"default":"32fox.png"},
+    "krsl": {"default":"32mad.png"},
+    "hblr": {"default":"32i2.png"},
+    "hbg": {"default":"32i4.png"},
+    "hbln": {"default":"32i2.png"},
+    "hbz": {"default":"32i2.png"},
+    "hbm": {"default":"32w2.png"},
+    "lrco": {"default":"32w.png"},
+    "mco": {"default":"32w3.png"},
+    "yjsw": {"default":["32d.png","32higai.png"]},
+    "hzsw": {"default":["32d.png","32h.png"]},
+    "mzsw": {"default":["32d.png","32syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Wendel": {
+    "gyfo1r": {"default":"33d.png",
+      "special":{"Johanna":"33d.png"}
+    },
+    "gyfo1": {"default":"33d.png",
+      "special":{"Johanna":"33d.png"}
+    },
+    "gyho2": {"default":"33d.png"},
+    "qfgsw3": {"default":"33o.png",
+      "special":{"Johanna":"33n.png"}
+    },
+    "gkgsw4": {"default":"33n.png",
+      "special":{"Johanna":"33n2.png"}
+    },
+    "qfjcqr5r": {"default":"33d.png",
+      "special":{"Johanna":"33d.png"}
+    },
+    "qfjc5": {"default":"33i.png",
+      "special":{"Johanna":"33i.png"}
+    },
+    "gycx6": {"default":"33n.png",
+      "special":{"Johanna":"33n.png"}
+    },
+    "zco7": {"default":"33i.png"},
+    "jhdh8b": {"default":"33i.png",
+      "special":{"Johanna":"33n2.png"}
+    },
+    "zjgh8b": {"default":"33n.png",
+      "special":{"Johanna":"33n.png"}
+    },
+    "jbdh8r": {"default":"33w.png",
+      "special":{"Johanna":"33w.png"}
+    },
+    "zjgb8": {"default":"33w.png",
+      "special":{"Johanna":"33w.png"}
+    },
+    "zrzbjg9": {"default":"33d.png"},
+    "zbdxsw10": {"default":"33k.png",
+      "special":{"Johanna":"33n.png"}
+    },
+    "gprz11p": {"default":"33w.png",
+      "special":{"Johanna":"33i.png"}
+    },
+    "gprz11r": {"default":"33i.png",
+      "special":{"Johanna":"33n.png"}
+    },
+    "zcrh12r": {"default":"33o.png",
+      "special":{"Johanna":"33n2.png"}
+    },
+    "zcrh12": {"default":"33n.png",
+      "special":{"Johanna":"33n2.png"}
+    },
+    "gyzs13": {"default":"33i.png"},
+    "zs14": {"default":"33i.png",
+      "special":{"Johanna":"33o.png"}
+    },
+    "zspz15": {"default":"33w.png"},
+    "szsm16": {"default":"33i.png",
+      "special":{"Johanna":"33o.png"}
+    },
+    "wz17": {"default":"33i.png"},
+    "lnco18": {"default":"33i.png"},
+    "ljgh19b": {"default":"33i.png",
+      "special":{"Johanna":"33o2.png"}
+    },
+    "ljgb19": {"default":"33n.png",
+      "special":{"Johanna":"33n2.png"}
+    },
+    "cxs": {"default":["33n.png","33syokei.png"]},
+    "crsl": {"default":"33w.png"},
+    "rlsl": {"default":"33wolf.png"},
+    "yhsl": {"default":"33fox.png"},
+    "krsl": {"default":"33mad.png"},
+    "hblr": {"default":"33i.png"},
+    "hbg": {"default":"33o.png"},
+    "hbln": {"default":"33i.png"},
+    "hbz": {"default":"33i.png"},
+    "hbm": {"default":"33t.png"},
+    "lrco": {"default":"33i.png"},
+    "mco": {"default":"33t.png"},
+    "yjsw": {"default":["33d.png","33higai.png"]},
+    "hzsw": {"default":["33d.png","33h.png"]},
+    "mzsw": {"default":["33d.png","33syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Sergius": {
+    "gyfo1r": {"default":"34d.png"},
+    "gyfo1": {"default":"34d.png"},
+    "gyho2": {"default":"34d.png"},
+    "qfgsw3": {"default":"34i1.png"},
+    "gkgsw4": {"default":"34d.png"},
+    "qfjcqr5r": {"default":"34d.png"},
+    "qfjc5": {"default":"34d.png"},
+    "gycx6": {"default":"34o.png"},
+    "zco7": {"default":"34d.png"},
+    "jhdh8b": {"default":"34o.png"},
+    "zjgh8b": {"default":"34i3.png"},
+    "jbdh8r": {"default":"34i2.png"},
+    "zjgb8": {"default":"34i2.png"},
+    "zrzbjg9": {"default":"34d.png"},
+    "zbdxsw10": {"default":"34i2.png"},
+    "gprz11p": {"default":"34w.png"},
+    "gprz11r": {"default":"34i3.png"},
+    "zcrh12r": {"default":"34o.png"},
+    "zcrh12": {"default":"34i3.png"},
+    "gyzs13": {"default":"34i2.png"},
+    "zs14": {"default":"34k.png"},
+    "zspz15": {"default":"34i3.png"},
+    "szsm16": {"default":"34k.png"},
+    "wz17": {"default":"34i2.png"},
+    "lnco18": {"default":"34d.png"},
+    "ljgh19b": {"default":"34i3.png"},
+    "ljgb19": {"default":"34k.png"},
+    "cxs": {"default":["34i2.png","34syokei.png"]},
+    "crsl": {"default":"34i3.png"},
+    "rlsl": {"default":"34wolf.png"},
+    "yhsl": {"default":"34fox.png"},
+    "krsl": {"default":"34mad.png"},
+    "hblr": {"default":"34i2.png"},
+    "hbg": {"default":"34i2.png"},
+    "hbln": {"default":"34i2.png"},
+    "hbz": {"default":"34i2.png"},
+    "hbm": {"default":"34i3.png"},
+    "lrco": {"default":"34w.png"},
+    "mco": {"default":"34i3.png"},
+    "yjsw": {"default":["34d.png","34higai.png"]},
+    "hzsw": {"default":["34d.png","34h.png"]},
+    "mzsw": {"default":["34d.png","34syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Kaja": {
+    "gyfo1r": {"default":"35d.png",
+      "special":{"Julian":"35i2.png",
+        "Iwan":"35i1.png"}
+    },
+    "gyfo1": {"default":"35d.png",
+      "special":{"Julian":"35i1.png",
+        "Iwan":"35i1.png"}
+    },
+    "gyho2": {"default":"35d.png"},
+    "qfgsw3": {"default":"35i1.png",
+      "special":{"Julian":"35n.png"}
+    },
+    "gkgsw4": {"default":"35i1.png",
+      "special":{"Julian":"35n.png",
+        "Iwan":"35n.png"}
+    },
+    "qfjcqr5r": {"default":"35d.png",
+      "special":{"Julian":"35i2.png",
+        "Iwan":"35o2.png"}
+    },
+    "qfjc5": {"default":"35d.png",
+      "special":{"Julian":"35i2.png",
+        "Iwan":"35i2.png"}
+    },
+    "gycx6": {"default":"35i3.png",
+      "special":{"Julian":"35n.png",
+        "Iwan":"35n.png"}
+    },
+    "zco7": {"default":"35d.png"},
+    "jhdh8b": {"default":"35i3.png",
+      "special":{"Julian":"35o.png",
+        "Iwan":"35o.png"}
+    },
+    "zjgh8b": {"default":"35i1.png",
+      "special":{"Julian":"35i3.png",
+        "Iwan":"35i3.png"}
+    },
+    "jbdh8r": {"default":"35i2.png",
+      "special":{"Julian":"35i2.png",
+        "Iwan":"35o2.png"}
+    },
+    "zjgb8": {"default":"35i2.png",
+      "special":{"Julian":"35w.png",
+        "Iwan":"35w.png"}
+    },
+    "zrzbjg9": {"default":"35i1.png"},
+    "zbdxsw10": {"default":"35i2.png",
+      "special":{"Julian":"35o.png",
+        "Iwan":"35n.png"}
+    },
+    "gprz11p": {"default":"35w.png",
+      "special":{"Julian":"35w.png",
+        "Iwan":"35o.png"}
+    },
+    "gprz11r": {"default":"35i3.png",
+      "special":{"Julian":"35i3.png",
+        "Iwan":"35i3.png"}
+    },
+    "zcrh12r": {"default":"35o2.png",
+      "special":{"Julian":"35o.png",
+        "Iwan":"35o.png"}
+    },
+    "zcrh12": {"default":"35i1.png",
+      "special":{"Julian":"35i3.png",
+        "Iwan":"35i3.png"}
+    },
+    "gyzs13": {"default":"35i1.png"},
+    "zs14": {"default":"35d.png",
+      "special":{"Julian":"35i1.png",
+        "Iwan":"35o.png"}
+    },
+    "zspz15": {"default":"35n.png"},
+    "szsm16": {"default":"35i2.png",
+      "special":{"Julian":"35i1.png",
+        "Iwan":"35o.png"}
+    },
+    "wz17": {"default":"35i3.png"},
+    "lnco18": {"default":"35d.png"},
+    "ljgh19b": {"default":"35t.png",
+      "special":{"Julian":"35o.png",
+        "Iwan":"35o.png"}
+    },
+    "ljgb19": {"default":"35i1.png",
+      "special":{"Julian":"35n.png",
+        "Iwan":"35n.png"}
+    },
+    "cxs": {"default":["35n.png","35syokei.png"]},
+    "crsl": {"default":"35w.png"},
+    "rlsl": {"default":"35wolf.png"},
+    "yhsl": {"default":"35fox.png"},
+    "krsl": {"default":"35mad.png"},
+    "hblr": {"default":"35i1.png"},
+    "hbg": {"default":"35o.png"},
+    "hbln": {"default":"35i1.png"},
+    "hbz": {"default":"35i1.png"},
+    "hbm": {"default":"35i3.png"},
+    "lrco": {"default":"35i3.png"},
+    "mco": {"default":"35t.png"},
+    "yjsw": {"default":["35d.png","35higai.png"]},
+    "hzsw": {"default":["35d.png","35h.png"]},
+    "mzsw": {"default":["35d.png","35syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Betti": {
+    "gyfo1r": {"default":"36d2.png",
+      "special":{"Abel":"36w.png"}
+    },
+    "gyfo1": {"default":"36d2.png",
+      "special":{"Abel":"36w.png"}
+    },
+    "gyho2": {"default":"36d2.png"},
+    "qfgsw3": {"default":"36i2.png",
+      "special":{"Abel":"36o.png"}
+    },
+    "gkgsw4": {"default":"36i2.png",
+      "special":{"Abel":"36i2.png"}
+    },
+    "qfjcqr5r": {"default":"36d2.png",
+      "special":{"Abel":"36w.png"}
+    },
+    "qfjc5": {"default":"36d2.png",
+      "special":{"Abel":"36w.png"}
+    },
+    "gycx6": {"default":"36n.png",
+      "special":{"Abel":"36n.png"}
+    },
+    "zco7": {"default":"36d2.png"},
+    "jhdh8b": {"default":"36i2.png",
+      "special":{"Abel":"36i2.png"}
+    },
+    "zjgh8b": {"default":"36i2.png",
+      "special":{"Abel":"36i2.png"}
+    },
+    "jbdh8r": {"default":"36k.png",
+      "special":{"Abel":"36w.png"}
+    },
+    "zjgb8": {"default":"36d2.png",
+      "special":{"Abel":"36w.png"}
+    },
+    "zrzbjg9": {"default":"36d.png"},
+    "zbdxsw10": {"default":"36k.png",
+      "special":{"Abel":"36k2.png"}
+    },
+    "gprz11p": {"default":"36w.png",
+      "special":{"Abel":"36w.png"}
+    },
+    "gprz11r": {"default":"36w2.png",
+      "special":{"Abel":"36w2.png"}
+    },
+    "zcrh12r": {"default":"36o.png",
+      "special":{"Abel":"36o.png"}
+    },
+    "zcrh12": {"default":"36i.png",
+      "special":{"Abel":"36i2.png"}
+    },
+    "gyzs13": {"default":"36i.png"},
+    "zs14": {"default":"36w.png",
+      "special":{"Abel":"36w2.png"}
+    },
+    "zspz15": {"default":"36w2.png"},
+    "szsm16": {"default":"36d.png",
+      "special":{"Abel":"36w2.png"}
+    },
+    "wz17": {"default":"36k.png"},
+    "lnco18": {"default":"36d2.png"},
+    "ljgh19b": {"default":"36w.png",
+      "special":{"Abel":"36w2.png"}
+    },
+    "ljgb19": {"default":"36k2.png",
+      "special":{"Abel":"36n.png"}
+    },
+    "cxs": {"default":["36n.png","36syokei.png"]},
+    "crsl": {"default":"36k.png"},
+    "rlsl": {"default":"36wolf.png"},
+    "yhsl": {"default":"36fox.png"},
+    "krsl": {"default":"36mad.png"},
+    "hblr": {"default":"36k.png"},
+    "hbg": {"default":"36w.png"},
+    "hbln": {"default":"36k.png"},
+    "hbz": {"default":"36k.png"},
+    "hbm": {"default":"36i2.png"},
+    "lrco": {"default":"36d2.png"},
+    "mco": {"default":"36o.png"},
+    "yjsw": {"default":["36d.png","36higai.png"]},
+    "hzsw": {"default":["36d.png","36h.png"]},
+    "mzsw": {"default":["36d.png","36syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Chloe": {
+    "gyfo1r": {
+      "default":"37d.png",
+      "special":{"Heinrich":"37d.png"}
+    },
+    "gyfo1": {"default":"37d.png",
+      "special":{"Heinrich":"37d.png"}
+    },
+    "gyho2": {"default":"37d.png"},
+    "qfgsw3": {"default":"37i.png",
+      "special":{"Heinrich":"37k2.png"}
+    },
+    "gkgsw4": {"default":"37i.png",
+      "special":{"Heinrich":"37i.png"}
+    },
+    "qfjcqr5r": {"default":"37d.png",
+      "special":{"Heinrich":"37w3.png"}
+    },
+    "qfjc5": {"default":"37d.png",
+      "special":{"Heinrich":"37d.png"}
+    },
+    "gycx6": {"default":"37n2.png",
+      "special":{"Heinrich":"37n.png"}
+    },
+    "zco7": {"default":"37d.png"},
+    "jhdh8b": {"default":"37n2.png",
+      "special":{"Heinrich":"37k2.png"}
+    },
+    "zjgh8b": {"default":"37i.png",
+      "special":{"Heinrich":"37k2.png"}
+    },
+    "jbdh8r": {"default":"37w3.png",
+      "special":{"Heinrich":"37i2.png"}
+    },
+    "zjgb8": {"default":"37i2.png",
+      "special":{"Heinrich":"37d.png"}
+    },
+    "zrzbjg9": {"default":"37d.png"},
+    "zbdxsw10": {"default":"37i2.png",
+      "special":{"Heinrich":"37n2.png"}
+    },
+    "gprz11p": {"default":"37w.png",
+      "special":{"Heinrich":"37w3.png"}
+    },
+    "gprz11r": {"default":"37w.png",
+      "special":{"Heinrich":"37i.png"}
+    },
+    "zcrh12r": {"default":"37k2.png",
+      "special":{"Heinrich":"37o.png"}
+    },
+    "zcrh12": {"default":"37k2.png",
+      "special":{"Heinrich":"37i2.png"}
+    },
+    "gyzs13": {"default":"37d.png"},
+    "zs14": {"default":"37d.png",
+      "special":{"Heinrich":"37i.png"}
+    },
+    "zspz15": {"default":"37w3.png"},
+    "szsm16": {"default":"37i2.png",
+      "special":{"Heinrich":"37n2.png"}
+    },
+    "wz17": {"default":"37i2.png"},
+    "lnco18": {"default":"37d.png"},
+    "ljgh19b": {"default":"37d.png",
+      "special":{"Heinrich":"37i.png"}
+    },
+    "ljgb19": {"default":"37k.png",
+      "special":{"Heinrich":"37k.png"}
+    },
+    "cxs": {"default":["37n.png","37syokei.png"]},
+    "crsl": {"default":"37i.png"},
+    "rlsl": {"default":"37wolf.png"},
+    "yhsl": {"default":"37fox.png"},
+    "krsl": {"default":"37mad.png"},
+    "hblr": {"default":"37i2.png"},
+    "hbg": {"default":"37w3.png"},
+    "hbln": {"default":"37i2.png"},
+    "hbz": {"default":"37i2.png"},
+    "hbm": {"default":"37t.png"},
+    "lrco": {"default":"37d.png"},
+    "mco": {"default":"37t.png"},
+    "yjsw": {"default":["37d.png","37higai.png"]},
+    "hzsw": {"default":["37d.png","37h.png"]},
+    "mzsw": {"default":["37d.png","37syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Carmen": {
+    "gyfo1r": {"default":"38d.png",
+      "special":{"Iwan":"38w.png"}
+    },
+    "gyfo1": {"default":"38d.png",
+      "special":{"Iwan":"38w.png"}
+    },
+    "gyho2": {"default":"38d.png"},
+    "qfgsw3": {"default":"38i.png",
+      "special":{"Iwan":"38i2.png"}
+    },
+    "gkgsw4": {"default":"38i.png",
+      "special":{"Iwan":"38i.png"}
+    },
+    "qfjcqr5r": {"default":"38d.png",
+      "special":{"Iwan":"38i.png"}},
+    "qfjc5": {"default":"38w.png",
+      "special":{"Iwan":"38i2.png"}
+    },
+    "gycx6": {"default":"38i2.png",
+      "special":{"Iwan":"38i2.png"}
+    },
+    "zco7": {"default":"38w.png"},
+    "jhdh8b": {"default":"38n.png",
+      "special":{"Iwan":"38o.png"}
+    },
+    "zjgh8b": {"default":"38i2.png",
+      "special":{"Iwan":"38i.png"}
+    },
+    "jbdh8r": {"default":"38w.png",
+      "special":{"Iwan":"38w.png"}
+    },
+    "zjgb8": {"default":"38i3.png",
+      "special":{"Iwan":"38i2.png"}
+    },
+    "zrzbjg9": {"default":"38d.png"},
+    "zbdxsw10": {"default":"38i3.png",
+      "special":{"Iwan":"38i3.png"}
+    },
+    "gprz11p": {"default":"38w2.png",
+      "special":{"Iwan":"38o.png"}
+    },
+    "gprz11r": {"default":"38i.png",
+      "special":{"Iwan":"38i.png"}
+    },
+    "zcrh12r": {"default":"38i2.png",
+      "special":{"Iwan":"38i.png"}
+    },
+    "zcrh12": {"default":"38i2.png",
+      "special":{"Iwan":"38i.png"}
+    },
+    "gyzs13": {"default":"38k2.png"},
+    "zs14": {"default":"38w.png",
+      "special":{"Iwan":"38i.png"}
+    },
+    "zspz15": {"default":"38n.png"},
+    "szsm16": {"default":"38w.png",
+      "special":{"Iwan":"38i.png"}
+    },
+    "wz17": {"default":"38i2.png"},
+    "lnco18": {"default":"38d.png"},
+    "ljgh19b": {"default":"38w.png",
+      "special":{"Iwan":"38i.png"}
+    },
+    "ljgb19": {"default":"38k2.png",
+      "special":{"Iwan":"38i2.png"}
+    },
+    "cxs": {"default":["38k.png","38syokei.png"]},
+    "crsl": {"default":"38k2.png"},
+    "rlsl": {"default":"38wolf.png"},
+    "yhsl": {"default":"38fox.png"},
+    "krsl": {"default":"38mad.png"},
+    "hblr": {"default":"38i2.png"},
+    "hbg": {"default":"38k2.png"},
+    "hbln": {"default":"38i2.png"},
+    "hbz": {"default":"38i2.png"},
+    "hbm": {"default":"38i2.png"},
+    "lrco": {"default":"38i.png"},
+    "mco": {"default":"38k2.png"},
+    "yjsw": {"default":["38d.png","38higai.png"]},
+    "hzsw": {"default":["38d.png","38h.png"]},
+    "mzsw": {"default":["38d.png","38syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Renate": {
+    "gyfo1r": {"default":"39d2.png"},
+    "gyfo1": {"default":"39i.png"},
+    "gyho2": {"default":"39d.png"},
+    "qfgsw3": {"default":"39k2.png"},
+    "gkgsw4": {"default":"39k2.png"},
+    "qfjcqr5r": {"default":"39i.png"},
+    "qfjc5": {"default":"39i.png"},
+    "gycx6": {"default":"39o.png"},
+    "zco7": {"default":"39d2.png"},
+    "jhdh8b": {"default":"39d.png"},
+    "zjgh8b": {"default":"39o.png"},
+    "jbdh8r": {"default":"39t.png"},
+    "zjgb8": {"default":"39k2.png"},
+    "zrzbjg9": {"default":"39d.png"},
+    "zbdxsw10": {"default":"39d2.png"},
+    "gprz11p": {"default":"39i.png"},
+    "gprz11r": {"default":"39o.png"},
+    "zcrh12r": {"default":"39o.png"},
+    "zcrh12": {"default":"39o.png"},
+    "gyzs13": {"default":"39i.png"},
+    "zs14": {"default":"39d2.png"},
+    "zspz15": {"default":"39i.png"},
+    "szsm16": {"default":"39d2.png"},
+    "wz17": {"default":"39d2.png"},
+    "lnco18": {"default":"39d2.png"},
+    "ljgh19b": {"default":"39o.png"},
+    "ljgb19": {"default":"39k.png"},
+    "cxs": {"default":["39k.png","39syokei.png"]},
+    "crsl": {"default":"39d2.png"},
+    "rlsl": {"default":"39wolf.png"},
+    "yhsl": {"default":"39fox.png"},
+    "krsl": {"default":"39mad.png"},
+    "hblr": {"default":"39d2.png"},
+    "hbg": {"default":"39w.png"},
+    "hbln": {"default":"39d2.png"},
+    "hbz": {"default":"39d2.png"},
+    "hbm": {"default":"39k2.png"},
+    "lrco": {"default":"39d2.png"},
+    "mco": {"default":"39k2.png"},
+    "yjsw": {"default":["39d.png","39higai.png"]},
+    "hzsw": {"default":["39d.png","39h.png"]},
+    "mzsw": {"default":["39d.png","39syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Romi": {
+    "gyfo1r": {"default":"40d.png",
+      "special":{"Reichard":"40t.png"}
+    },
+    "gyfo1": {"default":"40d.png",
+      "special":{"Reichard":"40d.png"}
+    },
+    "gyho2": {"default":"40d.png"},
+    "qfgsw3": {"default":"40i3.png",
+      "special":{"Reichard":"40n.png"}
+    },
+    "gkgsw4": {"default":"40i3.png",
+      "special":{"Reichard":"40n.png"}
+    },
+    "qfjcqr5r": {"default":"40d.png",
+      "special":{"Reichard":"40t.png"}
+    },
+    "qfjc5": {"default":"40d.png",
+      "special":{"Reichard":"40d.png"}
+    },
+    "gycx6": {"default":"40n.png",
+      "special":{"Reichard":"40n.png"}
+    },
+    "zco7": {"default":"40d.png"},
+    "jhdh8b": {"default":"40i3.png",
+      "special":{"Reichard":"40o2.png"}
+    },
+    "zjgh8b": {"default":"40i3.png",
+      "special":{"Reichard":"40o2.png"}
+    },
+    "jbdh8r": {"default":"40i1.png",
+      "special":{"Reichard":"40t.png"}
+    },
+    "zjgb8": {"default":"40d.png",
+      "special":{"Reichard":"40d.png"}
+    },
+    "zrzbjg9": {"default":"40d.png"},
+    "zbdxsw10": {"default":"40i3.png",
+      "special":{"Reichard":"40o.png"}
+    },
+    "gprz11p": {"default":"40d.png",
+      "special":{"Reichard":"40d.png"}
+    },
+    "gprz11r": {"default":"40i4.png",
+      "special":{"Reichard":"40d.png"}
+    },
+    "zcrh12r": {"default":"40o.png",
+      "special":{"Reichard":"40o2.png"}
+    },
+    "zcrh12": {"default":"40i4.png",
+      "special":{"Reichard":"40k1.png"}
+    },
+    "gyzs13": {"default":"40i3.png"},
+    "zs14": {"default":"40i1.png",
+      "special":{"Reichard":"40o.png"}
+    },
+    "zspz15": {"default":"40d.png"},
+    "szsm16": {"default":"40i1.png",
+      "special":{"Reichard":"40o.png"}
+    },
+    "wz17": {"default":"40d.png"},
+    "lnco18": {"default":"40d.png"},
+    "ljgh19b": {"default":"40i3.png",
+      "special":{"Reichard":"40i2.png"}
+    },
+    "ljgb19": {"default":"40i1.png",
+      "special":{"Reichard":"40i4.png"}
+    },
+    "cxs": {"default":["40k1.png","40syokei.png"]},
+    "crsl": {"default":"40n.png"},
+    "rlsl": {"default":"40wolf.png"},
+    "yhsl": {"default":"40fox.png"},
+    "krsl": {"default":"40mad.png"},
+    "hblr": {"default":"40i1.png"},
+    "hbg": {"default":"40i4.png"},
+    "hbln": {"default":"40i1.png"},
+    "hbz": {"default":"40i1.png"},
+    "hbm": {"default":"40t.png"},
+    "lrco": {"default":"40o.png"},
+    "mco": {"default":"40t.png"},
+    "yjsw": {"default":["40d.png","40higai.png"]},
+    "hzsw": {"default":["40d.png","40h.png"]},
+    "mzsw": {"default":["40d.png","40syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Gerda": {
+    "gyfo1r": {"default":"41d.png"},
+    "gyfo1": {"default":"41d.png"},
+    "gyho2": {"default":"41d.png"},
+    "qfgsw3": {"default":"41k.png"},
+    "gkgsw4": {"default":"41k.png"},
+    "qfjcqr5r": {"default":"41d.png"},
+    "qfjc5": {"default":"41k.png"},
+    "gycx6": {"default":"41k.png"},
+    "zco7": {"default":"41d.png"},
+    "jhdh8b": {"default":"41k.png"},
+    "zjgh8b": {"default":"41o.png"},
+    "jbdh8r": {"default":"41d.png"},
+    "zjgb8": {"default":"41d.png"},
+    "zrzbjg9": {"default":"41d.png"},
+    "zbdxsw10": {"default":"41k.png"},
+    "gprz11p": {"default":"41w.png"},
+    "gprz11r": {"default":"41w.png"},
+    "zcrh12r": {"default":"41o.png"},
+    "zcrh12": {"default":"41i2.png"},
+    "gyzs13": {"default":"41d.png"},
+    "zs14": {"default":"41i.png"},
+    "zspz15": {"default":"41w2.png"},
+    "szsm16": {"default":"41i.png"},
+    "wz17": {"default":"41k.png"},
+    "lnco18": {"default":"41d.png"},
+    "ljgh19b": {"default":"41w.png"},
+    "ljgb19": {"default":"41k.png"},
+    "cxs": {"default":["41k.png","41syokei.png"]},
+    "crsl": {"default":"41k.png"},
+    "rlsl": {"default":"41wolf.png"},
+    "yhsl": {"default":"41fox.png"},
+    "krsl": {"default":"41mad.png"},
+    "hblr": {"default":"41k.png"},
+    "hbg": {"default":"41o.png"},
+    "hbln": {"default":"41k.png"},
+    "hbz": {"default":"41k.png"},
+    "hbm": {"default":"41o.png"},
+    "lrco": {"default":"41d.png"},
+    "mco": {"default":"41o.png"},
+    "yjsw": {"default":["41d.png","41higai.png"]},
+    "hzsw": {"default":["41d.png","41h.png"]},
+    "mzsw": {"default":["41d.png","41syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Iwan": {
+    "gyfo1r": {"default":"42d.png",
+      "special":{"Carmen":"42w.png",
+        "Kaja":"42w.png"}
+    },
+    "gyfo1": {"default":"42d.png",
+      "special":{"Carmen":"42w.png",
+        "Kaja":"42w.png"}
+    },
+    "gyho2": {"default":"42d.png"},
+    "qfgsw3": {"default":"42i.png",
+      "special":{"Carmen":"42i.png",
+        "Kaja":"42i.png"}
+    },
+    "gkgsw4": {"default":"42i.png",
+      "special":{"Carmen":"42n.png",
+        "Kaja":"42n.png"}
+    },
+    "qfjcqr5r": {"default":"42d.png",
+      "special":{"Carmen":"42o.png",
+        "Kaja":"42w.png"}
+    },
+    "qfjc5": {"default":"42d.png",
+      "special":{"Carmen":"42i.png",
+        "Kaja":"42d.png"}
+    },
+    "gycx6": {"default":"42n.png",
+      "special":{"Carmen":"42n.png",
+        "Kaja":"42n.png"}
+    },
+    "zco7": {"default":"42d.png"},
+    "jhdh8b": {"default":"42i.png",
+      "special":{"Carmen":"42o.png",
+        "Kaja":"42i.png"}
+    },
+    "zjgh8b": {"default":"42i.png",
+      "special":{"Carmen":"42o.png",
+        "Kaja":"42o.png"}
+    },
+    "jbdh8r": {"default":"42d.png",
+      "special":{"Carmen":"42w.png",
+        "Kaja":"42w.png"}
+    },
+    "zjgb8": {"default":"42d.png",
+      "special":{"Carmen":"42w.png",
+        "Kaja":"42w.png"}
+    },
+    "zrzbjg9": {"default":"42d.png"},
+    "zbdxsw10": {"default":"42o.png",
+      "special":{"Carmen":"42n.png",
+        "Kaja":"42i.png"}
+    },
+    "gprz11p": {"default":"42w.png",
+      "special":{"Carmen":"42w.png",
+        "Kaja":"42w.png"}
+    },
+    "gprz11r": {"default":"42i.png",
+      "special":{"Carmen":"42k.png",
+        "Kaja":"42i.png"}
+    },
+    "zcrh12r": {"default":"42o.png",
+      "special":{"Carmen":"42o.png",
+        "Kaja":"42o.png"}
+    },
+    "zcrh12": {"default":"42i.png",
+      "special":{"Carmen":"42k.png",
+        "Kaja":"42i.png"}
+    },
+    "gyzs13": {"default":"42i.png"},
+    "zs14": {"default":"42o.png",
+      "special":{"Carmen":"42k.png",
+        "Kaja":"42k.png"}
+    },
+    "zspz15": {"default":"42o.png"},
+    "szsm16": {"default":"42o.png",
+      "special":{"Carmen":"42k.png",
+        "Kaja":"42k.png"}
+    },
+    "wz17": {"default":"42o.png"},
+    "lnco18": {"default":"42n.png"},
+    "ljgh19b": {"default":"42i.png",
+      "special":{"Carmen":"42o.png",
+        "Kaja":"42o.png"}
+    },
+    "ljgb19": {"default":"42k.png",
+      "special":{"Carmen":"42n.png",
+        "Kaja":"42i.png"}
+    },
+    "cxs": {"default":["42i.png","42syokei.png"]},
+    "crsl": {"default":"42o.png"},
+    "rlsl": {"default":"42wolf.png"},
+    "yhsl": {"default":"42fox.png"},
+    "krsl": {"default":"42mad.png"},
+    "hblr": {"default":"42i.png"},
+    "hbg": {"default":"42o.png"},
+    "hbln": {"default":"42i.png"},
+    "hbz": {"default":"42i.png"},
+    "hbm": {"default":"42n.png"},
+    "lrco": {"default":"42i.png"},
+    "mco": {"default":"42o.png"},
+    "yjsw": {"default":["42d.png","42higai.png"]},
+    "hzsw": {"default":["42d.png","42h.png"]},
+    "mzsw": {"default":["42d.png","42syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Oktavia": {
+    "gyfo1r": {"default":"43d.png",
+      "special":{"Helmut":"43i.png"}
+    },
+    "gyfo1": {"default":"43d.png",
+      "special":{"Helmut":"43i.png"}
+    },
+    "gyho2": {"default":"43d.png"},
+    "qfgsw3": {"default":"43i.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "gkgsw4": {"default":"43i.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "qfjcqr5r": {"default":"43d.png",
+      "special":{"Helmut":"43i.png"}
+    },
+    "qfjc5": {"default":"43i.png",
+      "special":{"Helmut":"43i2.png"}
+    },
+    "gycx6": {"default":"43i.png",
+      "special":{"Helmut":"43k.png"}
+    },
+    "zco7": {"default":"43d.png"},
+    "jhdh8b": {"default":"43i2.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "zjgh8b": {"default":"43w2.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "jbdh8r": {"default":"43i.png",
+      "special":{"Helmut":"43i.png"}
+    },
+    "zjgb8": {"default":"43i.png",
+      "special":{"Helmut":"43w.png"}
+    },
+    "zrzbjg9": {"default":"43d.png"},
+    "zbdxsw10": {"default":"43i.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "gprz11p": {"default":"43i.png",
+      "special":{"Helmut":"43w2.png"}
+    },
+    "gprz11r": {"default":"43w2.png",
+      "special":{"Helmut":"43k.png"}
+    },
+    "zcrh12r": {"default":"43o.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "zcrh12": {"default":"43w.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "gyzs13": {"default":"43d.png"},
+    "zs14": {"default":"43i.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "zspz15": {"default":"43o.png"},
+    "szsm16": {"default":"43i2.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "wz17": {"default":"43i2.png"},
+    "lnco18": {"default":"43d.png"},
+    "ljgh19b": {"default":"43w2.png",
+      "special":{"Helmut":"43o.png"}
+    },
+    "ljgb19": {"default":"43i.png",
+      "special":{"Helmut":"43k.png"}
+    },
+    "cxs": {"default":["43k.png","43syokei.png"]},
+    "crsl": {"default":"43k.png"},
+    "rlsl": {"default":"43wolf.png"},
+    "yhsl": {"default":"43fox.png"},
+    "krsl": {"default":"43mad.png"},
+    "hblr": {"default":"43i.png"},
+    "hbg": {"default":"43w2.png"},
+    "hbln": {"default":"43i.png"},
+    "hbz": {"default":"43i.png"},
+    "hbm": {"default":"43o.png"},
+    "lrco": {"default":"43w2.png"},
+    "mco": {"default":"43o.png"},
+    "yjsw": {"default":["43d.png","43higai.png"]},
+    "hzsw": {"default":["43d.png","43h.png"]},
+    "mzsw": {"default":["43d.png","43syokei.png"]},
+    "default": {"all": "frame.png"}
+  },
+  "Helmut": {
+    "gyfo1r": {"default":"44w2.png",
+      "special":{"Oktavia":"44w.png"}
+    },
+    "gyfo1": {"default":"44w.png",
+      "special":{"Oktavia":"44w2.png"}
+    },
+    "gyho2": {"default":"44k2.png"},
+    "qfgsw3": {"default":"44n.png",
+      "special":{"Oktavia":"44n.png"}
+    },
+    "gkgsw4": {"default":"44n.png",
+      "special":{"Oktavia":"44n.png"}
+    },
+    "qfjcqr5r": {"default":"44w.png",
+      "special":{"Oktavia":"44o.png"}
+    },
+    "qfjc5": {"default":"44w2.png",
+      "special":{"Oktavia":"44w.png"}
+    },
+    "gycx6": {
+      "default":"44i2.png",
+      "special":{"Oktavia":"44n.png"}
+    },
+    "zco7": {"default":"44w.png"},
+    "jhdh8b": {"default":"44w.png",
+      "special":{"Oktavia":"44k2.png"}
+    },
+    "zjgh8b": {"default":"44o.png",
+      "special":{"Oktavia":"44k2.png"}
+    },
+    "jbdh8r": {"default":"44i.png",
+      "special":{"Oktavia":"44w.png"}
+    },
+    "zjgb8": {"default":"44i.png",
+      "special":{"Oktavia":"44w.png"}
+    },
+    "zrzbjg9": {"default":"44k2.png"},
+    "zbdxsw10": {"default":"44o.png",
+      "special":{"Oktavia":"44k.png"}
+    },
+    "gprz11p": {"default":"44n.png",
+      "special":{"Oktavia":"44w.png"}
+    },
+    "gprz11r": {"default":"44w.png",
+      "special":{"Oktavia":"44k2.png"}
+    },
+    "zcrh12r": {"default":"44k2.png",
+      "special":{"Oktavia":"44o.png"}
+    },
+    "zcrh12": {"default":"44w.png",
+      "special":{"Oktavia":"44k2.png"}
+    },
+    "gyzs13": {"default":"44w2.png"},
+    "zs14": {"default":"44k2.png",
+      "special":{"Oktavia":"44n.png"}
+    },
+    "zspz15": {"default":"44w.png"},
+    "szsm16": {"default":"44k2.png",
+      "special":{"Oktavia":"44n.png"}
+    },
+    "wz17": {"default":"44i.png"},
+    "lnco18": {"default":"44w.png"},
+    "ljgh19b": {"default":"44w2.png",
+      "special":{"Oktavia":"44k2.png"}
+    },
+    "ljgb19": {"default":"44i2.png",
+      "special":{"Oktavia":"44n.png"}
+    },
+    "cxs": {"default":["44i2.png","44syokei.png"]},
+    "crsl": {"default":"44n.png"},
+    "rlsl": {"default":"44wolf.png"},
+    "yhsl": {"default":"44fox.png"},
+    "krsl": {"default":"44mad.png"},
+    "hblr": {"default":"44o.png"},
+    "hbg": {"default":"44i.png"},
+    "hbln": {"default":"44o.png"},
+    "hbz": {"default":"44o.png"},
+    "hbm": {"default":"44n.png"},
+    "lrco": {"default":"44w.png"},
+    "mco": {"default":"44w.png"},
+    "yjsw": {"default":["44d.png","44higai.png"]},
+    "hzsw": {"default":["44d.png","44h.png"]},
+    "mzsw": {"default":["44d.png","44syokei.png"]},
+    "default": {"all": "frame.png"}
+  }
+}
