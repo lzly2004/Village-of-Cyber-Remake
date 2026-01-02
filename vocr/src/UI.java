@@ -136,7 +136,7 @@ public class UI implements UIInterface
     public void init()
     {
         currentScene = Scene.START_SCENE;//初始为开始界面
-        jFrame = new JFrame("Village of Cyber:Remake v1.0.3");
+        jFrame = new JFrame("Village of Cyber:Remake v1.0.3.1");
         jFrame.setResizable(false);
         jFrame.setSize(1280,720);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -5673,7 +5673,8 @@ public class UI implements UIInterface
         piaoText.setVisible(true);
         piaoText1.setVisible(true);
         int[][] voteTotal = new int[gs.gc.length][4];//获取每轮每个角色有几票
-        for (int i = 1; i < gs.gc.length; ++i) {
+        for (int i = 1; i < gs.gc.length; ++i)
+        {
             voteTotal[gs.gc[i].voteTarget[gameDay][round]][round]++;//对应人票数++
         }
         StringBuilder extraText = new StringBuilder();
@@ -7193,88 +7194,88 @@ public class UI implements UIInterface
         });
         //词条按钮
         //1
-        ImageIcon btnNext = resources.getImage("avg_button2.png");
-        JButton btn_next = new JButton(resources.getHelpText("Info1-1.txt"),btnNext);
+        ImageIcon btnNext = resources.getImage("avg_button2.png");  //
+        JButton btn_next = new JButton(resources.getHelpText("Info1-1.txt"),btnNext);   //
         btnSet(btn_next);
         // 核心设置：文本在图标上方，且水平居中
         btn_next.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
         btn_next.addActionListener(e -> {
             resources.playSound("click.wav");
-            currentScene = Scene.INFO_SCENE_1_1;
+            currentScene = Scene.INFO_SCENE_1_1;    //
             run();
         });
         scalableComponents.add(new ScalableComponent(btn_next,80.0/1280,80.0/720,222.0/1280,50.0/720,btnNext.getImage()));
         //2
-        JButton btn_next2 = new JButton(resources.getHelpText("Info1-2.txt"),btnNext);
+        JButton btn_next2 = new JButton(resources.getHelpText("Info1-2.txt"),btnNext);  //
         btnSet(btn_next2);
         // 核心设置：文本在图标上方，且水平居中
         btn_next2.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
         btn_next2.addActionListener(e -> {
             resources.playSound("click.wav");
-            currentScene = Scene.INFO_SCENE_1_2;
+            currentScene = Scene.INFO_SCENE_1_2;    //
             run();
         });
         //3
         scalableComponents.add(new ScalableComponent(btn_next2,80.0/1280,150.0/720,222.0/1280,50.0/720,btnNext.getImage()));
 
-        JButton btn_next3 = new JButton(resources.getHelpText("Info1-3.txt"),btnNext);
+        JButton btn_next3 = new JButton(resources.getHelpText("Info1-3.txt"),btnNext);  //
         btnSet(btn_next3);
         // 核心设置：文本在图标上方，且水平居中
         btn_next3.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
         btn_next3.addActionListener(e -> {
             resources.playSound("click.wav");
-            currentScene = Scene.INFO_SCENE_1_3;
+            currentScene = Scene.INFO_SCENE_1_3;    //
             run();
         });
         scalableComponents.add(new ScalableComponent(btn_next3,80.0/1280,220.0/720,222.0/1280,50.0/720,btnNext.getImage()));
         //4
-        JButton btn_next4 = new JButton(resources.getHelpText("Info1-4.txt"),btnNext);
+        JButton btn_next4 = new JButton(resources.getHelpText("Info1-4.txt"),btnNext);  //
         btnSet(btn_next4);
         // 核心设置：文本在图标上方，且水平居中
         btn_next4.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
         btn_next4.addActionListener(e -> {
             resources.playSound("click.wav");
-            currentScene = Scene.INFO_SCENE_1_4;
+            currentScene = Scene.INFO_SCENE_1_4;    //
             run();
         });
         scalableComponents.add(new ScalableComponent(btn_next4,80.0/1280,290.0/720,222.0/1280,50.0/720,btnNext.getImage()));
         //5
-        JButton btn_next5 = new JButton(resources.getHelpText("Info1-5.txt"),btnNext);
+        JButton btn_next5 = new JButton(resources.getHelpText("Info1-5.txt"),btnNext);  //
         btnSet(btn_next5);
         // 核心设置：文本在图标上方，且水平居中
         btn_next5.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
         btn_next5.addActionListener(e -> {
             resources.playSound("click.wav");
-            currentScene = Scene.INFO_SCENE_1_5;
+            currentScene = Scene.INFO_SCENE_1_5;    //
             run();
         });
         scalableComponents.add(new ScalableComponent(btn_next5,80.0/1280,360.0/720,222.0/1280,50.0/720,btnNext.getImage()));
         //6
-        JButton btn_next6 = new JButton(resources.getHelpText("Info1-6.txt"),btnNext);
+        JButton btn_next6 = new JButton(resources.getHelpText("Info1-6.txt"),btnNext);  //
         btnSet(btn_next6);
         // 核心设置：文本在图标上方，且水平居中
         btn_next6.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
         btn_next6.addActionListener(e -> {
             resources.playSound("click.wav");
-            currentScene = Scene.INFO_SCENE_1_6;
+            currentScene = Scene.INFO_SCENE_1_6;    //
             run();
         });
         scalableComponents.add(new ScalableComponent(btn_next6,80.0/1280,430.0/720,222.0/1280,50.0/720,btnNext.getImage()));
         //7
-        JButton btn_next7 = new JButton(resources.getHelpText("Info1-7.txt"),btnNext);
+        JButton btn_next7 = new JButton(resources.getHelpText("Info1-7.txt"),btnNext);  //
         btnSet(btn_next7);
         // 核心设置：文本在图标上方，且水平居中
         btn_next7.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
         btn_next7.addActionListener(e -> {
             resources.playSound("click.wav");
-            currentScene = Scene.INFO_SCENE_1_7;
+            currentScene = Scene.INFO_SCENE_1_7;    //
             run();
         });
         scalableComponents.add(new ScalableComponent(btn_next7,400.0/1280,80.0/720,222.0/1280,50.0/720,btnNext.getImage()));
