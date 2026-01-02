@@ -228,13 +228,9 @@ public class UI implements UIInterface
                 GameScene_day();
                 break;
             case END_VILLAGE:
-                end_village();
-                break;
             case END_WOLF:
-                end_wolf();
-                break;
             case END_FOX:
-                end_fox();
+                end_game(currentScene);
                 break;
             case END_ANIME:
                 end_anime();
@@ -1816,17 +1812,20 @@ public class UI implements UIInterface
     List<ImageIcon> linkIcon = new ArrayList<>();//记录接连事件图像
     boolean[] specialEvent ={false};//是不是特殊事件，也就是三个连续的事件组，有特殊显示方式
 
-    public void dialogue_day(){
+    public void dialogue_day()
+    {
 
         Event event = events.poll();
 
-        if(event == null){
+        if(event == null)
+        {
             //如果显示死亡后没有其他事件直接到vote
             currentScene = Scene.GAME_SCENE_VOTE;
             run();
         }
         boolean isConnect = true;//是否为接连发生事件的下一个
-        switch(event.eventname){
+        switch(event.eventname)
+        {
             case jhdh8b:
             case gyfo1r:
             case qfjcqr5r:
@@ -2101,7 +2100,8 @@ public class UI implements UIInterface
 
 
     }//白天对话，用于co
-    public void dialogue_afternoon(){
+    public void dialogue_afternoon()
+    {
         Event event = events.poll();
 
         diaPanel.removeAll();
@@ -2383,8 +2383,8 @@ public class UI implements UIInterface
     boolean[] isHu = {false};//是否指定护卫
     //三个都用于投票时指定内容的显示
 
-    public void GameScene_vote(){
-
+    public void GameScene_vote()    //白天事件播放完毕之后自动停留的界面
+    {
         jPanel.removeAll();
         scalableComponents.clear();
         if(isTest) {
@@ -2403,7 +2403,8 @@ public class UI implements UIInterface
 
 
         //按钮
-        if((gs.aliveCounter - 1)/2 == 1){
+        if((gs.aliveCounter - 1)/2 == 1)
+        {
             ImageIcon musicBtnIcon = resources.getImage("musicBtn.png");
             JButton btnMusic = new JButton(musicBtnIcon);
             btnSet(btnMusic);
@@ -2501,91 +2502,6 @@ public class UI implements UIInterface
             });
             jPanel.add(btnMusic);
         }
-
-        //jPanel.add(musicText);
-        // 遍历游戏中的所有角色（假设角色存储在gs.gc数组中）
-        //测试11111111111111111
-//        gs.gc[5].claimedRole = 3;
-//
-//        gs.gc[5].claimedRoleorder = 2;
-//
-//        gs.gc[8].whyDie = whyDie.chuxing;
-//        gs.gc[6].whyDie = whyDie.beiyao;
-//        gs.gc[2].whyDie = whyDie.chuxing;
-//
-//
-//        gs.gc[8].dieDay = 1;
-//        gs.gc[2].dieDay = 1;
-//        gs.gc[6].dieDay = 1;
-//
-//        //1, 8, 10, 11, 12, 13, 41, 20, 22, 23, 24, 26, 29, 30, 33, 34, 35, 36, 37, 41
-//        gs.gc[1].skillTarget[1] = 11;
-//        gs.gc[2].skillTarget[1] = 12;
-//        gs.gc[3].skillTarget[1] = 13;
-//        gs.gc[4].skillTarget[1] = 14;
-//        gs.gc[5].skillTarget[1] = 15;
-//        gs.gc[6].skillTarget[1] = 16;
-//        gs.gc[7].skillTarget[1] = 17;
-//        gs.gc[8].skillTarget[1] = 18;
-//        gs.gc[9].skillTarget[1] = 19;
-//        gs.gc[10].skillTarget[1] = 20;
-//        gs.gc[11].skillTarget[1] = 21;
-//        gs.gc[12].skillTarget[1] = 22;
-//        gs.gc[13].skillTarget[1] = 23;
-//        gs.gc[14].skillTarget[1] = 24;
-//        gs.gc[15].skillTarget[1] = 25;
-//        gs.gc[16].skillTarget[1] = 26;
-//        gs.gc[17].skillTarget[1] = 27;
-//        gs.gc[18].skillTarget[1] = 28;
-//        gs.gc[19].skillTarget[1] = 29;
-//        gs.gc[20].skillTarget[1] = 30;
-//
-//        gs.gc[1].skillTarget[2] = 2;
-//        gs.gc[2].skillTarget[2] = 4;
-//        gs.gc[3].skillTarget[2] = 6;
-//        gs.gc[4].skillTarget[2] = 8;
-//        gs.gc[5].skillTarget[2] = 10;
-//        gs.gc[6].skillTarget[2] = 12;
-//        gs.gc[7].skillTarget[2] = 14;
-//        gs.gc[8].skillTarget[2] = 16;
-//        gs.gc[9].skillTarget[2] = 18;
-//        gs.gc[10].skillTarget[2] = 20;
-//        gs.gc[11].skillTarget[2] = 22;
-//        gs.gc[12].skillTarget[2] = 24;
-//        gs.gc[13].skillTarget[2] = 26;
-//        gs.gc[14].skillTarget[2] = 28;
-//        gs.gc[15].skillTarget[2] = 20;
-//        gs.gc[16].skillTarget[2] = 32;
-//        gs.gc[17].skillTarget[2] = 34;
-//        gs.gc[18].skillTarget[2] = 36;
-//        gs.gc[19].skillTarget[2] = 38;
-//        gs.gc[20].skillTarget[2] = 40;
-
-//        gs.gc[10].claimedRole = 1;
-//        gs.gc[10].claimedRoleorder = 2;
-//        gs.gc[3].claimedRole = 1;
-//        gs.gc[3].claimedRoleorder = 3;
-//        gs.gc[15].claimedRole = 2;
-//        gs.gc[15].claimedRoleorder = 2;
-//        gs.gc[1].claimedRole = 1;
-//        gs.gc[1].claimedRoleorder = 1;
-//        gs.gc[2].claimedRole = 1;
-//        gs.gc[2].claimedRoleorder = 2;
-//        gs.gc[3].claimedRole = 2;
-//        gs.gc[3].claimedRoleorder = 1;
-//        gs.gc[4].claimedRole = 2;
-//        gs.gc[4].claimedRoleorder = 2;
-
-//        gs.gc[12].claimedRole = 4;
-//        gs.gc[11].claimedRole = 4;
-
-//        gs.gc[6].whyDie = whyDie.dayhouzhui;
-//        gs.gc[7].whyDie = whyDie.daymaozhou;
-
-//        gs.gc[8].claimedRole = 5;
-//        gs.gc[9].claimedRole = 11;
-
-
         for (int i = 1; i <= gs.gc.length - 1; i++) {
             // 获取第i个角色对象
             //GameCharacter character = gs.gc[i];
@@ -2623,18 +2539,22 @@ public class UI implements UIInterface
 
             StringBuilder claimedRoleName = new StringBuilder("yaku");
             StringBuilder skillTargetName = new StringBuilder("result");
-            if(gs.gc[i].claimedRole > 0 && gs.gc[i].claimedRole < 6){
+            if(gs.gc[i].claimedRole > 0 && gs.gc[i].claimedRole < 6)
+            {
                 //有职业则进入
-                if(gs.gc[i].claimedRole <= 3){
+                if(gs.gc[i].claimedRole <= 3)
+                {
                     //职业图标
                     claimedRoleName.append(gs.gc[i].claimedRole).append("_").append(gs.gc[i].claimedRoleorder).append(".png");
                     //技能结果
                     skillTargetName.append(gs.gc[i].claimedRole).append("_").append(gs.gc[i].claimedRoleorder);
                     int a = 0;
-                    for(int day = 1;day < gs.gameDay;day++) {
+                    for(int day = 1;day < gs.gameDay;day++)
+                    {
                         a = gs.gc[i].skillTarget[day];
                     }
-                    if(a != 0){
+                    if(a != 0)
+                    {
                         claimedRolenum[i][gs.gameDay] = gs.gc[i].claimedRole;
                         //有技能使用对象
                         //添加职业顺序
@@ -2820,6 +2740,7 @@ public class UI implements UIInterface
                 peacePos.add(pos);
             }
         }
+        //占灵猎，处刑死体这一块的文本显示准备
         for(int k = 1; k < gs.gameDay;++k){
             int shitiCnt = 0;
             ArrayList<Integer> shitiNum = new ArrayList<>();
@@ -6667,18 +6588,246 @@ public class UI implements UIInterface
 
 
     }//狐胜
-    public void end_anime(){
-        //测试测试测试111
-//        gs.gc[1].dieDay = 3;
-//        gs.gc[1].whyDie = whyDie.dayhouzhui;
-//
-//        gs.gc[14].dieDay = 5;
-//        gs.gc[14].whyDie = whyDie.beiyao;
-//        gs.gc[4].dieDay = 1;
-//        gs.gc[4].whyDie = whyDie.zhousha;
-//        gs.gc[17].dieDay = 8;
-//        gs.gc[17].whyDie = whyDie.daymaozhou;
+    public void end_game(Scene scene)
+    {
+        Event event = events.poll();
+        ImageIcon bgIcon;
+        switch(scene)
+        {
+            case END_FOX:
+                while(event.eventname != EventName.yhsl){
+                    event = events.poll();
+                }
+                resources.playBgm("失败画面.wav");
+                bgIcon = resources.getImage("endFox.png");
+                break;
+            case END_WOLF:
+                while(event.eventname != EventName.krsl && event.eventname != EventName.rlsl){
+                    event = events.poll();
+                }
+                resources.playBgm("失败画面.wav");
+                bgIcon = resources.getImage("endWolf.png");
+                break;
+            case END_VILLAGE:
+            default:
+                while(event.eventname != EventName.crsl)
+                {
+                    event = events.poll();
+                }
+                resources.playBgm("胜利画面.wav");
+                bgIcon = resources.getImage("endVillage.png");
+                break;
+        }
+        diaPanel.removeAll();
+        diaPanel.setVisible(true);
+        //背景图片
 
+        JLabel background = new JLabel(bgIcon);
+        background.setOpaque(false);
+        background.setFocusable(false);
+        scalableComponents.add(new ScalableComponent(
+                background, 0, 0, 1.0, 1.0,
+                bgIcon.getImage()
+        ));
+
+
+        // 对话框背景（添加到对话框面板）
+        ImageIcon backIcon = resources.getImage("messageframe.png");
+        // 对话框面板
+        JPanel dialogPanel = new JPanel();
+        dialogPanel.setLayout(null);
+        dialogPanel.setOpaque(false);
+        dialogPanel.setBackground(new Color(0, 0, 0, 0));
+        scalableComponents.add(new ScalableComponent(
+                dialogPanel, 260.0 / 1280, 450.0 / 720,
+                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                null
+        ));
+        diaPanel.add(dialogPanel);     // 顶层：对话框面板
+
+
+
+        JLabel back = new JLabel(backIcon);
+        scalableComponents.add(new ScalableComponent(
+                back, 0.0 / 1280, 0.0 / 720,  // 基于对话框的绝对比例
+                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getImage()
+        ));
+
+        // 角色名称标签（添加到对话框面板）
+        JLabel nameLabel = new JLabel();
+        if(event.ch1!=null) {
+            nameLabel.setText(getCharacterFullName(event.ch1));
+        }
+        nameLabel.setForeground(Color.WHITE);
+        nameLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
+        nameLabel.setOpaque(false);
+        dialogPanel.add(nameLabel);  // 添加到对话框面板
+        scalableComponents.add(new ScalableComponent(
+                nameLabel, (20) / 1280.0, (10) / 720.0,  // 基于窗口的绝对位置
+                1000.0 / 1280, 30.0 / 720,
+                null
+        ));
+
+        // 文本显示区域（添加到对话框面板）
+        JTextArea dialogText = new JTextArea();
+        dialogText.setForeground(Color.WHITE);
+        dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
+        dialogText.setLineWrap(true);
+        dialogText.setWrapStyleWord(true);
+        dialogText.setEditable(false);
+        dialogText.setOpaque(false);
+        dialogText.setFocusable(false);
+        dialogText.setBackground(new Color(0, 0, 0, 0));
+        dialogText.setBorder(BorderFactory.createEmptyBorder());
+
+        scalableComponents.add(new ScalableComponent(
+                dialogText, (20) / 1280.0, (50) / 720.0,  // 基于窗口的绝对位置
+                (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
+                null
+        ));
+
+        JButton nextBtn = new JButton();
+        btnSet(nextBtn);
+
+        scalableComponents.add(new ScalableComponent(
+                nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
+                backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
+                null
+        ));
+
+        // 文本逐字打印逻辑
+        String text = resources.getEventText(event);
+        final String[] fullText = {text};
+        final int[] index = {0};
+        Timer typeTimer = new Timer(50, e -> {
+            if (index[0] < fullText[0].length()) {
+                dialogText.append(String.valueOf(fullText[0].charAt(index[0])));
+                index[0]++;
+            } else {
+                ((Timer) e.getSource()).stop();
+            }
+        });
+        dialogPanel.setVisible(true);
+        typeTimer.start();
+        //人物立绘
+        ImageIcon[] CharIcon = resources.getEventImage(event);
+        JLabel Chara = new JLabel();
+        //此时判断本次事件是不是接连事件
+        if(!linkIcon.isEmpty()) {
+            //是接连发生的事件则一左一右
+            //待修改
+            //展示第一个，话说完了点击再展示第二个
+            Chara.setIcon(CharIcon[0]);
+            Chara.setOpaque(false);
+            Chara.setFocusable(false);
+            scalableComponents.add(new ScalableComponent(
+                    Chara, 650/ 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
+                    CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                    CharIcon[0].getImage()
+            ));
+            diaPanel.add(Chara);
+            resizeComponents();
+            diaPanel.revalidate();
+            diaPanel.repaint();
+
+            JLabel Chara2 = new JLabel(linkIcon.get(0));
+
+            Chara2.setOpaque(false);
+            Chara2.setFocusable(false);
+            scalableComponents.add(new ScalableComponent(
+                    Chara2, 300 / 1280.0, (720 - linkIcon.get(0).getIconHeight() - 30) / 720.0,
+                    linkIcon.get(0).getIconWidth() / 1280.0, linkIcon.get(0).getIconHeight() / 720.0,
+                    linkIcon.get(0).getImage()
+            ));
+            diaPanel.add(Chara2);
+            diaPanel.setComponentZOrder(Chara2, 1);
+
+            linkIcon.remove(0);
+        }
+        //其他
+        else{
+            Chara.setIcon(CharIcon[0]);
+            Chara.setOpaque(false);
+            Chara.setFocusable(false);
+            boolean isLinked = false;
+            switch(event.eventname){
+                case gyfo1:
+                case qfjc5:
+                case zjgh8b:
+                case zjgb8:
+                case gprz11p:
+                case zcrh12:
+                    isLinked = true;
+                    break;
+            }
+            if(isLinked){
+                scalableComponents.add(new ScalableComponent(
+                        Chara, 300 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
+                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        CharIcon[0].getImage()
+                ));
+                linkIcon.add(CharIcon[0]);
+            }
+            else {
+                scalableComponents.add(new ScalableComponent(
+                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
+                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        CharIcon[0].getImage()
+                ));
+            }
+            diaPanel.add(Chara);
+
+            resizeComponents();
+            diaPanel.revalidate();
+            diaPanel.repaint();
+        }
+
+        // 按钮点击事件
+        nextBtn.addActionListener(e -> {
+            if (index[0] < fullText[0].length()) {
+                dialogText.setText(fullText[0]);
+                index[0] = fullText[0].length();
+                typeTimer.stop();
+            } else {
+                dialogPanel.setVisible(false);
+                switch(scene)
+                {
+                    case END_VILLAGE:
+                        resources.playSound("村人胜利音效.wav");
+                        break;
+                    case END_WOLF:
+                        resources.playSound("人狼胜利音效.wav");
+                        break;
+                    case END_FOX:
+                        resources.playSound("妖狐胜利音效.wav");
+                        break;
+                }
+                Timer timer = new Timer(3000,e1 -> {
+                    currentScene = Scene.END_ANIME;
+                    run();
+                    ((Timer) e1.getSource()).stop();
+                });
+                timer.start();
+            }
+        });
+        dialogPanel.add(nextBtn);  // 添加到对话框面板
+        dialogPanel.add(dialogText);  // 添加到对话框面板
+        dialogPanel.add(back);  // 添加到对话框面板
+
+        diaPanel.add(background);          // 最底层：背景
+        jPanel.add(diaPanel);
+
+        // 强制触发一次大小调整
+        jPanel.setComponentZOrder(diaPanel,0);
+        resizeComponents();
+        diaPanel.revalidate();
+        diaPanel.repaint();
+        diaPanel.setVisible(true);
+        jPanel.revalidate();
+        jPanel.repaint();
+    }
+    public void end_anime(){
         jPanel.removeAll();
         scalableComponents.clear();
 

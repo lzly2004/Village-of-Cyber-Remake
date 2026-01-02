@@ -3638,7 +3638,6 @@ public class MainLogic implements MainLogicInterface
         //提供给UI类，调用后主逻辑处理询问某一职业co的逻辑，这一步有可能会添加一些事件给UI类
         //参数：被询问co的职业。
         //无返回值，在函数体运行时添加对应的事件
-        
             logicTools.log("询问职业：" + aclaimedRole);
         int zhi = aclaimedRole.ordinal();
         if(claimedRoleaskday[zhi] != 0)
@@ -3652,7 +3651,7 @@ public class MainLogic implements MainLogicInterface
             if(gs.p == peiyi.jianyi) return;
             if(zhi == 5 && gs.p != peiyi.maoyou && gs.p != peiyi.daxing) return;
         }
-        if(zhi == 5)    //猫村出现两次多死，不可能还有猫了
+        if(zhi == 5)    //猫村出现两次多死，不可能还有猫了；出现过双死并且不可能有占卜师主张咒杀的话，也不可能co猫
         {
             int counter = 0;
             for(int i=1;i<=gs.gameDay;i++)
@@ -3662,6 +3661,54 @@ public class MainLogic implements MainLogicInterface
             }
             if(counter == 2 && gs.gc[actualRoleindex[5]].whyDie != whyDie.NONE)
                 return;
+            if(isDoubleDeathOccurred[gs.gameDay-1] && gs.gc[actualRoleindex[5]].whyDie != whyDie.NONE)    //若出现了一次多死,并且没有占卜师候补能声称咒杀，则不可能还有猫了
+            {
+                //检查是否有占卜师候补能声称咒杀
+                boolean canclaim = false;//默认没有占卜师候补能够生成咒杀
+
+                //处理第三日潜伏占卜师的问题
+                if(gs.gameDay == 3 && claimedRoleaskday[1] != 2) //存在有潜伏占卜师的选项
+                {
+                    boolean have_yugao = false;//默认没有潜伏占卜师的预告
+                    for(int i=1;i<=gs.getPlayerSum();i++)
+                    {
+                        if(gs.hiddenSeerScheduledSkillTargets[i][gs.gameDay-1])
+                        {
+                            have_yugao = true;
+                            if(diebody.contains(i))
+                                canclaim = true;
+                        }
+                    }
+                }
+
+                //处理常规情况
+                for(int i=0;i<zhans.size();i++)
+                {
+                    int zhan = zhans.get(i);//占候补的index
+                    if(gs.gc[zhan].nonHumanMarker) continue;//不考虑破绽占卜
+                    if(gs.gc[zhan].whyDie == whyDie.NONE)   //占候补没有死，所以直接看占卜结果
+                    {
+                        if(diebody.contains(gs.gc[zhan].skillTarget[gs.gameDay-1]))
+                            canclaim = true;//可以co猫主张咒杀
+                    }
+                    else
+                    {
+                        boolean have_yugao = false;//默认没有做预告
+                        for(int j=1;j<=gs.getPlayerSum();j++)   //占候补死了，只能看预告
+                        {
+                            if(gs.gc[zhan].claimedRoleScheduledSkillTargets[j][gs.gameDay-1])
+                            {
+                                have_yugao = true;
+                                if(diebody.contains(j))
+                                    canclaim = true;
+                            }
+                        }
+                        if(!have_yugao) //没有预告，只要死体范围内有人之前没有被占过，那么就有咒杀选项。此处没有考虑
+                            canclaim = true;
+                    }
+                }
+                if(!canclaim) return;
+            }
         }
         response.clear();
         for(int i=1;i<=gs.getPlayerSum();i++)
