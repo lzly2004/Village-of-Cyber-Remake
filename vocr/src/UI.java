@@ -20,6 +20,38 @@ import java.awt.*;
 //希望以后我能吸取第一次开发项目的教训，重视这些问题
 //以上
 //***************************************
+class ScalableComponent
+{
+    Component component;
+    double relX, relY; // 相对位置比例
+    double relWidth, relHeight; // 相对大小比例
+    Image originalImage; // 原始图片(用于按钮和标签的图标)
+
+    ScalableComponent(Component comp, double x, double y, double w, double h, Image img)
+    {
+        component = comp;
+        relX = x;
+        relY = y;
+        relWidth = w;
+        relHeight = h;
+        originalImage = img;
+    }
+    public Component getComponent(){
+        return component;
+    }
+    public double getXRatio(){
+        return relX;
+    }
+    public double getYRatio(){
+        return relY;
+    }
+    public double getWidthRatio(){
+        return relWidth;
+    }
+    public double getHeightRatio(){
+        return relHeight;
+    }
+}//保存所有需要缩放的组件及其原始属性，但是后面为了稳定禁止了窗口缩放，也就没用了，单纯作为设置组件位置和大小的工具
 public class UI implements UIInterface
 {
     public GameStatus getGameStatus()
@@ -139,39 +171,6 @@ public class UI implements UIInterface
     JFrame jFrame;//窗口
     JPanel jPanel;//容器
     JPanel diaPanel;//对话容器
-
-    class ScalableComponent
-    {
-        Component component;
-        double relX, relY; // 相对位置比例
-        double relWidth, relHeight; // 相对大小比例
-        Image originalImage; // 原始图片(用于按钮和标签的图标)
-
-        ScalableComponent(Component comp, double x, double y, double w, double h, Image img)
-        {
-            component = comp;
-            relX = x;
-            relY = y;
-            relWidth = w;
-            relHeight = h;
-            originalImage = img;
-        }
-        public Component getComponent(){
-            return component;
-        }
-        public double getXRatio(){
-            return relX;
-        }
-        public double getYRatio(){
-            return relY;
-        }
-        public double getWidthRatio(){
-            return relWidth;
-        }
-        public double getHeightRatio(){
-            return relHeight;
-        }
-    }//保存所有需要缩放的组件及其原始属性，但是后面为了稳定禁止了窗口缩放，也就没用了，单纯作为设置组件位置和大小的工具
     List<ScalableComponent> scalableComponents = new ArrayList<>();//用于添加需要缩放的组件，现在没有用了
 
     //定义当前待处理的事件
@@ -179,10 +178,13 @@ public class UI implements UIInterface
     static GameStatus gs;//从主逻辑类拿到的游戏状态
     ResourcesInterface resources;//资源接口
     MainLogicInterface mainLogic;//主逻辑接口
-
+    UIComponentFactory uiComponentFactory;
     boolean isTest = true;//测试，false时不显示测试内容
     public void init()
     {
+        //resources = Game.getInstance().getResources();
+        //dialogUtil = new DialogUtil(this,resources);
+        uiComponentFactory = new UIComponentFactory();
         currentScene = Scene.START_SCENE;//初始为开始界面
         jFrame = new JFrame("Village of Cyber:Remake v1.0.3.1");
         jFrame.setResizable(false);
@@ -247,19 +249,20 @@ public class UI implements UIInterface
     {
         resources = Game.getInstance().getResources();
         mainLogic = Game.getInstance().getMainLogic();
-        switch (currentScene){
+        switch (currentScene)
+        {
             case DIALOGUE_AFTERNOON:
                 dialogue_afternoon();
                 break;
-                case DIALOGUE_DEATH:
-                    dialogue_day_death();
-                    break;
-                case DIALOGUE_CHUXING:
-                    dialogue_chuxing();
-                    break;
-                case DIALOGUE_DAY:
-                    dialogue_day();
-                    break;
+            case DIALOGUE_DEATH:
+                dialogue_day_death();
+                break;
+            case DIALOGUE_CHUXING:
+                dialogue_chuxing();
+                break;
+            case DIALOGUE_DAY:
+                dialogue_day();
+                break;
             case START_SCENE:
                 StartScene();
                 break;
@@ -461,411 +464,33 @@ public class UI implements UIInterface
 
     public static LinkedList<Event> events = new LinkedList<>();//作为事件队列
 
-    public void addEvent(Event event) {
+    public void addEvent(Event event)
+    {
         events.add(event);
         if(isTest && event != null && !events.isEmpty())System.out.println("事件添加成功且不为空");
 
     }//添加event
-    public void btnSet (JButton btn){
-        btn.setOpaque(false);
-        btn.setBorderPainted(false);
-        btn.setContentAreaFilled(false);
-        btn.setForeground(Color.white);
-        btn.setFont(new Font("Takao Mincho",Font.BOLD,20));
-        btn.setFocusPainted(false);
-    }//按钮快捷设置
-    public void labelSet (JLabel label){
-        label.setOpaque(false);
-        label.setForeground(Color.BLACK);
-        label.setFont(new Font("Takao Mincho",Font.BOLD,50));
-    }//标签快捷设置
-    public void testBtn(){
+    public void testBtn()
+    {
         //测试用按钮，显示信息
         JButton test = new JButton("点我进入");
-
         scalableComponents.add(new ScalableComponent(test,0,0,60.0/1280,30.0/720,null));
         test.addActionListener(e -> {
             for(int i = 1;i < gs.gc.length;++i){
-                System.out.println("编号"+i+" "+getJobText(gs.gc[i].number) + " 真实职业："+getZY(gs.gc[i].actualRole)+" 声称职业："+getZY(gs.gc[i].claimedRole)
-                +" 死亡日期"+gs.gc[i].dieDay + " 死亡原因" + getwhyDie(gs.gc[i].whyDie) + " 怀疑度：");
+                System.out.println("编号"+i+" "+uiComponentFactory.getJobText(gs.gc[i].number) + " 真实职业："+uiComponentFactory.getZY(gs.gc[i].actualRole)+" 声称职业："+uiComponentFactory.getZY(gs.gc[i].claimedRole)
+                +" 死亡日期"+gs.gc[i].dieDay + " 死亡原因" + uiComponentFactory.getwhyDie(gs.gc[i].whyDie) + " 怀疑度：");
                 for(int j = 1;j < gs.gc.length;++j){
-                    System.out.print(getJobText(gs.gc[j].number)+" 为"+gs.gc[i].suspicionValue[j]+" ");
+                    System.out.print(uiComponentFactory.getJobText(gs.gc[j].number)+" 为"+gs.gc[i].suspicionValue[j]+" ");
                 }
                 System.out.println();
 
-                System.out.print(getJobText(gs.gc[i].number) + " 怀疑前三为" + gs.gc[i].top3SuspectedPlayers[1][gs.gameDay] + " "+ gs.gc[i].top3SuspectedPlayers[2][gs.gameDay] + " "+ gs.gc[i].top3SuspectedPlayers[3][gs.gameDay] + " ");
+                System.out.print(uiComponentFactory.getJobText(gs.gc[i].number) + " 怀疑前三为" + gs.gc[i].top3SuspectedPlayers[1][gs.gameDay] + " "+ gs.gc[i].top3SuspectedPlayers[2][gs.gameDay] + " "+ gs.gc[i].top3SuspectedPlayers[3][gs.gameDay] + " ");
                 System.out.println();
             }
         });
         jPanel.add(test);
         jPanel.setComponentZOrder(test,0);
     }//设置测试按钮，显示信息
-
-    public String getCharacterFullName(CharacterEnglishName englishName) {
-        // 初始化默认值
-        String kanjiName = CharacterKanjiName.NONE.name();
-        String katakanaName = CharacterKatakanaName.NONE.name();
-
-        // 通过switch一一匹配所有枚举的对应关系
-        switch (englishName) {
-            case NONE:
-                kanjiName = CharacterKanjiName.NONE.name();
-                katakanaName = CharacterKatakanaName.NONE.name();
-                break;
-            case Abel:
-                kanjiName = CharacterKanjiName.青年.name();
-                katakanaName = CharacterKatakanaName.アーベル.name();
-                break;
-            case Erich:
-                kanjiName = CharacterKanjiName.研究生.name();
-                katakanaName = CharacterKatakanaName.エーリッヒ.name();
-                break;
-            case Matthäus:
-                kanjiName = CharacterKanjiName.傭兵.name();
-                katakanaName = CharacterKatakanaName.マテウス.name();
-                break;
-            case Otfried:
-                kanjiName = CharacterKanjiName.教師.name();
-                katakanaName = CharacterKatakanaName.オトフリート.name();
-                break;
-            case Karl:
-                kanjiName = CharacterKanjiName.情報通.name();
-                katakanaName = CharacterKatakanaName.カルル.name();
-                break;
-            case Till:
-                kanjiName = CharacterKanjiName.少年.name();
-                katakanaName = CharacterKatakanaName.ティル.name();
-                break;
-            case Samuel:
-                kanjiName = CharacterKanjiName.宝石商.name();
-                katakanaName = CharacterKatakanaName.ザムエル.name();
-                break;
-            case Hans:
-                kanjiName = CharacterKanjiName.旅人.name();
-                katakanaName = CharacterKatakanaName.ハンス.name();
-                break;
-            case Beatrice:
-                kanjiName = CharacterKanjiName.少女.name();
-                katakanaName = CharacterKatakanaName.ベアトリーチェ.name();
-                break;
-            case Amanda:
-                kanjiName = CharacterKanjiName.陶芸家.name();
-                katakanaName = CharacterKatakanaName.アマンダ.name();
-                break;
-            case Irene:
-                kanjiName = CharacterKanjiName.ランプ屋.name();
-                katakanaName = CharacterKatakanaName.イレーネ.name();
-                break;
-            case Elsa:
-                kanjiName = CharacterKanjiName.歌姫.name();
-                katakanaName = CharacterKatakanaName.エルザ.name();
-                break;
-            case Nora:
-                kanjiName = CharacterKanjiName.未亡人.name();
-                katakanaName = CharacterKatakanaName.ノーラ.name();
-                break;
-            case Johanna:
-                kanjiName = CharacterKanjiName.物識り.name();
-                katakanaName = CharacterKatakanaName.ヨハナ.name();
-                break;
-            case Milli:
-                kanjiName = CharacterKanjiName.読書家.name();
-                katakanaName = CharacterKatakanaName.ミリィ.name();
-                break;
-            case Judith:
-                kanjiName = CharacterKanjiName.召使い.name();
-                katakanaName = CharacterKatakanaName.ユーディット.name();
-                break;
-            case Michael:
-                kanjiName = CharacterKanjiName.貴族.name();
-                katakanaName = CharacterKatakanaName.ミハエル.name();
-                break;
-            case Günther:
-                kanjiName = CharacterKanjiName.自衛団長.name();
-                katakanaName = CharacterKatakanaName.ギュンター.name();
-                break;
-            case David:
-                kanjiName = CharacterKanjiName.騎士.name();
-                katakanaName = CharacterKatakanaName.ダーヴィッド.name();
-                break;
-            case Julian:
-                kanjiName = CharacterKanjiName.職人見習い.name();
-                katakanaName = CharacterKatakanaName.ユリアン.name();
-                break;
-            case Klemens:
-                kanjiName = CharacterKanjiName.神父.name();
-                katakanaName = CharacterKatakanaName.クレメンス.name();
-                break;
-            case Heinrich:
-                kanjiName = CharacterKanjiName.探偵.name();
-                katakanaName = CharacterKatakanaName.ハインリヒ.name();
-                break;
-            case Liddi:
-                kanjiName = CharacterKanjiName.学生.name();
-                katakanaName = CharacterKatakanaName.リディ.name();
-                break;
-            case Brigitte:
-                kanjiName = CharacterKanjiName.小説家.name();
-                katakanaName = CharacterKatakanaName.ブリジット.name();
-                break;
-            case Helga:
-                kanjiName = CharacterKanjiName.酒場のママ.name();
-                katakanaName = CharacterKatakanaName.ヘルガ.name();
-                break;
-            case Natalie:
-                kanjiName = CharacterKanjiName.シスター.name();
-                katakanaName = CharacterKatakanaName.ナターリエ.name();
-                break;
-            case Volker: // 双生儿弟弟
-                kanjiName = CharacterKanjiName.双生児弟.name();
-                katakanaName = CharacterKatakanaName.フォルカー.name();
-                break;
-            case Eva: // 双生儿姐姐
-                kanjiName = CharacterKanjiName.双生児姉.name();
-                katakanaName = CharacterKatakanaName.エーファ.name();
-                break;
-            case Willy:
-                kanjiName = CharacterKanjiName.流れ者.name();
-                katakanaName = CharacterKatakanaName.ヴィリー.name();
-                break;
-            case Reichard:
-                kanjiName = CharacterKanjiName.修道士.name();
-                katakanaName = CharacterKatakanaName.ライヒアルト.name();
-                break;
-            case Hugo:
-                kanjiName = CharacterKanjiName.宿屋主人.name();
-                katakanaName = CharacterKatakanaName.フーゴー.name();
-                break;
-            case Rosa:
-                kanjiName = CharacterKanjiName.踊り子.name();
-                katakanaName = CharacterKatakanaName.ローザ.name();
-                break;
-            case Wendel:
-                kanjiName = CharacterKanjiName.神学生.name();
-                katakanaName = CharacterKatakanaName.ウェンデル.name();
-                break;
-            case Sergius:
-                kanjiName = CharacterKanjiName.薬師.name();
-                katakanaName = CharacterKatakanaName.ゼルギウス.name();
-                break;
-            case Kaja:
-                kanjiName = CharacterKanjiName.煙突掃除人.name();
-                katakanaName = CharacterKatakanaName.カヤ.name();
-                break;
-            case Betti:
-                kanjiName = CharacterKanjiName.店員.name();
-                katakanaName = CharacterKatakanaName.ベッティ.name();
-                break;
-            case Chloe:
-                kanjiName = CharacterKanjiName.洗濯女.name();
-                katakanaName = CharacterKatakanaName.クロエ.name();
-                break;
-            case Carmen:
-                kanjiName = CharacterKanjiName.娼妓.name();
-                katakanaName = CharacterKatakanaName.カルメン.name();
-                break;
-            case Renate:
-                kanjiName = CharacterKanjiName.剣士.name();
-                katakanaName = CharacterKatakanaName.レナーテ.name();
-                break;
-            case Romi:
-                kanjiName = CharacterKanjiName.村娘.name();
-                katakanaName = CharacterKatakanaName.ロミ.name();
-                break;
-            case Gerda:
-                kanjiName = CharacterKanjiName.刺繍工.name();
-                katakanaName = CharacterKatakanaName.ゲルダ.name();
-                break;
-            case Iwan:
-                kanjiName = CharacterKanjiName.大工.name();
-                katakanaName = CharacterKatakanaName.イヴァン.name();
-                break;
-            case Oktavia:
-                kanjiName = CharacterKanjiName.貴婦人.name();
-                katakanaName = CharacterKatakanaName.オクタヴィア.name();
-                break;
-            case Helmut:
-                kanjiName = CharacterKanjiName.音楽家.name();
-                katakanaName = CharacterKatakanaName.ヘルムート.name();
-                break;
-            default:
-                kanjiName = "未知角色";
-                katakanaName = "未知片假名";
-                break;
-        }
-
-        // 核心修改：拼接为「日文汉字 片假名/英文」格式
-        return String.format("%s %s/%s", kanjiName, katakanaName, englishName.name());
-    }//获取人物的完整名字，输入的是event的ch1
-    public String getJobText(int num) {
-        switch (num) {
-            case 1:
-                return "青年";
-            case 2:
-                return "研究";
-            case 3:
-                return "傭兵";
-            case 4:
-                return "教師";
-            case 5:
-                return "情報";
-            case 6:
-                return "少年";
-            case 7:
-                return "宝石";
-            case 8:
-                return "旅人";
-            case 9:
-                return "少女";
-            case 10:
-                return "陶芸";
-            case 11:
-                return "洋灯";
-            case 12:
-                return "歌姫";
-            case 13:
-                return "未亡";
-            case 14:
-                return "物識";
-            case 15:
-                return "読書";
-            case 16:
-                return "召使";
-            case 17:
-                return "貴族";
-            case 18:
-                return "団長";
-            case 19:
-                return "騎士";
-            case 20:
-                return "職人";
-            case 21:
-                return "神父";
-            case 22:
-                return "探偵";
-            case 23:
-                return "学生";
-            case 24:
-                return "小説";
-            case 25:
-                return "女将";
-            case 26:
-                return "尼僧";
-            case 27:
-                return "双弟";
-            case 28:
-                return "双姉";
-            case 29:
-                return "流者";
-            case 30:
-                return "修道";
-            case 31:
-                return "宿主";
-            case 32:
-                return "踊子";
-            case 33:
-                return "神学";
-            case 34:
-                return "薬師";
-            case 35:
-                return "煙突";
-            case 36:
-                return "店員";
-            case 37:
-                return "洗濯";
-            case 38:
-                return "娼妓";
-            case 39:
-                return "剣士";
-            case 40:
-                return "村娘";
-            case 41:
-                return "刺繡";
-            case 42:
-                return "大工";
-            case 43:
-                return "婦人";
-            case 44:
-                return "音楽";
-            default:
-                return "";
-        }
-    }//获取名字，需要传入人物编号
-    public String getZY(int i){
-        String str = "";
-        switch(i){
-            case 1:
-                str = "占い師";
-                break;
-            case 2:
-                str = "霊能者";
-                break;
-            case 3:
-                str = "狩人";
-                break;
-            case 5:
-                str = "猫又";
-                break;
-            case 4:
-                str = "共有者";
-                break;
-            case 10:
-                str = "妖狐";
-                break;
-            case 11:
-                str = "背徳者";
-                break;
-            case 7:
-                str = "人狼";
-                break;
-            case 8:
-                str = "狂人";
-                break;
-            case 9:
-                str = "狂信者";
-                break;
-            case 6:
-                str = "村人";
-                break;
-            default:
-                str = "無し";
-                break;
-        }
-        return str;
-    }//获取职业文本，需要传入角色的number
-    public String getwhyDie(whyDie i){
-        String str = "";
-        switch(i){
-            case NONE :
-                str = "没死";
-                break;
-            case nightmaozhou:
-                str = "夜间猫咒";
-                break;
-            case daymaozhou:
-                str = "白天猫咒";
-                break;
-            case dayhouzhui:
-                str = "白天后追";
-                break;
-            case zhousha:
-                str = "咒杀";
-                break;
-            case nighthouzhui:
-                str = "夜间后追";
-                break;
-            case chuxing:
-                str = "处刑";
-                break;
-            case beiyao:
-                str = "被咬";
-                break;
-            default:
-                break;
-        }
-        return str;
-    }//获取角色死因，用于测试信息的显示
-
     String levelName = "";//当前关卡职业配置图片，用于投票履历中显示
 
     public void StartScene()
@@ -899,7 +524,7 @@ public class UI implements UIInterface
         // 游戏标题
         ImageIcon titleIcon = resources.getImage("titleLogo.png");
         JLabel titleLabel = new JLabel(titleIcon);
-        labelSet(titleLabel);
+        uiComponentFactory.labelSet(titleLabel);
         jPanel.add(titleLabel);
         // 添加到可缩放列表(相对位置和大小)
         scalableComponents.add(new ScalableComponent(
@@ -919,7 +544,7 @@ public class UI implements UIInterface
         // 新游戏按钮
         ImageIcon startIcon = resources.getImage("startButton.png");
         JButton btnStart = new JButton(startIcon);
-        btnSet(btnStart);
+        uiComponentFactory.btnSet(btnStart);
         btnStart.addActionListener(e -> {
             resources.playSound("click.wav");
             currentScene = Scene.GAME_SCENE_SELECT;
@@ -935,7 +560,7 @@ public class UI implements UIInterface
         // 继续游戏按钮
         ImageIcon continueIcon = resources.getImage("continueButton.png");
         JButton btnContinue = new JButton(continueIcon);
-        btnSet(btnContinue);
+        uiComponentFactory.btnSet(btnContinue);
         btnContinue.addActionListener(e -> resources.playSound("click.wav"));
         jPanel.add(btnContinue);
         scalableComponents.add(new ScalableComponent(
@@ -947,7 +572,7 @@ public class UI implements UIInterface
         // 选择存档按钮
         ImageIcon saveIcon = resources.getImage("replayButton.png");
         JButton btnSave = new JButton(saveIcon);
-        btnSet(btnSave);
+        uiComponentFactory.btnSet(btnSave);
         btnSave.addActionListener(e -> resources.playSound("click.wav"));
         jPanel.add(btnSave);
         scalableComponents.add(new ScalableComponent(
@@ -959,7 +584,7 @@ public class UI implements UIInterface
         // 数据统计按钮
         ImageIcon recordIcon = resources.getImage("recordButton.png");
         JButton btnRecord = new JButton(recordIcon);
-        btnSet(btnRecord);
+        uiComponentFactory.btnSet(btnRecord);
         btnRecord.addActionListener(e -> resources.playSound("click.wav"));
         jPanel.add(btnRecord);
         scalableComponents.add(new ScalableComponent(
@@ -971,7 +596,7 @@ public class UI implements UIInterface
         // 信息查看按钮
         ImageIcon infoIcon = resources.getImage("infoButton.png");
         JButton btnInfo = new JButton(infoIcon);
-        btnSet(btnInfo);
+        uiComponentFactory.btnSet(btnInfo);
         btnInfo.addActionListener(e ->{
             resources.playSound("click.wav");
             currentScene = Scene.INFO_SCENE;
@@ -989,7 +614,7 @@ public class UI implements UIInterface
         // 角色收集按钮
         ImageIcon collectionsIcon = resources.getImage("collectionsButton.png");
         JButton btnCollections = new JButton(collectionsIcon);
-        btnSet(btnCollections);
+        uiComponentFactory.btnSet(btnCollections);
         btnCollections.addActionListener(e -> resources.playSound("click.wav"));
         jPanel.add(btnCollections);
         scalableComponents.add(new ScalableComponent(
@@ -1020,7 +645,7 @@ public class UI implements UIInterface
         //简易村
         ImageIcon village1 = resources.getImage("game1.png");
         JButton btn1 = new JButton(village1);
-        btnSet(btn1);
+        uiComponentFactory.btnSet(btn1);
         scalableComponents.add(new ScalableComponent(btn1,30.0/1280,20.0/720,
                 village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
                 village1.getImage()));
@@ -1050,7 +675,7 @@ public class UI implements UIInterface
         //通常村
         village1 = resources.getImage("game2.png");
         btn1 = new JButton(village1);
-        btnSet(btn1);
+        uiComponentFactory.btnSet(btn1);
         scalableComponents.add(new ScalableComponent(btn1,30.0/1280.0,(20.0+ village1.getIconHeight())/720.0,
                 village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
                 village1.getImage()));
@@ -1069,7 +694,7 @@ public class UI implements UIInterface
         //妖狐村
         village1 = resources.getImage("game3.png");
         btn1 = new JButton(village1);
-        btnSet(btn1);
+        uiComponentFactory.btnSet(btn1);
         scalableComponents.add(new ScalableComponent(btn1,30.0/1280.0,(20.0+ village1.getIconHeight()*2)/720.0,
                 village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
                 village1.getImage()));
@@ -1088,7 +713,7 @@ public class UI implements UIInterface
         //狂信村
         village1 = resources.getImage("game4 #19067.png");
         btn1 = new JButton(village1);
-        btnSet(btn1);
+        uiComponentFactory.btnSet(btn1);
         scalableComponents.add(new ScalableComponent(btn1,30.0/1280.0,(20 + village1.getIconHeight()*3)/720.0,
                 village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
                 village1.getImage()));
@@ -1107,7 +732,7 @@ public class UI implements UIInterface
         //背德村
         village1 = resources.getImage("game5.png");
         btn1 = new JButton(village1);
-        btnSet(btn1);
+        uiComponentFactory.btnSet(btn1);
         scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/1280.0,20.0/720.0,
                 village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
                 village1.getImage()));
@@ -1126,7 +751,7 @@ public class UI implements UIInterface
         //猫又村
         village1 = resources.getImage("game6.png");
         btn1 = new JButton(village1);
-        btnSet(btn1);
+        uiComponentFactory.btnSet(btn1);
         scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/1280.0,(20.0+ village1.getIconHeight())/720.0,
                 village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
                 village1.getImage()));
@@ -1145,7 +770,7 @@ public class UI implements UIInterface
         //大型村
         village1 = resources.getImage("game7.png");
         btn1 = new JButton(village1);
-        btnSet(btn1);
+        uiComponentFactory.btnSet(btn1);
         scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/1280.0,(20.0+ 2*village1.getIconHeight())/720.0,
                 village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
                 village1.getImage()));
@@ -1164,7 +789,7 @@ public class UI implements UIInterface
         //返回按钮
         ImageIcon back = resources.getImage("return.png");
         btn1 = new JButton(back);
-        btnSet(btn1);
+        uiComponentFactory.btnSet(btn1);
         scalableComponents.add(new ScalableComponent(btn1,(1280 - back.getIconWidth() - 30)/1280.0,(720 - 40- back.getIconHeight())/720.0,
                 back.getIconWidth()/1280.0,back.getIconHeight()/720.0,
                 back.getImage()));
@@ -1331,7 +956,7 @@ public class UI implements UIInterface
         ));
 
         JButton nextBtn = new JButton();
-        btnSet(nextBtn);
+        uiComponentFactory.btnSet(nextBtn);
 
         scalableComponents.add(new ScalableComponent(
                 nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
@@ -1443,7 +1068,7 @@ public class UI implements UIInterface
             ));
 
             JButton nextBtn = new JButton();
-            btnSet(nextBtn);
+            uiComponentFactory.btnSet(nextBtn);
 
             scalableComponents.add(new ScalableComponent(
                     nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
@@ -1547,7 +1172,7 @@ public class UI implements UIInterface
             // 角色名称标签（添加到对话框面板）
             JLabel nameLabel = new JLabel();
             if (event.ch1 != null) {
-                nameLabel.setText(getCharacterFullName(event.ch1));
+                nameLabel.setText(uiComponentFactory.getCharacterFullName(event.ch1));
             }
             nameLabel.setForeground(Color.WHITE);
             nameLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
@@ -1577,7 +1202,7 @@ public class UI implements UIInterface
             ));
 
             JButton nextBtn = new JButton();
-            btnSet(nextBtn);
+            uiComponentFactory.btnSet(nextBtn);
 
             scalableComponents.add(new ScalableComponent(
                     nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
@@ -1742,7 +1367,7 @@ public class UI implements UIInterface
 
         JLabel nameLabel = new JLabel();
         if(event.ch1!=null) {
-            nameLabel.setText(getCharacterFullName(event.ch1));
+            nameLabel.setText(uiComponentFactory.getCharacterFullName(event.ch1));
         }
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
@@ -1773,7 +1398,7 @@ public class UI implements UIInterface
         ));
 
         JButton nextBtn = new JButton();
-        btnSet(nextBtn);
+        uiComponentFactory.btnSet(nextBtn);
 
         scalableComponents.add(new ScalableComponent(
                 nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
@@ -1964,7 +1589,7 @@ public class UI implements UIInterface
         // 角色名称标签（添加到对话框面板）
         JLabel nameLabel = new JLabel();
         if(event.ch1!=null) {
-            nameLabel.setText(getCharacterFullName(event.ch1));
+            nameLabel.setText(uiComponentFactory.getCharacterFullName(event.ch1));
         }
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
@@ -1994,7 +1619,7 @@ public class UI implements UIInterface
         ));
 
         JButton nextBtn = new JButton();
-        btnSet(nextBtn);
+        uiComponentFactory.btnSet(nextBtn);
 
         scalableComponents.add(new ScalableComponent(
                 nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
@@ -2218,7 +1843,7 @@ public class UI implements UIInterface
         // 角色名称标签（添加到对话框面板）
         JLabel nameLabel = new JLabel();
         if(event.ch1!=null) {
-            nameLabel.setText(getCharacterFullName(event.ch1));
+            nameLabel.setText(uiComponentFactory.getCharacterFullName(event.ch1));
         }
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
@@ -2248,7 +1873,7 @@ public class UI implements UIInterface
         ));
 
         JButton nextBtn = new JButton();
-        btnSet(nextBtn);
+        uiComponentFactory.btnSet(nextBtn);
 
         scalableComponents.add(new ScalableComponent(
                 nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
@@ -2383,7 +2008,8 @@ public class UI implements UIInterface
     boolean isAvoid = true;//是否回避，默认开启
     boolean isCo = false;//是否询问co
 
-    public JButton createDraggableButton() {
+    public JButton createDraggableButton() //创建一个拖动button:指定的时候使用
+    {
         // 1. 创建基础空按钮
         JButton draggableBtn = new JButton();
         draggableBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -2396,9 +2022,11 @@ public class UI implements UIInterface
         final int[] mouseOffset = new int[2];
 
         // 2. 鼠标按下：记录初始位置+偏移量+切换光标+按钮置顶
-        draggableBtn.addMouseListener(new MouseAdapter() {
+        draggableBtn.addMouseListener(new MouseAdapter()
+        {
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mousePressed(MouseEvent e)
+            {
                 // 记录按钮当前位置（拖拽前的初始位置）
                 initPos.setLocation(draggableBtn.getX(), draggableBtn.getY());
                 // 记录鼠标在按钮内的偏移量（防止拖动瞬移）
@@ -2413,18 +2041,19 @@ public class UI implements UIInterface
                     parent.repaint();
                 }
             }
-
-
         });
 
         // 3. 鼠标拖动：跟随移动+边界限制（不超出父容器）
-        draggableBtn.addMouseMotionListener(new MouseAdapter() {
+        draggableBtn.addMouseMotionListener(new MouseAdapter()
+        {
             @Override
-            public void mouseDragged(MouseEvent e) {
+            public void mouseDragged(MouseEvent e)
+            {
                 Container parent = draggableBtn.getParent();
                 // 校验父容器尺寸有效（避免缩放时计算错乱）
                 if (parent == null || parent.getWidth() <= 0 || parent.getHeight() <= 0
-                        || draggableBtn.getWidth() <= 0 || draggableBtn.getHeight() <= 0) {
+                        || draggableBtn.getWidth() <= 0 || draggableBtn.getHeight() <= 0)
+                {
                     return;
                 }
 
@@ -2443,7 +2072,7 @@ public class UI implements UIInterface
         });
 
         return draggableBtn;
-    }//创建一个拖动button
+    }
 
     int[][] skillTargetPeople;//用于存技能使用对象
     String[][] skillTargetNames;//用于存技能使用对象对应的图标
@@ -2462,7 +2091,8 @@ public class UI implements UIInterface
     {
         jPanel.removeAll();
         scalableComponents.clear();
-        if(isTest) {
+        if(isTest)
+        {
             testBtn();//测试按钮
         }
         // 背景图片
@@ -2482,7 +2112,7 @@ public class UI implements UIInterface
         {
             ImageIcon musicBtnIcon = resources.getImage("musicBtn.png");
             JButton btnMusic = new JButton(musicBtnIcon);
-            btnSet(btnMusic);
+            uiComponentFactory.btnSet(btnMusic);
             scalableComponents.add(new ScalableComponent(btnMusic,15.0/1280,35.0/720,musicBtnIcon.getIconWidth()/1280.0,musicBtnIcon.getIconHeight()/720.0,musicBtnIcon.getImage()));
             btnMusic.addActionListener(e -> {
 
@@ -2511,8 +2141,7 @@ public class UI implements UIInterface
         }
         else {
             ImageIcon musicBtnIcon = resources.getImage("musicBtn.png");
-            JButton btnMusic = new JButton(musicBtnIcon);
-            btnSet(btnMusic);
+            JButton btnMusic = ButtonSimpleFactory.makeButton(0,musicBtnIcon);
             scalableComponents.add(new ScalableComponent(btnMusic,15.0/1280,35.0/720,musicBtnIcon.getIconWidth()/1280.0,musicBtnIcon.getIconHeight()/720.0,musicBtnIcon.getImage()));
             btnMusic.addActionListener(e -> {
 
@@ -2824,7 +2453,7 @@ public class UI implements UIInterface
                 //死亡了显示到死亡前
                 if(k == 1) switch(gs.gc[i].claimedRole){
                     case 1://占卜
-                        zhanbu.append(getJobText(gs.gc[i].number)).append(" : ");
+                        zhanbu.append(uiComponentFactory.getJobText(gs.gc[i].number)).append(" : ");
                         for(int j = 1;j < gs.gameDay;++j){
                             //第一天占卜，在第二天才能看，此时只有第一天有，第二天没有
                             if(gs.gc[i].dieDay != 0&&j >= gs.gc[i].dieDay){
@@ -2835,11 +2464,11 @@ public class UI implements UIInterface
 
                                 if(gs.gc[i].skillTarget[j] > (gs.gc.length - 1)){
                                     //黑球
-                                    zhanbu.append(getJobText(gs.gc[gs.gc[i].skillTarget[j] - (gs.gc.length-1)].number)).append("●");
+                                    zhanbu.append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].skillTarget[j] - (gs.gc.length-1)].number)).append("●");
                                     zhanbu.append("→");
                                 }
                                 else if((gs.gc[i].skillTarget[j] > 0)){
-                                    zhanbu.append(getJobText(gs.gc[gs.gc[i].skillTarget[j]].number)).append("○");
+                                    zhanbu.append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].skillTarget[j]].number)).append("○");
                                     zhanbu.append("→");
                                 }
                             }
@@ -2854,7 +2483,7 @@ public class UI implements UIInterface
 
                         break;
                     case 2://灵能
-                        lingneng.append(getJobText(gs.gc[i].number)).append(" : ");
+                        lingneng.append(uiComponentFactory.getJobText(gs.gc[i].number)).append(" : ");
                         for(int j = 2;j < gs.gameDay;++j){
                             if(gs.gc[i].dieDay != 0&&j >= gs.gc[i].dieDay){
                                 //如果超出范围
@@ -2863,11 +2492,11 @@ public class UI implements UIInterface
                             else{
                                 if(gs.gc[i].skillTarget[j] > (gs.gc.length - 1)){
                                     //黑球
-                                    lingneng.append(getJobText(gs.gc[gs.gc[i].skillTarget[j] - (gs.gc.length-1)].number)).append("●");
+                                    lingneng.append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].skillTarget[j] - (gs.gc.length-1)].number)).append("●");
                                     lingneng.append("→");
                                 }
                                 else if((gs.gc[i].skillTarget[j] > 0)){
-                                    lingneng.append(getJobText(gs.gc[gs.gc[i].skillTarget[j]].number)).append("○");
+                                    lingneng.append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].skillTarget[j]].number)).append("○");
                                     lingneng.append("→");
                                 }
                             }
@@ -2881,7 +2510,7 @@ public class UI implements UIInterface
 
                         break;
                     case 3://猎人
-                        lieren.append(getJobText(gs.gc[i].number)).append(" : ");
+                        lieren.append(uiComponentFactory.getJobText(gs.gc[i].number)).append(" : ");
                         for(int j = 2;j < gs.gameDay;++j){
                             if(gs.gc[i].dieDay != 0&&j >= gs.gc[i].dieDay) {
                                 //如果超出范围
@@ -2889,7 +2518,7 @@ public class UI implements UIInterface
                             }
                             if(gs.gc[i].skillTarget[j] != 0){
                                 //没有对象
-                                lieren.append(getJobText(gs.gc[gs.gc[i].skillTarget[j]].number));
+                                lieren.append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].skillTarget[j]].number));
                                 lieren.append("→");
                             }
 
@@ -2910,7 +2539,7 @@ public class UI implements UIInterface
                                 //循环找一下谁是背德
                                 if (gs.gc[j].actualRole == 11 && gs.gc[j].whyDie !=whyDie.NONE && gs.gc[i].dieDay == k && gs.gc[j].dieDay < gs.gc[i].dieDay) {
                                     //如果背德已经死了且死亡在妖狐前，就正常显示
-                                    chuxing.append(getJobText(gs.gc[i].number)).append("→");
+                                    chuxing.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("→");
                                     break;
                                 }
                                 //没死的话就不做处理，等后面有dayhouzhui的时候一起处理
@@ -2921,7 +2550,7 @@ public class UI implements UIInterface
                         }
                         else{
                             if(gs.gc[i].dieDay == k){
-                            chuxing.append(getJobText(gs.gc[i].number)).append("→");
+                            chuxing.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("→");
                             }
                         }
                         break;
@@ -2930,14 +2559,14 @@ public class UI implements UIInterface
                             for (int j = 1; j <= gs.gc.length - 1; j++) {
                                 //循环找一下谁是猫
                                 if (gs.gc[j].actualRole == 5) {
-                                    chuxing.append(getJobText(gs.gc[j].number)).append("+");
+                                    chuxing.append(uiComponentFactory.getJobText(gs.gc[j].number)).append("+");
                                     break;
                                 }
 
                             }
 
                             //实现 猫+受猫害者
-                            chuxing.append(getJobText(gs.gc[i].number)).append("(猫呪)").append("→");
+                            chuxing.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("(猫呪)").append("→");
                         }
                         break;
                     case whyDie.dayhouzhui:
@@ -2945,12 +2574,12 @@ public class UI implements UIInterface
                             for (int j = 1; j <= gs.gc.length - 1; j++) {
                                 //循环找一下谁是妖狐
                                 if (gs.gc[j].actualRole == 10) {
-                                    chuxing.append(getJobText(gs.gc[j].number)).append("+");
+                                    chuxing.append(uiComponentFactory.getJobText(gs.gc[j].number)).append("+");
                                     break;
                                 }
                             }
                             //实现 狐+背德
-                            chuxing.append(getJobText(gs.gc[i].number)).append("(後追)").append("→");
+                            chuxing.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("(後追)").append("→");
                         }
                         break;
 
@@ -2971,11 +2600,11 @@ public class UI implements UIInterface
                 }
             }
             if(shitiCnt == 1) {
-                shiti.append(getJobText(shitiNum.get(0))).append("→");
+                shiti.append(uiComponentFactory.getJobText(shitiNum.get(0))).append("→");
             }
             else {
                 for (int l = 0; l < shitiNum.size(); ++l) {
-                    shiti.append(getJobText(shitiNum.get(l))).append("+");
+                    shiti.append(uiComponentFactory.getJobText(shitiNum.get(l))).append("+");
                 }
                 shiti.setLength(shiti.length()-1);
                 shiti.append("→");
@@ -3025,9 +2654,7 @@ public class UI implements UIInterface
         //按钮
         //投票
         ImageIcon btnImage = resources.getImage("goTohyo.png");
-        JButton voteBtn = new JButton(btnImage);
-        btnSet(voteBtn);
-
+        JButton voteBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(voteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
                         btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                         btnImage.getImage()));
@@ -3035,16 +2662,14 @@ public class UI implements UIInterface
         jPanel.add(voteBtn);
         //记录确认
         btnImage = resources.getImage("check.png");
-        JButton recordBtn = new JButton(btnImage);
-        btnSet(recordBtn);
+        JButton recordBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(recordBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
         jPanel.add(recordBtn);
         //指示按钮
         btnImage = resources.getImage("shiji.png");
-        JButton pointBtn = new JButton(btnImage);
-        btnSet(pointBtn);
+        JButton pointBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(pointBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3052,8 +2677,7 @@ public class UI implements UIInterface
         jPanel.add(pointBtn);
         //回避按钮(关)
         btnImage = resources.getImage("关闭回避.png");
-        JButton avoidBtn = new JButton(btnImage);
-        btnSet(avoidBtn);
+        JButton avoidBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(avoidBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3061,8 +2685,7 @@ public class UI implements UIInterface
         jPanel.add(avoidBtn);
         //回避按钮(开)
         btnImage = resources.getImage("开启回避.png");
-        JButton avoidBtn1 = new JButton(btnImage);
-        btnSet(avoidBtn1);
+        JButton avoidBtn1 = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(avoidBtn1,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3070,8 +2693,7 @@ public class UI implements UIInterface
         jPanel.add(avoidBtn1);
         //退出按钮
         btnImage = resources.getImage("IntroTitle.png");
-        JButton menuBtn = new JButton(btnImage);
-        btnSet(menuBtn);
+        JButton menuBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(menuBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 5 - 40)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3084,9 +2706,7 @@ public class UI implements UIInterface
         //投票第二层
         //灰随机
         btnImage = resources.getImage("tohyoGrey.png");
-        JButton greyBtn = new JButton(btnImage);
-        btnSet(greyBtn);
-
+        JButton greyBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(greyBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3094,8 +2714,7 @@ public class UI implements UIInterface
         jPanel.add(greyBtn);
         //自由投票
         btnImage = resources.getImage("tohyoFree.png");
-        JButton freeBtn = new JButton(btnImage);
-        btnSet(freeBtn);
+        JButton freeBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(freeBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3105,9 +2724,7 @@ public class UI implements UIInterface
         //记录确认第二层
         //怀疑度
         btnImage = resources.getImage("checkUtagai.png");
-        JButton doubtBtn = new JButton(btnImage);
-        btnSet(doubtBtn);
-
+        JButton doubtBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(doubtBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3115,8 +2732,7 @@ public class UI implements UIInterface
         jPanel.add(doubtBtn);
         //投票履历
         btnImage = resources.getImage("checkTohyo.png");
-        JButton votehisBtn = new JButton(btnImage);
-        btnSet(votehisBtn);
+        JButton votehisBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(votehisBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3126,9 +2742,7 @@ public class UI implements UIInterface
         //指示按钮第二层
         //co指示
         btnImage = resources.getImage("doCO.png");
-        JButton coBtn = new JButton(btnImage);
-        btnSet(coBtn);
-
+        JButton coBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(coBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3136,8 +2750,7 @@ public class UI implements UIInterface
         jPanel.add(coBtn);
         //指定指示
         btnImage = resources.getImage("doShitei.png");
-        JButton ppBtn = new JButton(btnImage);
-        btnSet(ppBtn);
+        JButton ppBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(ppBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3145,8 +2758,7 @@ public class UI implements UIInterface
         jPanel.add(ppBtn);
         //返回按钮
         btnImage = resources.getImage("return.png");
-        JButton returnBtn = new JButton(btnImage);
-        btnSet(returnBtn);
+        JButton returnBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(returnBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3154,8 +2766,7 @@ public class UI implements UIInterface
         jPanel.add(returnBtn);
         //下一天按钮
         btnImage = resources.getImage("nextDay.png");
-        JButton nextBtn = new JButton(btnImage);
-        btnSet(nextBtn);
+        JButton nextBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(nextBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3163,8 +2774,7 @@ public class UI implements UIInterface
         jPanel.add(nextBtn);
         //同票再次投票按钮
         btnImage = resources.getImage("goTohyo.png");
-        JButton againBtn = new JButton(btnImage);
-        btnSet(againBtn);
+        JButton againBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(againBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3173,9 +2783,7 @@ public class UI implements UIInterface
         //指定投票按钮
         //指定投票
         btnImage = resources.getImage("tohyoShitei.png");
-        JButton readyVoteBtn = new JButton(btnImage);
-        btnSet(readyVoteBtn);
-
+        JButton readyVoteBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(readyVoteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3184,8 +2792,7 @@ public class UI implements UIInterface
         //co按钮第三层
         //询问co
         btnImage = resources.getImage("询问CO.png");
-        JButton askCoBtn = new JButton(btnImage);
-        btnSet(askCoBtn);
+        JButton askCoBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(askCoBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3193,9 +2800,7 @@ public class UI implements UIInterface
         jPanel.add(askCoBtn);
         //灵能指示
         btnImage = resources.getImage("reiCO.png");
-        JButton reiBtn = new JButton(btnImage);
-        btnSet(reiBtn);
-
+        JButton reiBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(reiBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3203,8 +2808,7 @@ public class UI implements UIInterface
         jPanel.add(reiBtn);
         //猎人指示
         btnImage = resources.getImage("kariCO.png");
-        JButton kariBtn = new JButton(btnImage);
-        btnSet(kariBtn);
+        JButton kariBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(kariBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3213,9 +2817,7 @@ public class UI implements UIInterface
 
         //占卜指示
         btnImage = resources.getImage("uranaiCO.png");
-        JButton uranaiBtn = new JButton(btnImage);
-        btnSet(uranaiBtn);
-
+        JButton uranaiBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(uranaiBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3223,8 +2825,7 @@ public class UI implements UIInterface
         jPanel.add(uranaiBtn);
         //共有指示
         btnImage = resources.getImage("kyouyuCO.png");
-        JButton kyouyuBtn = new JButton(btnImage);
-        btnSet(kyouyuBtn);
+        JButton kyouyuBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(kyouyuBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3232,8 +2833,7 @@ public class UI implements UIInterface
         jPanel.add(kyouyuBtn);
         //猫又指示
         btnImage = resources.getImage("catCO.png");
-        JButton catBtn = new JButton(btnImage);
-        btnSet(catBtn);
+        JButton catBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(catBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3242,9 +2842,7 @@ public class UI implements UIInterface
         //指定指示按钮第三层
         //指定投票
         btnImage = resources.getImage("tohyoShitei.png");
-        JButton fixedVoteBtn = new JButton(btnImage);
-        btnSet(fixedVoteBtn);
-
+        JButton fixedVoteBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(fixedVoteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3252,8 +2850,7 @@ public class UI implements UIInterface
         jPanel.add(fixedVoteBtn);
         //指定占卜
         btnImage = resources.getImage("shiteiUranai.png");
-        JButton fixedUranaiBtn = new JButton(btnImage);
-        btnSet(fixedUranaiBtn);
+        JButton fixedUranaiBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(fixedUranaiBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3262,8 +2859,7 @@ public class UI implements UIInterface
 
         //指定护卫
         btnImage = resources.getImage("shiteiGoei.png");
-        JButton protectBtn = new JButton(btnImage);
-        btnSet(protectBtn);
+        JButton protectBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(protectBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
                 btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
                 btnImage.getImage()));
@@ -3309,7 +2905,7 @@ public class UI implements UIInterface
         for(int i = 1;i<gs.gc.length;++i){
             //灰投票是获取无球无职活着的人
             if(isTest){
-                System.out.println("已进入灰循环" + getJobText(gs.gc[i].number) + " " +gs.gc[i].whyDie+" "+ gs.gc[i].claimedRole);
+                System.out.println("已进入灰循环" + uiComponentFactory.getJobText(gs.gc[i].number) + " " +gs.gc[i].whyDie+" "+ gs.gc[i].claimedRole);
             }
             if(gs.gc[i].whyDie == whyDie.NONE&&(gs.gc[i].claimedRole == 0 || gs.gc[i].claimedRole == 6)) {
                 //活着
@@ -3317,12 +2913,12 @@ public class UI implements UIInterface
                 //村人和未声明的
                 if(beiZhan1.contains(i)){
                     if(isTest){
-                        System.out.println(getJobText(gs.gc[i].number) + "被占卜过了，不是灰");
+                        System.out.println(uiComponentFactory.getJobText(gs.gc[i].number) + "被占卜过了，不是灰");
                     }
                     continue;
                 }
                 if(isTest){
-                System.out.println(getJobText(gs.gc[i].number) + "是灰");
+                System.out.println(uiComponentFactory.getJobText(gs.gc[i].number) + "是灰");
                 }
                 cxList.add(i);
 
@@ -3378,9 +2974,7 @@ public class UI implements UIInterface
                 //前结果
                 ImageIcon btnImage1;
                 btnImage1 = resources.getImage("rirekiBack.png");
-                JButton backResult = new JButton(btnImage1);
-                btnSet(backResult);
-
+                JButton backResult = ButtonSimpleFactory.makeButton(0,btnImage1);
                 scalableComponents.add(new ScalableComponent(backResult,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 3 - 20)/720.0,
                         btnImage1.getIconWidth()/1280.0,btnImage1.getIconHeight()/720.0,
                         btnImage1.getImage()));
@@ -3389,8 +2983,7 @@ public class UI implements UIInterface
                 jPanel.setComponentZOrder(backResult,0);
                 //次结果
                 btnImage1 = resources.getImage("rirekiNext.png");
-                JButton nextResult = new JButton(btnImage1);
-                btnSet(nextResult);
+                JButton nextResult = ButtonSimpleFactory.makeButton(0,btnImage1);
                 scalableComponents.add(new ScalableComponent(nextResult,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 2 - 10)/720.0,
                         btnImage1.getIconWidth()/1280.0,btnImage1.getIconHeight()/720.0,
                         btnImage1.getImage()));
@@ -3399,9 +2992,7 @@ public class UI implements UIInterface
                 jPanel.setComponentZOrder(nextResult,0);
                 //前结果
                 btnImage1 = resources.getImage("rirekiBack.png");
-                JButton backResult1 = new JButton(btnImage1);
-                btnSet(backResult1);
-
+                JButton backResult1 = ButtonSimpleFactory.makeButton(0,btnImage1);
                 scalableComponents.add(new ScalableComponent(backResult1,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 3 - 20)/720.0,
                         btnImage1.getIconWidth()/1280.0,btnImage1.getIconHeight()/720.0,
                         btnImage1.getImage()));
@@ -3410,8 +3001,7 @@ public class UI implements UIInterface
                 jPanel.setComponentZOrder(backResult1,0);
                 //次结果
                 btnImage1 = resources.getImage("rirekiNext.png");
-                JButton nextResult1 = new JButton(btnImage1);
-                btnSet(nextResult1);
+                JButton nextResult1 = ButtonSimpleFactory.makeButton(0,btnImage1);
                 scalableComponents.add(new ScalableComponent(nextResult1,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 2 - 10)/720.0,
                         btnImage1.getIconWidth()/1280.0,btnImage1.getIconHeight()/720.0,
                         btnImage1.getImage()));
@@ -3444,8 +3034,7 @@ public class UI implements UIInterface
                     backResult.setVisible(true);
                 });
                 ImageIcon dayIcon = resources.getImage(gameday + "day.png");
-                JButton dayBtn = new JButton(dayIcon);
-                btnSet(dayBtn);
+                JButton dayBtn = ButtonSimpleFactory.makeButton(0,dayIcon);
                 dayBtn.addActionListener(e1 -> {
 
                     createDayPiao(1,gameday,voteMethods.get(gameday-2));
@@ -3525,7 +3114,7 @@ public class UI implements UIInterface
                 isSelectedVoteTargetResult.append("[指定投票]\n");
                 for (int i = 1; i < gs.gc.length; ++i) {
                     if (gs.gc[i].isSelectedVoteTarget[gs.gameDay]) {
-                        isSelectedVoteTargetResult.append(getJobText(gs.gc[i].number)+" ");
+                        isSelectedVoteTargetResult.append(uiComponentFactory.getJobText(gs.gc[i].number)+" ");
                     }
 
                 }
@@ -3537,10 +3126,10 @@ public class UI implements UIInterface
                 isSelectedVoteTargetResult.append("[指定占い]\n");
                 for (int i = 1; i < gs.gc.length; ++i) {
                     if (gs.gc[i].claimedRole == 1&& gs.gc[i].whyDie == whyDie.NONE) {
-                        isSelectedVoteTargetResult.append(getJobText(gs.gc[i].number) + "→");
+                        isSelectedVoteTargetResult.append(uiComponentFactory.getJobText(gs.gc[i].number) + "→");
                         for (int j = 1; j < gs.gc.length; ++j) {
                             if (gs.gc[i].claimedRoleScheduledSkillTargets[j][gs.gameDay]) {
-                                isSelectedVoteTargetResult.append(getJobText(gs.gc[j].number) + ",");
+                                isSelectedVoteTargetResult.append(uiComponentFactory.getJobText(gs.gc[j].number) + ",");
                             }
 
                         }
@@ -3551,7 +3140,7 @@ public class UI implements UIInterface
                 for (int j = 1; j < gs.gc.length; ++j) {
                     if (gs.hiddenSeerScheduledSkillTargets[j][gs.gameDay]) {
                         if(cc++ == 0)isSelectedVoteTargetResult.append("潜伏→");
-                        isSelectedVoteTargetResult.append(getJobText(gs.gc[j].number) + ",");
+                        isSelectedVoteTargetResult.append(uiComponentFactory.getJobText(gs.gc[j].number) + ",");
                     }
 
                 }
@@ -3564,7 +3153,7 @@ public class UI implements UIInterface
                 for (int i = 1; i < gs.gc.length; ++i) {
                     for (int j = 1; j < gs.gc.length; ++j) {
                         if (gs.gc[i].claimedRoleScheduledSkillTargets[j][gs.gameDay]) {
-                            System.out.println(getJobText(gs.gc[i].number)+"护卫了"+gs.gc[i].claimedRoleScheduledSkillTargets[j][gs.gameDay]);
+                            System.out.println(uiComponentFactory.getJobText(gs.gc[i].number)+"护卫了"+gs.gc[i].claimedRoleScheduledSkillTargets[j][gs.gameDay]);
                         }
                     }
                 }
@@ -3574,10 +3163,10 @@ public class UI implements UIInterface
 
                 for (int i = 1; i < gs.gc.length; ++i) {
                     if (gs.gc[i].claimedRole == 3 && gs.gc[i].whyDie == whyDie.NONE) {
-                        isSelectedVoteTargetResult.append(getJobText(gs.gc[i].number) + "→");
+                        isSelectedVoteTargetResult.append(uiComponentFactory.getJobText(gs.gc[i].number) + "→");
                         for (int j = 1; j < gs.gc.length; ++j) {
                             if (gs.gc[i].claimedRoleScheduledSkillTargets[j][gs.gameDay]) {
-                                isSelectedVoteTargetResult.append(getJobText(gs.gc[j].number) + ",");
+                                isSelectedVoteTargetResult.append(uiComponentFactory.getJobText(gs.gc[j].number) + ",");
                             }
                         }
                         isSelectedVoteTargetResult.append("\n");
@@ -3587,7 +3176,7 @@ public class UI implements UIInterface
                 for (int j = 1; j < gs.gc.length; ++j) {
                     if (gs.hiddenHunterScheduledSkillTargets[j][gs.gameDay]) {
                         if(vv++ == 0) isSelectedVoteTargetResult.append("潜伏→");
-                        isSelectedVoteTargetResult.append(getJobText(gs.gc[j].number) + ",");
+                        isSelectedVoteTargetResult.append(uiComponentFactory.getJobText(gs.gc[j].number) + ",");
                     }
 
                 }
@@ -3634,7 +3223,7 @@ public class UI implements UIInterface
             scrollPane1.setVisible(false);
             StringBuilder greyText = new StringBuilder();
             for(int i = 0;i < cxList.size();++i){
-                greyText.append(getJobText(gs.gc[cxList.get(i)].number));
+                greyText.append(uiComponentFactory.getJobText(gs.gc[cxList.get(i)].number));
             }
             List<Integer> beiZhan = new ArrayList<>();
             for(int j = 1;j<gs.gameDay;++j){
@@ -3876,7 +3465,7 @@ public class UI implements UIInterface
 
                 StringBuilder isSelectedVoteTargetText = new StringBuilder();
                 for(int i = 0;i < chuxingList.size();++i){
-                    isSelectedVoteTargetText.append(getJobText(gs.gc[chuxingList.get(i)].number)).append(",");
+                    isSelectedVoteTargetText.append(uiComponentFactory.getJobText(gs.gc[chuxingList.get(i)].number)).append(",");
                 }
                 System.out.println(isSelectedVoteTargetText);
                 createPiao("-投票結果/" + trueDay + "日目-指定投票\n"+isSelectedVoteTargetText+"\n", round[0], isReVote);
@@ -4280,9 +3869,7 @@ public class UI implements UIInterface
                     boardImage.getImage()));
 
             ImageIcon dragIcon = resources.getImage("uranaiAll.png");
-            JButton dragBtn = createDraggableButton();
-            dragBtn.setIcon(dragIcon);
-            btnSet(dragBtn);
+            JButton dragBtn = ButtonSimpleFactory.makeButton(1,dragIcon);
             scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn.addMouseListener(new MouseAdapter() {
@@ -4334,9 +3921,7 @@ public class UI implements UIInterface
             infoCoPanel.add(dragBtn);
 
             dragIcon = resources.getImage("delete.png");
-            JButton dragBtn_delete = createDraggableButton();
-            dragBtn_delete.setIcon(dragIcon);
-            btnSet(dragBtn_delete);
+            JButton dragBtn_delete = ButtonSimpleFactory.makeButton(1,dragIcon);
             scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn_delete.addMouseListener(new MouseAdapter() {
@@ -4625,9 +4210,7 @@ public class UI implements UIInterface
                     boardImage.getImage()));
 
             ImageIcon dragIcon = resources.getImage("touhyou.png");
-            JButton dragBtn = createDraggableButton();
-            dragBtn.setIcon(dragIcon);
-            btnSet(dragBtn);
+            JButton dragBtn = ButtonSimpleFactory.makeButton(1,dragIcon);
             scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn.addMouseListener(new MouseAdapter() {
@@ -4682,7 +4265,7 @@ public class UI implements UIInterface
                         }
                         if(isTest) {
                             for (int a = 1; a < gs.gc.length; ++a) {
-                                if (gs.gc[a].isSelectedVoteTarget[gs.gameDay]) System.out.println(getJobText(gs.gc[a].number));
+                                if (gs.gc[a].isSelectedVoteTarget[gs.gameDay]) System.out.println(uiComponentFactory.getJobText(gs.gc[a].number));
                             }
                         }
                     }
@@ -4691,9 +4274,7 @@ public class UI implements UIInterface
             infoPanel.add(dragBtn);
 
             dragIcon = resources.getImage("delete.png");
-            JButton dragBtn_delete = createDraggableButton();
-            dragBtn_delete.setIcon(dragIcon);
-            btnSet(dragBtn_delete);
+            JButton dragBtn_delete = ButtonSimpleFactory.makeButton(1,dragIcon);
             scalableComponents.add(new ScalableComponent(dragBtn_delete,500.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn_delete.addMouseListener(new MouseAdapter() {
@@ -4753,7 +4334,7 @@ public class UI implements UIInterface
                         }
                         if(isTest) {
                             for (int a = 1; a < gs.gc.length; ++a) {
-                                if (gs.gc[a].isSelectedVoteTarget[gs.gameDay]) System.out.println(getJobText(gs.gc[a].number));
+                                if (gs.gc[a].isSelectedVoteTarget[gs.gameDay]) System.out.println(uiComponentFactory.getJobText(gs.gc[a].number));
                             }
                         }
                     }
@@ -4982,9 +4563,7 @@ public class UI implements UIInterface
                     boardImage.getImage()));
 
             ImageIcon dragIcon = resources.getImage("uranaiAll.png");
-            JButton dragBtn = createDraggableButton();
-            dragBtn.setIcon(dragIcon);
-            btnSet(dragBtn);
+            JButton dragBtn = ButtonSimpleFactory.makeButton(1,dragIcon);
             scalableComponents.add(new ScalableComponent(dragBtn,150.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn.addMouseListener(new MouseAdapter() {
@@ -5029,7 +4608,7 @@ public class UI implements UIInterface
                                     for (int hh = 1; hh < gs.gc.length; ++hh) {
                                         for (int t = 1; t < gs.gc.length; ++t) {
                                             if (gs.gc[hh].claimedRoleScheduledSkillTargets[t][gs.gameDay]) {
-                                                System.out.println(getJobText(gs.gc[hh].number) + "预告了" + getJobText(gs.gc[t].number));
+                                                System.out.println(uiComponentFactory.getJobText(gs.gc[hh].number) + "预告了" + uiComponentFactory.getJobText(gs.gc[t].number));
                                             }
                                         }
                                     }
@@ -5059,9 +4638,7 @@ public class UI implements UIInterface
                     System.out.println(zhanbuNum.size());
                 }
                 ImageIcon Icon1 = resources.getImage("uranai" + zhanbuOrder.get(cur)+".png");
-                JButton Btn = createDraggableButton();
-                Btn.setIcon(Icon1);
-                btnSet(Btn);
+                JButton Btn = ButtonSimpleFactory.makeButton(1,Icon1);
                 scalableComponents.add(new ScalableComponent(Btn,(zhanbuOrder.get(cur)*100+150)/1280.0,350/720.0,Icon1.getIconWidth()/2.0/1280,Icon1.getIconHeight()/2.0/720,
                         Icon1.getImage()));
                 Btn.addMouseListener(new MouseAdapter() {
@@ -5101,7 +4678,7 @@ public class UI implements UIInterface
                                         for (int hh = 1; hh < gs.gc.length; ++hh) {
                                             for (int t = 1; t < gs.gc.length; ++t) {
                                                 if (gs.gc[hh].claimedRoleScheduledSkillTargets[t][gs.gameDay]) {
-                                                    System.out.println(getJobText(gs.gc[hh].number) + "预告了" + getJobText(gs.gc[t].number));
+                                                    System.out.println(uiComponentFactory.getJobText(gs.gc[hh].number) + "预告了" + uiComponentFactory.getJobText(gs.gc[t].number));
                                                 }
                                             }
                                         }
@@ -5124,13 +4701,8 @@ public class UI implements UIInterface
 
                 arr[0]++;
             }
-
-
-
             dragIcon = resources.getImage("delete.png");
-            JButton dragBtn_delete = createDraggableButton();
-            dragBtn_delete.setIcon(dragIcon);
-            btnSet(dragBtn_delete);
+            JButton dragBtn_delete = ButtonSimpleFactory.makeButton(1,dragIcon);
             scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn_delete.addMouseListener(new MouseAdapter() {
@@ -5199,7 +4771,7 @@ public class UI implements UIInterface
                                     for (int hh = 1; hh < gs.gc.length; ++hh) {
                                         for (int t = 1; t < gs.gc.length; ++t) {
                                             if (gs.gc[hh].claimedRoleScheduledSkillTargets[t][gs.gameDay]) {
-                                                System.out.println(getJobText(gs.gc[hh].number) + "预告了" + getJobText(gs.gc[t].number));
+                                                System.out.println(uiComponentFactory.getJobText(gs.gc[hh].number) + "预告了" + uiComponentFactory.getJobText(gs.gc[t].number));
                                             }
                                         }
                                     }
@@ -5449,9 +5021,7 @@ public class UI implements UIInterface
                     boardImage.getImage()));
 
             ImageIcon dragIcon = resources.getImage("goeiAll.png");
-            JButton dragBtn = createDraggableButton();
-            dragBtn.setIcon(dragIcon);
-            btnSet(dragBtn);
+            JButton dragBtn = ButtonSimpleFactory.makeButton(1,dragIcon);
             scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn.addMouseListener(new MouseAdapter() {
@@ -5496,7 +5066,7 @@ public class UI implements UIInterface
                                     for (int hh = 1; hh < gs.gc.length; ++hh) {
                                         for (int t = 1; t < gs.gc.length; ++t) {
                                             if (gs.gc[hh].claimedRoleScheduledSkillTargets[t][gs.gameDay]) {
-                                                System.out.println(getJobText(gs.gc[hh].number) + "预告了" + getJobText(gs.gc[t].number));
+                                                System.out.println(uiComponentFactory.getJobText(gs.gc[hh].number) + "预告了" + uiComponentFactory.getJobText(gs.gc[t].number));
                                             }
                                         }
                                     }
@@ -5525,9 +5095,7 @@ public class UI implements UIInterface
                 System.out.println(cur);
                 System.out.println(zhanbuNum.size());
                 ImageIcon Icon1 = resources.getImage("goei" + zhanbuOrder.get(cur)+".png");
-                JButton Btn = createDraggableButton();
-                Btn.setIcon(Icon1);
-                btnSet(Btn);
+                JButton Btn = ButtonSimpleFactory.makeButton(1,Icon1);
                 scalableComponents.add(new ScalableComponent(Btn,(zhanbuOrder.get(cur)*150+250)/1280.0,350/720.0,Icon1.getIconWidth()/2.0/1280,Icon1.getIconHeight()/2.0/720,
                         Icon1.getImage()));
                 Btn.addMouseListener(new MouseAdapter() {
@@ -5567,7 +5135,7 @@ public class UI implements UIInterface
                                         for (int hh = 1; hh < gs.gc.length; ++hh) {
                                             for (int t = 1; t < gs.gc.length; ++t) {
                                                 if (gs.gc[hh].claimedRoleScheduledSkillTargets[t][gs.gameDay]) {
-                                                    System.out.println(getJobText(gs.gc[hh].number) + "预告了" + getJobText(gs.gc[t].number));
+                                                    System.out.println(uiComponentFactory.getJobText(gs.gc[hh].number) + "预告了" + uiComponentFactory.getJobText(gs.gc[t].number));
                                                 }
                                             }
                                         }
@@ -5590,13 +5158,8 @@ public class UI implements UIInterface
 
                 arr[0]++;
             }
-
-
-
             dragIcon = resources.getImage("delete.png");
-            JButton dragBtn_delete = createDraggableButton();
-            dragBtn_delete.setIcon(dragIcon);
-            btnSet(dragBtn_delete);
+            JButton dragBtn_delete = ButtonSimpleFactory.makeButton(1,dragIcon);
             scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn_delete.addMouseListener(new MouseAdapter() {
@@ -5662,7 +5225,7 @@ public class UI implements UIInterface
                                     for (int hh = 1; hh < gs.gc.length; ++hh) {
                                         for (int t = 1; t < gs.gc.length; ++t) {
                                             if (gs.gc[hh].claimedRoleScheduledSkillTargets[t][gs.gameDay]) {
-                                                System.out.println(getJobText(gs.gc[hh].number) + "预告了" + getJobText(gs.gc[t].number));
+                                                System.out.println(uiComponentFactory.getJobText(gs.gc[hh].number) + "预告了" + uiComponentFactory.getJobText(gs.gc[t].number));
                                             }
                                         }
                                     }
@@ -5761,7 +5324,7 @@ public class UI implements UIInterface
                 extraText.append("グレラン：\n");
                 for(int i = 0;i < gs.gc.length;++i){
                     if(greyCharas[i][gameDay] != 0){
-                        extraText.append(getJobText(gs.gc[greyCharas[i][gameDay]].number));
+                        extraText.append(uiComponentFactory.getJobText(gs.gc[greyCharas[i][gameDay]].number));
                     }
                 }
                 break;
@@ -5769,7 +5332,7 @@ public class UI implements UIInterface
                 extraText.append("指定投票：\n");
                 for(int i = 0;i < gs.gc.length;++i){
                     if(isSelectedVoteTargetCharas[i][gameDay] != 0){
-                        extraText.append(getJobText(gs.gc[isSelectedVoteTargetCharas[i][gameDay]].number)).append(",");
+                        extraText.append(uiComponentFactory.getJobText(gs.gc[isSelectedVoteTargetCharas[i][gameDay]].number)).append(",");
                     }
                 }
                 break;
@@ -5781,13 +5344,13 @@ public class UI implements UIInterface
             if(gs.gc[i].whyDie == whyDie.NONE || gs.gc[i].dieDay >= gameDay){
                 //没死 或者第gameDay还没死
                 if(leftCnt >= 10){
-                    rightPiao.append(getJobText(gs.gc[i].number)).append("：").append( voteTotal[i][round]).append("票  ")
-                            .append("投票先→").append(getJobText(gs.gc[gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
+                    rightPiao.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("：").append( voteTotal[i][round]).append("票  ")
+                            .append("投票先→").append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
                     //有10个了就去右边
                 }
                 else {
-                    leftPiao.append(getJobText(gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
-                            .append("投票先→").append(getJobText(gs.gc[gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
+                    leftPiao.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
+                            .append("投票先→").append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
                     leftCnt++;
                 }
             }
@@ -5872,12 +5435,12 @@ public class UI implements UIInterface
             if (gs.gc[i].whyDie == whyDie.NONE || gs.gc[i].dieDay == gameDay) {
                 //没死或者今天才死，但是还是能投票
                 if (leftCnt >= 10) {
-                    rightPiao.append(getJobText(gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
-                            .append("投票先→").append(getJobText(gs.gc[gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
+                    rightPiao.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
+                            .append("投票先→").append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
                     //有10个了就去右边
                 } else {
-                    leftPiao.append(getJobText(gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
-                            .append("投票先→").append(getJobText(gs.gc[gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
+                    leftPiao.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
+                            .append("投票先→").append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
                     leftCnt++;
                 }
             }
@@ -5889,7 +5452,7 @@ public class UI implements UIInterface
                 }
                 //4 票で、剣士さんが処刑されました。
                 if (maxCnt == 1) {
-                    leftPiao.append(max).append("票で").append(getJobText(gs.gc[maxPos.get(0)].number)).append("さんが処刑されました。");
+                    leftPiao.append(max).append("票で").append(uiComponentFactory.getJobText(gs.gc[maxPos.get(0)].number)).append("さんが処刑されました。");
                     isReVote[0] = false;
                     chuxingWho = maxPos.get(0);
                     maxPos.clear();
@@ -5978,9 +5541,9 @@ public class UI implements UIInterface
                 if(leftCnt >= 10){
                     for(int u = 1; u < 4;++u) {
                         if(u < gs.gc[i].top3SuspectedPlayers.length&& gs.gc[i].top3SuspectedPlayers[u][gs.gameDay]!=0) {
-                            if (u == 1) rightPiao.append(getJobText(gs.gc[i].number)).append("：");
+                            if (u == 1) rightPiao.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("：");
 
-                            rightPiao.append(getJobText(gs.gc[gs.gc[i].top3SuspectedPlayers[u][gs.gameDay]].number));
+                            rightPiao.append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].top3SuspectedPlayers[u][gs.gameDay]].number));
                             if(!cmps.isEmpty()){
                                 rightPiao.append(cmps.getFirst());
                                 cmps.removeFirst();
@@ -5994,8 +5557,8 @@ public class UI implements UIInterface
                     for(int u = 1; u < 4;++u) {
                         if(u < gs.gc[i].top3SuspectedPlayers.length && gs.gc[i].top3SuspectedPlayers[u][gs.gameDay]!=0){
                             //如果存在怀疑对象
-                            if(u == 1)leftPiao.append(getJobText(gs.gc[i].number)).append("：");
-                            leftPiao.append(getJobText(gs.gc[gs.gc[i].top3SuspectedPlayers[u][gs.gameDay]].number));
+                            if(u == 1)leftPiao.append(uiComponentFactory.getJobText(gs.gc[i].number)).append("：");
+                            leftPiao.append(uiComponentFactory.getJobText(gs.gc[gs.gc[i].top3SuspectedPlayers[u][gs.gameDay]].number));
                             if(!cmps.isEmpty()){
                                 leftPiao.append(cmps.getFirst());
                                 cmps.removeFirst();
@@ -6116,7 +5679,7 @@ public class UI implements UIInterface
         // 角色名称标签（添加到对话框面板）
         JLabel nameLabel = new JLabel();
         if(event.ch1!=null) {
-            nameLabel.setText(getCharacterFullName(event.ch1));
+            nameLabel.setText(uiComponentFactory.getCharacterFullName(event.ch1));
         }
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
@@ -6145,10 +5708,7 @@ public class UI implements UIInterface
                 (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
                 null
         ));
-
-        JButton nextBtn = new JButton();
-        btnSet(nextBtn);
-
+        JButton nextBtn = ButtonSimpleFactory.makeButton(0,null);
         scalableComponents.add(new ScalableComponent(
                 nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
                 backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
@@ -6300,8 +5860,7 @@ public class UI implements UIInterface
                 backIcon.getImage()
         ));
         ImageIcon btnImage = resources.getImage("PVBtitile.png");
-        JButton nextBtn = new JButton(btnImage);
-        btnSet(nextBtn);
+        JButton nextBtn = ButtonSimpleFactory.makeButton(0,btnImage);
         scalableComponents.add(new ScalableComponent(nextBtn,1130.0/1280,(720  - btnImage.getIconHeight())/720.0,
                 btnImage.getIconWidth()*0.6/1280.0,btnImage.getIconHeight()*0.6/720.0,
                 btnImage.getImage()));
@@ -6315,9 +5874,11 @@ public class UI implements UIInterface
         for(int i = 1;i < gs.gc.length; i++) {
 
             StringBuilder infoText = new StringBuilder();
-            infoText.append("公称職業:\n").append(getZY(gs.gc[i].claimedRole)).append("\n真の職業:\n").append(getZY(gs.gc[i].actualRole)).append("\n");
-            if(gs.gc[i].whyDie != whyDie.NONE){
-                switch(gs.gc[i].whyDie){
+            infoText.append("公称職業:\n").append(uiComponentFactory.getZY(gs.gc[i].claimedRole)).append("\n真の職業:\n").append(uiComponentFactory.getZY(gs.gc[i].actualRole)).append("\n");
+            if(gs.gc[i].whyDie != whyDie.NONE)
+            {
+                switch(gs.gc[i].whyDie)
+                {
                     case beiyao:
                         infoText.append(gs.gc[i].dieDay).append("日目狼噛");
                         break;
@@ -6339,23 +5900,31 @@ public class UI implements UIInterface
                         break;
                 }
             }
-            else{
-                if(gs.end == 1) {
+            else
+            {
+                if(gs.end == 1)
+                {
                     infoText.append("最終存活");
                 }
-                else if(gs.end == 2) {
-                    if(gs.gc[i].actualRole < 7||gs.gc[i].actualRole > 9) {
+                else if(gs.end == 2)
+                {
+                    if(gs.gc[i].actualRole < 7||gs.gc[i].actualRole > 9)
+                    {
                         infoText.append("最終死亡");
                     }
-                    else {
+                    else
+                    {
                         infoText.append("最終胜利");
                     }
                 }
-                else if(gs.end == 3) {
-                    if(gs.gc[i].actualRole < 10) {
+                else if(gs.end == 3)
+                {
+                    if(gs.gc[i].actualRole < 10)
+                    {
                         infoText.append("最終死亡");
                     }
-                    else {
+                    else
+                    {
                         infoText.append("最終胜利");
                     }
                 }
@@ -6376,7 +5945,8 @@ public class UI implements UIInterface
             imageName.append(gs.gc[i].number);
             switch(gs.gc[i].whyDie){
                 case NONE:
-                    switch(gs.gc[i].actualRole){
+                    switch(gs.gc[i].actualRole)
+                    {
                         case 5:
                             imageName.append("cs");
                             break;
@@ -6516,8 +6086,7 @@ public class UI implements UIInterface
         //词条按钮
         //1
         ImageIcon btnNext = resources.getImage("avg_button2.png");
-        JButton btn_next = new JButton(resources.getHelpText("Info1.txt"),btnNext);
-        btnSet(btn_next);
+        JButton btn_next = ButtonSimpleFactory.makeButton(0,resources.getHelpText("Info1.txt"),btnNext);
         // 核心设置：文本在图标上方，且水平居中
         btn_next.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
@@ -6528,8 +6097,7 @@ public class UI implements UIInterface
         });
         scalableComponents.add(new ScalableComponent(btn_next,80.0/1280,80.0/720,222.0/1280,50.0/720,btnNext.getImage()));
         //2
-        JButton btn_next2 = new JButton(resources.getHelpText("Info2.txt"),btnNext);
-        btnSet(btn_next2);
+        JButton btn_next2 = ButtonSimpleFactory.makeButton(0,resources.getHelpText("Info2.txt"),btnNext);
         // 核心设置：文本在图标上方，且水平居中
         btn_next2.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
@@ -6541,8 +6109,7 @@ public class UI implements UIInterface
         //3
         scalableComponents.add(new ScalableComponent(btn_next2,80.0/1280,150.0/720,222.0/1280,50.0/720,btnNext.getImage()));
 
-        JButton btn_next3 = new JButton(resources.getHelpText("Info3.txt"),btnNext);
-        btnSet(btn_next3);
+        JButton btn_next3 = ButtonSimpleFactory.makeButton(0,resources.getHelpText("Info3.txt"),btnNext);
         // 核心设置：文本在图标上方，且水平居中
         btn_next3.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
@@ -6553,8 +6120,7 @@ public class UI implements UIInterface
         });
         scalableComponents.add(new ScalableComponent(btn_next3,80.0/1280,220.0/720,222.0/1280,50.0/720,btnNext.getImage()));
         //4
-        JButton btn_next4 = new JButton(resources.getHelpText("Info4.txt"),btnNext);
-        btnSet(btn_next4);
+        JButton btn_next4 = ButtonSimpleFactory.makeButton(0,resources.getHelpText("Info4.txt"),btnNext);
         // 核心设置：文本在图标上方，且水平居中
         btn_next4.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
@@ -6565,8 +6131,7 @@ public class UI implements UIInterface
         });
         scalableComponents.add(new ScalableComponent(btn_next4,80.0/1280,290.0/720,222.0/1280,50.0/720,btnNext.getImage()));
         //5
-        JButton btn_next5 = new JButton(resources.getHelpText("Info5.txt"),btnNext);
-        btnSet(btn_next5);
+        JButton btn_next5 = ButtonSimpleFactory.makeButton(0,resources.getHelpText("Info5.txt"),btnNext);
         // 核心设置：文本在图标上方，且水平居中
         btn_next5.setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
@@ -6596,8 +6161,7 @@ public class UI implements UIInterface
         scalableComponents.add(new ScalableComponent(backgroundLabel_2,10.0/1280,10.0/720,980.0/1280,660.0/720,background_2.getImage()));
         //返回主菜单按钮
         ImageIcon menu = resources.getImage("PVBtitile.png");
-        JButton btnMenu = new JButton();
-        btnSet(btnMenu);
+        JButton btnMenu = ButtonSimpleFactory.makeButton(0,null);
         scalableComponents.add(new ScalableComponent(btnMenu,1050.0/1280,560.0/720,194.0/1280,127.0/720,menu.getImage()));
         btnMenu.addActionListener(e -> {
             resources.playSound("click.wav");
@@ -6639,8 +6203,7 @@ public class UI implements UIInterface
 
         //返回主菜单按钮
         ImageIcon menu = resources.getImage("PVBtitile.png");
-        JButton btnMenu = new JButton();
-        btnSet(btnMenu);
+        JButton btnMenu = ButtonSimpleFactory.makeButton(0,null);
         scalableComponents.add(new ScalableComponent(btnMenu,1050.0/1280,560.0/720,194.0/1280,127.0/720,menu.getImage()));
         btnMenu.addActionListener(e -> {
             resources.playSound("click.wav");
@@ -6649,8 +6212,7 @@ public class UI implements UIInterface
         });
         //返回上一界面
         ImageIcon back = resources.getImage("PVBreturn.png");
-        JButton btnBack = new JButton();
-        btnSet(btnBack);
+        JButton btnBack = ButtonSimpleFactory.makeButton(0,null);
         scalableComponents.add(new ScalableComponent(btnBack, 1050.0 / 1280, 400.0 / 720, 194.0 / 1280, 127.0 / 720, back.getImage()));
         btnBack.addActionListener(e -> {
             resources.playSound("click.wav");
@@ -6711,8 +6273,7 @@ public class UI implements UIInterface
         scalableComponents.add(new ScalableComponent(backgroundLabel_2,10.0/1280,10.0/720,980.0/1280,660.0/720,background_2.getImage()));
         //返回主菜单按钮
         ImageIcon menu = resources.getImage("PVBtitile.png");
-        JButton btnMenu = new JButton();
-        btnSet(btnMenu);
+        JButton btnMenu = ButtonSimpleFactory.makeButton(0,null);
         scalableComponents.add(new ScalableComponent(btnMenu,1050.0/1280,560.0/720,194.0/1280,127.0/720,menu.getImage()));
         btnMenu.addActionListener(e -> {
             resources.playSound("click.wav");
@@ -6721,8 +6282,7 @@ public class UI implements UIInterface
         });
         //返回上一界面
         ImageIcon back = resources.getImage("PVBreturn.png");
-        JButton btnBack = new JButton();
-        btnSet(btnBack);
+        JButton btnBack = ButtonSimpleFactory.makeButton(0,null);
         scalableComponents.add(new ScalableComponent(btnBack, 1050.0 / 1280, 400.0 / 720, 194.0 / 1280, 127.0 / 720, back.getImage()));
         btnBack.addActionListener(e -> {
             resources.playSound("click.wav");
@@ -6738,15 +6298,12 @@ public class UI implements UIInterface
             final int currentIndex = i;
             //1
             btnNext[i] = resources.getImage("avg_button2.png");  //
-            //JButton btn_next[i] = new JButton(resources.getHelpText("Info1-1.txt"),btnNext[i]);   //
-            btn_next[i] = new JButton(resources.getHelpText("Info" + scene.FirstInfoNum(scene) + "-" + i + ".txt"),btnNext[i]);   //
-            btnSet(btn_next[i]);
+            btn_next[i] = ButtonSimpleFactory.makeButton(0,resources.getHelpText("Info" + scene.FirstInfoNum(scene) + "-" + i + ".txt"),btnNext[i]);
             // 核心设置：文本在图标上方，且水平居中
             btn_next[i].setHorizontalTextPosition(SwingConstants.CENTER); // 文本在图标的水平中心
 
             btn_next[i].addActionListener(e -> {
                 resources.playSound("click.wav");
-                //currentScene = Scene.INFO_SCENE_1_1;    //
                 currentScene = Scene.values()[scene.ordinal() + currentIndex];    //
                 run();
             });
