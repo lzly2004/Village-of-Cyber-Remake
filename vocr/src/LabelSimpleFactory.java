@@ -3,43 +3,48 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class ButtonSimpleFactory
+public class LabelSimpleFactory
 {
-    public static JButton makeButton(int kind,ImageIcon icon)//暂时放在这里，没来得及添加参数
+    public static JLabel makeLabel(int kind, String text,ImageIcon icon)//暂时放在这里，没来得及添加参数
     {
-        switch(kind)
+        switch (kind)
         {
-            case ButtonConst.Simple_Button ->
+            case LabelConst.Simple_Label ->
             {
-                return createSimpleButton(null,icon);
+                return createSimpleLabel(text,icon);
             }
-            case ButtonConst.Draggable_Button ->
+            case LabelConst.Text_Label ->
             {
-                return createDraggableButton(null,icon);
+                return createTextLabel(text,icon);
             }
-            /*case ButtonConst.SimpleTextButton ->//暂时放在这里，没来得及添加参数
+            /*case ButtonConst.Draggable_Button -> {
+                return createDraggableButton(null, icon);
+            }
+            case ButtonConst.SimpleTextButton ->//暂时放在这里，没来得及添加参数
             {
                 return createSimpleTextButton(null,icon);
             }*/
         }
         return null;
     }
-    public static JButton makeButton(int kind,String text,ImageIcon icon)//暂时放在这里，没来得及添加参数
+    public static JLabel makeLabel(int kind, ImageIcon icon)//暂时放在这里，没来得及添加参数
     {
-        switch(kind)
-        {
-            case ButtonConst.Simple_Button ->
-            {
-                return createSimpleButton(text,icon);
+      return makeLabel(kind,null,icon);
+    }
+    public static JLabel makeLabel(int kind, String text)//暂时放在这里，没来得及添加参数
+    {
+       return makeLabel(kind,text,null);
+    }
+    /*
+    public static JButton makeButton(int kind, String text, ImageIcon icon)//暂时放在这里，没来得及添加参数
+    {
+        switch (kind) {
+            case ButtonConst.Simple_Button -> {
+                return createSimpleButton(text, icon);
             }
-            case ButtonConst.Draggable_Button ->
-            {
-                return createDraggableButton(text,icon);
+            case ButtonConst.Draggable_Button -> {
+                return createDraggableButton(text, icon);
             }
-            /*case ButtonConst.SimpleTextButton ->//暂时放在这里，没来得及添加参数
-            {
-                return createSimpleTextButton(text,icon);
-            }*/
         }
         return null;
     }
@@ -116,30 +121,34 @@ public class ButtonSimpleFactory
 
         return draggableBtn;
     }
-    public static JButton createSimpleButton(String text,ImageIcon icon)    //创建一个普通按钮
+    */
+    public static JLabel createSimpleLabel(String text,ImageIcon icon)    //创建一个普通按钮
     {
-        JButton btn = new JButton();
+        JLabel jLabel = new JLabel();
         if(icon != null)
-            btn.setIcon(icon);
+            jLabel.setIcon(icon);
         if(text != null)
-            btn.setText(text);
-        setButton(btn);
-        return btn;
+            jLabel.setText(text);
+        jLabel.setOpaque(false);
+        jLabel.setFocusable(false);
+        return jLabel;
     }
-    /*public static JButton createSimpleTextButton(String text,ImageIcon icon)   //暂时放在这里，没来得及添加参数
+    public static JLabel createTextLabel(String text,ImageIcon icon)    //创建一个普通按钮
     {
-        JButton btn = new JButton();
+        JLabel jLabel = new JLabel();
         if(icon != null)
-            btn.setIcon(icon);
+            jLabel.setIcon(icon);
         if(text != null)
-            btn.setText(text);
-        setButton(btn);
-        return btn;
-    }*/
+            jLabel.setText(text);
+        jLabel.setForeground(Color.WHITE);
+        jLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
+        jLabel.setOpaque(false);
+        return jLabel;
+    }
 }
-final class ButtonConst//按钮常量类
+final class LabelConst//按钮常量类
 {
-    static final int Simple_Button = 0;//普通按钮
-    static final int Draggable_Button = 1;//可拉取的按钮
+    static final int Simple_Label = 0;//普通标签
+    static final int Text_Label = 1;//文本标签
     //static final int SimpleTextButton = 2;//普通按钮，带文本
 }

@@ -4,15 +4,6 @@ import java.awt.*;
 public class UIComponentFactory
 {
     // 创建标准按钮样式（替代 btnSet 方法）
-    public static void applyButtonStyle(JButton btn)
-    {
-        btn.setOpaque(false);
-        btn.setBorderPainted(false);
-        btn.setContentAreaFilled(false);
-        btn.setForeground(Color.white);
-        btn.setFont(new Font("Takao Mincho", Font.BOLD, 20));
-        btn.setFocusPainted(false);
-    }
     public static void applyLabelStyle(JLabel label) // 创建标准标签样式（替代 labelSet 方法）
     {
         applyLabelStyle(label, 50, Color.BLACK); // 默认50号字，黑色
