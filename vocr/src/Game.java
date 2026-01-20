@@ -336,6 +336,10 @@ class ConstNum
     {//生成[min,max]的随机整数
         return min + (int)(Math.random() * (max - min + 1));
     }
+    public static int WINDOW_WIDTH = 1280;//游戏窗口的宽度
+    public static int WINDOW_HEIGHT = 720;//游戏窗口的高度
+    public static double WINDOW_WIDTH_D = 1280.0;//游戏窗口的宽度(double)
+    public static double WINDOW_HEIGHT_D = 720.0;//游戏窗口的高度(double)
 }
 class GameCharacter
 {//游戏角色封装类

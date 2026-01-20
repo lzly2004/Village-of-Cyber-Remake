@@ -4,56 +4,6 @@ import java.awt.*;
 public class UIComponentFactory
 {
     // 创建标准按钮样式（替代 btnSet 方法）
-    public static void applyLabelStyle(JLabel label) // 创建标准标签样式（替代 labelSet 方法）
-    {
-        applyLabelStyle(label, 50, Color.BLACK); // 默认50号字，黑色
-    }
-    public static void applyLabelStyle(JLabel label, int fontSize, Color color)
-    {
-        label.setOpaque(false);
-        label.setForeground(color);
-        label.setFont(new Font("Takao Mincho", Font.BOLD, fontSize));
-    }
-    public static JTextArea createDialogTextArea() // 创建标准对话框文本区域（用于对话显示）
-    {
-        JTextArea dialogText = new JTextArea();
-        dialogText.setForeground(Color.WHITE);
-        dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
-        dialogText.setLineWrap(true);
-        dialogText.setWrapStyleWord(true);
-        dialogText.setEditable(false);
-        dialogText.setOpaque(false);
-        dialogText.setBackground(new Color(0, 0, 0, 0));
-        dialogText.setBorder(BorderFactory.createEmptyBorder());
-        return dialogText;
-    }
-    public static JTextArea createInfoTextArea()  // 创建信息显示文本区域（用于投票界面）
-    {
-        JTextArea textArea = new JTextArea();
-        textArea.setForeground(Color.BLACK);
-        textArea.setFont(new Font("Takao Mincho", Font.BOLD, 24));
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setEditable(false);
-        textArea.setFocusable(false);
-        textArea.setOpaque(false);
-        textArea.setBackground(new Color(0, 0, 0, 0));
-        textArea.setBorder(BorderFactory.createEmptyBorder());
-        return textArea;
-    }
-    public static JTextArea createDataTextArea()  // 创建数据文本区域（用于生存者信息显示）
-    {
-        JTextArea textArea = new JTextArea();
-        textArea.setForeground(Color.WHITE);
-        textArea.setFont(new Font("Takao Mincho", Font.BOLD, 20));
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setEditable(false);
-        textArea.setOpaque(false);
-        textArea.setBackground(new Color(0, 0, 0, 0));
-        textArea.setBorder(BorderFactory.createEmptyBorder());
-        return textArea;
-    }
     public String getJobText(int num)//获取名字，需要传入人物编号
     {
         switch (num) {
@@ -423,19 +373,4 @@ public class UIComponentFactory
         // 核心修改：拼接为「日文汉字 片假名/英文」格式
         return String.format("%s %s/%s", kanjiName, katakanaName, englishName.name());
     }
-    public void btnSet (JButton btn)
-    {
-        btn.setOpaque(false);
-        btn.setBorderPainted(false);
-        btn.setContentAreaFilled(false);
-        btn.setForeground(Color.white);
-        btn.setFont(new Font("Takao Mincho",Font.BOLD,20));
-        btn.setFocusPainted(false);
-    }//按钮快捷设置
-    public void labelSet (JLabel label)
-    {
-        label.setOpaque(false);
-        label.setForeground(Color.BLACK);
-        label.setFont(new Font("Takao Mincho",Font.BOLD,50));
-    }//标签快捷设置
 }

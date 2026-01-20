@@ -26,7 +26,6 @@ class ScalableComponent
     double relX, relY; // 相对位置比例
     double relWidth, relHeight; // 相对大小比例
     Image originalImage; // 原始图片(用于按钮和标签的图标)
-
     ScalableComponent(Component comp, double x, double y, double w, double h, Image img)
     {
         component = comp;
@@ -35,21 +34,6 @@ class ScalableComponent
         relWidth = w;
         relHeight = h;
         originalImage = img;
-    }
-    public Component getComponent(){
-        return component;
-    }
-    public double getXRatio(){
-        return relX;
-    }
-    public double getYRatio(){
-        return relY;
-    }
-    public double getWidthRatio(){
-        return relWidth;
-    }
-    public double getHeightRatio(){
-        return relHeight;
     }
 }//保存所有需要缩放的组件及其原始属性，但是后面为了稳定禁止了窗口缩放，也就没用了，单纯作为设置组件位置和大小的工具
 public class UI implements UIInterface
@@ -191,13 +175,8 @@ public class UI implements UIInterface
         jFrame.setLocationRelativeTo(null);
         ImageIcon frameIcon = new ImageIcon("vocr/resources/images/Icon2.png");
         jFrame.setIconImage(frameIcon.getImage());
-        jPanel = new JPanel();
-        jPanel.setSize(1280,720);
-        jPanel.setLayout(null);
-        diaPanel = new JPanel();
-        diaPanel.setSize(1280,720);
-        diaPanel.setLayout(null);
-        diaPanel.setOpaque(false);
+        jPanel = PanelSimpleFactory.createSimplePanel(1280,720,true,false);
+        diaPanel = PanelSimpleFactory.createSimplePanel(1280,720,false,false);
         jFrame.add(jPanel);
 
 
@@ -216,28 +195,28 @@ public class UI implements UIInterface
     {
         int currentWidth = jFrame.getWidth();
         int currentHeight = jFrame.getHeight();
-
         // 确保面板大小与窗口一致
         jPanel.setSize(currentWidth, currentHeight);
-
-        for (ScalableComponent sc : scalableComponents) {
+        for (ScalableComponent sc : scalableComponents)
+        {
             // 计算新位置和大小
             int x = (int)(currentWidth * sc.relX);
             int y = (int)(currentHeight * sc.relY);
             int width = (int)(currentWidth * sc.relWidth);
             int height = (int)(currentHeight * sc.relHeight);
-
             // 设置组件位置和大小
             sc.component.setBounds(x, y, width, height);
-
             // 处理带图标的组件
-            if (sc.originalImage != null) {
+            if (sc.originalImage != null)
+            {
                 Image scaledImage = sc.originalImage.getScaledInstance(
                         width, height, Image.SCALE_SMOOTH);
-
-                if (sc.component instanceof JLabel) {
+                if (sc.component instanceof JLabel)
+                {
                     ((JLabel)sc.component).setIcon(new ImageIcon(scaledImage));
-                } else if (sc.component instanceof JButton) {
+                }
+                else if (sc.component instanceof JButton)
+                {
                     ((JButton)sc.component).setIcon(new ImageIcon(scaledImage));
                 }
             }
@@ -344,7 +323,6 @@ public class UI implements UIInterface
     {
         events.add(event);
         if(isTest && event != null && !events.isEmpty())System.out.println("事件添加成功且不为空");
-
     }//添加event
     public void testBtn()
     {
@@ -352,14 +330,15 @@ public class UI implements UIInterface
         JButton test = new JButton("点我进入");
         scalableComponents.add(new ScalableComponent(test,0,0,60.0/1280,30.0/720,null));
         test.addActionListener(e -> {
-            for(int i = 1;i < gs.gc.length;++i){
+            for(int i = 1;i < gs.gc.length;++i)
+            {
                 System.out.println("编号"+i+" "+uiComponentFactory.getJobText(gs.gc[i].number) + " 真实职业："+uiComponentFactory.getZY(gs.gc[i].actualRole)+" 声称职业："+uiComponentFactory.getZY(gs.gc[i].claimedRole)
                 +" 死亡日期"+gs.gc[i].dieDay + " 死亡原因" + uiComponentFactory.getwhyDie(gs.gc[i].whyDie) + " 怀疑度：");
-                for(int j = 1;j < gs.gc.length;++j){
+                for(int j = 1;j < gs.gc.length;++j)
+                {
                     System.out.print(uiComponentFactory.getJobText(gs.gc[j].number)+" 为"+gs.gc[i].suspicionValue[j]+" ");
                 }
                 System.out.println();
-
                 System.out.print(uiComponentFactory.getJobText(gs.gc[i].number) + " 怀疑前三为" + gs.gc[i].top3SuspectedPlayers[1][gs.gameDay] + " "+ gs.gc[i].top3SuspectedPlayers[2][gs.gameDay] + " "+ gs.gc[i].top3SuspectedPlayers[3][gs.gameDay] + " ");
                 System.out.println();
             }
@@ -388,8 +367,10 @@ public class UI implements UIInterface
         huChosen.clear();
 
         events.clear();
-        if(isTest){
-            if(events.isEmpty()){
+        if(isTest)
+        {
+            if(events.isEmpty())
+            {
                 System.out.println("事件成功清空");
             }
         }
@@ -398,15 +379,13 @@ public class UI implements UIInterface
         resources.playBgm("start_menu.wav");
 
         // 游戏标题
-        ImageIcon titleIcon = resources.getImage("titleLogo.png");
-        JLabel titleLabel = new JLabel(titleIcon);
-        uiComponentFactory.labelSet(titleLabel);
+        JLabel titleLabel = LabelSimpleFactory.makeLabel(LabelConst.Black_Label,resources.getImage("titleLogo.png"));
         jPanel.add(titleLabel);
         // 添加到可缩放列表(相对位置和大小)
         scalableComponents.add(new ScalableComponent(
                 titleLabel, 600.0/1280, 200.0/720,
                 554.0/1280, 138.0/720,
-                titleIcon.getImage()
+                ((ImageIcon)titleLabel.getIcon()).getImage()
         ));
 
         // 按钮属性
@@ -418,9 +397,7 @@ public class UI implements UIInterface
         int y_div = 80;
 
         // 新游戏按钮
-        ImageIcon startIcon = resources.getImage("startButton.png");
-        JButton btnStart = new JButton(startIcon);
-        uiComponentFactory.btnSet(btnStart);
+        JButton btnStart = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,resources.getImage("startButton.png"));
         btnStart.addActionListener(e -> {
             resources.playSound("click.wav");
             currentScene = Scene.GAME_SCENE_SELECT;
@@ -430,49 +407,42 @@ public class UI implements UIInterface
         scalableComponents.add(new ScalableComponent(
                 btnStart, x/(double)1280, y/(double)720,
                 width/(double)1280, height/(double)720,
-                startIcon.getImage()
+                //startIcon.getImage()
+                ((ImageIcon)btnStart.getIcon()).getImage()
         ));
 
         // 继续游戏按钮
-        ImageIcon continueIcon = resources.getImage("continueButton.png");
-        JButton btnContinue = new JButton(continueIcon);
-        uiComponentFactory.btnSet(btnContinue);
+        JButton btnContinue = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,resources.getImage("continueButton.png"));
         btnContinue.addActionListener(e -> resources.playSound("click.wav"));
         jPanel.add(btnContinue);
         scalableComponents.add(new ScalableComponent(
                 btnContinue, (x+x_div)/(double)1280, y/(double)720,
                 width/(double)1280, height/(double)720,
-                continueIcon.getImage()
+                ((ImageIcon)btnContinue.getIcon()).getImage()
         ));
 
         // 选择存档按钮
-        ImageIcon saveIcon = resources.getImage("replayButton.png");
-        JButton btnSave = new JButton(saveIcon);
-        uiComponentFactory.btnSet(btnSave);
+        JButton btnSave = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,resources.getImage("replayButton.png"));
         btnSave.addActionListener(e -> resources.playSound("click.wav"));
         jPanel.add(btnSave);
         scalableComponents.add(new ScalableComponent(
                 btnSave, x/(double)1280, (y+y_div)/(double)720,
                 width/(double)1280, height/(double)720,
-                saveIcon.getImage()
+                ((ImageIcon)btnSave.getIcon()).getImage()
         ));
 
         // 数据统计按钮
-        ImageIcon recordIcon = resources.getImage("recordButton.png");
-        JButton btnRecord = new JButton(recordIcon);
-        uiComponentFactory.btnSet(btnRecord);
+        JButton btnRecord = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,resources.getImage("recordButton.png"));
         btnRecord.addActionListener(e -> resources.playSound("click.wav"));
         jPanel.add(btnRecord);
         scalableComponents.add(new ScalableComponent(
                 btnRecord, (x+x_div)/(double)1280, (y+y_div)/(double)720,
                 width/(double)1280, height/(double)720,
-                recordIcon.getImage()
+                ((ImageIcon)btnRecord.getIcon()).getImage()
         ));
 
         // 信息查看按钮
-        ImageIcon infoIcon = resources.getImage("infoButton.png");
-        JButton btnInfo = new JButton(infoIcon);
-        uiComponentFactory.btnSet(btnInfo);
+        JButton btnInfo = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,resources.getImage("infoButton.png"));
         btnInfo.addActionListener(e ->{
             resources.playSound("click.wav");
             currentScene = Scene.INFO_SCENE;
@@ -483,29 +453,27 @@ public class UI implements UIInterface
         scalableComponents.add(new ScalableComponent(
                 btnInfo, x/(double)1280, (y+y_div*2)/(double)720,
                 width/(double)1280, height/(double)720,
-                infoIcon.getImage()
+                ((ImageIcon)btnInfo.getIcon()).getImage()
         ));
 
 
         // 角色收集按钮
-        ImageIcon collectionsIcon = resources.getImage("collectionsButton.png");
-        JButton btnCollections = new JButton(collectionsIcon);
-        uiComponentFactory.btnSet(btnCollections);
+        JButton btnCollections = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,resources.getImage("collectionsButton.png"));
         btnCollections.addActionListener(e -> resources.playSound("click.wav"));
         jPanel.add(btnCollections);
         scalableComponents.add(new ScalableComponent(
                 btnCollections, (x+x_div)/(double)1280, (y+y_div*2)/(double)720,
                 width/(double)1280, height/(double)720,
-                collectionsIcon.getImage()
+                ((ImageIcon)btnCollections.getIcon()).getImage()
         ));
 
         // 背景图片（放在最后添加，确保在最底层）
-        ImageIcon bgIcon = resources.getImage("title_base_resized.png");
-        JLabel background = new JLabel(bgIcon);
+        //ImageIcon bgIcon = ;
+        JLabel background = new JLabel(resources.getImage("title_base_resized.png"));
         jPanel.add(background);
         scalableComponents.add(new ScalableComponent(
                 background, 0, 0, 1.0, 1.0,
-                bgIcon.getImage()
+                ((ImageIcon)background.getIcon()).getImage()
         ));
 
         resizeComponents();//强制重置一次
@@ -520,10 +488,9 @@ public class UI implements UIInterface
 
         //简易村
         ImageIcon village1 = resources.getImage("game1.png");
-        JButton btn1 = new JButton(village1);
-        uiComponentFactory.btnSet(btn1);
+        JButton btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,village1);
         scalableComponents.add(new ScalableComponent(btn1,30.0/1280,20.0/720,
-                village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
+                village1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,village1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 village1.getImage()));
         jPanel.add(btn1);
         btn1.addActionListener(e -> {
@@ -550,10 +517,9 @@ public class UI implements UIInterface
         });
         //通常村
         village1 = resources.getImage("game2.png");
-        btn1 = new JButton(village1);
-        uiComponentFactory.btnSet(btn1);
-        scalableComponents.add(new ScalableComponent(btn1,30.0/1280.0,(20.0+ village1.getIconHeight())/720.0,
-                village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
+        btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,village1);
+        scalableComponents.add(new ScalableComponent(btn1,30.0/ConstNum.WINDOW_WIDTH_D,(20.0+ village1.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                village1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,village1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 village1.getImage()));
         btn1.addActionListener(e -> {
             levelName="game2 #17977.png";
@@ -569,10 +535,9 @@ public class UI implements UIInterface
         jPanel.add(btn1);
         //妖狐村
         village1 = resources.getImage("game3.png");
-        btn1 = new JButton(village1);
-        uiComponentFactory.btnSet(btn1);
-        scalableComponents.add(new ScalableComponent(btn1,30.0/1280.0,(20.0+ village1.getIconHeight()*2)/720.0,
-                village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
+        btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,village1);
+        scalableComponents.add(new ScalableComponent(btn1,30.0/ConstNum.WINDOW_WIDTH_D,(20.0+ village1.getIconHeight()*2)/ConstNum.WINDOW_HEIGHT_D,
+                village1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,village1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 village1.getImage()));
         btn1.addActionListener(e -> {
             levelName="game3 #18179.png";
@@ -588,10 +553,9 @@ public class UI implements UIInterface
         jPanel.add(btn1);
         //狂信村
         village1 = resources.getImage("game4 #19067.png");
-        btn1 = new JButton(village1);
-        uiComponentFactory.btnSet(btn1);
-        scalableComponents.add(new ScalableComponent(btn1,30.0/1280.0,(20 + village1.getIconHeight()*3)/720.0,
-                village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
+        btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,village1);
+        scalableComponents.add(new ScalableComponent(btn1,30.0/ConstNum.WINDOW_WIDTH_D,(20 + village1.getIconHeight()*3)/ConstNum.WINDOW_HEIGHT_D,
+                village1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,village1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 village1.getImage()));
         btn1.addActionListener(e -> {
             levelName="game4.png";
@@ -607,10 +571,9 @@ public class UI implements UIInterface
         jPanel.add(btn1);
         //背德村
         village1 = resources.getImage("game5.png");
-        btn1 = new JButton(village1);
-        uiComponentFactory.btnSet(btn1);
-        scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/1280.0,20.0/720.0,
-                village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
+        btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,village1);
+        scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/ConstNum.WINDOW_WIDTH_D,20.0/ConstNum.WINDOW_HEIGHT_D,
+                village1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,village1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 village1.getImage()));
         btn1.addActionListener(e -> {
             levelName="game5 #17265.png";
@@ -626,10 +589,9 @@ public class UI implements UIInterface
         jPanel.add(btn1);
         //猫又村
         village1 = resources.getImage("game6.png");
-        btn1 = new JButton(village1);
-        uiComponentFactory.btnSet(btn1);
-        scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/1280.0,(20.0+ village1.getIconHeight())/720.0,
-                village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
+        btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,village1);
+        scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(20.0+ village1.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                village1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,village1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 village1.getImage()));
         btn1.addActionListener(e -> {
             levelName="game6 #17098.png";
@@ -645,10 +607,9 @@ public class UI implements UIInterface
         jPanel.add(btn1);
         //大型村
         village1 = resources.getImage("game7.png");
-        btn1 = new JButton(village1);
-        uiComponentFactory.btnSet(btn1);
-        scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/1280.0,(20.0+ 2*village1.getIconHeight())/720.0,
-                village1.getIconWidth()/1280.0,village1.getIconHeight()/720.0,
+        btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,village1);
+        scalableComponents.add(new ScalableComponent(btn1,(30.0+ village1.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(20.0+ 2*village1.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                village1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,village1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 village1.getImage()));
         btn1.addActionListener(e -> {
             levelName="game7 #18147.png";
@@ -664,10 +625,9 @@ public class UI implements UIInterface
         jPanel.add(btn1);
         //返回按钮
         ImageIcon back = resources.getImage("return.png");
-        btn1 = new JButton(back);
-        uiComponentFactory.btnSet(btn1);
-        scalableComponents.add(new ScalableComponent(btn1,(1280 - back.getIconWidth() - 30)/1280.0,(720 - 40- back.getIconHeight())/720.0,
-                back.getIconWidth()/1280.0,back.getIconHeight()/720.0,
+        btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,back);
+        scalableComponents.add(new ScalableComponent(btn1,(1280 - back.getIconWidth() - 30)/ConstNum.WINDOW_WIDTH_D,(720 - 40- back.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                back.getIconWidth()/ConstNum.WINDOW_WIDTH_D,back.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 back.getImage()));
         btn1.addActionListener(e -> {
             resources.playSound("click.wav");
@@ -742,10 +702,12 @@ public class UI implements UIInterface
         });
         timer.start();
     }//入夜界面
-    public void GameScene_day(){
+    public void GameScene_day()
+    {
 
         gs = mainLogic.getGameStatus();//新一天获取新gs
-        switch(gs.end){
+        switch(gs.end)
+        {
             case 1:
                 //村胜
                 jPanel.removeAll();
@@ -788,13 +750,10 @@ public class UI implements UIInterface
         // 对话框背景（添加到对话框面板）
         ImageIcon backIcon = resources.getImage("messageframe.png");
         // 对话框面板
-        JPanel dialogPanel = new JPanel();
-        dialogPanel.setLayout(null);
-        dialogPanel.setOpaque(false);
-        dialogPanel.setBackground(new Color(0, 0, 0, 0));
+        JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(0,0,false,true);
         scalableComponents.add(new ScalableComponent(
                 dialogPanel, 260.0 / 1280, 450.0 / 720,
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         jPanel.add(dialogPanel);     // 顶层：对话框面板
@@ -802,33 +761,22 @@ public class UI implements UIInterface
         JLabel back = new JLabel(backIcon);
         scalableComponents.add(new ScalableComponent(
                 back, 0.0 / 1280, 0.0 / 720,  // 基于对话框的绝对比例
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 backIcon.getImage()
         ));
 
         // 文本显示区域（添加到对话框面板）
-        JTextArea dialogText = new JTextArea();
-        dialogText.setForeground(Color.WHITE);
-        dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
-        dialogText.setLineWrap(true);
-        dialogText.setWrapStyleWord(true);
-        dialogText.setEditable(false);
-        dialogText.setOpaque(false);
-        dialogText.setBackground(new Color(0, 0, 0, 0));
-        dialogText.setBorder(BorderFactory.createEmptyBorder());
-
+        JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
         scalableComponents.add(new ScalableComponent(
-                dialogText, (20) / 1280.0, (50) / 720.0,  // 基于窗口的绝对位置
-                (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
+                dialogText, (20) / ConstNum.WINDOW_WIDTH_D, (50) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                (backIcon.getIconWidth() - 50) / ConstNum.WINDOW_WIDTH_D, (backIcon.getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
 
-        JButton nextBtn = new JButton();
-        uiComponentFactory.btnSet(nextBtn);
-
+        JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,null);
         scalableComponents.add(new ScalableComponent(
-                nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
+                nextBtn, 0 / ConstNum.WINDOW_WIDTH_D, 0 / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconWidth() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
 
@@ -898,13 +846,10 @@ public class UI implements UIInterface
             ImageIcon backIcon = resources.getImage("messageframe.png");
             JLabel back = new JLabel(backIcon);
             // 对话框面板
-            JPanel dialogPanel = new JPanel();
-            dialogPanel.setLayout(null);
-            dialogPanel.setOpaque(false);
-            dialogPanel.setBackground(new Color(0, 0, 0, 0));
+            JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(0,0,false,true);
             scalableComponents.add(new ScalableComponent(
                     dialogPanel, 260.0 / 1280, 450.0 / 720,
-                    backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                    backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     null
             ));
             diaPanel.add(dialogPanel);     // 顶层：对话框面板
@@ -912,32 +857,23 @@ public class UI implements UIInterface
             //JLabel back = new JLabel(backIcon);
             scalableComponents.add(new ScalableComponent(
                     back, 0.0 / 1280, 0.0 / 720,  // 基于对话框的绝对比例
-                    backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                    backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     backIcon.getImage()
             ));
 
 
             // 文本显示区域（添加到对话框面板）
-            JTextArea dialogText = new JTextArea();
-            dialogText.setForeground(Color.WHITE);
-            dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
-            dialogText.setLineWrap(true);
-            dialogText.setWrapStyleWord(true);
-            dialogText.setEditable(false);
-            dialogText.setOpaque(false);
-            dialogText.setBackground(new Color(0, 0, 0, 0));
-            dialogText.setBorder(BorderFactory.createEmptyBorder());
-
-            scalableComponents.add(new ScalableComponent(
-                    dialogText, (20) / 1280.0, (50) / 720.0,  // 基于窗口的绝对位置
-                    (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
+            JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
+                    scalableComponents.add(new ScalableComponent(
+                    dialogText, (20) / ConstNum.WINDOW_WIDTH_D, (50) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                    (backIcon.getIconWidth() - 50) / ConstNum.WINDOW_WIDTH_D, (backIcon.getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
                     null
             ));
             
             JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,null);
             scalableComponents.add(new ScalableComponent(
-                    nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
-                    backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
+                    nextBtn, 0 / ConstNum.WINDOW_WIDTH_D, 0 / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                    backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconWidth() / ConstNum.WINDOW_HEIGHT_D,
                     null
             ));
 
@@ -1010,13 +946,10 @@ public class UI implements UIInterface
             // 对话框背景（添加到对话框面板）
             ImageIcon backIcon = resources.getImage("messageframe.png");
             // 对话框面板
-            JPanel dialogPanel = new JPanel();
-            dialogPanel.setLayout(null);
-            dialogPanel.setOpaque(false);
-            dialogPanel.setBackground(new Color(0, 0, 0, 0));
+            JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(0,0,false,true);
             scalableComponents.add(new ScalableComponent(
                     dialogPanel, 260.0 / 1280, 450.0 / 720,
-                    backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                    backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     null
             ));
             diaPanel.add(dialogPanel);     // 顶层：对话框面板
@@ -1027,7 +960,7 @@ public class UI implements UIInterface
             JLabel back = new JLabel(backIcon);
             scalableComponents.add(new ScalableComponent(
                     back, 0.0 / 1280, 0.0 / 720,  // 基于对话框的绝对比例
-                    backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                    backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     backIcon.getImage()
             ));
 
@@ -1035,34 +968,23 @@ public class UI implements UIInterface
             JLabel nameLabel = LabelSimpleFactory.makeLabel(1,uiComponentFactory.getCharacterFullName(event.ch1));
             dialogPanel.add(nameLabel);  // 添加到对话框面板
             scalableComponents.add(new ScalableComponent(
-                    nameLabel, (40) / 1280.0, (10) / 720.0,  // 基于窗口的绝对位置
+                    nameLabel, (40) / ConstNum.WINDOW_WIDTH_D, (10) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
                     1000.0 / 1280, 30.0 / 720,
                     null
             ));
 
             // 文本显示区域（添加到对话框面板）
-            JTextArea dialogText = new JTextArea();
-            dialogText.setForeground(Color.WHITE);
-            dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
-            dialogText.setLineWrap(true);
-            dialogText.setWrapStyleWord(true);
-            dialogText.setEditable(false);
-            dialogText.setOpaque(false);
-            dialogText.setBackground(new Color(0, 0, 0, 0));
-            dialogText.setBorder(BorderFactory.createEmptyBorder());
-
+            JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
             scalableComponents.add(new ScalableComponent(
-                    dialogText, (20) / 1280.0, (50) / 720.0,  // 基于窗口的绝对位置
-                    (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
+                    dialogText, (20) / ConstNum.WINDOW_WIDTH_D, (50) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                    (backIcon.getIconWidth() - 50) / ConstNum.WINDOW_WIDTH_D, (backIcon.getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
                     null
             ));
 
-            JButton nextBtn = new JButton();
-            uiComponentFactory.btnSet(nextBtn);
-
+            JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,null);
             scalableComponents.add(new ScalableComponent(
-                    nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
-                    backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
+                    nextBtn, 0 / ConstNum.WINDOW_WIDTH_D, 0 / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                    backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconWidth() / ConstNum.WINDOW_HEIGHT_D,
                     null
             ));
             nextBtn.setVisible(false);
@@ -1091,8 +1013,8 @@ public class UI implements UIInterface
                 Chara.setOpaque(false);
                 Chara.setFocusable(false);
                 scalableComponents.add(new ScalableComponent(
-                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
                 diaPanel.add(Chara);
@@ -1103,8 +1025,8 @@ public class UI implements UIInterface
                     Chara.setVisible(false);
                     JLabel Chara2 = LabelSimpleFactory.makeLabel(1,CharIcon[1]);
                     scalableComponents.add(new ScalableComponent(
-                            Chara2, (1280 - CharIcon[1].getIconWidth()) / 2.0 / 1280.0, (720 - CharIcon[1].getIconHeight() - 30) / 720.0,
-                            CharIcon[1].getIconWidth() / 1280.0, CharIcon[1].getIconHeight() / 720.0,
+                            Chara2, (1280 - CharIcon[1].getIconWidth()) / 2.0 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[1].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                            CharIcon[1].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[1].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                             CharIcon[1].getImage()
                     ));
                     diaPanel.add(Chara2);
@@ -1185,13 +1107,10 @@ public class UI implements UIInterface
         // 对话框背景（添加到对话框面板）
         ImageIcon backIcon = resources.getImage("messageframe.png");
         // 对话框面板
-        JPanel dialogPanel = new JPanel();
-        dialogPanel.setLayout(null);
-        dialogPanel.setOpaque(false);
-        dialogPanel.setBackground(new Color(0, 0, 0, 0));
+        JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(0,0,false,true);
         scalableComponents.add(new ScalableComponent(
                 dialogPanel, 260.0 / 1280, 450.0 / 720,
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         diaPanel.add(dialogPanel);         // 顶层：对话框面板
@@ -1200,8 +1119,8 @@ public class UI implements UIInterface
             ImageIcon[] CharIcon = resources.getEventImage(event);
             JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,CharIcon[0]);
             scalableComponents.add(new ScalableComponent(
-                    Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                    CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                    Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                    CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     CharIcon[0].getImage()
             ));
             diaPanel.add(Chara);
@@ -1209,7 +1128,7 @@ public class UI implements UIInterface
         JLabel back = new JLabel(backIcon);
         scalableComponents.add(new ScalableComponent(
                 back, 0.0 / 1280, 0.0 / 720,  // 基于对话框的绝对比例
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 backIcon.getImage()
         ));
 
@@ -1218,33 +1137,23 @@ public class UI implements UIInterface
         JLabel nameLabel = LabelSimpleFactory.makeLabel(1,uiComponentFactory.getCharacterFullName(event.ch1));
         dialogPanel.add(nameLabel);  // 添加到对话框面板
         scalableComponents.add(new ScalableComponent(
-                nameLabel, (40) / 1280.0, (10) / 720.0,  // 基于窗口的绝对位置
+                nameLabel, (40) / ConstNum.WINDOW_WIDTH_D, (10) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
                 1000.0 / 1280, 30.0 / 720,
                 null
         ));
 
         // 文本显示区域（添加到对话框面板）
-        JTextArea dialogText = new JTextArea();
-        dialogText.setForeground(Color.WHITE);
-        dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
-        dialogText.setLineWrap(true);
-        dialogText.setWrapStyleWord(true);
-        dialogText.setEditable(false);
-        dialogText.setOpaque(false);
-        dialogText.setFocusable(false);
-        dialogText.setBackground(new Color(0, 0, 0, 0));
-        dialogText.setBorder(BorderFactory.createEmptyBorder());
-
+        JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
         scalableComponents.add(new ScalableComponent(
-                dialogText, (20) / 1280.0, (50) / 720.0,  // 基于窗口的绝对位置
-                (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
+                dialogText, (20) / ConstNum.WINDOW_WIDTH_D, (50) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                (backIcon.getIconWidth() - 50) / ConstNum.WINDOW_WIDTH_D, (backIcon.getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,null);
         scalableComponents.add(new ScalableComponent(
-                nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
+                nextBtn, 0 / ConstNum.WINDOW_WIDTH_D, 0 / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconWidth() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
 
@@ -1311,8 +1220,8 @@ public class UI implements UIInterface
                 Chara.setVisible(false);
                 JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,CharIcon[1]);
                 scalableComponents.add(new ScalableComponent(
-                        Chara2, (1280 - CharIcon[1].getIconWidth()) / 2.0 / 1280.0, (720 - CharIcon[1].getIconHeight() - 30) / 720.0,
-                        CharIcon[1].getIconWidth() / 1280.0, CharIcon[1].getIconHeight() / 720.0,
+                        Chara2, (1280 - CharIcon[1].getIconWidth()) / 2.0 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[1].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[1].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[1].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[1].getImage()
                 ));
                 if(isNext[0]){
@@ -1404,13 +1313,10 @@ public class UI implements UIInterface
         // 对话框背景（添加到对话框面板）
         ImageIcon backIcon = resources.getImage("messageframe.png");
         // 对话框面板
-        JPanel dialogPanel = new JPanel();
-        dialogPanel.setLayout(null);
-        dialogPanel.setOpaque(false);
-        dialogPanel.setBackground(new Color(0, 0, 0, 0));
+        JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(0,0,false,true);
         scalableComponents.add(new ScalableComponent(
                 dialogPanel, 260.0 / 1280, 450.0 / 720,
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         diaPanel.add(dialogPanel);     // 顶层：对话框面板
@@ -1420,7 +1326,7 @@ public class UI implements UIInterface
         JLabel back = new JLabel(backIcon);
         scalableComponents.add(new ScalableComponent(
                 back, 0.0 / 1280, 0.0 / 720,  // 基于对话框的绝对比例
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 backIcon.getImage()
         ));
 
@@ -1428,32 +1334,23 @@ public class UI implements UIInterface
         JLabel nameLabel = LabelSimpleFactory.makeLabel(1,uiComponentFactory.getCharacterFullName(event.ch1));
         dialogPanel.add(nameLabel);  // 添加到对话框面板
         scalableComponents.add(new ScalableComponent(
-                nameLabel, (40) / 1280.0, (10) / 720.0,  // 基于窗口的绝对位置
+                nameLabel, (40) / ConstNum.WINDOW_WIDTH_D, (10) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
                 1000.0 / 1280, 30.0 / 720,
                 null
         ));
 
         // 文本显示区域（添加到对话框面板）
-        JTextArea dialogText = new JTextArea();
-        dialogText.setForeground(Color.WHITE);
-        dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
-        dialogText.setLineWrap(true);
-        dialogText.setWrapStyleWord(true);
-        dialogText.setEditable(false);
-        dialogText.setOpaque(false);
-        dialogText.setBackground(new Color(0, 0, 0, 0));
-        dialogText.setBorder(BorderFactory.createEmptyBorder());
-
+        JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
         scalableComponents.add(new ScalableComponent(
-                dialogText, (20) / 1280.0, (50) / 720.0,  // 基于窗口的绝对位置
-                (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
+                dialogText, (20) / ConstNum.WINDOW_WIDTH_D, (50) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                (backIcon.getIconWidth() - 50) / ConstNum.WINDOW_WIDTH_D, (backIcon.getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,null);
         scalableComponents.add(new ScalableComponent(
-                nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
+                nextBtn, 0 / ConstNum.WINDOW_WIDTH_D, 0 / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconWidth() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
 
@@ -1487,8 +1384,8 @@ public class UI implements UIInterface
                 Chara.setOpaque(false);
                 Chara.setFocusable(false);
                 scalableComponents.add(new ScalableComponent(
-                        Chara, 650 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara, 650 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
                 diaPanel.add(Chara);
@@ -1498,8 +1395,8 @@ public class UI implements UIInterface
                 
                 JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,linkIcon.get(0));
                 scalableComponents.add(new ScalableComponent(
-                        Chara2, 300 / 1280.0, (720 - linkIcon.get(0).getIconHeight() - 30) / 720.0,
-                        linkIcon.get(0).getIconWidth() / 1280.0, linkIcon.get(0).getIconHeight() / 720.0,
+                        Chara2, 300 / ConstNum.WINDOW_WIDTH_D, (720 - linkIcon.get(0).getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        linkIcon.get(0).getIconWidth() / ConstNum.WINDOW_WIDTH_D, linkIcon.get(0).getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         linkIcon.get(0).getImage()
                 ));
                 diaPanel.add(Chara2);
@@ -1529,8 +1426,8 @@ public class UI implements UIInterface
                 Chara.setOpaque(false);
                 Chara.setFocusable(false);
                 scalableComponents.add(new ScalableComponent(
-                        Chara, 650 / 1280.0, (720 - linkIcon.get(0).getIconHeight() - 30) / 720.0,
-                        linkIcon.get(0).getIconWidth() / 1280.0, linkIcon.get(0).getIconHeight() / 720.0,
+                        Chara, 650 / ConstNum.WINDOW_WIDTH_D, (720 - linkIcon.get(0).getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        linkIcon.get(0).getIconWidth() / ConstNum.WINDOW_WIDTH_D, linkIcon.get(0).getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         linkIcon.get(0).getImage()
                 ));
                 diaPanel.add(Chara);
@@ -1540,8 +1437,8 @@ public class UI implements UIInterface
                 
                 JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,CharIcon[0]);
                 scalableComponents.add(new ScalableComponent(
-                        Chara2, 300 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara2, 300 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
                 diaPanel.add(Chara2);
@@ -1571,16 +1468,16 @@ public class UI implements UIInterface
             }
             if(isLinked){
                 scalableComponents.add(new ScalableComponent(
-                        Chara, 300 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara, 300 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
                 linkIcon.add(CharIcon[0]);
             }
             else {
                 scalableComponents.add(new ScalableComponent(
-                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
             }
@@ -1642,13 +1539,10 @@ public class UI implements UIInterface
         // 对话框背景（添加到对话框面板）
         ImageIcon backIcon = resources.getImage("messageframe.png");
         // 对话框面板
-        JPanel dialogPanel = new JPanel();
-        dialogPanel.setLayout(null);
-        dialogPanel.setOpaque(false);
-        dialogPanel.setBackground(new Color(0, 0, 0, 0));
+        JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(0,0,false,true);
         scalableComponents.add(new ScalableComponent(
                 dialogPanel, 260.0 / 1280, 450.0 / 720,
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         diaPanel.add(dialogPanel);     // 顶层：对话框面板
@@ -1658,7 +1552,7 @@ public class UI implements UIInterface
         JLabel back = new JLabel(backIcon);
         scalableComponents.add(new ScalableComponent(
                 back, 0.0 / 1280, 0.0 / 720,  // 基于对话框的绝对比例
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 backIcon.getImage()
         ));
 
@@ -1666,32 +1560,23 @@ public class UI implements UIInterface
         JLabel nameLabel = LabelSimpleFactory.makeLabel(1,uiComponentFactory.getCharacterFullName(event.ch1));
         dialogPanel.add(nameLabel);  // 添加到对话框面板
         scalableComponents.add(new ScalableComponent(
-                nameLabel, (40) / 1280.0, (10) / 720.0,  // 基于窗口的绝对位置
+                nameLabel, (40) / ConstNum.WINDOW_WIDTH_D, (10) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
                 1000.0 / 1280, 30.0 / 720,
                 null
         ));
 
         // 文本显示区域（添加到对话框面板）
-        JTextArea dialogText = new JTextArea();
-        dialogText.setForeground(Color.WHITE);
-        dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
-        dialogText.setLineWrap(true);
-        dialogText.setWrapStyleWord(true);
-        dialogText.setEditable(false);
-        dialogText.setOpaque(false);
-        dialogText.setBackground(new Color(0, 0, 0, 0));
-        dialogText.setBorder(BorderFactory.createEmptyBorder());
-
+        JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
         scalableComponents.add(new ScalableComponent(
-                dialogText, (20) / 1280.0, (50) / 720.0,  // 基于窗口的绝对位置
-                (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
+                dialogText, (20) / ConstNum.WINDOW_WIDTH_D, (50) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                (backIcon.getIconWidth() - 50) / ConstNum.WINDOW_WIDTH_D, (backIcon.getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,null);
         scalableComponents.add(new ScalableComponent(
-                nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
+                nextBtn, 0 / ConstNum.WINDOW_WIDTH_D, 0 / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconWidth() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
 
@@ -1721,8 +1606,8 @@ public class UI implements UIInterface
             Chara.setOpaque(false);
             Chara.setFocusable(false);
             scalableComponents.add(new ScalableComponent(
-                    Chara, 650/ 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                    CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                    Chara, 650/ ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                    CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     CharIcon[0].getImage()
             ));
             diaPanel.add(Chara);
@@ -1732,8 +1617,8 @@ public class UI implements UIInterface
             
             JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,linkIcon.get(0));
             scalableComponents.add(new ScalableComponent(
-                    Chara2, 300 / 1280.0, (720 - linkIcon.get(0).getIconHeight() - 30) / 720.0,
-                    linkIcon.get(0).getIconWidth() / 1280.0, linkIcon.get(0).getIconHeight() / 720.0,
+                    Chara2, 300 / ConstNum.WINDOW_WIDTH_D, (720 - linkIcon.get(0).getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                    linkIcon.get(0).getIconWidth() / ConstNum.WINDOW_WIDTH_D, linkIcon.get(0).getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     linkIcon.get(0).getImage()
             ));
             diaPanel.add(Chara2);
@@ -1759,16 +1644,16 @@ public class UI implements UIInterface
             }
             if(isLinked){
                 scalableComponents.add(new ScalableComponent(
-                        Chara, 300 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara, 300 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
                 linkIcon.add(CharIcon[0]);
             }
             else {
                 scalableComponents.add(new ScalableComponent(
-                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
             }
@@ -1921,7 +1806,7 @@ public class UI implements UIInterface
         {
             ImageIcon musicBtnIcon = resources.getImage("musicBtn.png");
             JButton btnMusic = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,musicBtnIcon);
-            scalableComponents.add(new ScalableComponent(btnMusic,15.0/1280,35.0/720,musicBtnIcon.getIconWidth()/1280.0,musicBtnIcon.getIconHeight()/720.0,musicBtnIcon.getImage()));
+            scalableComponents.add(new ScalableComponent(btnMusic,15.0/1280,35.0/720,musicBtnIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D,musicBtnIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,musicBtnIcon.getImage()));
             btnMusic.addActionListener(e -> {
 
                 int cur = count % 4;
@@ -1950,7 +1835,7 @@ public class UI implements UIInterface
         else {
             ImageIcon musicBtnIcon = resources.getImage("musicBtn.png");
             JButton btnMusic = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,musicBtnIcon);
-            scalableComponents.add(new ScalableComponent(btnMusic,15.0/1280,35.0/720,musicBtnIcon.getIconWidth()/1280.0,musicBtnIcon.getIconHeight()/720.0,musicBtnIcon.getImage()));
+            scalableComponents.add(new ScalableComponent(btnMusic,15.0/1280,35.0/720,musicBtnIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D,musicBtnIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,musicBtnIcon.getImage()));
             btnMusic.addActionListener(e -> {
 
                 int cur = count % 13;
@@ -2108,14 +1993,14 @@ public class UI implements UIInterface
                 JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //职业
-                    scalableComponents.add(new ScalableComponent(claimedRoleLabel,((160+64 * i)/1280.0),0.0/720,
-                            claimedRoleIcon.getIconWidth()/1280.0
-                            ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(claimedRoleLabel,((160+64 * i)/ConstNum.WINDOW_WIDTH_D),0.0/720,
+                            claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(claimedRoleLabel,(160+64 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,98.0/720.0
-                            ,claimedRoleIcon.getIconWidth()/1280.0
-                            ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(claimedRoleLabel,(160+64 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,98.0/ConstNum.WINDOW_HEIGHT_D
+                            ,claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                 }
                 jPanel.add(claimedRoleLabel);
 
@@ -2129,14 +2014,14 @@ public class UI implements UIInterface
                 JLabel deathLabel = new JLabel(deathImage);
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //死亡叉叉
-                    scalableComponents.add(new ScalableComponent(deathLabel,((165+64 * i)/1280.0),10.0/720,
-                            deathImage.getIconWidth()/1280.0
-                            ,deathImage.getIconHeight()/720.0,deathImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(deathLabel,((165+64 * i)/ConstNum.WINDOW_WIDTH_D),10.0/720,
+                            deathImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,deathImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,deathImage.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(deathLabel,(165+64 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,108.0/720.0
-                            ,deathImage.getIconWidth()/1280.0
-                            ,deathImage.getIconHeight()/720.0,deathImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(deathLabel,(165+64 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,108.0/ConstNum.WINDOW_HEIGHT_D
+                            ,deathImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,deathImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,deathImage.getImage()));
                 }
                 jPanel.add(deathLabel);
             }
@@ -2147,18 +2032,18 @@ public class UI implements UIInterface
             JLabel textLabel = new JLabel(characterText);
             if(i <= (gs.gc.length - 1 + 1)/2){
                 //头像
-                scalableComponents.add(new ScalableComponent(label,(160+characterImage.getIconWidth() * i)/1280.0,0.0/720,characterImage.getIconWidth()/1280.0
-                        ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                scalableComponents.add(new ScalableComponent(label,(160+characterImage.getIconWidth() * i)/ConstNum.WINDOW_WIDTH_D,0.0/720,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                        ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                 //文字
-                scalableComponents.add(new ScalableComponent(textLabel,(175+characterImage.getIconWidth() * i)/1280.0,(characterImage.getIconHeight()-characterText.getIconHeight()/2.0)/720.0,characterText.getIconWidth() / 2.0 /1280.0
-                        ,characterText.getIconHeight()/2.0/720.0,characterText.getImage()));
+                scalableComponents.add(new ScalableComponent(textLabel,(175+characterImage.getIconWidth() * i)/ConstNum.WINDOW_WIDTH_D,(characterImage.getIconHeight()-characterText.getIconHeight()/2.0)/ConstNum.WINDOW_HEIGHT_D,characterText.getIconWidth() / 2.0 /ConstNum.WINDOW_WIDTH_D
+                        ,characterText.getIconHeight()/2.0/ConstNum.WINDOW_HEIGHT_D,characterText.getImage()));
             }
             else{
-                scalableComponents.add(new ScalableComponent(label,(160+characterImage.getIconWidth() * (i - ((gs.gc.length - 1+1)/2)))/1280.0,(0.0+characterImage.getIconHeight())/720.0
-                        ,characterImage.getIconWidth()/1280.0
-                        ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
-                scalableComponents.add(new ScalableComponent(textLabel,(175+characterImage.getIconWidth() * (i - ((gs.gc.length - 1+1)/2)))/1280.0,(2* characterImage.getIconHeight()-characterText.getIconHeight()/2.0)/720.0,characterText.getIconWidth() / 2.0 /1280.0
-                        ,characterText.getIconHeight()/2.0/720.0,characterText.getImage()));
+                scalableComponents.add(new ScalableComponent(label,(160+characterImage.getIconWidth() * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,(0.0+characterImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                        ,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                        ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
+                scalableComponents.add(new ScalableComponent(textLabel,(175+characterImage.getIconWidth() * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,(2* characterImage.getIconHeight()-characterText.getIconHeight()/2.0)/ConstNum.WINDOW_HEIGHT_D,characterText.getIconWidth() / 2.0 /ConstNum.WINDOW_WIDTH_D
+                        ,characterText.getIconHeight()/2.0/ConstNum.WINDOW_HEIGHT_D,characterText.getImage()));
             }
             jPanel.add(textLabel);
             jPanel.add(label);
@@ -2181,13 +2066,13 @@ public class UI implements UIInterface
                 JLabel skillTargetLabel = new JLabel(skillTargetIcon);
                 if (i <= (gs.gc.length - 1 + 1) / 2) {
                     //技能
-                    scalableComponents.add(new ScalableComponent(skillTargetLabel, ((160 + 64 * (i + 1) - skillTargetIcon.getIconWidth() * zynum) / 1280.0), (0.0 + (order - 1) * skillTargetIcon.getIconHeight()) / 720,
-                            skillTargetIcon.getIconWidth() / 1280.0
-                            , skillTargetIcon.getIconHeight() / 720.0, skillTargetIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(skillTargetLabel, ((160 + 64 * (i + 1) - skillTargetIcon.getIconWidth() * zynum) / ConstNum.WINDOW_WIDTH_D), (0.0 + (order - 1) * skillTargetIcon.getIconHeight()) / 720,
+                            skillTargetIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D
+                            , skillTargetIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D, skillTargetIcon.getImage()));
                 } else {
-                    scalableComponents.add(new ScalableComponent(skillTargetLabel, (160 + 64 * (i + 1 - ((gs.gc.length - 1 + 1) / 2)) - skillTargetIcon.getIconWidth() * zynum) / 1280.0, (98.0 + (order - 1) * skillTargetIcon.getIconHeight()) / 720.0
-                            , skillTargetIcon.getIconWidth() / 1280.0
-                            , skillTargetIcon.getIconHeight() / 720.0, skillTargetIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(skillTargetLabel, (160 + 64 * (i + 1 - ((gs.gc.length - 1 + 1) / 2)) - skillTargetIcon.getIconWidth() * zynum) / ConstNum.WINDOW_WIDTH_D, (98.0 + (order - 1) * skillTargetIcon.getIconHeight()) / ConstNum.WINDOW_HEIGHT_D
+                            , skillTargetIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D
+                            , skillTargetIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D, skillTargetIcon.getImage()));
                 }
                 jPanel.add(skillTargetLabel);
                 jPanel.setComponentZOrder(skillTargetLabel, 0);
@@ -2199,18 +2084,11 @@ public class UI implements UIInterface
         ImageIcon dataImage = resources.getImage("hiduke.png");
         JLabel data = new JLabel(dataImage);
         scalableComponents.add(new ScalableComponent(data,880.0/1280,10.0/720,
-                dataImage.getIconWidth()/1280.0,dataImage.getIconHeight()/720.0,
+                dataImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,dataImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 dataImage.getImage()));
         //数据文本
-        JTextArea dataText = new JTextArea("    "+gs.gameDay+"日目\n 生存者:" +gs.aliveCounter+"\n 死亡者:"+gs.deathCounter+"\n 吊り縄:"+(gs.aliveCounter - 1)/2);
-        dataText.setForeground(Color.WHITE);
-        dataText.setFont(new Font("Takao Mincho",Font.BOLD,20));
-        dataText.setLineWrap(true);       // 自动换行
-        dataText.setWrapStyleWord(true);  // 按单词拆分换行（避免单词截断）
-        dataText.setEditable(false);
-        dataText.setOpaque(false);
-        dataText.setBackground(new Color(0, 0, 0, 0));
-        dataText.setBorder(BorderFactory.createEmptyBorder());
+        JTextArea dataText = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE,20,
+                "    "+gs.gameDay+"日目\n 生存者:" +gs.aliveCounter+"\n 死亡者:"+gs.deathCounter+"\n 吊り縄:"+(gs.aliveCounter - 1)/2,true);
         scalableComponents.add(new ScalableComponent(dataText,890.0/1280,25.0/720,100.0/1280,130.0/720,null));
 
         jPanel.add(dataText);
@@ -2433,19 +2311,9 @@ public class UI implements UIInterface
         ImageIcon boardImage = resources.getImage("frame #19252.png");
         JLabel board = new JLabel(boardImage);
         scalableComponents.add(new ScalableComponent(board,0.0/1280,198.0/720,
-                (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                 boardImage.getImage()));
-        JTextArea infoText = new JTextArea();
-        infoText.setText(result.toString());
-        infoText.setForeground(Color.BLACK);
-        infoText.setFont(new Font("Takao Mincho",Font.BOLD,24));
-        infoText.setLineWrap(true);       // 自动换行
-        infoText.setWrapStyleWord(true);  // 按单词拆分换行（避免单词截断）
-        infoText.setEditable(false);
-        infoText.setFocusable(false);
-        infoText.setOpaque(false);
-        infoText.setBackground(new Color(0, 0, 0, 0));
-        infoText.setBorder(BorderFactory.createEmptyBorder());
+        JTextArea infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK,24,result.toString(),false);
         // 创建滚动面板，包裹文本区域
         JScrollPane scrollPane = new JScrollPane(infoText);
         // 隐藏不必要的边框
@@ -2456,54 +2324,54 @@ public class UI implements UIInterface
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false); // 确保滚动面板背景透明
         scalableComponents.add(new ScalableComponent(scrollPane,40.0/1280,228.0/720,
-                (200+boardImage.getIconWidth() - 80)/1280.0,(50+boardImage.getIconHeight()- 60)/720.0,
+                (200+boardImage.getIconWidth() - 80)/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight()- 60)/ConstNum.WINDOW_HEIGHT_D,
                 null));
 
         //按钮
         //投票
         ImageIcon btnImage = resources.getImage("goTohyo.png");
         JButton voteBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(voteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
-                        btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(voteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                        btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                         btnImage.getImage()));
 
         jPanel.add(voteBtn);
         //记录确认
         btnImage = resources.getImage("check.png");
         JButton recordBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(recordBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(recordBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         jPanel.add(recordBtn);
         //指示按钮
         btnImage = resources.getImage("shiji.png");
         JButton pointBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(pointBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(pointBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
 
         jPanel.add(pointBtn);
         //回避按钮(关)
         btnImage = resources.getImage("关闭回避.png");
         JButton avoidBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(avoidBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(avoidBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
 
         jPanel.add(avoidBtn);
         //回避按钮(开)
         btnImage = resources.getImage("开启回避.png");
         JButton avoidBtn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(avoidBtn1,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(avoidBtn1,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         avoidBtn1.setVisible(false);
         jPanel.add(avoidBtn1);
         //退出按钮
         btnImage = resources.getImage("IntroTitle.png");
         JButton menuBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(menuBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 5 - 40)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(menuBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 5 - 40)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         menuBtn.addActionListener(e -> {
             resources.playSound("click.wav");
@@ -2515,16 +2383,16 @@ public class UI implements UIInterface
         //灰随机
         btnImage = resources.getImage("tohyoGrey.png");
         JButton greyBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(greyBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(greyBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         greyBtn.setVisible(false);
         jPanel.add(greyBtn);
         //自由投票
         btnImage = resources.getImage("tohyoFree.png");
         JButton freeBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(freeBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(freeBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         freeBtn.setVisible(false);
         jPanel.add(freeBtn);
@@ -2533,16 +2401,16 @@ public class UI implements UIInterface
         //怀疑度
         btnImage = resources.getImage("checkUtagai.png");
         JButton doubtBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(doubtBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(doubtBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         doubtBtn.setVisible(false);
         jPanel.add(doubtBtn);
         //投票履历
         btnImage = resources.getImage("checkTohyo.png");
         JButton votehisBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(votehisBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(votehisBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         votehisBtn.setVisible(false);
         jPanel.add(votehisBtn);
@@ -2551,40 +2419,40 @@ public class UI implements UIInterface
         //co指示
         btnImage = resources.getImage("doCO.png");
         JButton coBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(coBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(coBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         coBtn.setVisible(false);
         jPanel.add(coBtn);
         //指定指示
         btnImage = resources.getImage("doShitei.png");
         JButton ppBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(ppBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(ppBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         ppBtn.setVisible(false);
         jPanel.add(ppBtn);
         //返回按钮
         btnImage = resources.getImage("return.png");
         JButton returnBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(returnBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(returnBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         returnBtn.setVisible(false);
         jPanel.add(returnBtn);
         //下一天按钮
         btnImage = resources.getImage("nextDay.png");
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(nextBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(nextBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         nextBtn.setVisible(false);
         jPanel.add(nextBtn);
         //同票再次投票按钮
         btnImage = resources.getImage("goTohyo.png");
         JButton againBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(againBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(againBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         againBtn.setVisible(false);
         jPanel.add(againBtn);
@@ -2592,8 +2460,8 @@ public class UI implements UIInterface
         //指定投票
         btnImage = resources.getImage("tohyoShitei.png");
         JButton readyVoteBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(readyVoteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(readyVoteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         readyVoteBtn.setVisible(false);
         jPanel.add(readyVoteBtn);
@@ -2601,24 +2469,24 @@ public class UI implements UIInterface
         //询问co
         btnImage = resources.getImage("询问CO.png");
         JButton askCoBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(askCoBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(askCoBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 4 - 30)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         askCoBtn.setVisible(false);
         jPanel.add(askCoBtn);
         //灵能指示
         btnImage = resources.getImage("reiCO.png");
         JButton reiBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(reiBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(reiBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         reiBtn.setVisible(false);
         jPanel.add(reiBtn);
         //猎人指示
         btnImage = resources.getImage("kariCO.png");
         JButton kariBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(kariBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(kariBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         kariBtn.setVisible(false);
         jPanel.add(kariBtn);
@@ -2626,24 +2494,24 @@ public class UI implements UIInterface
         //占卜指示
         btnImage = resources.getImage("uranaiCO.png");
         JButton uranaiBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(uranaiBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(uranaiBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         uranaiBtn.setVisible(false);
         jPanel.add(uranaiBtn);
         //共有指示
         btnImage = resources.getImage("kyouyuCO.png");
         JButton kyouyuBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(kyouyuBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(kyouyuBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         kyouyuBtn.setVisible(false);
         jPanel.add(kyouyuBtn);
         //猫又指示
         btnImage = resources.getImage("catCO.png");
         JButton catBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(catBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(catBtn,(1060.0 - btnImage.getIconWidth() - 30)/1280,(720 - 40 - btnImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         catBtn.setVisible(false);
         jPanel.add(catBtn);
@@ -2651,16 +2519,16 @@ public class UI implements UIInterface
         //指定投票
         btnImage = resources.getImage("tohyoShitei.png");
         JButton fixedVoteBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(fixedVoteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(fixedVoteBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         fixedVoteBtn.setVisible(false);
         jPanel.add(fixedVoteBtn);
         //指定占卜
         btnImage = resources.getImage("shiteiUranai.png");
         JButton fixedUranaiBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(fixedUranaiBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(fixedUranaiBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         fixedUranaiBtn.setVisible(false);
         jPanel.add(fixedUranaiBtn);
@@ -2668,8 +2536,8 @@ public class UI implements UIInterface
         //指定护卫
         btnImage = resources.getImage("shiteiGoei.png");
         JButton protectBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(protectBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/720.0,
-                btnImage.getIconWidth()/1280.0,btnImage.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(protectBtn,1060.0/1280,(720 - 40 - btnImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         protectBtn.setVisible(false);
         jPanel.add(protectBtn);
@@ -2742,12 +2610,10 @@ public class UI implements UIInterface
             createDoubt();
         });
         //投票履历
-
-        JPanel hisPanel = new JPanel();
-        hisPanel.setOpaque(false);
-        hisPanel.setLayout(null);
+        
+        JPanel hisPanel = PanelSimpleFactory.createSimplePanel(0,0,false,false);
         scalableComponents.add(new ScalableComponent(hisPanel,0.0/1280,198.0/720,
-                (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                 null));
 
         jPanel.add(hisPanel);
@@ -2756,7 +2622,7 @@ public class UI implements UIInterface
         JLabel levellb = new JLabel(levelIcon);
         jPanel.add(levellb);
         scalableComponents.add(new ScalableComponent(levellb,700.0/1280,600.0/720,
-                levelIcon.getIconWidth()/1280.0,levelIcon.getIconHeight()/720.0,
+                levelIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D,levelIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                 levelIcon.getImage()));
         levellb.setVisible(false);
 
@@ -2781,8 +2647,8 @@ public class UI implements UIInterface
                 ImageIcon btnImage1;
                 btnImage1 = resources.getImage("rirekiBack.png");
                 JButton backResult = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage1);
-                scalableComponents.add(new ScalableComponent(backResult,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 3 - 20)/720.0,
-                        btnImage1.getIconWidth()/1280.0,btnImage1.getIconHeight()/720.0,
+                scalableComponents.add(new ScalableComponent(backResult,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                        btnImage1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                         btnImage1.getImage()));
                 backResult.setVisible(false);
                 jPanel.add(backResult);
@@ -2790,8 +2656,8 @@ public class UI implements UIInterface
                 //次结果
                 btnImage1 = resources.getImage("rirekiNext.png");
                 JButton nextResult = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage1);
-                scalableComponents.add(new ScalableComponent(nextResult,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 2 - 10)/720.0,
-                        btnImage1.getIconWidth()/1280.0,btnImage1.getIconHeight()/720.0,
+                scalableComponents.add(new ScalableComponent(nextResult,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                        btnImage1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                         btnImage1.getImage()));
                 nextResult.setVisible(false);
                 jPanel.add(nextResult);
@@ -2799,8 +2665,8 @@ public class UI implements UIInterface
                 //前结果
                 btnImage1 = resources.getImage("rirekiBack.png");
                 JButton backResult1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage1);
-                scalableComponents.add(new ScalableComponent(backResult1,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 3 - 20)/720.0,
-                        btnImage1.getIconWidth()/1280.0,btnImage1.getIconHeight()/720.0,
+                scalableComponents.add(new ScalableComponent(backResult1,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 3 - 20)/ConstNum.WINDOW_HEIGHT_D,
+                        btnImage1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                         btnImage1.getImage()));
                 backResult1.setVisible(false);
                 jPanel.add(backResult1);
@@ -2808,8 +2674,8 @@ public class UI implements UIInterface
                 //次结果
                 btnImage1 = resources.getImage("rirekiNext.png");
                 JButton nextResult1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage1);
-                scalableComponents.add(new ScalableComponent(nextResult1,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 2 - 10)/720.0,
-                        btnImage1.getIconWidth()/1280.0,btnImage1.getIconHeight()/720.0,
+                scalableComponents.add(new ScalableComponent(nextResult1,1060.0/1280,(720 - 40 - btnImage1.getIconHeight()* 2 - 10)/ConstNum.WINDOW_HEIGHT_D,
+                        btnImage1.getIconWidth()/ConstNum.WINDOW_WIDTH_D,btnImage1.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                         btnImage1.getImage()));
                 nextResult1.setVisible(false);
                 jPanel.add(nextResult1);
@@ -2850,19 +2716,19 @@ public class UI implements UIInterface
                     }
                 });
                 if(i < 5){
-                scalableComponents.add(new ScalableComponent(dayBtn,((10+dayIcon.getIconWidth())*i)/1280.0,10.0/720,
-                        dayIcon.getIconWidth()/1280.0,dayIcon.getIconHeight()/720.0,
+                scalableComponents.add(new ScalableComponent(dayBtn,((10+dayIcon.getIconWidth())*i)/ConstNum.WINDOW_WIDTH_D,10.0/720,
+                        dayIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D,dayIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                         dayIcon.getImage()));
                 }
                 else if(i < 10){
-                    scalableComponents.add(new ScalableComponent(dayBtn,((10+dayIcon.getIconWidth())*(i -5))/1280.0,(dayIcon.getIconHeight()+20)/720.0,
-                            dayIcon.getIconWidth()/1280.0,dayIcon.getIconHeight()/720.0,
+                    scalableComponents.add(new ScalableComponent(dayBtn,((10+dayIcon.getIconWidth())*(i -5))/ConstNum.WINDOW_WIDTH_D,(dayIcon.getIconHeight()+20)/ConstNum.WINDOW_HEIGHT_D,
+                            dayIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D,dayIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                             dayIcon.getImage()));
 
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(dayBtn,((10+dayIcon.getIconWidth())*(i -10))/1280.0,(dayIcon.getIconHeight()*2+30)/720.0,
-                            dayIcon.getIconWidth()/1280.0,dayIcon.getIconHeight()/720.0,
+                    scalableComponents.add(new ScalableComponent(dayBtn,((10+dayIcon.getIconWidth())*(i -10))/ConstNum.WINDOW_WIDTH_D,(dayIcon.getIconHeight()*2+30)/ConstNum.WINDOW_HEIGHT_D,
+                            dayIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D,dayIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                             dayIcon.getImage()));
                 }
                 hisPanel.add(dayBtn);
@@ -3008,7 +2874,7 @@ public class UI implements UIInterface
             scrollPane1.setOpaque(false);
             scrollPane1.getViewport().setOpaque(false); // 确保滚动面板背景透明
             scalableComponents.add(new ScalableComponent(scrollPane1,40.0/1280,228.0/720,
-                    (200+boardImage.getIconWidth() - 80)/1280.0,(50+boardImage.getIconHeight()- 60)/720.0,
+                    (200+boardImage.getIconWidth() - 80)/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight()- 60)/ConstNum.WINDOW_HEIGHT_D,
                     null));
 
             isSelectedVoteTargetText.setVisible(true);
@@ -3390,14 +3256,15 @@ public class UI implements UIInterface
 
         });
 
-        JPanel infoPanel = new JPanel();//用于存头像按钮
-        infoPanel.setLayout(null); // 关键！确保手动设置的坐标生效
-        JPanel infoZhanPanel = new JPanel();//用于存头像按钮
-        infoZhanPanel.setLayout(null); // 关键！确保手动设置的坐标生效
-        JPanel infoHuPanel = new JPanel();//用于存头像按钮
-        infoHuPanel.setLayout(null); // 关键！确保手动设置的坐标生效
-        JPanel infoCoPanel = new JPanel();//用于存头像按钮
-        infoCoPanel.setLayout(null); // 关键！确保手动设置的坐标生效
+        JPanel infoPanel = PanelSimpleFactory.createSimplePanel(0,0,true,false);//用于存头像按钮
+        //new jp()
+        //infoPanel.setLayout(null); // 关键！确保手动设置的坐标生效
+        JPanel infoZhanPanel = PanelSimpleFactory.createSimplePanel(0,0,true,false);//用于存头像按钮
+        //infoZhanPanel.setLayout(null); // 关键！确保手动设置的坐标生效
+        JPanel infoHuPanel = PanelSimpleFactory.createSimplePanel(0,0,true,false);//用于存头像按钮
+        //infoHuPanel.setLayout(null); // 关键！确保手动设置的坐标生效
+        JPanel infoCoPanel = PanelSimpleFactory.createSimplePanel(0,0,true,false);//用于存头像按钮
+        //infoCoPanel.setLayout(null); // 关键！确保手动设置的坐标生效
         //返回按钮逻辑
         List<Integer> askList = new ArrayList<>();
         boolean[] isCo = {false};
@@ -3520,14 +3387,14 @@ public class UI implements UIInterface
                     JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
                     if(i <= (gs.gc.length - 1 + 1)/2){
                         //职业
-                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,((60+74 * i)/1280.0),20.0/720,
-                                claimedRoleIcon.getIconWidth()/1280.0
-                                ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,((60+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                                claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                                ,claimedRoleIcon.getIconWidth()/1280.0
-                                ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                                ,claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                     }
                     infoCoPanel.add(claimedRoleLabel);
                 }//职业图标
@@ -3538,14 +3405,14 @@ public class UI implements UIInterface
                 frameLabels.add(chooseLabel);
                 if(i <= (gs.gc.length - 1 + 1)/2){
 
-                    scalableComponents.add(new ScalableComponent(chooseLabel,((60+74 * i)/1280.0),20.0/720,
-                            chooseIcon.getIconWidth()/1280.0
-                            ,chooseIcon.getIconHeight()/720.0,chooseIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(chooseLabel,((60+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                            chooseIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,chooseIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,chooseIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(chooseLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                            ,chooseIcon.getIconWidth()/1280.0
-                            ,chooseIcon.getIconHeight()/720.0,chooseIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(chooseLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                            ,chooseIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,chooseIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,chooseIcon.getImage()));
                 }
                 infoCoPanel.add(chooseLabel);
                 chooseLabel.setVisible(false);
@@ -3555,14 +3422,14 @@ public class UI implements UIInterface
 
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //all标记
-                    scalableComponents.add(new ScalableComponent(voteLabel,((60+5+74 * i)/1280.0),20.0/720,
-                            voteIcon.getIconWidth()/1280.0
-                            ,voteIcon.getIconHeight()/720.0,voteIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteLabel,((60+5+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                            voteIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(voteLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                            ,voteIcon.getIconWidth()/1280.0
-                            ,voteIcon.getIconHeight()/720.0,voteIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                            ,voteIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteIcon.getImage()));
                 }
                 infoCoPanel.add(voteLabel);
                 infoCoPanel.setComponentZOrder(voteLabel,0);
@@ -3575,14 +3442,14 @@ public class UI implements UIInterface
 
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //all标记
-                    scalableComponents.add(new ScalableComponent(voteAllLabel,((60+5+74 * i)/1280.0),40.0/720,
-                            voteAllIcon.getIconWidth()/1280.0
-                            ,voteAllIcon.getIconHeight()/720.0,voteAllIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteAllLabel,((60+5+74 * i)/ConstNum.WINDOW_WIDTH_D),40.0/720,
+                            voteAllIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteAllIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteAllIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(voteAllLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,148.0/720.0
-                            ,voteAllIcon.getIconWidth()/1280.0
-                            ,voteAllIcon.getIconHeight()/720.0,voteAllIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteAllLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,148.0/ConstNum.WINDOW_HEIGHT_D
+                            ,voteAllIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteAllIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteAllIcon.getImage()));
                 }
                 infoCoPanel.add(voteAllLabel);
                 resultLabels.add(voteAllLabel);
@@ -3596,13 +3463,13 @@ public class UI implements UIInterface
                         zbLabels.add(zbLabel);
                         if (i2 <= (gs.gc.length - 1 + 1) / 2) {
                             //all标记
-                            scalableComponents.add(new ScalableComponent(zbLabel, ((60 + 5 + zbIcon.getIconWidth() + 74 * i2) / 1280.0), (20.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / 720.0,
-                                    zbIcon.getIconWidth() / 1280.0
-                                    , zbIcon.getIconHeight() / 720.0, zbIcon.getImage()));
+                            scalableComponents.add(new ScalableComponent(zbLabel, ((60 + 5 + zbIcon.getIconWidth() + 74 * i2) / ConstNum.WINDOW_WIDTH_D), (20.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / ConstNum.WINDOW_HEIGHT_D,
+                                    zbIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D
+                                    , zbIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D, zbIcon.getImage()));
                         } else {
-                            scalableComponents.add(new ScalableComponent(zbLabel, (60 + 5 + zbIcon.getIconWidth() + 74 * (i2 - ((gs.gc.length - 1 + 1) / 2))) / 1280.0, (128.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / 720.0
-                                    , zbIcon.getIconWidth() / 1280.0
-                                    , zbIcon.getIconHeight() / 720.0, zbIcon.getImage()));
+                            scalableComponents.add(new ScalableComponent(zbLabel, (60 + 5 + zbIcon.getIconWidth() + 74 * (i2 - ((gs.gc.length - 1 + 1) / 2))) / ConstNum.WINDOW_WIDTH_D, (128.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / ConstNum.WINDOW_HEIGHT_D
+                                    , zbIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D
+                                    , zbIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D, zbIcon.getImage()));
                         }
                         infoCoPanel.add(zbLabel);
                         zbLabel.setVisible(false);
@@ -3614,13 +3481,13 @@ public class UI implements UIInterface
                 targetLabels.add(label);
                 if(i <= (gs.gc.length - 1 + 1)/2){
 
-                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * i)/1280.0,20.0/720,characterImage.getIconWidth()/1280.0
-                            ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * i)/ConstNum.WINDOW_WIDTH_D,20.0/720,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * (i - ((gs.gc.length - 1+1)/2)))/1280.0,(30.0+characterImage.getIconHeight())/720.0
-                            ,characterImage.getIconWidth()/1280.0
-                            ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,(30.0+characterImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                            ,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                 }
                 infoCoPanel.add(label);
 
@@ -3643,31 +3510,31 @@ public class UI implements UIInterface
                     JLabel skillTargetLabel = new JLabel(skillTargetIcon);
                     if(i1 <= (gs.gc.length - 1 + 1)/2){
                         //职业
-                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1+1))- skillTargetIcon.getIconWidth()*zynum)/1280.0,(20.0 + (order - 1)*skillTargetIcon.getIconHeight())/720,
-                                skillTargetIcon.getIconWidth()/1280.0
-                                ,skillTargetIcon.getIconHeight()/720.0,skillTargetIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1+1))- skillTargetIcon.getIconWidth()*zynum)/ConstNum.WINDOW_WIDTH_D,(20.0 + (order - 1)*skillTargetIcon.getIconHeight())/720,
+                                skillTargetIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,skillTargetIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,skillTargetIcon.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1 +1 - ((gs.gc.length - 1+1)/2))) - skillTargetIcon.getIconWidth()*zynum)/1280.0,(128.0 + (order-1)*skillTargetIcon.getIconHeight())/720.0
-                                ,skillTargetIcon.getIconWidth()/1280.0
-                                ,skillTargetIcon.getIconHeight()/720.0,skillTargetIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1 +1 - ((gs.gc.length - 1+1)/2))) - skillTargetIcon.getIconWidth()*zynum)/ConstNum.WINDOW_WIDTH_D,(128.0 + (order-1)*skillTargetIcon.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                                ,skillTargetIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,skillTargetIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,skillTargetIcon.getImage()));
                     }
                     infoCoPanel.add(skillTargetLabel);
                     infoCoPanel.setComponentZOrder(skillTargetLabel,0);
                 }
             }
             scalableComponents.add(new ScalableComponent(infoCoPanel,0.0/1280,198.0/720,
-                    (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                    (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                     null));
 
             JLabel infoBoard = new JLabel(boardImage);
             scalableComponents.add(new ScalableComponent(infoBoard,0.0/1280,0.0/720,
-                    (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                    (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                     boardImage.getImage()));
 
             ImageIcon dragIcon = resources.getImage("uranaiAll.png");
             JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,dragIcon);
-            scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
+            scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/ConstNum.WINDOW_HEIGHT_D,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn.addMouseListener(new MouseAdapter() {
                 @Override
@@ -3719,7 +3586,7 @@ public class UI implements UIInterface
 
             dragIcon = resources.getImage("delete.png");
             JButton dragBtn_delete = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,dragIcon);
-            scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
+            scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/ConstNum.WINDOW_HEIGHT_D,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn_delete.addMouseListener(new MouseAdapter() {
                 @Override
@@ -3893,14 +3760,14 @@ public class UI implements UIInterface
                     JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
                     if(i <= (gs.gc.length - 1 + 1)/2){
                         //职业
-                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,((60+74 * i)/1280.0),20.0/720,
-                                claimedRoleIcon.getIconWidth()/1280.0
-                                ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,((60+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                                claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                                ,claimedRoleIcon.getIconWidth()/1280.0
-                                ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                                ,claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                     }
                     infoPanel.add(claimedRoleLabel);
                 }//职业图标
@@ -3911,14 +3778,14 @@ public class UI implements UIInterface
                 frameLabels.add(chooseLabel);
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //职业
-                    scalableComponents.add(new ScalableComponent(chooseLabel,((60+74 * i)/1280.0),20.0/720,
-                            chooseIcon.getIconWidth()/1280.0
-                            ,chooseIcon.getIconHeight()/720.0,chooseIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(chooseLabel,((60+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                            chooseIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,chooseIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,chooseIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(chooseLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                            ,chooseIcon.getIconWidth()/1280.0
-                            ,chooseIcon.getIconHeight()/720.0,chooseIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(chooseLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                            ,chooseIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,chooseIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,chooseIcon.getImage()));
                 }
                 infoPanel.add(chooseLabel);
                 chooseLabel.setVisible(false);
@@ -3932,14 +3799,14 @@ public class UI implements UIInterface
 
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //all标记
-                    scalableComponents.add(new ScalableComponent(voteAllLabel,((60+5+74 * i)/1280.0),30.0/720,
-                            voteAllIcon.getIconWidth()/1280.0
-                            ,voteAllIcon.getIconHeight()/720.0,voteAllIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteAllLabel,((60+5+74 * i)/ConstNum.WINDOW_WIDTH_D),30.0/720,
+                            voteAllIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteAllIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteAllIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(voteAllLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,138.0/720.0
-                            ,voteAllIcon.getIconWidth()/1280.0
-                            ,voteAllIcon.getIconHeight()/720.0,voteAllIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteAllLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,138.0/ConstNum.WINDOW_HEIGHT_D
+                            ,voteAllIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteAllIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteAllIcon.getImage()));
                 }
                 infoPanel.add(voteAllLabel);
                 infoPanel.setComponentZOrder(voteAllLabel,0);
@@ -3956,13 +3823,13 @@ public class UI implements UIInterface
                 targetLabels.add(label);
                 if(i <= (gs.gc.length - 1 + 1)/2){
 
-                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * i)/1280.0,20.0/720,characterImage.getIconWidth()/1280.0
-                            ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * i)/ConstNum.WINDOW_WIDTH_D,20.0/720,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * (i - ((gs.gc.length - 1+1)/2)))/1280.0,(30.0+characterImage.getIconHeight())/720.0
-                            ,characterImage.getIconWidth()/1280.0
-                            ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,(30.0+characterImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                            ,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                 }
                 infoPanel.add(label);
             }
@@ -3983,14 +3850,14 @@ public class UI implements UIInterface
                     JLabel skillTargetLabel = new JLabel(skillTargetIcon);
                     if(i1 <= (gs.gc.length - 1 + 1)/2){
                         //职业
-                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1+1))- skillTargetIcon.getIconWidth()*zynum)/1280.0,(20.0 + (order - 1)*skillTargetIcon.getIconHeight())/720,
-                                skillTargetIcon.getIconWidth()/1280.0
-                                ,skillTargetIcon.getIconHeight()/720.0,skillTargetIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1+1))- skillTargetIcon.getIconWidth()*zynum)/ConstNum.WINDOW_WIDTH_D,(20.0 + (order - 1)*skillTargetIcon.getIconHeight())/720,
+                                skillTargetIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,skillTargetIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,skillTargetIcon.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1 +1 - ((gs.gc.length - 1+1)/2))) - skillTargetIcon.getIconWidth()*zynum)/1280.0,(128.0 + (order-1)*skillTargetIcon.getIconHeight())/720.0
-                                ,skillTargetIcon.getIconWidth()/1280.0
-                                ,skillTargetIcon.getIconHeight()/720.0,skillTargetIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1 +1 - ((gs.gc.length - 1+1)/2))) - skillTargetIcon.getIconWidth()*zynum)/ConstNum.WINDOW_WIDTH_D,(128.0 + (order-1)*skillTargetIcon.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                                ,skillTargetIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,skillTargetIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,skillTargetIcon.getImage()));
                     }
                     infoPanel.add(skillTargetLabel);
                     infoPanel.setComponentZOrder(skillTargetLabel,0);
@@ -3998,17 +3865,17 @@ public class UI implements UIInterface
             }
 
             scalableComponents.add(new ScalableComponent(infoPanel,0.0/1280,198.0/720,
-                    (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                    (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                     null));
 
             JLabel infoBoard = new JLabel(boardImage);
             scalableComponents.add(new ScalableComponent(infoBoard,0.0/1280,0.0/720,
-                    (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                    (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                     boardImage.getImage()));
 
             ImageIcon dragIcon = resources.getImage("touhyou.png");
             JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,dragIcon);
-            scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
+            scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/ConstNum.WINDOW_HEIGHT_D,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn.addMouseListener(new MouseAdapter() {
                 @Override
@@ -4072,7 +3939,7 @@ public class UI implements UIInterface
 
             dragIcon = resources.getImage("delete.png");
             JButton dragBtn_delete = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,dragIcon);
-            scalableComponents.add(new ScalableComponent(dragBtn_delete,500.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
+            scalableComponents.add(new ScalableComponent(dragBtn_delete,500.0/1280,350/ConstNum.WINDOW_HEIGHT_D,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn_delete.addMouseListener(new MouseAdapter() {
                 @Override
@@ -4204,14 +4071,14 @@ public class UI implements UIInterface
                     JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
                     if(i <= (gs.gc.length - 1 + 1)/2){
                         //职业
-                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,((60+74 * i)/1280.0),20.0/720,
-                                claimedRoleIcon.getIconWidth()/1280.0
-                                ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,((60+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                                claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                                ,claimedRoleIcon.getIconWidth()/1280.0
-                                ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                                ,claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                     }
                     infoZhanPanel.add(claimedRoleLabel);
                 }//职业图标
@@ -4222,14 +4089,14 @@ public class UI implements UIInterface
                 frameLabels.add(chooseLabel);
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //职业
-                    scalableComponents.add(new ScalableComponent(chooseLabel,((60+74 * i)/1280.0),20.0/720,
-                            chooseIcon.getIconWidth()/1280.0
-                            ,chooseIcon.getIconHeight()/720.0,chooseIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(chooseLabel,((60+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                            chooseIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,chooseIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,chooseIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(chooseLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                            ,chooseIcon.getIconWidth()/1280.0
-                            ,chooseIcon.getIconHeight()/720.0,chooseIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(chooseLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                            ,chooseIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,chooseIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,chooseIcon.getImage()));
                 }
                 infoZhanPanel.add(chooseLabel);
                 chooseLabel.setVisible(false);
@@ -4243,14 +4110,14 @@ public class UI implements UIInterface
 
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //all标记
-                    scalableComponents.add(new ScalableComponent(voteLabel,((60+5+74 * i)/1280.0),20.0/720,
-                            voteIcon.getIconWidth()/1280.0
-                            ,voteIcon.getIconHeight()/720.0,voteIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteLabel,((60+5+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                            voteIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(voteLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                            ,voteIcon.getIconWidth()/1280.0
-                            ,voteIcon.getIconHeight()/720.0,voteIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                            ,voteIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteIcon.getImage()));
                 }
                 infoZhanPanel.add(voteLabel);
                 infoZhanPanel.setComponentZOrder(voteLabel,0);
@@ -4262,14 +4129,14 @@ public class UI implements UIInterface
                 resultLabels.add(voteAllLabel);
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //all标记
-                    scalableComponents.add(new ScalableComponent(voteAllLabel,((60+5+74 * i)/1280.0),40.0/720,
-                            voteAllIcon.getIconWidth()/1280.0
-                            ,voteAllIcon.getIconHeight()/720.0,voteAllIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteAllLabel,((60+5+74 * i)/ConstNum.WINDOW_WIDTH_D),40.0/720,
+                            voteAllIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteAllIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteAllIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(voteAllLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,148.0/720.0
-                            ,voteAllIcon.getIconWidth()/1280.0
-                            ,voteAllIcon.getIconHeight()/720.0,voteAllIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteAllLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,148.0/ConstNum.WINDOW_HEIGHT_D
+                            ,voteAllIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteAllIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteAllIcon.getImage()));
                 }
                 infoZhanPanel.add(voteAllLabel);
                 voteAllLabel.setVisible(false);
@@ -4285,13 +4152,13 @@ public class UI implements UIInterface
                         zbLabels.add(zbLabel);
                         if (i2 <= (gs.gc.length - 1 + 1) / 2) {
                             //all标记
-                            scalableComponents.add(new ScalableComponent(zbLabel, ((60 + 5 + zbIcon.getIconWidth() + 74 * i2) / 1280.0), (20.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / 720.0,
-                                    zbIcon.getIconWidth() / 1280.0
-                                    , zbIcon.getIconHeight() / 720.0, zbIcon.getImage()));
+                            scalableComponents.add(new ScalableComponent(zbLabel, ((60 + 5 + zbIcon.getIconWidth() + 74 * i2) / ConstNum.WINDOW_WIDTH_D), (20.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / ConstNum.WINDOW_HEIGHT_D,
+                                    zbIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D
+                                    , zbIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D, zbIcon.getImage()));
                         } else {
-                            scalableComponents.add(new ScalableComponent(zbLabel, (60 + 5 + zbIcon.getIconWidth() + 74 * (i2 - ((gs.gc.length - 1 + 1) / 2))) / 1280.0, (128.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / 720.0
-                                    , zbIcon.getIconWidth() / 1280.0
-                                    , zbIcon.getIconHeight() / 720.0, zbIcon.getImage()));
+                            scalableComponents.add(new ScalableComponent(zbLabel, (60 + 5 + zbIcon.getIconWidth() + 74 * (i2 - ((gs.gc.length - 1 + 1) / 2))) / ConstNum.WINDOW_WIDTH_D, (128.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / ConstNum.WINDOW_HEIGHT_D
+                                    , zbIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D
+                                    , zbIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D, zbIcon.getImage()));
                         }
                         infoZhanPanel.add(zbLabel);
                         zbLabel.setVisible(false);
@@ -4307,13 +4174,13 @@ public class UI implements UIInterface
                     targetLabels.add(label);
                     if(i <= (gs.gc.length - 1 + 1)/2){
 
-                        scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * i)/1280.0,20.0/720,characterImage.getIconWidth()/1280.0
-                                ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                        scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * i)/ConstNum.WINDOW_WIDTH_D,20.0/720,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * (i - ((gs.gc.length - 1+1)/2)))/1280.0,(30.0+characterImage.getIconHeight())/720.0
-                                ,characterImage.getIconWidth()/1280.0
-                                ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                        scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,(30.0+characterImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                                ,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                     }
                     infoZhanPanel.add(label);
 
@@ -4336,14 +4203,14 @@ public class UI implements UIInterface
                     JLabel skillTargetLabel = new JLabel(skillTargetIcon);
                     if(i1 <= (gs.gc.length - 1 + 1)/2){
                         //职业
-                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1+1))- skillTargetIcon.getIconWidth()*zynum)/1280.0,(20.0 + (order - 1)*skillTargetIcon.getIconHeight())/720,
-                                skillTargetIcon.getIconWidth()/1280.0
-                                ,skillTargetIcon.getIconHeight()/720.0,skillTargetIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1+1))- skillTargetIcon.getIconWidth()*zynum)/ConstNum.WINDOW_WIDTH_D,(20.0 + (order - 1)*skillTargetIcon.getIconHeight())/720,
+                                skillTargetIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,skillTargetIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,skillTargetIcon.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1 +1 - ((gs.gc.length - 1+1)/2))) - skillTargetIcon.getIconWidth()*zynum)/1280.0,(128.0 + (order-1)*skillTargetIcon.getIconHeight())/720.0
-                                ,skillTargetIcon.getIconWidth()/1280.0
-                                ,skillTargetIcon.getIconHeight()/720.0,skillTargetIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1 +1 - ((gs.gc.length - 1+1)/2))) - skillTargetIcon.getIconWidth()*zynum)/ConstNum.WINDOW_WIDTH_D,(128.0 + (order-1)*skillTargetIcon.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                                ,skillTargetIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,skillTargetIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,skillTargetIcon.getImage()));
                     }
                     infoZhanPanel.add(skillTargetLabel);
                     infoZhanPanel.setComponentZOrder(skillTargetLabel,0);
@@ -4351,17 +4218,17 @@ public class UI implements UIInterface
             }
 
             scalableComponents.add(new ScalableComponent(infoZhanPanel,0.0/1280,198.0/720,
-                    (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                    (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                     null));
 
             JLabel infoBoard = new JLabel(boardImage);
             scalableComponents.add(new ScalableComponent(infoBoard,0.0/1280,0.0/720,
-                    (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                    (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                     boardImage.getImage()));
 
             ImageIcon dragIcon = resources.getImage("uranaiAll.png");
             JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,dragIcon);
-            scalableComponents.add(new ScalableComponent(dragBtn,150.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
+            scalableComponents.add(new ScalableComponent(dragBtn,150.0/1280,350/ConstNum.WINDOW_HEIGHT_D,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn.addMouseListener(new MouseAdapter() {
                 @Override
@@ -4436,7 +4303,7 @@ public class UI implements UIInterface
                 }
                 ImageIcon Icon1 = resources.getImage("uranai" + zhanbuOrder.get(cur)+".png");
                 JButton Btn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,Icon1);
-                scalableComponents.add(new ScalableComponent(Btn,(zhanbuOrder.get(cur)*100+150)/1280.0,350/720.0,Icon1.getIconWidth()/2.0/1280,Icon1.getIconHeight()/2.0/720,
+                scalableComponents.add(new ScalableComponent(Btn,(zhanbuOrder.get(cur)*100+150)/ConstNum.WINDOW_WIDTH_D,350/ConstNum.WINDOW_HEIGHT_D,Icon1.getIconWidth()/2.0/1280,Icon1.getIconHeight()/2.0/720,
                         Icon1.getImage()));
                 Btn.addMouseListener(new MouseAdapter() {
                     @Override
@@ -4500,7 +4367,7 @@ public class UI implements UIInterface
             }
             dragIcon = resources.getImage("delete.png");
             JButton dragBtn_delete = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,dragIcon);
-            scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
+            scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/ConstNum.WINDOW_HEIGHT_D,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn_delete.addMouseListener(new MouseAdapter() {
                 @Override
@@ -4660,14 +4527,14 @@ public class UI implements UIInterface
                     JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
                     if(i <= (gs.gc.length - 1 + 1)/2){
                         //职业
-                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,((60+74 * i)/1280.0),20.0/720,
-                                claimedRoleIcon.getIconWidth()/1280.0
-                                ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,((60+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                                claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                                ,claimedRoleIcon.getIconWidth()/1280.0
-                                ,claimedRoleIcon.getIconHeight()/720.0,claimedRoleIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(claimedRoleLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                                ,claimedRoleIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,claimedRoleIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,claimedRoleIcon.getImage()));
                     }
                     infoHuPanel.add(claimedRoleLabel);
                 }//职业图标
@@ -4678,14 +4545,14 @@ public class UI implements UIInterface
                 frameLabels.add(chooseLabel);
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //职业
-                    scalableComponents.add(new ScalableComponent(chooseLabel,((60+74 * i)/1280.0),20.0/720,
-                            64/1280.0
-                            ,98/720.0,chooseIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(chooseLabel,((60+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                            64/ConstNum.WINDOW_WIDTH_D
+                            ,98/ConstNum.WINDOW_HEIGHT_D,chooseIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(chooseLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                            ,64/1280.0
-                            ,98/720.0,chooseIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(chooseLabel,(60+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                            ,64/ConstNum.WINDOW_WIDTH_D
+                            ,98/ConstNum.WINDOW_HEIGHT_D,chooseIcon.getImage()));
                 }
                 infoHuPanel.add(chooseLabel);
                 chooseLabel.setVisible(false);
@@ -4700,14 +4567,14 @@ public class UI implements UIInterface
 
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //all标记
-                    scalableComponents.add(new ScalableComponent(voteLabel,((60+5+74 * i)/1280.0),20.0/720,
-                            voteIcon.getIconWidth()/1280.0
-                            ,voteIcon.getIconHeight()/720.0,voteIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteLabel,((60+5+74 * i)/ConstNum.WINDOW_WIDTH_D),20.0/720,
+                            voteIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(voteLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,128.0/720.0
-                            ,voteIcon.getIconWidth()/1280.0
-                            ,voteIcon.getIconHeight()/720.0,voteIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,128.0/ConstNum.WINDOW_HEIGHT_D
+                            ,voteIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteIcon.getImage()));
                 }
                 infoHuPanel.add(voteLabel);
                 infoHuPanel.setComponentZOrder(voteLabel,0);
@@ -4720,14 +4587,14 @@ public class UI implements UIInterface
                 resultLabels.add(voteAllLabel);
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //all标记
-                    scalableComponents.add(new ScalableComponent(voteAllLabel,((60+5+74 * i)/1280.0),40.0/720,
-                            voteAllIcon.getIconWidth()/1280.0
-                            ,voteAllIcon.getIconHeight()/720.0,voteAllIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteAllLabel,((60+5+74 * i)/ConstNum.WINDOW_WIDTH_D),40.0/720,
+                            voteAllIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteAllIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteAllIcon.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(voteAllLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/1280.0,148.0/720.0
-                            ,voteAllIcon.getIconWidth()/1280.0
-                            ,voteAllIcon.getIconHeight()/720.0,voteAllIcon.getImage()));
+                    scalableComponents.add(new ScalableComponent(voteAllLabel,(60+5+74 * (i  - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,148.0/ConstNum.WINDOW_HEIGHT_D
+                            ,voteAllIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,voteAllIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,voteAllIcon.getImage()));
                 }
                 infoHuPanel.add(voteAllLabel);
                 voteAllLabel.setVisible(false);
@@ -4743,13 +4610,13 @@ public class UI implements UIInterface
                         zbLabels.add(zbLabel);
                         if (i2 <= (gs.gc.length - 1 + 1) / 2) {
                             //all标记
-                            scalableComponents.add(new ScalableComponent(zbLabel, ((60 + 5 + zbIcon.getIconWidth() + 74 * i2) / 1280.0), (20.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / 720.0,
-                                    zbIcon.getIconWidth() / 1280.0
-                                    , zbIcon.getIconHeight() / 720.0, zbIcon.getImage()));
+                            scalableComponents.add(new ScalableComponent(zbLabel, ((60 + 5 + zbIcon.getIconWidth() + 74 * i2) / ConstNum.WINDOW_WIDTH_D), (20.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / ConstNum.WINDOW_HEIGHT_D,
+                                    zbIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D
+                                    , zbIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D, zbIcon.getImage()));
                         } else {
-                            scalableComponents.add(new ScalableComponent(zbLabel, (60 + 5 + zbIcon.getIconWidth() + 74 * (i2 - ((gs.gc.length - 1 + 1) / 2))) / 1280.0, (128.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / 720.0
-                                    , zbIcon.getIconWidth() / 1280.0
-                                    , zbIcon.getIconHeight() / 720.0, zbIcon.getImage()));
+                            scalableComponents.add(new ScalableComponent(zbLabel, (60 + 5 + zbIcon.getIconWidth() + 74 * (i2 - ((gs.gc.length - 1 + 1) / 2))) / ConstNum.WINDOW_WIDTH_D, (128.0 + zbIcon.getIconHeight() * zhanbuOrder.get(i-1)) / ConstNum.WINDOW_HEIGHT_D
+                                    , zbIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D
+                                    , zbIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D, zbIcon.getImage()));
                         }
                         infoHuPanel.add(zbLabel);
                         zbLabel.setVisible(false);
@@ -4765,13 +4632,13 @@ public class UI implements UIInterface
                 targetLabels.add(label);
                 if(i <= (gs.gc.length - 1 + 1)/2){
 
-                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * i)/1280.0,20.0/720,characterImage.getIconWidth()/1280.0
-                            ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * i)/ConstNum.WINDOW_WIDTH_D,20.0/720,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * (i - ((gs.gc.length - 1+1)/2)))/1280.0,(30.0+characterImage.getIconHeight())/720.0
-                            ,characterImage.getIconWidth()/1280.0
-                            ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(label,(60+(characterImage.getIconWidth()+10) * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,(30.0+characterImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                            ,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                 }
                 infoHuPanel.add(label);
 
@@ -4794,14 +4661,14 @@ public class UI implements UIInterface
                     JLabel skillTargetLabel = new JLabel(skillTargetIcon);
                     if(i1 <= (gs.gc.length - 1 + 1)/2){
                         //职业
-                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1+1))- skillTargetIcon.getIconWidth()*zynum)/1280.0,(20.0 + (order - 1)*skillTargetIcon.getIconHeight())/720,
-                                skillTargetIcon.getIconWidth()/1280.0
-                                ,skillTargetIcon.getIconHeight()/720.0,skillTargetIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1+1))- skillTargetIcon.getIconWidth()*zynum)/ConstNum.WINDOW_WIDTH_D,(20.0 + (order - 1)*skillTargetIcon.getIconHeight())/720,
+                                skillTargetIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,skillTargetIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,skillTargetIcon.getImage()));
                     }
                     else{
-                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1 +1 - ((gs.gc.length - 1+1)/2))) - skillTargetIcon.getIconWidth()*zynum)/1280.0,(128.0 + (order-1)*skillTargetIcon.getIconHeight())/720.0
-                                ,skillTargetIcon.getIconWidth()/1280.0
-                                ,skillTargetIcon.getIconHeight()/720.0,skillTargetIcon.getImage()));
+                        scalableComponents.add(new ScalableComponent(skillTargetLabel,((50+74 * (i1 +1 - ((gs.gc.length - 1+1)/2))) - skillTargetIcon.getIconWidth()*zynum)/ConstNum.WINDOW_WIDTH_D,(128.0 + (order-1)*skillTargetIcon.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                                ,skillTargetIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                                ,skillTargetIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,skillTargetIcon.getImage()));
                     }
                     infoHuPanel.add(skillTargetLabel);
                     infoHuPanel.setComponentZOrder(skillTargetLabel,0);
@@ -4809,17 +4676,17 @@ public class UI implements UIInterface
             }
 
             scalableComponents.add(new ScalableComponent(infoHuPanel,0.0/1280,198.0/720,
-                    (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                    (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                     null));
 
             JLabel infoBoard = new JLabel(boardImage);
             scalableComponents.add(new ScalableComponent(infoBoard,0.0/1280,0.0/720,
-                    (200 + boardImage.getIconWidth())/1280.0,(50+boardImage.getIconHeight())/720.0,
+                    (200 + boardImage.getIconWidth())/ConstNum.WINDOW_WIDTH_D,(50+boardImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
                     boardImage.getImage()));
 
             ImageIcon dragIcon = resources.getImage("goeiAll.png");
             JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,dragIcon);
-            scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
+            scalableComponents.add(new ScalableComponent(dragBtn,250.0/1280,350/ConstNum.WINDOW_HEIGHT_D,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn.addMouseListener(new MouseAdapter() {
                 @Override
@@ -4893,7 +4760,7 @@ public class UI implements UIInterface
                 System.out.println(zhanbuNum.size());
                 ImageIcon Icon1 = resources.getImage("goei" + zhanbuOrder.get(cur)+".png");
                 JButton Btn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,Icon1);
-                scalableComponents.add(new ScalableComponent(Btn,(zhanbuOrder.get(cur)*150+250)/1280.0,350/720.0,Icon1.getIconWidth()/2.0/1280,Icon1.getIconHeight()/2.0/720,
+                scalableComponents.add(new ScalableComponent(Btn,(zhanbuOrder.get(cur)*150+250)/ConstNum.WINDOW_WIDTH_D,350/ConstNum.WINDOW_HEIGHT_D,Icon1.getIconWidth()/2.0/1280,Icon1.getIconHeight()/2.0/720,
                         Icon1.getImage()));
                 Btn.addMouseListener(new MouseAdapter() {
                     @Override
@@ -4957,7 +4824,7 @@ public class UI implements UIInterface
             }
             dragIcon = resources.getImage("delete.png");
             JButton dragBtn_delete = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,dragIcon);
-            scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/720.0,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
+            scalableComponents.add(new ScalableComponent(dragBtn_delete,800.0/1280,350/ConstNum.WINDOW_HEIGHT_D,dragIcon.getIconWidth()/2.0/1280,dragIcon.getIconHeight()/2.0/720,
                     dragIcon.getImage()));
             dragBtn_delete.addMouseListener(new MouseAdapter() {
                 @Override
@@ -5079,16 +4946,8 @@ public class UI implements UIInterface
     int[][] isSelectedVoteTargetCharas;//存储每天的指定角色[角色+1][天数]
 
     public void createTishi(String str){
-        JTextArea tishiText = new JTextArea();
-        tishiText.setText(str);
-        tishiText.setForeground(Color.WHITE);
-        tishiText.setFont(new Font("Takao Mincho",Font.BOLD,24));
-        tishiText.setLineWrap(true);       // 自动换行
-        tishiText.setWrapStyleWord(true);  // 按单词拆分换行（避免单词截断）
-        tishiText.setEditable(false);
-        tishiText.setBackground(new Color(0,0,0,180));
-        tishiText.setBorder(BorderFactory.createEmptyBorder());
-        scalableComponents.add(new ScalableComponent(tishiText,300.0/1280,300.0/720,500.0/1280,200/720.0,null));
+        JTextArea tishiText = TextareaSimpleFactory.createTranslucentTipTextArea(str);
+        scalableComponents.add(new ScalableComponent(tishiText,300.0/1280,300.0/720,500.0/1280,200/ConstNum.WINDOW_HEIGHT_D,null));
         jPanel.add(tishiText);
         jPanel.setComponentZOrder(tishiText,0);
         Timer timer = new Timer(1000, new ActionListener() {
@@ -5167,7 +5026,7 @@ public class UI implements UIInterface
         piaoText.setBackground(new Color(0,0,0,0));
         piaoText.setBorder(BorderFactory.createEmptyBorder());
         scalableComponents.add(new ScalableComponent(piaoText,40.0/1280,228.0/720,
-                (1000)/1280.0,(430)/720.0,
+                (1000)/ConstNum.WINDOW_WIDTH_D,(430)/ConstNum.WINDOW_HEIGHT_D,
                 null));
         jPanel.add(piaoText);
         jPanel.setComponentZOrder(piaoText,0);
@@ -5182,7 +5041,7 @@ public class UI implements UIInterface
         piaoText1.setBackground(new Color(0,0,0,0));
         piaoText1.setBorder(BorderFactory.createEmptyBorder());
         scalableComponents.add(new ScalableComponent(piaoText1,400.0/1280,228.0/720,
-                (450)/1280.0,(430)/720.0,
+                (450)/ConstNum.WINDOW_WIDTH_D,(430)/ConstNum.WINDOW_HEIGHT_D,
                 null));
         jPanel.add(piaoText1);
         jPanel.setComponentZOrder(piaoText1,0);
@@ -5276,7 +5135,7 @@ public class UI implements UIInterface
         piaoText.setBackground(new Color(0,0,0,0));
         piaoText.setBorder(BorderFactory.createEmptyBorder());
         scalableComponents.add(new ScalableComponent(piaoText,40.0/1280,228.0/720,
-                (900)/1280.0,(430)/720.0,
+                (900)/ConstNum.WINDOW_WIDTH_D,(430)/ConstNum.WINDOW_HEIGHT_D,
                 null));
         jPanel.add(piaoText);
         jPanel.setComponentZOrder(piaoText,0);
@@ -5292,7 +5151,7 @@ public class UI implements UIInterface
         piaoText1.setBackground(new Color(0,0,0,0));
         piaoText1.setBorder(BorderFactory.createEmptyBorder());
         scalableComponents.add(new ScalableComponent(piaoText1,530.0/1280,228.0/720,
-                (450)/1280.0,(430)/720.0,
+                (450)/ConstNum.WINDOW_WIDTH_D,(430)/ConstNum.WINDOW_HEIGHT_D,
                 null));
         jPanel.add(piaoText1);
         jPanel.setComponentZOrder(piaoText1,0);
@@ -5382,7 +5241,7 @@ public class UI implements UIInterface
         piaoText.setBackground(new Color(0,0,0,0));
         piaoText.setBorder(BorderFactory.createEmptyBorder());
         scalableComponents.add(new ScalableComponent(piaoText,40.0/1280,228.0/720,
-                (900)/1280.0,(430)/720.0,
+                (900)/ConstNum.WINDOW_WIDTH_D,(430)/ConstNum.WINDOW_HEIGHT_D,
                 null));
         jPanel.add(piaoText);
         jPanel.setComponentZOrder(piaoText,0);
@@ -5397,7 +5256,7 @@ public class UI implements UIInterface
         piaoText1.setBackground(new Color(0,0,0,0));
         piaoText1.setBorder(BorderFactory.createEmptyBorder());
         scalableComponents.add(new ScalableComponent(piaoText1,530.0/1280,228.0/720,
-                (450)/1280.0,(430)/720.0,
+                (450)/ConstNum.WINDOW_WIDTH_D,(430)/ConstNum.WINDOW_HEIGHT_D,
                 null));
         jPanel.add(piaoText1);
         jPanel.setComponentZOrder(piaoText1,0);
@@ -5451,23 +5310,18 @@ public class UI implements UIInterface
         // 对话框背景（添加到对话框面板）
         ImageIcon backIcon = resources.getImage("messageframe.png");
         // 对话框面板
-        JPanel dialogPanel = new JPanel();
-        dialogPanel.setLayout(null);
-        dialogPanel.setOpaque(false);
-        dialogPanel.setBackground(new Color(0, 0, 0, 0));
+        JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(0,0,false,true);
         scalableComponents.add(new ScalableComponent(
                 dialogPanel, 260.0 / 1280, 450.0 / 720,
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         diaPanel.add(dialogPanel);     // 顶层：对话框面板
-
-
-
+        
         JLabel back = new JLabel(backIcon);
         scalableComponents.add(new ScalableComponent(
                 back, 0.0 / 1280, 0.0 / 720,  // 基于对话框的绝对比例
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconHeight() / 720.0,
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                 backIcon.getImage()
         ));
 
@@ -5475,32 +5329,22 @@ public class UI implements UIInterface
         JLabel nameLabel = LabelSimpleFactory.makeLabel(1,uiComponentFactory.getCharacterFullName(event.ch1));
         dialogPanel.add(nameLabel);  // 添加到对话框面板
         scalableComponents.add(new ScalableComponent(
-                nameLabel, (20) / 1280.0, (10) / 720.0,  // 基于窗口的绝对位置
+                nameLabel, (20) / ConstNum.WINDOW_WIDTH_D, (10) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
                 1000.0 / 1280, 30.0 / 720,
                 null
         ));
 
         // 文本显示区域（添加到对话框面板）
-        JTextArea dialogText = new JTextArea();
-        dialogText.setForeground(Color.WHITE);
-        dialogText.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
-        dialogText.setLineWrap(true);
-        dialogText.setWrapStyleWord(true);
-        dialogText.setEditable(false);
-        dialogText.setOpaque(false);
-        dialogText.setFocusable(false);
-        dialogText.setBackground(new Color(0, 0, 0, 0));
-        dialogText.setBorder(BorderFactory.createEmptyBorder());
-
+        JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
         scalableComponents.add(new ScalableComponent(
-                dialogText, (20) / 1280.0, (50) / 720.0,  // 基于窗口的绝对位置
-                (backIcon.getIconWidth() - 50) / 1280.0, (backIcon.getIconHeight() - 30) / 720.0,
+                dialogText, (20) / ConstNum.WINDOW_WIDTH_D, (50) / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                (backIcon.getIconWidth() - 50) / ConstNum.WINDOW_WIDTH_D, (backIcon.getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,null);
         scalableComponents.add(new ScalableComponent(
-                nextBtn, 0 / 1280.0, 0 / 720.0,  // 基于窗口的绝对位置
-                backIcon.getIconWidth() / 1280.0, backIcon.getIconWidth() / 720.0,
+                nextBtn, 0 / ConstNum.WINDOW_WIDTH_D, 0 / ConstNum.WINDOW_HEIGHT_D,  // 基于窗口的绝对位置
+                backIcon.getIconWidth() / ConstNum.WINDOW_WIDTH_D, backIcon.getIconWidth() / ConstNum.WINDOW_HEIGHT_D,
                 null
         ));
 
@@ -5530,8 +5374,8 @@ public class UI implements UIInterface
             Chara.setOpaque(false);
             Chara.setFocusable(false);
             scalableComponents.add(new ScalableComponent(
-                    Chara, 650/ 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                    CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                    Chara, 650/ ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                    CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     CharIcon[0].getImage()
             ));
             diaPanel.add(Chara);
@@ -5541,8 +5385,8 @@ public class UI implements UIInterface
             
             JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,linkIcon.get(0));
             scalableComponents.add(new ScalableComponent(
-                    Chara2, 300 / 1280.0, (720 - linkIcon.get(0).getIconHeight() - 30) / 720.0,
-                    linkIcon.get(0).getIconWidth() / 1280.0, linkIcon.get(0).getIconHeight() / 720.0,
+                    Chara2, 300 / ConstNum.WINDOW_WIDTH_D, (720 - linkIcon.get(0).getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                    linkIcon.get(0).getIconWidth() / ConstNum.WINDOW_WIDTH_D, linkIcon.get(0).getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                     linkIcon.get(0).getImage()
             ));
             diaPanel.add(Chara2);
@@ -5568,16 +5412,16 @@ public class UI implements UIInterface
             }
             if(isLinked){
                 scalableComponents.add(new ScalableComponent(
-                        Chara, 300 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara, 300 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
                 linkIcon.add(CharIcon[0]);
             }
             else {
                 scalableComponents.add(new ScalableComponent(
-                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / 1280.0, (720 - CharIcon[0].getIconHeight() - 30) / 720.0,
-                        CharIcon[0].getIconWidth() / 1280.0, CharIcon[0].getIconHeight() / 720.0,
+                        Chara, (1280 - CharIcon[0].getIconWidth()) / 2.0 / ConstNum.WINDOW_WIDTH_D, (720 - CharIcon[0].getIconHeight() - 30) / ConstNum.WINDOW_HEIGHT_D,
+                        CharIcon[0].getIconWidth() / ConstNum.WINDOW_WIDTH_D, CharIcon[0].getIconHeight() / ConstNum.WINDOW_HEIGHT_D,
                         CharIcon[0].getImage()
                 ));
             }
@@ -5647,8 +5491,8 @@ public class UI implements UIInterface
         ));
         ImageIcon btnImage = resources.getImage("PVBtitile.png");
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,btnImage);
-        scalableComponents.add(new ScalableComponent(nextBtn,1130.0/1280,(720  - btnImage.getIconHeight())/720.0,
-                btnImage.getIconWidth()*0.6/1280.0,btnImage.getIconHeight()*0.6/720.0,
+        scalableComponents.add(new ScalableComponent(nextBtn,1130.0/1280,(720  - btnImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D,
+                btnImage.getIconWidth()*0.6/ConstNum.WINDOW_WIDTH_D,btnImage.getIconHeight()*0.6/ConstNum.WINDOW_HEIGHT_D,
                 btnImage.getImage()));
         nextBtn.addActionListener(e -> {
             resources.playSound("click.wav");
@@ -5716,15 +5560,7 @@ public class UI implements UIInterface
                 }
             }
             System.out.println(infoText);
-            JTextArea infoLabel = new JTextArea(infoText.toString());
-            infoLabel.setEditable(false);
-            infoLabel.setLineWrap(true);
-            infoLabel.setWrapStyleWord(true);
-            infoLabel.setBorder(null);
-            infoLabel.setOpaque(false);
-            infoLabel.setFocusable(false);
-            infoLabel.setFont(new Font("Takao Mincho", Font.BOLD, 16));
-
+            JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK,16,infoText.toString(),false);
             StringBuilder xName = new StringBuilder();
             StringBuilder imageName = new StringBuilder();
             if(gs.gc[i].number <=9)imageName.append("0");
@@ -5781,14 +5617,14 @@ public class UI implements UIInterface
                 JLabel deathLabel = new JLabel(deathImage);
                 if(i <= (gs.gc.length - 1 + 1)/2){
                     //死亡叉叉
-                    scalableComponents.add(new ScalableComponent(deathLabel,(22+(characterImage.getIconWidth()+40) * i)/1280.0,110.0/720,
-                            deathImage.getIconWidth()/1280.0,deathImage.getIconHeight()/720.0,deathImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(deathLabel,(22+(characterImage.getIconWidth()+40) * i)/ConstNum.WINDOW_WIDTH_D,110.0/720,
+                            deathImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D,deathImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,deathImage.getImage()));
                 }
                 else{
-                    scalableComponents.add(new ScalableComponent(deathLabel,(22+(characterImage.getIconWidth()+40) * (i - ((gs.gc.length - 1+1)/2)))/1280.0,
-                            (260.0+characterImage.getIconHeight())/720.0
-                            ,deathImage.getIconWidth()/1280.0
-                            ,deathImage.getIconHeight()/720.0,deathImage.getImage()));
+                    scalableComponents.add(new ScalableComponent(deathLabel,(22+(characterImage.getIconWidth()+40) * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,
+                            (260.0+characterImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                            ,deathImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                            ,deathImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,deathImage.getImage()));
                 }
                 jPanel.add(deathLabel);
             }
@@ -5797,24 +5633,24 @@ public class UI implements UIInterface
             JLabel textLabel = new JLabel(characterText);
             if(i <= (gs.gc.length - 1 + 1)/2){
                 //头像
-                scalableComponents.add(new ScalableComponent(label,(20+(characterImage.getIconWidth()+40) * i)/1280.0,100.0/720,characterImage.getIconWidth()/1280.0
-                        ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
+                scalableComponents.add(new ScalableComponent(label,(20+(characterImage.getIconWidth()+40) * i)/ConstNum.WINDOW_WIDTH_D,100.0/720,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                        ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
                 //文字
-                scalableComponents.add(new ScalableComponent(textLabel,(35+(characterImage.getIconWidth()+40) * i)/1280.0,(100.0+characterImage.getIconHeight()-characterText.getIconHeight()/2.0)/720.0,characterText.getIconWidth() / 2.0 /1280.0
-                        ,characterText.getIconHeight()/2.0/720.0,characterText.getImage()));
+                scalableComponents.add(new ScalableComponent(textLabel,(35+(characterImage.getIconWidth()+40) * i)/ConstNum.WINDOW_WIDTH_D,(100.0+characterImage.getIconHeight()-characterText.getIconHeight()/2.0)/ConstNum.WINDOW_HEIGHT_D,characterText.getIconWidth() / 2.0 /ConstNum.WINDOW_WIDTH_D
+                        ,characterText.getIconHeight()/2.0/ConstNum.WINDOW_HEIGHT_D,characterText.getImage()));
                 //文本
-                scalableComponents.add(new ScalableComponent(infoLabel,(20+(characterImage.getIconWidth()+40) * i)/1280.0,210.0/720,100/1280.0
-                        ,150/720.0,null));
+                scalableComponents.add(new ScalableComponent(infoLabel,(20+(characterImage.getIconWidth()+40) * i)/ConstNum.WINDOW_WIDTH_D,210.0/720,100/ConstNum.WINDOW_WIDTH_D
+                        ,150/ConstNum.WINDOW_HEIGHT_D,null));
             }
             else{
-                scalableComponents.add(new ScalableComponent(label,(20+(characterImage.getIconWidth()+40) * (i - ((gs.gc.length - 1+1)/2)))/1280.0,(250.0+characterImage.getIconHeight())/720.0
-                        ,characterImage.getIconWidth()/1280.0
-                        ,characterImage.getIconHeight()/720.0,characterImage.getImage()));
-                scalableComponents.add(new ScalableComponent(textLabel,(35+(characterImage.getIconWidth()+40) * (i - ((gs.gc.length - 1+1)/2)))/1280.0,(250.0+2* characterImage.getIconHeight()-characterText.getIconHeight()/2.0)/720.0,characterText.getIconWidth() / 2.0 /1280.0
-                        ,characterText.getIconHeight()/2.0/720.0,characterText.getImage()));
+                scalableComponents.add(new ScalableComponent(label,(20+(characterImage.getIconWidth()+40) * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,(250.0+characterImage.getIconHeight())/ConstNum.WINDOW_HEIGHT_D
+                        ,characterImage.getIconWidth()/ConstNum.WINDOW_WIDTH_D
+                        ,characterImage.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,characterImage.getImage()));
+                scalableComponents.add(new ScalableComponent(textLabel,(35+(characterImage.getIconWidth()+40) * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,(250.0+2* characterImage.getIconHeight()-characterText.getIconHeight()/2.0)/ConstNum.WINDOW_HEIGHT_D,characterText.getIconWidth() / 2.0 /ConstNum.WINDOW_WIDTH_D
+                        ,characterText.getIconHeight()/2.0/ConstNum.WINDOW_HEIGHT_D,characterText.getImage()));
                 //文本
-                scalableComponents.add(new ScalableComponent(infoLabel,(20+(characterImage.getIconWidth()+40) * (i - ((gs.gc.length - 1+1)/2)))/1280.0,460.0/720,100/1280.0
-                        ,150/720.0,null));
+                scalableComponents.add(new ScalableComponent(infoLabel,(20+(characterImage.getIconWidth()+40) * (i - ((gs.gc.length - 1+1)/2)))/ConstNum.WINDOW_WIDTH_D,460.0/720,100/ConstNum.WINDOW_WIDTH_D
+                        ,150/ConstNum.WINDOW_HEIGHT_D,null));
             }
             jPanel.add(infoLabel);
             jPanel.add(textLabel);
@@ -5839,20 +5675,13 @@ public class UI implements UIInterface
         }
         ImageIcon winIcon = resources.getImage(winIconText);
         JLabel winLabel = new JLabel(winIcon);
-        scalableComponents.add(new ScalableComponent(winLabel,50/1280.0,25/720.0,
-                winIcon.getIconWidth()/1280.0,winIcon.getIconHeight()/720.0,
+        scalableComponents.add(new ScalableComponent(winLabel,50/ConstNum.WINDOW_WIDTH_D,25/ConstNum.WINDOW_HEIGHT_D,
+                winIcon.getIconWidth()/ConstNum.WINDOW_WIDTH_D,winIcon.getIconHeight()/ConstNum.WINDOW_HEIGHT_D,
                     winIcon.getImage()));
         jPanel.add(winLabel);
-
-        JTextArea infoLabel = new JTextArea(winText);
-        infoLabel.setEditable(false);
-        infoLabel.setFocusable(false);
-        infoLabel.setLineWrap(true);
-        infoLabel.setWrapStyleWord(true);
-        infoLabel.setBorder(null);
-        infoLabel.setOpaque(false);
-        infoLabel.setFont(new Font("Takao Mincho", Font.BOLD, 24));
-        scalableComponents.add(new ScalableComponent(infoLabel,100/1280.0,29/720.0,200/1280.0,100/1280.0,null));
+        
+        JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK,24,winText,false);
+        scalableComponents.add(new ScalableComponent(infoLabel,100/ConstNum.WINDOW_WIDTH_D,29/ConstNum.WINDOW_HEIGHT_D,200/ConstNum.WINDOW_WIDTH_D,100/ConstNum.WINDOW_WIDTH_D,null));
         jPanel.add(infoLabel);
 
         jPanel.add(background);
@@ -5996,17 +5825,7 @@ public class UI implements UIInterface
         });
 
         // 文本显示区域（核心修改：添加滚动和自动换行）
-        JTextArea dialogText = new JTextArea(resources.getHelpText(scene.toString()));
-        dialogText.setForeground(Color.WHITE);
-        dialogText.setFont(new Font("Takao Mincho",Font.BOLD,24));
-        // 1. 开启自动换行
-        dialogText.setLineWrap(true);       // 自动换行
-        dialogText.setWrapStyleWord(true);  // 按单词拆分换行（避免单词截断）
-        dialogText.setEditable(false);
-        dialogText.setOpaque(false);
-        dialogText.setBackground(new Color(0, 0, 0, 0));
-        dialogText.setBorder(BorderFactory.createEmptyBorder());
-
+        JTextArea dialogText = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE,24,resources.getHelpText(scene.toString()),true);
         // 2. 创建滚动面板，包裹文本区域
         JScrollPane scrollPane = new JScrollPane(dialogText);
         // 隐藏不必要的边框
