@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -328,7 +329,8 @@ enum whyDie
     zhousha,//咒杀
 }
 class ConstNum
-{//常量类，定义游戏常量以及静态方法
+{
+    //常量类，定义游戏常量以及静态方法
     public static int CharacterSum = 44;// 游戏角色数量
     public static int N = 50;//最大游戏天数
     public static int M = 20;//职业状态数量
@@ -338,8 +340,17 @@ class ConstNum
     }
     public static int WINDOW_WIDTH = 1280;//游戏窗口的宽度
     public static int WINDOW_HEIGHT = 720;//游戏窗口的高度
+    public static int RETURN_WIDTH = 194;
+    public static int RETURN_HEIGHT = 127;
     public static double WINDOW_WIDTH_D = 1280.0;//游戏窗口的宽度(double)
     public static double WINDOW_HEIGHT_D = 720.0;//游戏窗口的高度(double)
+    public static ImageIcon scaleIcon(ImageIcon originalIcon, int width, int height)
+    {
+        if (originalIcon == null) return null;
+        Image scaledImage = originalIcon.getImage().getScaledInstance(
+                width, height, Image.SCALE_SMOOTH);
+        return new ImageIcon(scaledImage);
+    }
 }
 class GameCharacter
 {//游戏角色封装类
