@@ -24,7 +24,7 @@ public class PanelSimpleFactory
            jPanel.setSize(width,height);
        }
        if(isWhiteBk)
-           jPanel.setBackground(new Color(0,0,0,0));
+           jPanel.setBackground(GameConstants.COLOR_TRANSPARENT);
        jPanel.setOpaque(isOpaque);
        return jPanel;
     }
@@ -50,7 +50,7 @@ public class PanelSimpleFactory
             jPanel.setBounds(x,y,width,height);
         }
         if(isWhiteBk)
-            jPanel.setBackground(new Color(0,0,0,0));
+            jPanel.setBackground(GameConstants.COLOR_TRANSPARENT);
         jPanel.setOpaque(isOpaque);
         return jPanel;
     }

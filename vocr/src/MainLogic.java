@@ -26,19 +26,12 @@ class IntPair
         return "(" + first + ", " + second + ")";
     }
 }
-class logicTools    //逻辑类中的工具方法集合
+class logicTools    //逻辑类中的工具方法集合(已迁移至DebugLogger)
 {
-    static boolean istest;
-    logicTools()
-    {
-        istest = true;
-    }
+    /** @deprecated 使用 DebugLogger.log() 替代 */
     public static void log(String message)
     {
-        if(istest)
-        {
-            System.out.println(message);
-        }
+        DebugLogger.log(message);
     }
     public static int min(int x,int y)
     {
@@ -58,7 +51,6 @@ class logicTools    //逻辑类中的工具方法集合
 }
 public class MainLogic implements MainLogicInterface
 {
-    boolean istest;//当前是否在游戏测试阶段。控制输出控制台信息
     GameStatus gs;
     boolean isDoubleDeathOccurred[];//当前日期的夜间是否出现过双死
     boolean rlsl,rlsm;//当前是否有人狼上猎，是否有人狼上猫
@@ -119,7 +111,6 @@ public class MainLogic implements MainLogicInterface
         //返回值：游戏状态
         //函数体中有可能向UI类添加一系列事件
         gs         = new GameStatus();
-        istest = true;//默认在测试阶段
         gs.startGame(p);
         isDoubleDeathOccurred    = new boolean[ConstNum.N+1];
         ybzw       = new int[gs.getPlayerSum()+1];
@@ -146,15 +137,14 @@ public class MainLogic implements MainLogicInterface
 
             String configPath = "config/probability.txt";
             probabilityCalculator = new ProbabilityCalculator(configPath);
-            if(istest)
+            if(probabilityCalculator != null)
              {
                 logicTools.log("概率计算器已初始化");
                 probabilityCalculator.printStatistics();
             }
         } catch (Exception e) {
             // 如果配置文件加载失败，使用默认值
-            if(istest)
-                System.err.println("加载配置文件失败，使用默认值: " + e.getMessage());
+            DebugLogger.error("加载配置文件失败，使用默认值: " + e.getMessage());
             probabilityCalculator = new ProbabilityCalculator();
         }
         response = new ArrayList<IntPair>();
@@ -2586,23 +2576,23 @@ public class MainLogic implements MainLogicInterface
         //CharacterKatakanaName ch2 = CharacterKatakanaName.values()[ch1.ordinal()];
         //猎人工作逻辑
         if(gs.gc[num].whyDie != whyDie.NONE) return 0;//猎人死亡，返回0
-        
+
         {
-            logicTools.log("猎人编号："+num+" 当前游戏日期："+gs.gameDay);
-            System.out.print("这个猎的预告：");
+            DebugLogger.log("猎人编号："+num+" 当前游戏日期："+gs.gameDay);
+            StringBuilder sb = new StringBuilder("这个猎的预告：");
             for(int i=1;i<=gs.getPlayerSum();i++)
             {
                 if(gs.gc[num].claimedRoleScheduledSkillTargets[i][gs.gameDay])
-                    System.out.print(i+" ");
+                    sb.append(i).append(" ");
             }
-            logicTools.log("");
-            logicTools.log("潜伏猎人的预告：");
+            DebugLogger.log(sb.toString());
+            sb = new StringBuilder("潜伏猎人的预告：");
             for(int i=1;i<=gs.getPlayerSum();i++)
             {
                 if(gs.hiddenHunterScheduledSkillTargets[i][gs.gameDay])
-                    System.out.print(i+" ");
+                    sb.append(i).append(" ");
             }
-            logicTools.log("");
+            DebugLogger.log(sb.toString());
         }
         boolean haveterget = false;//判断当前是否有指定护卫对象
         boolean qf = false;//真猎人当前是否潜伏
@@ -3057,16 +3047,16 @@ public class MainLogic implements MainLogicInterface
     {
         //znum:占卜师编号
         if(gs.gc[znum].whyDie != whyDie.NONE) return -1;//占已经死亡，返回-1
-        
+
         {
-            logicTools.log("占卜师编号："+znum+" 当前游戏日期："+gs.gameDay);
-            System.out.print("这个占的预告：");
+            DebugLogger.log("占卜师编号："+znum+" 当前游戏日期："+gs.gameDay);
+            StringBuilder sb = new StringBuilder("这个占的预告：");
             for(int i=1;i<=gs.getPlayerSum();i++)
             {
                 if(gs.gc[znum].claimedRoleScheduledSkillTargets[i][gs.gameDay])
-                    System.out.print(i+" ");
+                    sb.append(i).append(" ");
             }
-            logicTools.log("");
+            DebugLogger.log(sb.toString());
         }
         int weight[] = new int [gs.getPlayerSum()+1];//定义权重数组
         ArrayList target = new ArrayList<Integer>();//定义合法占卜对象数组
@@ -3284,35 +3274,35 @@ public class MainLogic implements MainLogicInterface
             for(int i=0;i<zhans.size();i++)
             {
                 int zhan = zhans.get(i);
-                System.out.print("占卜师候补编号：" + gs.gc[zhan].claimedRoleorder+"预告情况：");
+                StringBuilder sb = new StringBuilder("占卜师候补编号：" + gs.gc[zhan].claimedRoleorder + "预告情况：");
                 for(int j=1;j<=gs.getPlayerSum();j++)
                     if(gs.gc[zhan].claimedRoleScheduledSkillTargets[j][gs.gameDay])
-                        System.out.print(CharacterKanjiName.values()[gs.gc[j].number] + " ");
-                logicTools.log("");
+                        sb.append(CharacterKanjiName.values()[gs.gc[j].number]).append(" ");
+                DebugLogger.log(sb.toString());
             }
             for (int i = 0; i < lies.size(); i++)
             {
                 int lie = lies.get(i);
-                System.out.print("猎人候补编号：" + gs.gc[lie].claimedRoleorder + "指定护卫情况：");
+                StringBuilder sb = new StringBuilder("猎人候补编号：" + gs.gc[lie].claimedRoleorder + "指定护卫情况：");
                 for (int j = 1; j <= gs.getPlayerSum(); j++)
                     if (gs.gc[lie].claimedRoleScheduledSkillTargets[j][gs.gameDay])
-                        System.out.print(CharacterKanjiName.values()[gs.gc[j].number] + " ");
-                logicTools.log("");
+                        sb.append(CharacterKanjiName.values()[gs.gc[j].number]).append(" ");
+                DebugLogger.log(sb.toString());
             }
-            System.out.print("潜伏占预告情况：");
+            StringBuilder sb3 = new StringBuilder("潜伏占预告情况：");
             for(int i=1;i<=gs.getPlayerSum();i++)
             {
                 if(gs.hiddenSeerScheduledSkillTargets[i][gs.gameDay])
-                        System.out.print(CharacterKanjiName.values()[gs.gc[i].number] + " ");
+                        sb3.append(CharacterKanjiName.values()[gs.gc[i].number]).append(" ");
             }
-            logicTools.log("");
-            System.out.print("潜伏猎人指定护卫情况：");
+            DebugLogger.log(sb3.toString());
+            StringBuilder sb4 = new StringBuilder("潜伏猎人指定护卫情况：");
             for(int i=1;i<=gs.getPlayerSum();i++)
             {
                 if(gs.hiddenHunterScheduledSkillTargets[i][gs.gameDay])
-                    System.out.print(CharacterKanjiName.values()[gs.gc[i].number] + " ");
+                    sb4.append(CharacterKanjiName.values()[gs.gc[i].number]).append(" ");
             }
-            logicTools.log("");
+            DebugLogger.log(sb4.toString());
         }
 
         //1,非人或真职业回避处刑指定的逻辑
@@ -3565,15 +3555,15 @@ public class MainLogic implements MainLogicInterface
                 if(gs.gc[j].actualRole == 5 && weight[j] < -INFJ)
                     weight[j] = 5;//正常权重，放置残局不能处刑唯一猫
             }
-            
+
             {
-                logicTools.log("玩家" + CharacterKanjiName.values()[gs.gc[i].number] + "投票权重:");
+                StringBuilder sb = new StringBuilder("玩家" + CharacterKanjiName.values()[gs.gc[i].number] + "投票权重:");
                 for(int j=1;j<=gs.getPlayerSum();j++)
                 {
                     if(gs.gc[j].whyDie != whyDie.NONE) continue;
-                    System.out.print("玩家" + CharacterKanjiName.values()[gs.gc[j].number] + "," + weight[j] + ";");
+                    sb.append("玩家").append(CharacterKanjiName.values()[gs.gc[j].number]).append(",").append(weight[j]).append(";");
                 }
-                logicTools.log("");
+                DebugLogger.log(sb.toString());
             }
             int shokeitaregt = getOne(weight);
             gs.gc[i].voteTarget[gs.gameDay][shokeinum] = shokeitaregt;//得到该名玩家的票型

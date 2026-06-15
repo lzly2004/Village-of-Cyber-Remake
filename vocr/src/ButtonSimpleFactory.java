@@ -38,7 +38,7 @@ public class ButtonSimpleFactory
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setForeground(Color.white);
-        btn.setFont(new Font("Takao Mincho",Font.BOLD,20));
+        btn.setFont(new Font(GameConstants.FONT_FAMILY, Font.BOLD, GameConstants.FONT_SIZE_BUTTON));
         btn.setFocusPainted(false);
     }
     public static JButton createDraggableButton(String text,ImageIcon icon) //创建一个拖动button:指定的时候使用

@@ -73,14 +73,14 @@ public class ProbabilityCalculator {
      */
     private void loadFromConfig() {
         if (configFilePath == null) {
-            System.out.println("未指定配置文件，使用默认概率值" + DEFAULT_PROBABILITY);
+            DebugLogger.log("未指定配置文件，使用默认概率值" + DEFAULT_PROBABILITY);
             initWithDefaultValues();
             return;
         }
 
         File configFile = new File(configFilePath);
         if (!configFile.exists()) {
-            System.out.println("配置文件不存在，生成默认配置文件并加载");
+            DebugLogger.log("配置文件不存在，生成默认配置文件并加载");
             saveDefaultConfig(configFilePath);
         }
 
@@ -117,24 +117,24 @@ public class ProbabilityCalculator {
                         loadedCount++;
                     } else {
                         errorCount++;
-                        System.err.println(String.format("参数超出范围: %s", line));
+                        DebugLogger.error(String.format("参数超出范围: %s", line));
                     }
                 } catch (NumberFormatException e) {
                     errorCount++;
-                    System.err.println("解析失败: " + line);
+                    DebugLogger.error("解析失败: " + line);
                 }
             }
 
-            System.out.println(String.format("概率配置加载完成，成功加载 %d 条规则，失败 %d 条", loadedCount, errorCount));
+            DebugLogger.log(String.format("概率配置加载完成，成功加载 %d 条规则，失败 %d 条", loadedCount, errorCount));
 
             // 如果加载的规则太少，用默认值填充
             if (loadedCount < 100) { // 假设至少应该有100条有效规则
-                System.out.println("有效规则太少，用默认值填充缺失的规则");
+                DebugLogger.log("有效规则太少，用默认值填充缺失的规则");
                 initWithDefaultValues();
             }
 
         } catch (IOException e) {
-            System.err.println("加载配置文件失败: " + e.getMessage());
+            DebugLogger.error("加载配置文件失败: " + e.getMessage());
             initWithDefaultValues();
         }
     }
@@ -181,15 +181,15 @@ public class ProbabilityCalculator {
                 }
             }
 
-            System.out.println("默认配置文件已生成: " + outputPath);
-            System.out.println("总配置项数: " +
+            DebugLogger.log("默认配置文件已生成: " + outputPath);
+            DebugLogger.log("总配置项数: " +
                     ((ZHI_MAX - ZHI_MIN + 1) *
                             (SITUATION_MAX - SITUATION_MIN + 1) *
                             (P1_MAX - P1_MIN + 1) *
                             (P2_MAX - P2_MIN + 1)));
 
         } catch (IOException e) {
-            System.err.println("保存配置文件失败: " + e.getMessage());
+            DebugLogger.error("保存配置文件失败: " + e.getMessage());
         }
     }
 
@@ -208,7 +208,7 @@ public class ProbabilityCalculator {
      */
     public void printStatistics() {
         if (probabilityMap.isEmpty()) {
-            System.out.println("概率表为空");
+            DebugLogger.log("概率表为空");
             return;
         }
 
@@ -224,10 +224,10 @@ public class ProbabilityCalculator {
 
         double average = (double) sum / probabilityMap.size();
 
-        System.out.println("概率配置统计信息:");
-        System.out.println("  组合总数: " + probabilityMap.size());
-        System.out.println("  最小值: " + min);
-        System.out.println("  最大值: " + max);
-        System.out.println("  平均值: " + String.format("%.2f", average));
+        DebugLogger.log("概率配置统计信息:");
+        DebugLogger.log("  组合总数: " + probabilityMap.size());
+        DebugLogger.log("  最小值: " + min);
+        DebugLogger.log("  最大值: " + max);
+        DebugLogger.log("  平均值: " + String.format("%.2f", average));
     }
 }

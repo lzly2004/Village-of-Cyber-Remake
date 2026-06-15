@@ -39,10 +39,10 @@ public class ProbabilityGenerator {
             writer.close();
 
             // 打印统计信息
-            System.out.println("配置文件已生成: config/probability.txt");
-            System.out.println("总条目数: " + totalCount + " (应为560)");
-            System.out.println("最小概率: " + minProb + "%");
-            System.out.println("最大概率: " + maxProb + "%");
+            DebugLogger.log("配置文件已生成: config/probability.txt");
+            DebugLogger.log("总条目数: " + totalCount + " (应为560)");
+            DebugLogger.log("最小概率: " + minProb + "%");
+            DebugLogger.log("最大概率: " + maxProb + "%");
 
             // 计算平均概率
             int sum = 0;
@@ -50,17 +50,17 @@ public class ProbabilityGenerator {
                 sum += i * probDistribution[i];
             }
             double average = (double) sum / totalCount;
-            System.out.println("平均概率: " + String.format("%.2f", average) + "%");
+            DebugLogger.log("平均概率: " + String.format("%.2f", average) + "%");
 
             // 打印概率分布
-            System.out.println("\n概率分布:");
+            DebugLogger.log("\n概率分布:");
             for (int i = 0; i <= 100; i += 5) {
                 int count = 0;
                 for (int j = i; j < i + 5 && j <= 100; j++) {
                     count += probDistribution[j];
                 }
                 if (count > 0) {
-                    System.out.printf("%2d-%2d: %3d 个 (%.1f%%)\n",
+                    DebugLogger.printf("%2d-%2d: %3d 个 (%.1f%%)\n",
                             i, Math.min(i+4, 100), count, (double)count/totalCount*100);
                 }
             }

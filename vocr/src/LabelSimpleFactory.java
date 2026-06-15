@@ -51,7 +51,7 @@ public class LabelSimpleFactory
         if(text != null)
             jLabel.setText(text);
         jLabel.setForeground(Color.WHITE);
-        jLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
+        jLabel.setFont(new Font(GameConstants.FONT_FAMILY, Font.PLAIN, GameConstants.FONT_SIZE_DIALOG));
         jLabel.setOpaque(false);
         return jLabel;
     }
@@ -68,7 +68,7 @@ public class LabelSimpleFactory
         //    - 字体名：Takao Mincho（一款日文宋体，适合显示日文/中文）
         //    - 样式：Font.BOLD（加粗）
         //    - 字号：50号（大字号，适合标题/醒目的文字）
-        jLabel.setFont(new Font("Takao Mincho",Font.BOLD,50));
+        jLabel.setFont(new Font(GameConstants.FONT_FAMILY, Font.BOLD, GameConstants.FONT_SIZE_TITLE));
         return jLabel;
     }
 
@@ -131,7 +131,7 @@ public class LabelSimpleFactory
         if(text != null)
             jLabel.setText(text);
         jLabel.setForeground(Color.WHITE);
-        jLabel.setFont(new Font("Takao Mincho", Font.PLAIN, 26));
+        jLabel.setFont(new Font(GameConstants.FONT_FAMILY, Font.PLAIN, GameConstants.FONT_SIZE_DIALOG));
         jLabel.setOpaque(false);
         return jLabel;
     }
@@ -152,7 +152,7 @@ public class LabelSimpleFactory
         //    - 字体名：Takao Mincho（一款日文宋体，适合显示日文/中文）
         //    - 样式：Font.BOLD（加粗）
         //    - 字号：50号（大字号，适合标题/醒目的文字）
-        jLabel.setFont(new Font("Takao Mincho",Font.BOLD,50));
+        jLabel.setFont(new Font(GameConstants.FONT_FAMILY, Font.BOLD, GameConstants.FONT_SIZE_TITLE));
         return jLabel;
     }
 }

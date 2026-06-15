@@ -334,10 +334,41 @@ class ConstNum
     public static int CharacterSum = 44;// 游戏角色数量
     public static int N = 50;//最大游戏天数
     public static int M = 20;//职业状态数量
+
+    // ==================== 可复现随机数系统(第0步重构) ====================
+    private static java.util.Random rng = new java.util.Random();
+    private static boolean useFixedSeed = false;
+    private static long fixedSeed = 0;
+
+    /** 设置固定随机种子,用于回归测试。调用后所有randomInt()结果可复现。 */
+    public static void setRandomSeed(long seed)
+    {
+        rng = new java.util.Random(seed);
+        useFixedSeed = true;
+        fixedSeed = seed;
+        DebugLogger.info("随机种子已固定: " + seed);
+    }
+
+    /** 恢复使用系统时间的随机种子(游戏正常运行时使用) */
+    public static void resetRandomSeed()
+    {
+        rng = new java.util.Random();
+        useFixedSeed = false;
+        DebugLogger.info("随机种子已重置为系统时间");
+    }
+
+    /** 获取当前使用的随机种子(仅当种子被固定时有效) */
+    public static long getCurrentSeed() { return useFixedSeed ? fixedSeed : -1; }
+
+    /** 是否正在使用固定种子 */
+    public static boolean isUsingFixedSeed() { return useFixedSeed; }
+
     public static int randomInt(int min,int max)
     {//生成[min,max]的随机整数
-        return min + (int)(Math.random() * (max - min + 1));
+        if(min == max) return min;
+        return min + rng.nextInt(max - min + 1);
     }
+
     public static int WINDOW_WIDTH = 1280;//游戏窗口的宽度
     public static int WINDOW_HEIGHT = 720;//游戏窗口的高度
     public static int RETURN_WIDTH = 194;
@@ -498,7 +529,7 @@ class GameStatus
 
         for(int i=0;i<cnt-1;i++)
         {
-            System.out.println("当前随机交换玩家：" + i);
+            DebugLogger.log("当前随机交换玩家：" + i);
             int rd = ConstNum.randomInt(i+1,cnt-1),tmp;
             tmp = characters[i];//随机交换
             characters[i] = characters[rd];
@@ -525,7 +556,7 @@ class GameStatus
         {
             if(gc[i] == null || gc[i].actualRole == 0)
             {
-                System.out.println("第"+i+"个角色初始化失败");
+                DebugLogger.error("第"+i+"个角色初始化失败");
             }
         }
         this.hiddenHunterScheduledSkillTargets = new boolean[getPlayerSum()+1][ConstNum.N+1];
@@ -624,13 +655,13 @@ public class Game
     public void run()
     {
         init();
-        System.out.println("village of cyber");
+        DebugLogger.info("Village of Cyber Remake - 游戏启动");
         resources.run();
         ui.run();
     }
     public static void main(String[] args)
    {
-       new Game().run();
+       getInstance().run();
    }
     public UIInterface getUI()
     {

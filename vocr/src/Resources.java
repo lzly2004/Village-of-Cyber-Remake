@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 public class Resources implements ResourcesInterface {
-    private boolean isTest = true;//控制台输出控制变量
     // 音频相关
     private Clip currentBgm;
     // 台词资源：角色名 → 事件名 → 台词数据
@@ -49,8 +48,8 @@ public class Resources implements ResourcesInterface {
     }
 
     public void run() {
-        if(isTest){
-        System.out.println("资源类已启动，进入常态运行");}
+        if(DebugLogger.getInstance().isEnabled()){
+        DebugLogger.log("资源类已启动，进入常态运行");}
     }
 
     //事件图片获取（返回ImageIcon数组）
@@ -58,8 +57,8 @@ public class Resources implements ResourcesInterface {
     public ImageIcon[] getEventImage(Event event) {
         //入参校验：空值返回长度1的兜底数组（下标0为全局兜底图）
         if (event == null || event.ch1 == null || event.eventname == null) {
-            if(isTest){
-            System.err.println("事件/角色/事件名为空，返回全局兜底图数组");}
+            if(DebugLogger.getInstance().isEnabled()){
+            DebugLogger.error("事件/角色/事件名为空，返回全局兜底图数组");}
             return new ImageIcon[]{getGlobalDefaultImage()};
         }
 
@@ -71,14 +70,14 @@ public class Resources implements ResourcesInterface {
         //查找角色的图片配置
         Map<String, ImageLineData> characterImageConfig = eventImageMapping.get(ch1Name);
         if (characterImageConfig == null) {
-            System.err.println("角色" + ch1Name + "无图片配置，返回全局兜底图数组");
+            DebugLogger.error("角色" + ch1Name + "无图片配置，返回全局兜底图数组");
             return new ImageIcon[]{getGlobalDefaultImage()};
         }
 
         //查找该角色下对应事件的图片配置
         ImageLineData imageLineData = characterImageConfig.get(eventName);
         if (imageLineData == null) {
-            System.err.println("角色" + ch1Name + "无事件" + eventName + "的图片配置，返回全局兜底图数组");
+            DebugLogger.error("角色" + ch1Name + "无事件" + eventName + "的图片配置，返回全局兜底图数组");
             return new ImageIcon[]{getGlobalDefaultImage()};
         }
 
@@ -89,13 +88,13 @@ public class Resources implements ResourcesInterface {
                 && specialImages != null && specialImages.containsKey(ch2Name)) {
             // 解析special值（兼容字符串/数组）
             targetImageNames = parseImageNames(specialImages.get(ch2Name));
-            if(isTest){
-            System.out.println("匹配到特殊图片：" + ch1Name + "_" + eventName + "_" + ch2Name + "，共" + targetImageNames.length + "张");}
+            if(DebugLogger.getInstance().isEnabled()){
+            DebugLogger.log("匹配到特殊图片：" + ch1Name + "_" + eventName + "_" + ch2Name + "，共" + targetImageNames.length + "张");}
         } else {
             // 无特殊图片，解析default值（兼容字符串/数组）
             targetImageNames = parseImageNames(imageLineData.getDefaultImage());
             if (targetImageNames == null || targetImageNames.length == 0) {
-                System.err.println("角色" + ch1Name + "事件" + eventName + "无默认图片，返回全局兜底图数组");
+                DebugLogger.error("角色" + ch1Name + "事件" + eventName + "无默认图片，返回全局兜底图数组");
                 return new ImageIcon[]{getGlobalDefaultImage()};
             }
         }
@@ -156,12 +155,12 @@ public class Resources implements ResourcesInterface {
             // 拼接路径：/image/ + 图片名（适配resources/image目录）
             URL imageUrl = getClass().getResource("/images/" + imageName);
             if (imageUrl == null) {
-                System.err.println("未找到图片" + imageName);
+                DebugLogger.error("未找到图片" + imageName);
                 return getImage("frame.png");
             }
             return new ImageIcon(imageUrl);
         } catch (Exception e) {
-            System.err.println("图片" + imageName + "加载失败");
+            DebugLogger.error("图片" + imageName + "加载失败");
             e.printStackTrace();
             return getImage("frame.png");
         }
@@ -178,10 +177,10 @@ public class Resources implements ResourcesInterface {
                     is,
                     new TypeReference<Map<String, Map<String, LineData>>>() {}
             );
-            if(isTest){
-            System.out.println("成功加载 " + lineResource.size() + " 个角色的台词配置");}
+            if(DebugLogger.getInstance().isEnabled()){
+            DebugLogger.log("成功加载 " + lineResource.size() + " 个角色的台词配置");}
         } catch (IOException e) {
-            System.err.println("加载失败！");
+            DebugLogger.error("加载失败！");
             e.printStackTrace();
             lineResource = Map.of(); // 初始化空Map避免NPE
         }
@@ -198,10 +197,10 @@ public class Resources implements ResourcesInterface {
                     is,
                     new TypeReference<Map<String, Map<String, ImageLineData>>>() {}
             );
-            if(isTest){
-            System.out.println("成功加载 " + eventImageMapping.size() + " 个角色的图片映射配置");}
+            if(DebugLogger.getInstance().isEnabled()){
+            DebugLogger.log("成功加载 " + eventImageMapping.size() + " 个角色的图片映射配置");}
         } catch (IOException e) {
-            System.err.println("加载失败！");
+            DebugLogger.error("加载失败！");
             e.printStackTrace();
             eventImageMapping = Map.of(); // 初始化空Map避免NPE
         }
@@ -233,7 +232,7 @@ public class Resources implements ResourcesInterface {
             currentBgm.start();
             return true;
         } catch (Exception e) {
-            System.err.println("BGM " + bgmName + " 播放失败");
+            DebugLogger.error("BGM " + bgmName + " 播放失败");
             e.printStackTrace();
             return false;
         }
@@ -244,7 +243,7 @@ public class Resources implements ResourcesInterface {
         try {
             URL soundUrl = getClass().getResource("/sounds/" + soundName);
             if (soundUrl == null) {
-                System.err.println("未找到音效文件：" + soundName);
+                DebugLogger.error("未找到音效文件：" + soundName);
                 return false;
             }
 
@@ -265,7 +264,7 @@ public class Resources implements ResourcesInterface {
             clip.start();
             return true;
         } catch (Exception e) {
-            System.err.println("音效 " + soundName + " 播放失败");
+            DebugLogger.error("音效 " + soundName + " 播放失败");
             e.printStackTrace();
             return false;
         }
@@ -325,18 +324,18 @@ public class Resources implements ResourcesInterface {
             CharacterKatakanaName kanaName = CharacterKatakanaName.values()[englishName.ordinal()];
             return kanaName.name(); // 枚举name()即为日文名（如ベッティ）
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("角色枚举序号匹配失败：" + englishName.name());
+            DebugLogger.error("角色枚举序号匹配失败：" + englishName.name());
             return "";
         }
     }
 
     private String replaceParams(String line, CharacterEnglishName talkerEnum, CharacterEnglishName targetEnum) {
         // 日志排查（可选，方便验证）
-        if(isTest){
-        System.out.println("原始台词：" + line);}
+        if(DebugLogger.getInstance().isEnabled()){
+        DebugLogger.log("原始台词：" + line);}
         String targetKana = getKatakanaName(targetEnum); // ch2的日文名
-        if(isTest){
-        System.out.println("目标角色(ch2)日文名：" + targetKana);}
+        if(DebugLogger.getInstance().isEnabled()){
+        DebugLogger.log("目标角色(ch2)日文名：" + targetKana);}
 
         Matcher matcher = PARAM_PATTERN.matcher(line);
         StringBuffer result = new StringBuffer();
@@ -350,8 +349,8 @@ public class Resources implements ResourcesInterface {
             matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
         }
         matcher.appendTail(result);
-        if(isTest){
-        System.out.println("最终台词：" + result.toString());}
+        if(DebugLogger.getInstance().isEnabled()){
+        DebugLogger.log("最终台词：" + result.toString());}
         return result.toString();
     }
 
@@ -379,7 +378,7 @@ public class Resources implements ResourcesInterface {
             return content.isEmpty() ? "文件内容为空：" + helpTitle : content;
 
         } catch (Exception e) {
-            System.err.println("读取异常：");
+            DebugLogger.error("读取异常：");
             e.printStackTrace();
             return "加载失败：" + e.getMessage();
         }

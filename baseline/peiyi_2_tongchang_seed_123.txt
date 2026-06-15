@@ -1,0 +1,23 @@
+# ==========================================
+# Game Baseline Recording: peiyi_2_tongchang_seed_123
+# Time: 2026-06-15 15:00:40
+# Peiyi: tongchang (ordinal=2)
+# Seed: 123
+# PlayerCount: 16
+# ==========================================
+INIT|roles|1:11:7,2:40:6,3:20:6,4:34:7,5:4:6,6:15:4,7:39:6,8:35:6,9:13:2,10:30:3,11:18:7,12:24:4,13:2:1,14:8:6,15:29:6,16:23:8
+GAME_EVENT|day=1|event=yjsw|ch1=Renate|ch2=null|ch3=null
+GAME_EVENT|day=1|event=zjgb8|ch1=Irene|ch2=Willy|ch3=null
+GAME_EVENT|day=1|event=jbdh8r|ch1=Willy|ch2=Irene|ch3=null
+GAME_EVENT|day=1|event=lnco18|ch1=Nora|ch2=null|ch3=null
+GAME_EVENT|day=1|event=zjgb8|ch1=Erich|ch2=Otfried|ch3=null
+GAME_EVENT|day=1|event=jbdh8r|ch1=Otfried|ch2=Erich|ch3=null
+GAME_EVENT|day=1|event=lnco18|ch1=Liddi|ch2=null|ch3=null
+GAME_EVENT|day=1|event=gyfo1|ch1=Brigitte|ch2=Milli|ch3=null
+GAME_EVENT|day=1|event=gyfo1r|ch1=Milli|ch2=Brigitte|ch3=null
+STATE|day=1|{1:n=11,r=7,cr=1,cro=1,dd=0,wd=0,nm=false}{2:n=40,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{3:n=20,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{4:n=34,r=7,cr=0,cro=0,dd=0,wd=0,nm=false}{5:n=4,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{6:n=15,r=4,cr=4,cro=0,dd=0,wd=0,nm=false}{7:n=39,r=6,cr=0,cro=0,dd=1,wd=4,nm=false}{8:n=35,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{9:n=13,r=2,cr=2,cro=1,dd=0,wd=0,nm=false}{10:n=30,r=3,cr=0,cro=0,dd=0,wd=0,nm=false}{11:n=18,r=7,cr=0,cro=0,dd=0,wd=0,nm=false}{12:n=24,r=4,cr=4,cro=0,dd=0,wd=0,nm=false}{13:n=2,r=1,cr=1,cro=2,dd=0,wd=0,nm=false}{14:n=8,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{15:n=29,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{16:n=23,r=8,cr=2,cro=2,dd=0,wd=0,nm=false}
+# ==========================================
+# End of recording: peiyi_2_tongchang_seed_123
+# Duration: 0 days
+# Saved: 2026-06-15 15:00:40
+# ==========================================

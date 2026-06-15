@@ -8,14 +8,11 @@ import java.awt.*;
 public class TextareaSimpleFactory
 {
     // 核心固定配置（所有类型共享，如需修改统一调整）
-    private static final String DEFAULT_FONT_FAMILY = "Takao Mincho"; // 默认字体家族
     private static final boolean DEFAULT_EDITABLE = false; // 不可编辑
     private static final boolean DEFAULT_LINE_WRAP = true; // 自动换行
     private static final boolean DEFAULT_WRAP_STYLE_WORD = true; // 按单词拆分
     private static final boolean DEFAULT_OPAQUE = false; // 背景透明
     private static final Border DEFAULT_BORDER = BorderFactory.createEmptyBorder(); // 无边框
-    private static final Color DEFAULT_FOREGROUND = Color.WHITE; // 默认文字白色
-    private static final Color DEFAULT_BACKGROUND = new Color(0, 0, 0, 0); // 默认全透明背景
     // ==================== 1. 快捷方法：对应4类场景，一行调用 ====================
     /**
      * 基础显示型：常规字体+26号+白色文字+全透明背景（游戏对话、普通正文）
@@ -55,7 +52,7 @@ public class TextareaSimpleFactory
                 .fontStyle(Font.BOLD)
                 .fontSize(24)
                 .text(text)
-                .background(new Color(0, 0, 0, 180)) // 半透明背景
+                .background(GameConstants.COLOR_TRANSLUCENT_BLACK) // 半透明背景
                 .opaque(true)
                 .build();
     }
@@ -89,8 +86,8 @@ public class TextareaSimpleFactory
         // 可变参数（默认值为核心配置）
         private int fontStyle = Font.PLAIN;
         private int fontSize = 26;
-        private Color foreground = DEFAULT_FOREGROUND;
-        private Color background = DEFAULT_BACKGROUND;
+        private Color foreground = Color.WHITE;
+        private Color background = GameConstants.COLOR_TRANSPARENT;
         private String text = "";
         private boolean focusable = false;
         private boolean opaque = DEFAULT_OPAQUE; // 新增：默认继承工厂类的配置
@@ -148,7 +145,7 @@ public class TextareaSimpleFactory
             textArea.setOpaque(DEFAULT_OPAQUE);
             textArea.setBorder(DEFAULT_BORDER);
             // 可变参数配置
-            textArea.setFont(new Font(DEFAULT_FONT_FAMILY, fontStyle, fontSize));
+            textArea.setFont(new Font(GameConstants.FONT_FAMILY, fontStyle, fontSize));
             textArea.setForeground(foreground);
             textArea.setBackground(background);
             textArea.setFocusable(focusable);

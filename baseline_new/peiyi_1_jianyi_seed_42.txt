@@ -1,0 +1,20 @@
+# ==========================================
+# Game Baseline Recording: peiyi_1_jianyi_seed_42
+# Time: 2026-06-15 16:24:11
+# Peiyi: jianyi (ordinal=1)
+# Seed: 42
+# PlayerCount: 12
+# ==========================================
+INIT|roles|1:42:8,2:9:6,3:22:6,4:3:6,5:28:6,6:1:7,7:27:7,8:7:3,9:35:2,10:6:6,11:37:1,12:39:6
+GAME_EVENT|day=1|event=yjsw|ch1=Kaja|ch2=null|ch3=null
+GAME_EVENT|day=1|event=lnco18|ch1=Iwan|ch2=null|ch3=null
+GAME_EVENT|day=1|event=zjgb8|ch1=Abel|ch2=Samuel|ch3=null
+GAME_EVENT|day=1|event=jbdh8r|ch1=Samuel|ch2=Abel|ch3=null
+GAME_EVENT|day=1|event=zjgb8|ch1=Chloe|ch2=Eva|ch3=null
+GAME_EVENT|day=1|event=jbdh8r|ch1=Eva|ch2=Chloe|ch3=null
+STATE|day=1|{1:n=42,r=8,cr=2,cro=1,dd=0,wd=0,nm=false}{2:n=9,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{3:n=22,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{4:n=3,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{5:n=28,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{6:n=1,r=7,cr=1,cro=1,dd=0,wd=0,nm=false}{7:n=27,r=7,cr=0,cro=0,dd=0,wd=0,nm=false}{8:n=7,r=3,cr=0,cro=0,dd=0,wd=0,nm=false}{9:n=35,r=2,cr=0,cro=0,dd=1,wd=4,nm=false}{10:n=6,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{11:n=37,r=1,cr=1,cro=2,dd=0,wd=0,nm=false}{12:n=39,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}
+# ==========================================
+# End of recording: peiyi_1_jianyi_seed_42
+# Duration: 0 days
+# Saved: 2026-06-15 16:24:11
+# ==========================================

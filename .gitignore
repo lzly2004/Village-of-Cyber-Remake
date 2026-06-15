@@ -1,0 +1,15 @@
+﻿# 编译产物
+out/
+*.class
+
+# IDE
+.idea/
+.claude/
+*.iml
+
+# 系统文件
+desktop.ini
+Thumbs.db
+
+# 备份
+*.bak

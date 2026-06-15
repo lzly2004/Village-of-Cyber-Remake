@@ -43,12 +43,12 @@ public class StartSceneHandler implements SceneHandler {
         ui.jPanel.add(titleLabel);
 
         // 按钮属性
-        int x = 660;
-        int y = 400;
-        int width = 309;
-        int height = 68;
-        int x_div = 300;
-        int y_div = 80;
+        int x = GameConstants.START_BTN_X;
+        int y = GameConstants.START_BTN_Y;
+        int width = GameConstants.START_BTN_W;
+        int height = GameConstants.START_BTN_H;
+        int x_div = GameConstants.START_BTN_X_GAP;
+        int y_div = GameConstants.START_BTN_Y_GAP;
 
         // 新游戏按钮
         JButton btnStart = ButtonSimpleFactory.makeButton(
@@ -136,7 +136,7 @@ public class StartSceneHandler implements SceneHandler {
         // 背景图片（放在最后添加，确保在最底层）
         JLabel background = LabelSimpleFactory.makeLabel(
                 LabelConst.Simple_Label, 0, 0,
-                ConstNum.WINDOW_WIDTH, ConstNum.WINDOW_HEIGHT,
+                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("title_base_resized.png")
         );
         ui.jPanel.add(background);
