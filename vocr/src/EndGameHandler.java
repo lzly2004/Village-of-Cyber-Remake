@@ -31,22 +31,12 @@ public class EndGameHandler implements SceneHandler {
                 bgIcon = ui.resources.getImage("endVillage.png");
                 break;
         }
-        ui.diaPanel.removeAll();
-        ui.diaPanel.setVisible(true);
-        JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, bgIcon);
-        ImageIcon backIcon = ui.resources.getImage("messageframe.png");
-        JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(260, 450, 760, 230, false, true);
-        ui.diaPanel.add(dialogPanel);
-        JLabel back = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0, 760, 230, backIcon);
+        DialogueBox.Components dc = DialogueBox.setupWithIcon(ui, bgIcon);
         JLabel nameLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label, 20, 10, 1000, 30,
                 ui.uiComponentFactory.getCharacterFullName(event.ch1));
-        dialogPanel.add(nameLabel);
-        JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
-        dialogText.setBounds(20, 50, 710, 200);
-        JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 0, 0, 760, 230, null, null);
-        Timer typeTimer = ui.bindTypewriter(dialogText, ui.resources.getEventText(event), nextBtn, () -> {
-            dialogPanel.setVisible(false);
+        dc.dialogPanel.add(nameLabel);
+        Timer typeTimer = UIHelpers.bindTypewriter(dc.dialogText, ui.resources.getEventText(event), dc.nextBtn, () -> {
+            dc.dialogPanel.setVisible(false);
             switch (scene) {
                 case END_VILLAGE: ui.resources.playSound("村人胜利音效.wav"); break;
                 case END_WOLF:    ui.resources.playSound("人狼胜利音效.wav"); break;
@@ -59,7 +49,7 @@ public class EndGameHandler implements SceneHandler {
             });
             t.start();
         });
-        dialogPanel.setVisible(true);
+        dc.dialogPanel.setVisible(true);
         ImageIcon[] CharIcon = ui.resources.getEventImage(event);
         JLabel Chara = new JLabel();
         if (!ui.linkIcon.isEmpty()) {
@@ -100,13 +90,6 @@ public class EndGameHandler implements SceneHandler {
             ui.diaPanel.add(Chara);
             ui.resizeComponents();
         }
-        dialogPanel.add(nextBtn);
-        dialogPanel.add(dialogText);
-        dialogPanel.add(back);
-        ui.diaPanel.add(background);
-        ui.jPanel.add(ui.diaPanel);
-        ui.jPanel.setComponentZOrder(ui.diaPanel, 0);
-        ui.diaPanel.setVisible(true);
-        ui.resizeComponents();
+        DialogueBox.finalize(ui, dc);
     }
 }

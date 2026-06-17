@@ -1,54 +1,6 @@
 import java.io.File;
 import java.util.*;
 
-class IntPair
-{
-    final int first;  // 第一个整数
-    final int second; // 第二个整数
-    public IntPair(int first, int second)
-    {
-        this.first = first;
-        this.second = second;
-    }
-
-    // 获取器（游戏场景按需添加setter，若需可变）
-    public int getFirst() {
-        return first;
-    }
-
-    public int getSecond() {
-        return second;
-    }
-
-    // 可选：重写toString，方便调试
-    @Override
-    public String toString() {
-        return "(" + first + ", " + second + ")";
-    }
-}
-class logicTools    //逻辑类中的工具方法集合(已迁移至DebugLogger)
-{
-    /** @deprecated 使用 DebugLogger.log() 替代 */
-    public static void log(String message)
-    {
-        DebugLogger.log(message);
-    }
-    public static int min(int x,int y)
-    {
-        if(x < y) return x;
-        return y;
-    }
-    public static boolean probabilityJudge(int p)//判断概率为p%的事件是否发生：依据真实概率
-    {
-        //判断概率为p%的事件是否发生：依据真实概率
-        //p为任意整数
-        if(p >= 100) return true;//概率大于等于1，必定发生
-        if(p <= 0) return false;//概率小于等于0，必定不发生
-        int p0 = ConstNum.randomInt(1,100);
-        if(p0 <= p) return true;
-        else return false;
-    }
-}
 public class MainLogic implements MainLogicInterface
 {
     GameStatus gs;
@@ -64,16 +16,13 @@ public class MainLogic implements MainLogicInterface
     int actualRoleindex[];//单人职业的编号，包括占灵猫猎狐背狂 eg【3】=4：编号为4的玩家是职业3（猎人）
     int rlindex[];//人狼的编号 rlindex[2] = 7:第二位人狼的数组下标为7
     int gyindex[];//共有的编号
-    int lasySuspicionValue[];//怀疑度懒惰数组，用于临时保存所有人对某个玩家的统一怀疑度增减
     int claimedRoleaskday[];//每个村职被整体询问的日期，默认值为0
     int lined[][];  //占灵连线情况 1连线
     int initialWolfCount,initialNonHumanCount;//该村的初始人狼数量，非人数量
     ArrayList<Integer> zhans,lings,lies,maos,diebody;//占领猎猫候补数组,当天的死体数组
     int claimedRoleorder[];//当前职业位次数组，0表示未获取
-    public static int INF = 999;//理论最大数值和理论最小数值的相反数
-    public static int INFJ = 500;//判断是否是理论最大数值的值
-    public static int MAXN = 100;//所有合法值的最大值
     ArrayList<IntPair> response;//反应数组
+    SuspicionSystem suspicion;//怀疑度子系统
     private ProbabilityCalculator probabilityCalculator;
     /*
      * 参数取值表
@@ -82,23 +31,17 @@ public class MainLogic implements MainLogicInterface
      * p1 0完全怂狼（多指定） 1单狼上职（三指定） 2双狼上职（双指定） 3三狼上职（单指定）
      * p2 0孤狼剩余（游戏前期） 1双狼剩余（游戏前中期） 2三狼剩余（游戏中后期） 3四狼俱在（游戏后期）
      * */
-    //任何时刻，某一数值在MAXN-INFJ之间时，应该被收束到MAXN。某一数值在INFJ-INF时，应该被收束到INF
-    //INF 机制最大值
-    //-INF 机制最小值
-    //0-MAXN：正常数值
-    //MAXN:不涉及机制的最大值。
-    //INFJ-INF:均被判定为设计机制的最大值
+    //任何时刻，某一数值在GameConstants.MAXN-GameConstants.INFJ之间时，应该被收束到GameConstants.MAXN。某一数值在GameConstants.INFJ-GameConstants.INF时，应该被收束到GameConstants.INF
+    //GameConstants.INF 机制最大值
+    //-GameConstants.INF 机制最小值
+    //0-GameConstants.MAXN：正常数值
+    //GameConstants.MAXN:不涉及机制的最大值。
+    //GameConstants.INFJ-GameConstants.INF:均被判定为设计机制的最大值
     ArrayList<Event> eventarray;//当前待处理的事件数组
     //若涉及到游戏结束，则夜间事件都不会显示。在判断游戏不结束之后，将其中的事件依次添加到UI类当中。
     MainLogic()
     {
 
-    }
-    boolean isDayDie(whyDie why)
-    {
-        if(why == whyDie.chuxing || why == whyDie.dayhouzhui || why == whyDie.daymaozhou)
-            return true;
-        return false;
     }
     public GameStatus getGameStatus()
     {//提供给UI类，让UI类得到当前的游戏状态
@@ -119,7 +62,6 @@ public class MainLogic implements MainLogicInterface
         zw         = new int[gs.getPlayerSum()*2+1];//有黑色占文
         gyindex    = new int[3];
         rlindex    = new int[gs.getPlayerSum()+1];//人狼的编号 rlindex[2] = 7:第二位人狼的数组下标为7
-        lasySuspicionValue = new int[gs.getPlayerSum()+1];//怀疑度更新懒惰数组
         actualRoleindex = new int[Role.values().length + 1];//按照Role的长度设置数组长
         claimedRoleaskday = new int[12];//每个村职被整体询问的日期。初值0
         lined = new int[gs.getPlayerSum()+1][gs.getPlayerSum()+1];
@@ -127,6 +69,7 @@ public class MainLogic implements MainLogicInterface
         lings = new ArrayList<Integer>();
         lies = new ArrayList<Integer>();
         maos = new ArrayList<Integer>();//占领猎猫候补数组初始化
+        suspicion = new SuspicionSystem(gs, zhans, lings, lies, maos, isDoubleDeathOccurred, claimedRoleaskday);
         // 简化概率计算器初始化
         try {
             // 创建配置目录（如果不存在）
@@ -187,7 +130,7 @@ public class MainLogic implements MainLogicInterface
             for(int j=1;j<=gs.getPlayerSum();j++)
             {
                 if(i == j)
-                    gs.gc[i].suspicionValue[j] = -INF;
+                    gs.gc[i].suspicionValue[j] = -GameConstants.INF;
                 else
                     gs.gc[i].suspicionValue[j] = 50;
             }
@@ -216,7 +159,7 @@ public class MainLogic implements MainLogicInterface
         logicTools.log("死体逻辑结果：");
         feireninitilal();//非人的初始工作 + 第一天的进行（占灵共co）
         logicTools.log("非人的初始工作结果：");
-        updatetop3SuspectedPlayers();//更新怀疑度
+        suspicion.updateTop3SuspectedPlayers(	);//更新怀疑度
         logicTools.log("目前总人数：" + gs.getPlayerSum());
     }
     private void feireninitilal()
@@ -229,7 +172,7 @@ public class MainLogic implements MainLogicInterface
         logicTools.log("非人的初始工作：所有非人都生成一份预备占文");
         for(int i=1;i<=gs.getPlayerSum();i++)
         {
-            if(feiren(gs.gc[i]) == 0) continue;//村侧玩家不生成备用占文
+            if(GameLogicUtils.feiren(gs.gc[i]) == 0) continue;//村侧玩家不生成备用占文
             //调用getOne得到占文目标
             //狼和狂信会排除狼，所有非人会排除自己
             int weight[] = new int[gs.getPlayerSum()+1];//权重数组
@@ -237,8 +180,8 @@ public class MainLogic implements MainLogicInterface
             {
                 if(i == j)
                 {
-                    weight[j] = -INF;
-                    continue;//无法声称占卜自己，设置权重为-INF
+                    weight[j] = -GameConstants.INF;
+                    continue;//无法声称占卜自己，设置权重为-GameConstants.INF
                 }
                 if(gs.gc[i].actualRole != 7 && gs.gc[i].actualRole != 9)
                 {
@@ -248,9 +191,9 @@ public class MainLogic implements MainLogicInterface
                 }
                 //人狼或狂信上占
                 if(gs.gc[j].actualRole != 7) weight[j] = 1;//不是狼队友，权重为1
-                else weight[j] = -INF;//是狼队友，权重为-INF
+                else weight[j] = -GameConstants.INF;//是狼队友，权重为-GameConstants.INF
             }
-            ybzw[i] = getOne(weight);//得到占卜对象
+            ybzw[i] = suspicion.getOne(weight);//得到占卜对象
             logicTools.log("非人的预备占文，非人:"+i+",预备占文:"+ybzw[i]);
         }
 
@@ -268,7 +211,7 @@ public class MainLogic implements MainLogicInterface
         //人狼上占
         logicTools.log("非人的初始工作：人狼上占");
         //双狼上占 y+(x-2)*3 单狼上占 (11-x)*15 怂狼 10-y
-        int rlzhan = getEventIndexByProbability(new ArrayList<>(List.of(10-kz, (11-initialWolfCount)*15, kz + (initialWolfCount-2)*3)));
+        int rlzhan = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(10-kz, (11-initialWolfCount)*15, kz + (initialWolfCount-2)*3)));
         //获得计划上占人狼的数量
         int rlz = rlzhan;//保存上占人狼数副本
         while(rlzhan != 0)//当前仍有期望上占人狼
@@ -278,7 +221,7 @@ public class MainLogic implements MainLogicInterface
             rlzhan--;//待上占人狼数减一
             nonHumanPlan[rlindex[rl]] = 1;//上占计划
             //生成一份占文
-            int op = getEventIndexByProbability(new ArrayList<>(List.of(80-2*kz, 15, 5+kz, kz)));//得到狼占的策略
+            int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(80-2*kz, 15, 5+kz, kz)));//得到狼占的策略
             // 0 外白 1黒特攻 2围 3身内切
             int weight[] = new int[gs.getPlayerSum()+1];//权重数组
             for(int i=1;i<=gs.getPlayerSum();i++)
@@ -291,9 +234,9 @@ public class MainLogic implements MainLogicInterface
                 {
                     weight[i] = 1;
                 }
-                else weight[i] = -INF;//非法情况，设为非法值
+                else weight[i] = -GameConstants.INF;//非法情况，设为非法值
             }
-            int target = getOne(weight);//占卜目标
+            int target = suspicion.getOne(weight);//占卜目标
             if(op == 0 || op == 2 || diebody.contains(target))//白色结果，注意初日死者必须被发白
                 zw[rlindex[rl]] = target;
             else                  //黑色结果
@@ -338,7 +281,7 @@ public class MainLogic implements MainLogicInterface
         logicTools.log("非人的初始工作：狂人狂信策略");
         //设置标记
         if(gs.p == peiyi.kuangxin || gs.p == peiyi.daxing) kyojin = 0;//狂信标记 9
-        int kop = getEventIndexByProbability(new ArrayList<>(List.of(55-20*kyojin,35+25*kyojin,10-5*kyojin)));//狂信策略分布 0狂占 1狂灵 2潜伏狂
+        int kop = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(55-20*kyojin,35+25*kyojin,10-5*kyojin)));//狂信策略分布 0狂占 1狂灵 2潜伏狂
         if(kop == 1)
             nonHumanPlan[actualRoleindex[9-kyojin]] = 2;//狂人狂信的计划:上灵
         else if(kop == 2)
@@ -348,7 +291,7 @@ public class MainLogic implements MainLogicInterface
             nonHumanPlan[actualRoleindex[9-kyojin]] = 1;//狂人狂信的计划:上占
             if(kyojin == 1)//狂人
             {
-                int target,option = getEventIndexByProbability(new ArrayList<>(List.of(75-kz,25+kz)));//狂占策略分布 0外白 1黑球
+                int target,option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(75-kz,25+kz)));//狂占策略分布 0外白 1黑球
                 while(true)
                 {
                     target = ConstNum.randomInt(1,gs.getPlayerSum());//生成占文对象
@@ -363,7 +306,7 @@ public class MainLogic implements MainLogicInterface
             }
             else    //狂信
             {
-                int target,option = getEventIndexByProbability(new ArrayList<>(List.of(70-2*kz,20,kz+10,kz)));//信占策略分布
+                int target,option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(70-2*kz,20,kz+10,kz)));//信占策略分布
                 // 0 外白 1黒特攻 2围 3身内切
                 while(true)
                 {
@@ -385,7 +328,7 @@ public class MainLogic implements MainLogicInterface
         logicTools.log("非人的初始工作：妖狐策略");
         if(actualRoleindex[10] > 0 && gs.gc[actualRoleindex[10]].whyDie == whyDie.NONE)//存在妖狐的配役且存活
         {
-            int op = getEventIndexByProbability(new ArrayList<>(List.of(5+kz,kz,95-2*kz)));//妖狐策略分布 0狐占 1狐灵 2潜伏狐
+            int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(5+kz,kz,95-2*kz)));//妖狐策略分布 0狐占 1狐灵 2潜伏狐
             if(op == 1)
                 nonHumanPlan[actualRoleindex[10]] = 2;//妖狐的计划:上灵
             else if(op == 2)
@@ -393,7 +336,7 @@ public class MainLogic implements MainLogicInterface
             else    //狐占
             {
                 nonHumanPlan[actualRoleindex[10]] = 1;//妖狐的计划:上占
-                int target, option = getEventIndexByProbability(new ArrayList<>(List.of(90 - kz, 10 + kz)));//狐占策略分布 0外白 1黑球
+                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(90 - kz, 10 + kz)));//狐占策略分布 0外白 1黑球
                 while (true)
                 {
                     target = ConstNum.randomInt(1, gs.getPlayerSum());//生成占文对象
@@ -412,7 +355,7 @@ public class MainLogic implements MainLogicInterface
         logicTools.log("非人的初始工作：背德策略");
         if(actualRoleindex[11] > 0 && gs.gc[actualRoleindex[11]].whyDie == whyDie.NONE)//配役存在背德且存活
         {
-            int bop = getEventIndexByProbability(new ArrayList<>(List.of(50+kz,5,45-kz)));//背德策略分布 0背占 1背灵 2潜伏背
+            int bop = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50+kz,5,45-kz)));//背德策略分布 0背占 1背灵 2潜伏背
             if(bop == 1)
                 nonHumanPlan[actualRoleindex[11]] = 2;//背德的计划:上灵
             else if(bop == 2)
@@ -421,7 +364,7 @@ public class MainLogic implements MainLogicInterface
             {
                 logicTools.log("背德开始选择占文");
                 nonHumanPlan[actualRoleindex[11]] = 1;//背德的计划:上占
-                int target, option = getEventIndexByProbability(new ArrayList<>(List.of(60 - kz, 20, 20+kz, 0)));//背占策略分布 0外白 1黑特攻 2围  3逆围狐
+                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(60 - kz, 20, 20+kz, 0)));//背占策略分布 0外白 1黑特攻 2围  3逆围狐
                 if(option == 2)
                 {
                     zw[actualRoleindex[11]] = actualRoleindex[10];
@@ -510,7 +453,7 @@ public class MainLogic implements MainLogicInterface
             //占文随机排序
             
                 logicTools.log("非人的初始工作：占文随机排序");
-            zhans = shuffleList(zhans);
+            zhans = GameLogicUtils.shuffleList(zhans);
             for(int i=0;i<zhans.size();i++)
             {
                 eventarray.add(new Event(EventName.zs14,CharacterEnglishName.values()[gs.gc[zhans.get(i)].number],
@@ -519,9 +462,9 @@ public class MainLogic implements MainLogicInterface
                 if(gs.gc[zhans.get(i)].claimedRoleorder == 0)
                     gs.gc[zhans.get(i)].claimedRoleorder = ++claimedRoleorder[1];//职业位次
                 gs.gc[zhans.get(i)].comingOutDay = gs.gameDay;//co时机
-                lasySuspicionValue[zhans.get(i)] -= 50;
+                suspicion.getLasySuspicionValue()[zhans.get(i)] -= 50;
                 for(int j=0;j<i;j++)    //更新占候补之间的怀疑度
-                    updatetop3SuspectedPlayersaux2(zhans.get(i),zhans.get(j),INF,INF);
+                    suspicion.updateTop3Aux2(zhans.get(i),zhans.get(j),GameConstants.INF,GameConstants.INF);
             }
             //3,灵能co
             
@@ -553,7 +496,7 @@ public class MainLogic implements MainLogicInterface
             //灵能随机排序
             
                 logicTools.log("非人的初始工作：灵能随机排序");
-            lings = shuffleList(lings);
+            lings = GameLogicUtils.shuffleList(lings);
             for(int i=0;i<lings.size();i++)
             {
                 eventarray.add(new Event(EventName.lnco18,CharacterEnglishName.values()[gs.gc[lings.get(i)].number]));//添加事件：灵co
@@ -561,9 +504,9 @@ public class MainLogic implements MainLogicInterface
                 if(gs.gc[lings.get(i)].claimedRoleorder == 0)
                     gs.gc[lings.get(i)].claimedRoleorder = ++claimedRoleorder[2];//职业位次
                 gs.gc[lings.get(i)].comingOutDay = gs.gameDay;//co时机
-                lasySuspicionValue[lings.get(i)] -= 30;
+                suspicion.getLasySuspicionValue()[lings.get(i)] -= 30;
                 for(int j=0;j<i;j++)    //更新灵候补之间的怀疑度
-                    updatetop3SuspectedPlayersaux2(lings.get(i),lings.get(j),INF,INF);
+                    suspicion.updateTop3Aux2(lings.get(i),lings.get(j),GameConstants.INF,GameConstants.INF);
             }
 
             //4,共有逻辑（不可能接到黑球）
@@ -637,14 +580,14 @@ public class MainLogic implements MainLogicInterface
                 gs.gc[gyindex[2]].claimedRole = 4;//共co
                 gs.gc[gyindex[1]].comingOutDay = gs.gameDay;//co时机
                 gs.gc[gyindex[2]].comingOutDay = gs.gameDay;//co时机
-                lasySuspicionValue[gyindex[1]] -= INF;
-                lasySuspicionValue[gyindex[2]] -= INF;
+                suspicion.getLasySuspicionValue()[gyindex[1]] -= GameConstants.INF;
+                suspicion.getLasySuspicionValue()[gyindex[2]] -= GameConstants.INF;
             }
             //打乱占候补数组
-            zhans = shuffleList(zhans);
+            zhans = GameLogicUtils.shuffleList(zhans);
             while(zhans.size() > 3) //处理黑球占过多的情况：强行删除多余的黑球占，改为计划潜伏 极限情况：3黑球占 + 1接黒回复占 + 1白进行占
             {
-                zhans = shuffleList(zhans);
+                zhans = GameLogicUtils.shuffleList(zhans);
                 if(zhans.get(0) == actualRoleindex[1]) continue;//真占不删除
                 gs.gc[zhans.get(0)].skillTarget[1] = 0;//将占文删除
                 nonHumanPlan[zhans.get(0)] = 0;//改为整局潜伏
@@ -680,7 +623,7 @@ public class MainLogic implements MainLogicInterface
                 int bplayer = bplayers.get(i);//黑球玩家编号
                 if(bplayer > 0 && gs.gc[bplayer].whyDie == whyDie.NONE && gs.gc[bplayer].claimedRole == 0 && gs.gc[bplayer].actualRole != 6)//接黒玩家存活并且还没co职业,不是村人
                 {
-                    if(zhenying(gs.gc[bplayer]) == 0)//村侧玩家接黒
+                    if(GameLogicUtils.zhenying(gs.gc[bplayer]) == 0)//村侧玩家接黒
                     {
                         //村侧玩家
                         
@@ -701,7 +644,7 @@ public class MainLogic implements MainLogicInterface
                             //随机选择一篇占文进行报告
                             int ybweight = 50,zwweight = 50;
                             if(zw[bplayer] - gs.getPlayerSum() > 0 && gs.gc[zw[bplayer] - gs.getPlayerSum()].claimedRole == 4) zwweight = 0;//不能发共有者黑
-                            int option = getEventIndexByProbability(new ArrayList<Integer>(List.of(ybweight,zwweight)));//选择一篇占文
+                            int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(ybweight,zwweight)));//选择一篇占文
                             if(option == 0)
                                 gs.gc[bplayer].skillTarget[1] = ybzw[bplayer];//预备占文
                             else
@@ -741,7 +684,7 @@ public class MainLogic implements MainLogicInterface
                                 llweight = 0;//狼占狼灵狼猎co不能，因为会全露出。
                                 lmlweight = 0;
                             }
-                            int option = getEventIndexByProbability(new ArrayList<Integer>(List.of(lzweight,llweight,lmlweight,lwcoweight)));
+                            int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(lzweight,llweight,lmlweight,lwcoweight)));
                             switch(option)
                             {
                                 case 0:
@@ -760,7 +703,7 @@ public class MainLogic implements MainLogicInterface
                                     }
                                     break;//狼灵
                                 case 2:
-                                    nonHumanPlan[bplayer] = 5 - getEventIndexByProbability(new ArrayList<Integer>(List.of(50 + 50 * lies.size(),50+50 * maos.size()))) * 2;//3 猎 5 猫
+                                    nonHumanPlan[bplayer] = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(50 + 50 * lies.size(),50+50 * maos.size()))) * 2;//3 猎 5 猫
                                     if(actualRoleindex[5] == 0)
                                         nonHumanPlan[bplayer] = 3;//这村没猫，所以只能co猎人
                                     if(nonHumanPlan[bplayer] == 5)
@@ -781,9 +724,9 @@ public class MainLogic implements MainLogicInterface
                             switch(bplayer)
                             {
                                 case 8: case 9:
-                                    option = getEventIndexByProbability(new ArrayList<Integer>(List.of(95,5,0,0)));break;//狂占狂灵
-                                case 10:option = getEventIndexByProbability(new ArrayList<Integer>(List.of(80,5,10,5)));break;//狐占狐灵狐猫猎狐潜伏
-                                case 11:option = getEventIndexByProbability(new ArrayList<Integer>(List.of(45+kz,30,20,5-kz)));break;//背占背灵背猫猎背潜伏
+                                    option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(95,5,0,0)));break;//狂占狂灵
+                                case 10:option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(80,5,10,5)));break;//狐占狐灵狐猫猎狐潜伏
+                                case 11:option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(45+kz,30,20,5-kz)));break;//背占背灵背猫猎背潜伏
                             }
                             switch(option)
                             {
@@ -795,7 +738,7 @@ public class MainLogic implements MainLogicInterface
                                     response.add(new IntPair(bplayer,2));//准备co灵
                                     break;//灵
                                 case 2:
-                                    nonHumanPlan[bplayer] = 5 - getEventIndexByProbability(new ArrayList<Integer>(List.of(50 + 50 * lies.size(),50+50 * maos.size()))) * 2;//3 猎 5 猫
+                                    nonHumanPlan[bplayer] = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(50 + 50 * lies.size(),50+50 * maos.size()))) * 2;//3 猎 5 猫
                                     if(actualRoleindex[5] == 0)
                                         nonHumanPlan[bplayer] = 3;//这村没猫，只能co猎人
                                     if(nonHumanPlan[bplayer] == 5)
@@ -812,7 +755,7 @@ public class MainLogic implements MainLogicInterface
             
                 logicTools.log("本次有无猫又co：" );
             boolean havecatco = false;//本次有无猫又co
-            response = shuffleList(response);
+            response = GameLogicUtils.shuffleList(response);
 
             //处理接黒的时候狼占狼灵偶有可能数量超标的情况
             int lzsum = 0,llsum = 0;//狼占狼灵的数量
@@ -863,7 +806,7 @@ public class MainLogic implements MainLogicInterface
                 //处理过多的占
             while(zhans.size() + rezhan > 4)
             {
-                response = shuffleList(response);
+                response = GameLogicUtils.shuffleList(response);
                 if(response.get(0).second == 1 && response.get(0).first != actualRoleindex[1])//首位是占候补且不是真占
                 {
                     nonHumanPlan[response.get(0).first] = 0;//将占候选人设为潜伏
@@ -874,7 +817,7 @@ public class MainLogic implements MainLogicInterface
                 //处理过多的灵
             while(lings.size() + reling > 3)
             {
-                response = shuffleList(response);
+                response = GameLogicUtils.shuffleList(response);
                 if(response.get(0).second == 2 && response.get(0).first != actualRoleindex[2])//首位是灵候补且不是真灵
                 {
                     nonHumanPlan[response.get(0).first] = 0;//将占候选人设为潜伏
@@ -884,7 +827,7 @@ public class MainLogic implements MainLogicInterface
             //接黒上职回复
             for(int i=0;i<response.size();i++)
             {
-                lasySuspicionValue[response.get(i).first] += 10;//接黒上职，怀疑度+10.
+                suspicion.getLasySuspicionValue()[response.get(i).first] += 10;//接黒上职，怀疑度+10.
                 actualRoleCo(response.get(i).first,response.get(i).second);//村职co
                 if(response.get(i).second == 5)//猫
                 {
@@ -980,9 +923,9 @@ public class MainLogic implements MainLogicInterface
                 if(gs.end == 1 && gs.gc[i].actualRole < 7) weight[i] = 1;
                 else if(gs.end == 2 && gs.gc[i].actualRole == 7) weight[i] = 1;
                 else if(gs.end == 3 && gs.gc[i].actualRole == 10) weight[i] = 1;
-                else weight[i] = -INF;
+                else weight[i] = -GameConstants.INF;
             }
-            CharacterEnglishName player = CharacterEnglishName.values()[gs.gc[getOne(weight)].number];//获取发表获奖感言的玩家
+            CharacterEnglishName player = CharacterEnglishName.values()[gs.gc[suspicion.getOne(weight)].number];//获取发表获奖感言的玩家
             switch(gs.end)
             {
                 case 1:
@@ -1008,7 +951,7 @@ public class MainLogic implements MainLogicInterface
         //8，白天起身逻辑
         dayaction();
         //9,更新怀疑度
-        updatetop3SuspectedPlayers();
+        suspicion.updateTop3SuspectedPlayers(	);
     }
     private void frlyingaux(int num,int zhi)
     {
@@ -1040,7 +983,7 @@ public class MainLogic implements MainLogicInterface
                     }
                     else if(gs.gc[num].skillTarget[i] > 0)
                     {
-                        if (isackwhite(gs.gc[num].skillTarget[i])) continue;//排除确定白，避免计数错误
+                        if (suspicion.isAckWhite(gs.gc[num].skillTarget[i])) continue;//排除确定白，避免计数错误
                         baip -= 1;
                         zhaned[gs.gc[num].skillTarget[i]] = true;//白结果，剩余可占白结果-1
                     }
@@ -1056,7 +999,7 @@ public class MainLogic implements MainLogicInterface
                 }
                 //确定白排除
                 for(int i=1;i<=gs.getPlayerSum();i++)
-                    if(isackwhite(i) && gs.gc[i].whyDie == whyDie.NONE)
+                    if(suspicion.isAckWhite(i) && gs.gc[i].whyDie == whyDie.NONE)
                         baip--;
                 //2,写两篇占文，内容有可能会重复
                 for (int i = 0; i < 2; i++)
@@ -1065,10 +1008,10 @@ public class MainLogic implements MainLogicInterface
                     if(target[i] < 1) continue;//完占，返回
                     if (target[i] > gs.getPlayerSum()) target[i] -= gs.getPlayerSum();//先默认为白色结果
                     int heisum = 0, feisum = 0, waiheisum = 0;//统计目前为止发出去的黑球数,不明正体的非人数，明确黑球数
-                    feisum += max(zhans.size() - 1, 0);
-                    feisum += max(lings.size() - 1, 0);
-                    feisum += max(lies.size() - 1, 0);
-                    feisum += max(maos.size() - 1, 0);//占领猎猫当中的非人统计
+                    feisum += Math.max(zhans.size() - 1, 0);
+                    feisum += Math.max(lings.size() - 1, 0);
+                    feisum += Math.max(lies.size() - 1, 0);
+                    feisum += Math.max(maos.size() - 1, 0);//占领猎猫当中的非人统计
                     for (int j = 1; j < gs.gameDay; j++)
                         if (gs.gc[num].skillTarget[j] > gs.getPlayerSum())
                         {
@@ -1090,7 +1033,7 @@ public class MainLogic implements MainLogicInterface
                         if(blackzhi[gs.gc[target[i]].claimedRole] > 0 && gs.gc[target[i]].claimedRole != 1) continue;//不能发复数个同职业黑球
                         if(gs.gc[target[i]].claimedRole == 1 && blackzhi[gs.gc[target[i]].claimedRole] > 1) continue;//占候补最多2黑球
                     }
-                    int option = getEventIndexByProbability(new ArrayList<Integer>(List.of(baip,heip)));//根据现成比例得到占卜结果
+                    int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(baip,heip)));//根据现成比例得到占卜结果
                     target[i] += option * gs.getPlayerSum();//有可能改为黑结果
                     switch (gs.gc[num].actualRole)
                     {
@@ -1128,7 +1071,7 @@ public class MainLogic implements MainLogicInterface
                     else if(diebody.contains(target[i] - gs.getPlayerSum()) && diebody.size() < 2)
                         weight[i] -= 49;//不主动发单死死体黑球
                 }
-                int option = getEventIndexByProbability(new ArrayList<Integer>(List.of(weight[0],weight[1])));
+                int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(weight[0],weight[1])));
                 gs.gc[num].skillTarget[gs.gameDay] = target[option];//添加占文
                 //不能主动发死体黑球。尽量主动发死体白球
                 break;
@@ -1184,13 +1127,13 @@ public class MainLogic implements MainLogicInterface
                 }
                 //3,确定白排除
                 for(int i=1;i<=gs.getPlayerSum();i++)
-                    if(isackwhite(i) && gs.gc[i].whyDie == whyDie.NONE)
+                    if(suspicion.isAckWhite(i) && gs.gc[i].whyDie == whyDie.NONE)
                         baip--;
                 //4,处理占灵猫猎候补
-                feisum += max(0,zhans.size()-1);
-                feisum += max(0,lings.size()-1);
-                feisum += max(0,lies.size()-1);
-                feisum += max(0,maos.size()-1);
+                feisum += Math.max(0,zhans.size()-1);
+                feisum += Math.max(0,lings.size()-1);
+                feisum += Math.max(0,lies.size()-1);
+                feisum += Math.max(0,maos.size()-1);
                 //5，铁逻辑
                 //视角完全，外置位都是白
                 if(feisum + heisum >= initialNonHumanCount  && (gs.gc[shokei].claimedRole == 0 || gs.gc[shokei].claimedRole == 6)  )
@@ -1220,7 +1163,7 @@ public class MainLogic implements MainLogicInterface
                         option.add(0);//白色倾向加入
                     for(int i=0;i<zhans.size();i++)//队友上占
                     {
-                        if(gs.gc[zhans.get(i)].actualRole != 7 || gs.gc[zhans.get(i)].suspicionValue[num] > INFJ)continue;
+                        if(gs.gc[zhans.get(i)].actualRole != 7 || gs.gc[zhans.get(i)].suspicionValue[num] > GameConstants.INFJ)continue;
                         //必须是还未切线的上占队友
                         int zhan = zhans.get(i);
                         for(int j=1;j<gs.gameDay;j++)
@@ -1243,7 +1186,7 @@ public class MainLogic implements MainLogicInterface
                 for(int i=0;i<zhans.size();i++)
                 {
                     int zhan = zhans.get(i);
-                    if(gs.gc[zhan].suspicionValue[num] < INFJ && gs.gc[num].suspicionValue[zhan] < INFJ && lined[zhan][num] == 1)
+                    if(gs.gc[zhan].suspicionValue[num] < GameConstants.INFJ && gs.gc[num].suspicionValue[zhan] < GameConstants.INFJ && lined[zhan][num] == 1)
                     {
                         //连线的占灵关系
                         for(int j=1;j<gs.gameDay;j++)
@@ -1273,7 +1216,7 @@ public class MainLogic implements MainLogicInterface
                 for(int i=0;i<zhans.size();i++)
                 {
                     int zhan = zhans.get(i);
-                    if(gs.gc[zhan].suspicionValue[num] > INFJ && gs.gc[num].suspicionValue[zhan] > INFJ)
+                    if(gs.gc[zhan].suspicionValue[num] > GameConstants.INFJ && gs.gc[num].suspicionValue[zhan] > GameConstants.INFJ)
                     {
                         //切线的占灵关系
                         for(int j=1;j<gs.gameDay;j++)
@@ -1298,7 +1241,7 @@ public class MainLogic implements MainLogicInterface
                     break;
                 }
                 //根据具体概率给出结果
-                int op = getEventIndexByProbability(new ArrayList<Integer>(List.of(baip,heip)));
+                int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(baip,heip)));
                 if(op == 1) gs.gc[num].skillTarget[gs.gameDay] += gs.getPlayerSum();
                 break;
             }
@@ -1324,7 +1267,7 @@ public class MainLogic implements MainLogicInterface
                     if(diebody.size() == 1 && target[i] == diebody.get(0))
                         weight.set(i,1);
                 }
-                int op = getEventIndexByProbability(weight);
+                int op = GameLogicUtils.getEventIndexByProbability(weight);
                 gs.gc[num].skillTarget[gs.gameDay] = target[op];
                 
                     logicTools.log("假猎"+CharacterKanjiName.values()[gs.gc[num].number]
@@ -1348,7 +1291,7 @@ public class MainLogic implements MainLogicInterface
         //非人编造结果逻辑
         for (int i=1;i<=gs.getPlayerSum();i++)
         {
-            if(zhenying(gs.gc[i])  == 0 || gs.gc[i].whyDie != whyDie.NONE) continue;//存活非人
+            if(GameLogicUtils.zhenying(gs.gc[i])  == 0 || gs.gc[i].whyDie != whyDie.NONE) continue;//存活非人
             if(gs.gc[i].claimedRole == 6 || (gs.gc[i].claimedRole == 0 && nonHumanPlan[i] == 0)) continue;//死心潜伏或者已经村人co，则退出
             if(gs.gc[i].claimedRole == 1 || (gs.gc[i].claimedRole == 0 && nonHumanPlan[i] == 1))    //假占候选
             {
@@ -1439,7 +1382,7 @@ public class MainLogic implements MainLogicInterface
                                 if(lweight + mweight == 0) nonHumanPlan[target] = 0;
                                 else
                                 {
-                                    nonHumanPlan[target] = 3 + 2 * getEventIndexByProbability(new ArrayList<>(List.of(lweight,mweight)));
+                                    nonHumanPlan[target] = 3 + 2 * GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(lweight,mweight)));
                                     if(nonHumanPlan[target] == 5)
                                     {
                                         response.add(new IntPair(target,5));havecatco = true;rlsm = true;
@@ -1459,7 +1402,7 @@ public class MainLogic implements MainLogicInterface
                                 if(lweight + mweight == 0) nonHumanPlan[target] = 0;
                                 else
                                 {
-                                    nonHumanPlan[target] = 3 + 2 * getEventIndexByProbability(new ArrayList<>(List.of(lweight,mweight)));
+                                    nonHumanPlan[target] = 3 + 2 * GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(lweight,mweight)));
                                     if(nonHumanPlan[target] == 5)
                                     {
                                         response.add(new IntPair(target,5));havecatco = true;
@@ -1507,7 +1450,7 @@ public class MainLogic implements MainLogicInterface
                 dieaux(actualRoleindex[11],whyDie.nighthouzhui);//调用辅助函数：夜间后追
             }
         }
-        eventarray = shuffleList(eventarray);//随机打乱死亡事件数组
+        eventarray = GameLogicUtils.shuffleList(eventarray);//随机打乱死亡事件数组
             for(int i=0;i<diebody.size();i++)
             {
                 logicTools.log("夜间死体："+CharacterKanjiName.values()[gs.gc[diebody.get(i)].number]);
@@ -1532,7 +1475,7 @@ public class MainLogic implements MainLogicInterface
         else
         {
             isDoubleDeathOccurred[gs.gameDay] = true;//维护多死数组
-            if(actualRoleindex[5] > 1 && gs.gc[actualRoleindex[5]].whyDie == whyDie.NONE && isackwhite(actualRoleindex[5])
+            if(actualRoleindex[5] > 1 && gs.gc[actualRoleindex[5]].whyDie == whyDie.NONE && suspicion.isAckWhite(actualRoleindex[5])
                 && !diebody.contains(actualRoleindex[5]))//存在存活的唯一猫又
                 for (int i = 0; i < zhans.size(); i++)
                 {
@@ -1551,36 +1494,6 @@ public class MainLogic implements MainLogicInterface
         }
         delieverevent();//播放死者事件
         return diebody;//返回死体数组
-    }
-    /**
-     * 泛型洗牌函数：打乱任意类型ArrayList（不修改原列表）
-     * 随机数来源：ConstNum.randomInt(x,y)（返回x到y之间的随机整数，包含两端）
-     * @param originalList 待打乱的原列表（支持IntPair/AbstractMap.Entry/任意泛型）
-     * @param <T> 列表元素的泛型类型（可传入IntPair、AbstractMap.Entry<Integer,Integer>等）
-     * @return 打乱后的新列表；入参为null/空时返回空列表
-     */
-    public static <T> ArrayList<T> shuffleList(ArrayList<T> originalList)
-    {
-        // 1. 空值/空列表兜底
-        if (originalList == null || originalList.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        // 2. 复制原列表，避免修改原始数据
-        ArrayList<T> shuffledList = new ArrayList<>(originalList);
-        int listSize = shuffledList.size();
-
-        // 3. Fisher-Yates洗牌算法，适配ConstNum.randomInt
-        for (int i = listSize - 1; i > 0; i--) {
-            // 生成0到i（包含两端）的随机索引
-            int randomIndex = ConstNum.randomInt(0, i);
-            // 交换当前索引和随机索引的元素（泛型无需类型转换）
-            T temp = shuffledList.get(i);
-            shuffledList.set(i, shuffledList.get(randomIndex));
-            shuffledList.set(randomIndex, temp);
-        }
-
-        return shuffledList;
     }
     private void dieaux(int index,whyDie why)    //玩家死亡辅助函数，处理玩家死亡对于gs类的修正
     {
@@ -1603,12 +1516,6 @@ public class MainLogic implements MainLogicInterface
             eventarray.add(new Event(EventName.mzsw,CharacterEnglishName.values()[gs.gc[index].number]));
         else
             eventarray.add(new Event(EventName.yjsw,CharacterEnglishName.values()[gs.gc[index].number]));
-    }
-    private void updatetop3SuspectedPlayersaux2(int num1,int num2,int w1,int w2)//功能：num1对num2的怀疑度增量为w1；num2对num1的怀疑度增量为w2
-    {
-        //功能：num1对num2的怀疑度增量为w1；num2对num1的怀疑度增量为w2
-        gs.gc[num1].suspicionValue[num2] += w1;
-        gs.gc[num2].suspicionValue[num1] += w2;
     }
     private int judgeend()//判断当前游戏是否结束 返回值：0未结束 1村胜利 2狼胜利 3狐胜利
     {
@@ -1668,8 +1575,8 @@ public class MainLogic implements MainLogicInterface
                 gs.gc[gyindex[1]].comingOutDay = gs.gameDay;//co时机
                 gs.gc[gyindex[2]].claimedRole = 4;//共有co
                 gs.gc[gyindex[2]].comingOutDay = gs.gameDay;//co时机
-                lasySuspicionValue[gyindex[1]] -= INF;
-                lasySuspicionValue[gyindex[2]] -= INF;
+                suspicion.getLasySuspicionValue()[gyindex[1]] -= GameConstants.INF;
+                suspicion.getLasySuspicionValue()[gyindex[2]] -= GameConstants.INF;
                 return;
             }
             if(logicTools.probabilityJudge(50))
@@ -1693,8 +1600,8 @@ public class MainLogic implements MainLogicInterface
                 gs.gc[gyindex[1]].comingOutDay = gs.gameDay;//co时机
                 gs.gc[gyindex[2]].claimedRole = 4;//共有co
                 gs.gc[gyindex[2]].comingOutDay = gs.gameDay;//co时机
-                lasySuspicionValue[gyindex[1]] -= INF;
-                lasySuspicionValue[gyindex[2]] -= INF;
+                suspicion.getLasySuspicionValue()[gyindex[1]] -= GameConstants.INF;
+                suspicion.getLasySuspicionValue()[gyindex[2]] -= GameConstants.INF;
             }
             else
             {
@@ -1705,14 +1612,14 @@ public class MainLogic implements MainLogicInterface
                     eventarray.add(new Event(EventName.gyho2,CharacterEnglishName.values()[gs.gc[gyindex[1]].number]));//共有co事件
                     gs.gc[gyindex[1]].claimedRole = 4;//共有co
                     gs.gc[gyindex[1]].comingOutDay = gs.gameDay;//co时机
-                    lasySuspicionValue[gyindex[1]] -= INF;
+                    suspicion.getLasySuspicionValue()[gyindex[1]] -= GameConstants.INF;
                 }
                 else //共2co，共1潜伏
                 {
                     eventarray.add(new Event(EventName.gyho2,CharacterEnglishName.values()[gs.gc[gyindex[2]].number]));//共有co事件
                     gs.gc[gyindex[2]].claimedRole = 4;//共有co
                     gs.gc[gyindex[2]].comingOutDay = gs.gameDay;//co时机
-                    lasySuspicionValue[gyindex[2]] -= INF;
+                    suspicion.getLasySuspicionValue()[gyindex[2]] -= GameConstants.INF;
                 }
             }
             return;
@@ -1723,12 +1630,12 @@ public class MainLogic implements MainLogicInterface
             exposureProgress = ConstNum.randomInt(1,90);//暴露进度初始值
         else
             exposureProgress += ConstNum.randomInt(5,15);//增加暴露进度
-        if(gs.gc[gyindex[3-qfnum]].whyDie != whyDie.NONE || gs.gc[gyindex[qfnum]].whyDie != whyDie.NONE) exposureProgress = INF;//共有同伴死亡，立即co
+        if(gs.gc[gyindex[3-qfnum]].whyDie != whyDie.NONE || gs.gc[gyindex[qfnum]].whyDie != whyDie.NONE) exposureProgress = GameConstants.INF;//共有同伴死亡，立即co
         if(exposureProgress > 99)
         {
             gs.gc[gyindex[qfnum]].claimedRole = 4;//共有co
             gs.gc[gyindex[qfnum]].comingOutDay = gs.gameDay;
-            lasySuspicionValue[gyindex[qfnum]] -= INF;
+            suspicion.getLasySuspicionValue()[gyindex[qfnum]] -= GameConstants.INF;
             //原版处刑明共有者会固定触发回避共台词.所以明共有无法被处刑
             if(gs.gc[gyindex[qfnum]].whyDie == whyDie.chuxing)
                 eventarray.add(new Event(EventName.gycx6,CharacterEnglishName.values()[gs.gc[gyindex[3-qfnum]].number],
@@ -1747,41 +1654,6 @@ public class MainLogic implements MainLogicInterface
                         CharacterEnglishName.values()[gs.gc[gyindex[qfnum]].number]));//潜伏解除确认5r
             }
         }
-    }
-    public int getEventIndexByProbability(ArrayList<Integer> probabilities) //根据概率，返回互斥事件中发生的事件的编号 从0开始计数
-    {
-        //不需要数组元素总和一定为100
-        // 1. 基础参数校验：数组非空
-        if (probabilities == null || probabilities.isEmpty())
-        {
-            throw new IllegalArgumentException("概率数组不能为空！");
-        }
-
-        // 2. 校验元素合法性（非负）
-        int total = 0;
-        for (Integer prob : probabilities)
-        {
-            if (prob == null || prob < 0) {
-                throw new IllegalArgumentException("概率数组元素必须为非负整数！");
-            }
-            total += prob;
-        }
-        if(total == 0)
-            throw new IllegalArgumentException("概率数组元素总和必须为正整数！");
-        // 3. 替换为外部提供的随机数方法：生成0-99（包含两端）的随机数
-        int randomValue = ConstNum.randomInt(0, total-1);
-
-        // 4. 累加概率，匹配随机数对应的索引
-        int cumulativeProb = 0;
-        for (int i = 0; i < probabilities.size(); i++) {
-            cumulativeProb += probabilities.get(i);
-            if (randomValue < cumulativeProb) {
-                return i; // 仅返回索引，无任何打印逻辑
-            }
-        }
-
-        // 理论上不会执行到此处（总和为100，randomValue<100必然匹配到最后一个索引）
-        throw new IllegalStateException("概率计算异常，未匹配到有效索引！");
     }
     private void zhanresult(int num)//之前已经co的占卜报告当天的占卜结果
     {
@@ -1802,9 +1674,9 @@ public class MainLogic implements MainLogicInterface
             if(target > gs.getPlayerSum())//黑球结果
             {
                 target -= gs.getPlayerSum();
-                lasySuspicionValue[target] += 10;
-                lasySuspicionValue[num] += 2;
-                updatetop3SuspectedPlayersaux2(num,target,INF,INF);
+                suspicion.getLasySuspicionValue()[target] += 10;
+                suspicion.getLasySuspicionValue()[num] += 2;
+                suspicion.updateTop3Aux2(num,target,GameConstants.INF,GameConstants.INF);
                 eventarray.add(new Event(EventName.zjgh8b,CharacterEnglishName.values()[gs.gc[num].number],
                         CharacterEnglishName.values()[gs.gc[target].number]));//占结果黑
                 if(gs.gc[target].whyDie == whyDie.NONE)
@@ -1821,8 +1693,8 @@ public class MainLogic implements MainLogicInterface
                         if(gs.gc[gyindex[3-gy]].whyDie == whyDie.NONE)
                             eventarray.add(new Event(EventName.gprz11p,CharacterEnglishName.values()[gs.gc[gyindex[3-gy]].number],
                                     CharacterEnglishName.values()[gs.gc[target].number]));//共pair认证11p
-                        lasySuspicionValue[num] += INF;
-                        lasySuspicionValue[target] -= INF;
+                        suspicion.getLasySuspicionValue()[num] += GameConstants.INF;
+                        suspicion.getLasySuspicionValue()[target] -= GameConstants.INF;
                         gs.gc[target].claimedRole = 4;
                         gs.gc[target].comingOutDay = gs.gameDay;
                         gs.gc[num].nonHumanMarker = true;//破绽非人
@@ -1836,8 +1708,8 @@ public class MainLogic implements MainLogicInterface
             }
             else if(gs.gc[target].whyDie == whyDie.NONE)//白结果并且占卜对象存活
             {
-                lasySuspicionValue[target] -= 10;
-                updatetop3SuspectedPlayersaux2(num,target,-5,-10);
+                suspicion.getLasySuspicionValue()[target] -= 10;
+                suspicion.updateTop3Aux2(num,target,-5,-10);
                 eventarray.add(new Event(EventName.zjgb8,CharacterEnglishName.values()[gs.gc[num].number],
                         CharacterEnglishName.values()[gs.gc[target].number]));//占结果白
                 eventarray.add(new Event(EventName.jbdh8r,CharacterEnglishName.values()[gs.gc[target].number],
@@ -1849,12 +1721,12 @@ public class MainLogic implements MainLogicInterface
                         CharacterEnglishName.values()[gs.gc[target].number]));//占卜对象死亡
             }
         }
-        else if(actualRoleindex[5] > 0 && isackwhite(actualRoleindex[5]) && !diebody.contains(actualRoleindex[5]) && !diebody.contains(target))
+        else if(actualRoleindex[5] > 0 && suspicion.isAckWhite(actualRoleindex[5]) && !diebody.contains(actualRoleindex[5]) && !diebody.contains(target))
         {
             //唯一猫的前提，猫以外出现双死，没有对应。
             //咒杀破绽
             eventarray.add(new Event(EventName.zspz15, CharacterEnglishName.values()[gs.gc[num].number]));//咒杀破绽
-            lasySuspicionValue[num] += INF;
+            suspicion.getLasySuspicionValue()[num] += GameConstants.INF;
             gs.gc[num].nonHumanMarker = true;//破绽非人占卜
         }
         else if((gs.p != peiyi.daxing && gs.p != peiyi.maoyou) || diebody.size() > 2)  //双死，本村无猫；或者死者超过两位
@@ -1867,7 +1739,7 @@ public class MainLogic implements MainLogicInterface
             else    //咒杀破绽
             {
                 eventarray.add(new Event(EventName.zspz15,CharacterEnglishName.values()[gs.gc[num].number]));//咒杀破绽
-                lasySuspicionValue[num] += INF;
+                suspicion.getLasySuspicionValue()[num] += GameConstants.INF;
                 gs.gc[num].nonHumanMarker = true;//破绽非人占卜
             }
         }
@@ -1880,8 +1752,8 @@ public class MainLogic implements MainLogicInterface
             }
             else if(target <= gs.getPlayerSum()) //普通白色结果
             {
-                lasySuspicionValue[target] -= 10;
-                updatetop3SuspectedPlayersaux2(num,target,-5,-10);
+                suspicion.getLasySuspicionValue()[target] -= 10;
+                suspicion.updateTop3Aux2(num,target,-5,-10);
                 eventarray.add(new Event(EventName.zjgb8,CharacterEnglishName.values()[gs.gc[num].number],
                         CharacterEnglishName.values()[gs.gc[target].number]));//占结果白
                 eventarray.add(new Event(EventName.jbdh8r,CharacterEnglishName.values()[gs.gc[target].number],
@@ -1890,9 +1762,9 @@ public class MainLogic implements MainLogicInterface
             else    //黑色结果
             {
                 target -= gs.getPlayerSum();
-                lasySuspicionValue[target] += 10;
-                lasySuspicionValue[num] += 2;
-                updatetop3SuspectedPlayersaux2(num,target,INF,INF);
+                suspicion.getLasySuspicionValue()[target] += 10;
+                suspicion.getLasySuspicionValue()[num] += 2;
+                suspicion.updateTop3Aux2(num,target,GameConstants.INF,GameConstants.INF);
                 eventarray.add(new Event(EventName.zjgh8b,CharacterEnglishName.values()[gs.gc[num].number],
                         CharacterEnglishName.values()[gs.gc[target].number]));//占结果黑
                 if(gs.gc[target].whyDie == whyDie.NONE)//黑球没有死亡
@@ -1912,13 +1784,13 @@ public class MainLogic implements MainLogicInterface
                 gs.gc[num].claimedRoleorder = ++claimedRoleorder[2];//同职业位次
             for(int i=0;i<lings.size();i++)
             {
-                updatetop3SuspectedPlayersaux2(num,lings.get(i),INF,INF);//灵候补之间怀疑更新
+                suspicion.updateTop3Aux2(num,lings.get(i),GameConstants.INF,GameConstants.INF);//灵候补之间怀疑更新
             }
             if(!lings.contains(num))    //不重复获取位次
                 lings.add(num);
-            lasySuspicionValue[num] -= 30;
+            suspicion.getLasySuspicionValue()[num] -= 30;
             if(gs.gameDay > 2)
-                lasySuspicionValue[num] += 10;//潜伏占灵co被怀疑
+                suspicion.getLasySuspicionValue()[num] += 10;//潜伏占灵co被怀疑
         }
         if(gs.gc[num].skillTarget[gs.gameDay - 1] > gs.getPlayerSum())//灵结果黑
         {
@@ -1936,18 +1808,18 @@ public class MainLogic implements MainLogicInterface
             //占灵切线连线逻辑
             for (int j = 1; j <= gs.gameDay; j++)
                 {
-                    if(gs.gc[num].suspicionValue[zhans.get(i)] <= INFJ
+                    if(gs.gc[num].suspicionValue[zhans.get(i)] <= GameConstants.INFJ
                             && Math.abs(gs.gc[num].skillTarget[gs.gameDay - 1] - gs.gc[zhans.get(i)].skillTarget[j]) == gs.gameDay)
                     {
-                        lasySuspicionValue[num] += 5;
-                        lasySuspicionValue[zhans.get(i)] += 5;
-                        updatetop3SuspectedPlayersaux2(num,zhans.get(i),INF,INF);
+                        suspicion.getLasySuspicionValue()[num] += 5;
+                        suspicion.getLasySuspicionValue()[zhans.get(i)] += 5;
+                        suspicion.updateTop3Aux2(num,zhans.get(i),GameConstants.INF,GameConstants.INF);
                     }
-                    if(gs.gc[num].suspicionValue[zhans.get(i)] <= INFJ
+                    if(gs.gc[num].suspicionValue[zhans.get(i)] <= GameConstants.INFJ
                             && gs.gc[num].skillTarget[gs.gameDay - 1] == gs.gc[zhans.get(i)].skillTarget[j]
                     && gs.gc[zhans.get(i)].skillTarget[j] > gs.getPlayerSum())
                     {
-                        updatetop3SuspectedPlayersaux2(num,zhans.get(i),-10,-10);
+                        suspicion.updateTop3Aux2(num,zhans.get(i),-10,-10);
                         lined[zhans.get(i)][num] = 1;
                     }
                 }
@@ -1975,7 +1847,7 @@ public class MainLogic implements MainLogicInterface
             {
                 for(int i=0;i<zhans.size();i++)
                 {
-                    updatetop3SuspectedPlayersaux2(num,zhans.get(i),INF,INF);//占候补之间怀疑更新
+                    suspicion.updateTop3Aux2(num,zhans.get(i),GameConstants.INF,GameConstants.INF);//占候补之间怀疑更新
                 }
 
                 //增加逻辑：非人三日目co占的时候，不能发当天单死的人黑球.
@@ -1992,18 +1864,18 @@ public class MainLogic implements MainLogicInterface
                     for (int j = 1; j <= gs.gameDay; j++)
                         for (int k = 2; k <= gs.gameDay; k++)
                         {
-                            if(gs.gc[num].suspicionValue[lings.get(i)] <= INFJ
+                            if(gs.gc[num].suspicionValue[lings.get(i)] <= GameConstants.INFJ
                                     && Math.abs(gs.gc[lings.get(i)].skillTarget[k] - gs.gc[num].skillTarget[j]) == gs.gameDay)//占灵切线
                             {
-                                lasySuspicionValue[num] += 5;
-                                lasySuspicionValue[lings.get(i)] += 5;
-                                updatetop3SuspectedPlayersaux2(num,lings.get(i),INF,INF);
+                                suspicion.getLasySuspicionValue()[num] += 5;
+                                suspicion.getLasySuspicionValue()[lings.get(i)] += 5;
+                                suspicion.updateTop3Aux2(num,lings.get(i),GameConstants.INF,GameConstants.INF);
                                 lined[num][lings.get(i)] = 0;
                             }
-                            else if(gs.gc[num].suspicionValue[lings.get(i)] <= INFJ && gs.gc[lings.get(i)].skillTarget[k] == gs.gc[num].skillTarget[j]
+                            else if(gs.gc[num].suspicionValue[lings.get(i)] <= GameConstants.INFJ && gs.gc[lings.get(i)].skillTarget[k] == gs.gc[num].skillTarget[j]
                             && gs.gc[num].skillTarget[j] > gs.getPlayerSum())
                             {
-                                updatetop3SuspectedPlayersaux2(num,lings.get(i),-10,-10);//占灵连线
+                                suspicion.updateTop3Aux2(num,lings.get(i),-10,-10);//占灵连线
                                 lined[num][lings.get(i)] = 1;
                             }
                         }
@@ -2014,17 +1886,17 @@ public class MainLogic implements MainLogicInterface
                 }
                 if(!zhans.contains(num))
                     zhans.add(num);//加入职业数组
-                lasySuspicionValue[num] -= 50;
+                suspicion.getLasySuspicionValue()[num] -= 50;
                 if(gs.gameDay > 2)
-                    lasySuspicionValue[num] += 10;//潜伏占灵co被怀疑
+                    suspicion.getLasySuspicionValue()[num] += 10;//潜伏占灵co被怀疑
                 //处理第一天的占卜结果
                 int target = gs.gc[num].skillTarget[1];//占卜对象
                 if (target > gs.getPlayerSum())//黑球结果
                 {
                     target -= gs.getPlayerSum();
-                    lasySuspicionValue[target] += 10;
-                    lasySuspicionValue[num] += 2;
-                    updatetop3SuspectedPlayersaux2(num, target, INF, INF);
+                    suspicion.getLasySuspicionValue()[target] += 10;
+                    suspicion.getLasySuspicionValue()[num] += 2;
+                    suspicion.updateTop3Aux2(num, target, GameConstants.INF, GameConstants.INF);
                     eventarray.add(new Event(EventName.zjgh8b, CharacterEnglishName.values()[gs.gc[num].number],
                             CharacterEnglishName.values()[gs.gc[target].number]));//占结果黑
                     
@@ -2043,8 +1915,8 @@ public class MainLogic implements MainLogicInterface
                             if(gs.gc[gyindex[3-gy]].whyDie == whyDie.NONE)
                                 eventarray.add(new Event(EventName.gprz11p,CharacterEnglishName.values()[gs.gc[gyindex[3-gy]].number],
                                         CharacterEnglishName.values()[gs.gc[target].number]));//共pair认证11p
-                            lasySuspicionValue[num] += INF;
-                            lasySuspicionValue[target] -= INF;
+                            suspicion.getLasySuspicionValue()[num] += GameConstants.INF;
+                            suspicion.getLasySuspicionValue()[target] -= GameConstants.INF;
                             gs.gc[target].claimedRole = 4;
                             gs.gc[target].comingOutDay = gs.gameDay;
                             if(gs.gc[gyindex[3-gy]].claimedRole != 4)
@@ -2058,8 +1930,8 @@ public class MainLogic implements MainLogicInterface
                 }
                 else if (target > 0)  //白球结果
                 {
-                    lasySuspicionValue[target] -= 10;
-                    updatetop3SuspectedPlayersaux2(num, target, -5, -10);
+                    suspicion.getLasySuspicionValue()[target] -= 10;
+                    suspicion.updateTop3Aux2(num, target, -5, -10);
                     eventarray.add(new Event(EventName.zjgb8, CharacterEnglishName.values()[gs.gc[num].number],
                             CharacterEnglishName.values()[gs.gc[target].number]));//占结果白
                     if(gs.gc[target].whyDie == whyDie.NONE)
@@ -2069,7 +1941,7 @@ public class MainLogic implements MainLogicInterface
                 //若有第二天的占卜结果，则处理之
                 if(gs.gameDay == 3)
                 {
-                    lasySuspicionValue[num] += 10;//潜伏占灵co被怀疑
+                    suspicion.getLasySuspicionValue()[num] += 10;//潜伏占灵co被怀疑
                     zhanresult(num);
                 }
                 break;
@@ -2078,7 +1950,7 @@ public class MainLogic implements MainLogicInterface
             {
                 for(int i=0;i<lings.size();i++)
                 {
-                    updatetop3SuspectedPlayersaux2(num,lings.get(i),INF,INF);//灵候补之间怀疑更新
+                    suspicion.updateTop3Aux2(num,lings.get(i),GameConstants.INF,GameConstants.INF);//灵候补之间怀疑更新
                 }
                 if(!lings.contains(num))    //不重复获取位次
                 {
@@ -2086,7 +1958,7 @@ public class MainLogic implements MainLogicInterface
                 }
                 if(gs.gc[num].claimedRoleorder == 0)
                     gs.gc[num].claimedRoleorder = ++claimedRoleorder[2];//同职业位次
-                lasySuspicionValue[num] -= 30;
+                suspicion.getLasySuspicionValue()[num] -= 30;
                 if(gs.gameDay == 2)
                 {
                     eventarray.add(new Event(EventName.lnco18,CharacterEnglishName.values()[gs.gc[num].number]));//灵能co
@@ -2094,21 +1966,21 @@ public class MainLogic implements MainLogicInterface
                 }
                 else
                 {
-                    lasySuspicionValue[num] += 10;//潜伏占灵co被怀疑
+                    suspicion.getLasySuspicionValue()[num] += 10;//潜伏占灵co被怀疑
                     lingresult(num);//报告当天灵能结果
                 }
                 break;
             }
             case 3://猎人
                 for(int i=0;i<lies.size();i++)
-                    updatetop3SuspectedPlayersaux2(lies.get(i),num,INF,INF);//对抗怀疑
+                    suspicion.updateTop3Aux2(lies.get(i),num,GameConstants.INF,GameConstants.INF);//对抗怀疑
                 if(!lies.contains(num))    //不重复获取位次
                 {
                     lies.add(num);
                 }
                 if(gs.gc[num].claimedRoleorder == 0)
                     gs.gc[num].claimedRoleorder = ++claimedRoleorder[3];//同职业位次
-                lasySuspicionValue[num] -= 30;
+                suspicion.getLasySuspicionValue()[num] -= 30;
                 eventarray.add(new Event(EventName.lrco,CharacterEnglishName.values()[gs.gc[num].number]));
                 if(gs.gc[num].actualRole == 7)
                     rlsl = true;//人狼上猎标记
@@ -2119,7 +1991,7 @@ public class MainLogic implements MainLogicInterface
                 if(gyindex[2] == num) gy = 2;
                 //if(gs.gc[gyindex[3-gy]].claimedRole == 4) break;//不会重复进行co
 
-                lasySuspicionValue[num] -= INF;
+                suspicion.getLasySuspicionValue()[num] -= GameConstants.INF;
                 eventarray.add(new Event(EventName.qfjc5,CharacterEnglishName.values()[gs.gc[num].number],
                         CharacterEnglishName.values()[gs.gc[gyindex[3-gy]].number]));//潜伏解除5
                 eventarray.add(new Event(EventName.qfjcqr5r,CharacterEnglishName.values()[gs.gc[gyindex[3-gy]].number],
@@ -2133,14 +2005,14 @@ public class MainLogic implements MainLogicInterface
                 break;
             case 5:
                 for(int i=0;i<maos.size();i++)
-                    updatetop3SuspectedPlayersaux2(maos.get(i),num,INF,INF);//对抗怀疑
+                    suspicion.updateTop3Aux2(maos.get(i),num,GameConstants.INF,GameConstants.INF);//对抗怀疑
                 if(!maos.contains(num))    //不重复获取位次
                 {
                     maos.add(num);
                 }
                 if(gs.gc[num].claimedRoleorder == 0)
                     gs.gc[num].claimedRoleorder = ++claimedRoleorder[5];//同职业位次
-                lasySuspicionValue[num] -= 30;
+                suspicion.getLasySuspicionValue()[num] -= 30;
                 eventarray.add(new Event(EventName.mco,CharacterEnglishName.values()[gs.gc[num].number]));
                 if(gs.gc[num].actualRole == 7)
                     rlsm = true;//人狼上猫标记
@@ -2171,12 +2043,12 @@ public class MainLogic implements MainLogicInterface
         //参数：无
         //返回值：int[2]，wolf[0]:主咬狼；wolf[1]：被咬玩家
         //分配初始被咬权重
-            //若该玩家是人狼，或该玩家已经死亡，或该玩家已经破绽，则被咬权重-INF，否则为50.
+            //若该玩家是人狼，或该玩家已经死亡，或该玩家已经破绽，则被咬权重-GameConstants.INF，否则为50.
         int biteWeight[] = new int[gs.getPlayerSum()+1];
         for(int i=1;i<=gs.getPlayerSum();i++)
         {
-            //若该玩家是人狼，或该玩家已经死亡，或该玩家已经破绽，则被咬权重-INF
-            if(gs.gc[i].actualRole == 7 || gs.gc[i].dieDay != 0 || gs.gc[i].nonHumanMarker) biteWeight[i] -= INF;
+            //若该玩家是人狼，或该玩家已经死亡，或该玩家已经破绽，则被咬权重-GameConstants.INF
+            if(gs.gc[i].actualRole == 7 || gs.gc[i].dieDay != 0 || gs.gc[i].nonHumanMarker) biteWeight[i] -= GameConstants.INF;
             else                    biteWeight[i] += 20; //否则为20.
         }
 
@@ -2328,7 +2200,7 @@ public class MainLogic implements MainLogicInterface
                 alivewuco++;
         }
         k *= alivewuco;
-        k /= max(wuco,1);//避免除以0
+        k /= Math.max(wuco,1);//避免除以0
         //若当前已经喊过猎了，则潜伏猎人折旧系数强制为0.
         if(claimedRoleaskday[3] > 0)
             k = 0;
@@ -2384,7 +2256,7 @@ public class MainLogic implements MainLogicInterface
                 {
                     //白色结果
                     if(gs.gc[i].skillTarget[j] <= gs.getPlayerSum() && gs.gc[i].skillTarget[j]  > 0 && !gs.gc[gs.gc[i].skillTarget[j]].nonHumanMarker
-                            && gs.gc[gs.gc[i].skillTarget[j]].claimedRole != 1 && !isackwhite(gs.gc[i].skillTarget[j]))
+                            && gs.gc[gs.gc[i].skillTarget[j]].claimedRole != 1 && !suspicion.isAckWhite(gs.gc[i].skillTarget[j]))
                     //占卜出白结果，并且对方不是破绽非人、占候补、确定白
                     {
                         baiqiu[i] ++;//此人的有效白球数+1
@@ -2518,57 +2390,14 @@ public class MainLogic implements MainLogicInterface
         int wolfbite[] = new int[gs.getPlayerSum()+1];
         for(int i=1;i<=gs.getPlayerSum();i++)
         {
-            //若该玩家是存活人狼，则权重为1，否则权重为-INF
-            if(gs.gc[i].actualRole != 7 || gs.gc[i].whyDie != whyDie.NONE) wolfbite[i] = -INF;
-            else if(gs.gc[i].nonHumanMarker) wolfbite[i] = INF;
+            //若该玩家是存活人狼，则权重为1，否则权重为-GameConstants.INF
+            if(gs.gc[i].actualRole != 7 || gs.gc[i].whyDie != whyDie.NONE) wolfbite[i] = -GameConstants.INF;
+            else if(gs.gc[i].nonHumanMarker) wolfbite[i] = GameConstants.INF;
             else wolfbite[i] = 1;//优先选择破绽的人狼主咬
         }
-        int bitewolf = getOne(wolfbite);//得到主咬狼
-        int biteone = getOne(biteWeight);//得到被咬玩家
+        int bitewolf = suspicion.getOne(wolfbite);//得到主咬狼
+        int biteone = suspicion.getOne(biteWeight);//得到被咬玩家
         return new int[]{bitewolf, biteone};//返回人狼咬杀逻辑二元组
-    }
-    private void printtop3SuspectedPlayers()  //输出当前的怀疑情况
-    {
-        logicTools.log("当前怀疑值情况：");
-
-    }
-    private boolean isackwhite(int num)
-    {
-        //判断玩家数组中的对应位置的玩家是否是确定白
-        //参数：玩家编号num
-        //返回值：true为是，false为否
-        //工作：判断玩家是否是确定白
-        //返回值：若该玩家是co出来的共有者，或该玩家co猫并且之前没有双死并且当前已经喊过猫
-        //理论上可以实现唯一占和唯一灵的确定白逻辑（初日喊占喊灵+共欠），这里简化处理
-        if(num < 1) return false;//数组越界
-        if(gs.gc[num].claimedRole == 4) return true;//co出来的共有者
-        if(gs.gc[num].actualRole != 5 || claimedRoleaskday[5] < 1) return false;//不是猫，或者没有喊猫，就不能当确定白
-
-        //首先排除有其他猫候补（没有破绽）的情况
-        ArrayList<Integer> mao = maos;//得到当前的所有猫候补
-        for(int i = 0;i < mao.size();i++)
-        {
-            if(gs.gc[mao.get(i)].nonHumanMarker)
-                mao.remove(i);//删除已经破绽的猫候补
-        }
-        if(mao.size() > 1 || (mao.size() == 1 && mao.get(0) != num) ) return false;//若存在其他未破绽的猫候补，则返回false
-
-        //找到第一次出现多死的时点
-        int firsttimemoredie = -1;
-        for(int i=1;i<=gs.gameDay;i++)
-        {
-            if(isDoubleDeathOccurred[i] == true)
-            {
-                firsttimemoredie = i;
-                break;
-            }
-        }
-        if(firsttimemoredie != -1 && firsttimemoredie < claimedRoleaskday[5]) return false;//首次多死在喊猫之前，返回false
-
-        //更改怀疑值
-        lasySuspicionValue[num] -= INF;
-        logicTools.log("玩家"+num+" 确定猫");
-        return true;//首次多死在喊猫当天或之后，或者没有多死，返回true
     }
     private int zhenlie(int num)//返回真猎人当晚守护目标，若真猎死亡则返回-1或0
     {
@@ -2597,7 +2426,7 @@ public class MainLogic implements MainLogicInterface
         boolean haveterget = false;//判断当前是否有指定护卫对象
         boolean qf = false;//真猎人当前是否潜伏
         int huweiweight[] = new int[gs.getPlayerSum()+1];//护卫权重数组
-        huweiweight[num]  = -INF;
+        huweiweight[num]  = -GameConstants.INF;
         if(gs.gc[num].claimedRole != 3) qf = true;
         //1,判断当前是否存在指定护卫对象
         for(int i=1;i<=gs.getPlayerSum();i++)
@@ -2627,7 +2456,7 @@ public class MainLogic implements MainLogicInterface
                 for(int i=1;i<=gs.getPlayerSum();i++)
                 {
                     if(gs.gc[i].whyDie != whyDie.NONE || gs.gc[num].claimedRoleScheduledSkillTargets[i][gs.gameDay] == false)
-                        huweiweight[i] = -INF;//若该人已经死亡或者该人没有被指定护卫，则初值-INF
+                        huweiweight[i] = -GameConstants.INF;//若该人已经死亡或者该人没有被指定护卫，则初值-GameConstants.INF
                     else
                         huweiweight[i] = 40;//若该人没有死亡并且被指定护卫，则初值40
                 }
@@ -2636,7 +2465,7 @@ public class MainLogic implements MainLogicInterface
                 for(int i=1;i<=gs.getPlayerSum();i++)
                 {
                     if(gs.gc[i].whyDie != whyDie.NONE || gs.hiddenHunterScheduledSkillTargets[i][gs.gameDay] == false)
-                        huweiweight[i] = -INF;//若该人已经死亡或者该人没有被指定护卫，则初值-INF
+                        huweiweight[i] = -GameConstants.INF;//若该人已经死亡或者该人没有被指定护卫，则初值-GameConstants.INF
                     else
                         huweiweight[i] = 40;//若该人没有死亡并且被指定护卫，则初值40
                 }
@@ -2647,7 +2476,7 @@ public class MainLogic implements MainLogicInterface
              for(int i=1;i<=gs.getPlayerSum();i++)
              {
                  if(gs.gc[i].whyDie != whyDie.NONE || i == num)
-                        huweiweight[i] = -INF;//若该人已经死亡，或者该人是自己，则初值-INF
+                        huweiweight[i] = -GameConstants.INF;//若该人已经死亡，或者该人是自己，则初值-GameConstants.INF
                     else
                         huweiweight[i] = 40;//若该人没有死亡，则初值40
              }
@@ -2699,103 +2528,23 @@ public class MainLogic implements MainLogicInterface
         //公共视角破绽非人或者猎人视角破绽非人,护卫权重-200
         for(int i=1;i<=gs.getPlayerSum();i++)
         {
-            if(gs.gc[i].nonHumanMarker || gs.gc[num].suspicionValue[i] > INFJ)
+            if(gs.gc[i].nonHumanMarker || gs.gc[num].suspicionValue[i] > GameConstants.INFJ)
                 huweiweight[i] -= 200;//公共视角破绽非人或者猎人视角破绽非人，护卫权重-200
         }
 
         //4，根据怀疑度更新护卫权重
         //自己视角按照怀疑度排序，所有玩家被护卫权重改变值构成等差数列，公差为5，怀疑度最高的玩家的被护卫权重+0
-        ArrayList<Integer> suspectorder = getpriority(gs.gc[num].suspicionValue,true);
+        ArrayList<Integer> suspectorder = GameLogicUtils.getpriority(gs.gc[num].suspicionValue,true);
         for(int i=1;i<=gs.getPlayerSum();i++)
         {
             huweiweight[i] += 5*suspectorder.get(i);//怀疑度最高的玩家的被护卫权重+0，其他玩家被护卫权重改变值构成等差数列，公差为5
         }
 
         //5,得到最终的护卫对象
-        gs.gc[num].skillTarget[gs.gameDay] = getOne(huweiweight);
+        gs.gc[num].skillTarget[gs.gameDay] = suspicion.getOne(huweiweight);
         
             logicTools.log("最终护卫对象："+ CharacterKanjiName.values()[gs.gc[gs.gc[num].skillTarget[gs.gameDay]].number]);
         return gs.gc[num].skillTarget[gs.gameDay];
-    }
-    private ArrayList<Integer> getpriority(int array[],boolean maxfirst)//排序辅助函数，返回对应下标数据之位次 0最小值编号为1 1最大值编号为1
-    {
-        // 初始化返回的ArrayList，索引0默认占位0
-        ArrayList<Integer> result = new ArrayList<>();
-
-        // 入参校验：数组为null或长度<2（无有效元素），直接返回仅含0的ArrayList
-        if (array == null || array.length < 2) {
-            result.add(0); // 索引0占位
-            return result;
-        }
-
-        // 步骤1：提取有效元素（array[1]到array[array.length-1]），存入临时数组
-        int validLen = array.length - 1; // 有效元素个数（索引1开始）
-        int[] valArr = new int[validLen]; // 存储有效元素的值
-        int[] idxArr = new int[validLen]; // 存储有效元素的原始索引（与valArr一一对应）
-        for (int i = 0; i < validLen; i++)
-        {
-            valArr[i] = array[i + 1];    // 对应array[1],array[2]...
-            idxArr[i] = i + 1;           // 对应原始索引1,2...
-        }
-
-        // 步骤2：冒泡排序（基础排序），同步排序valArr和idxArr，保证索引与值的对应
-        for (int i = 0; i < validLen - 1; i++) { // 外层：排序轮数
-            for (int j = 0; j < validLen - 1 - i; j++) { // 内层：每轮比较次数
-                boolean needSwap = false;
-                if (maxfirst) {
-                    // maxfirst=true：降序（大值在前），前 < 后则交换
-                    needSwap = valArr[j] < valArr[j + 1];
-                } else {
-                    // maxfirst=false：升序（小值在前），前 > 后则交换
-                    needSwap = valArr[j] > valArr[j + 1];
-                }
-                // 同步交换值数组和索引数组
-                if (needSwap) {
-                    // 交换valArr
-                    int tempVal = valArr[j];
-                    valArr[j] = valArr[j + 1];
-                    valArr[j + 1] = tempVal;
-                    // 交换idxArr（保证索引与值对应）
-                    int tempIdx = idxArr[j];
-                    idxArr[j] = idxArr[j + 1];
-                    idxArr[j + 1] = tempIdx;
-                }
-            }
-        }
-
-        // 步骤3：计算位次（处理并列值），存入rankArr
-        int[] rankArr = new int[validLen];
-        if (validLen == 0) { // 极端情况：无有效元素（已提前校验，此处为冗余防御）
-            result.add(0);
-            return result;
-        }
-        int currentRank = 1; // 初始位次为1
-        int currentVal = valArr[0]; // 基准值（排序后第一个元素的值）
-        rankArr[0] = currentRank;   // 第一个元素位次为1
-        for (int i = 1; i < validLen; i++) {
-            if (valArr[i] != currentVal) {
-                // 值不同，更新位次为当前索引+1（索引从0开始）
-                currentRank = i + 1;
-                currentVal = valArr[i]; // 更新基准值
-            }
-            // 值相同则沿用当前位次，不同则用更新后的位次
-            rankArr[i] = currentRank;
-        }
-
-        // 步骤4：构建返回的ArrayList（索引0占位0，索引1开始填充位次）
-        // 先初始化所有位置为0（长度与入参数组一致）
-        for (int i = 0; i < array.length; i++) {
-            result.add(0);
-        }
-        // 按原始索引，将位次填充到对应位置
-        for (int i = 0; i < validLen; i++) {
-            int originalIndex = idxArr[i]; // 元素的原始索引（1开始）
-            int rank = rankArr[i];         // 对应的位次
-            result.set(originalIndex, rank); // 赋值到ArrayList的对应索引
-        }
-
-        return result;
-
     }
     private ArrayList<Integer> getclaimedRole(int claimedRolenum, boolean mustalive)//得到某个职业的所有候补（可以要求必须存活）的辅助函数
     {
@@ -2820,228 +2569,6 @@ public class MainLogic implements MainLogicInterface
 
         // 返回 ArrayList
         return array;
-    }
-    private void updatetop3SuspectedPlayers()//每天更新所有玩家的怀疑度：依据听感逻辑。
-    {
-        //参数：无
-        //无返回值,直接改动玩家的怀疑度数组
-        //工作：根据听感逻辑，更新所有玩家的怀疑度。
-        //枚举所有玩家
-        for(int i=1;i<=gs.getPlayerSum();i++)
-        {
-            if(gs.gc[i].whyDie != whyDie.NONE) continue;//死人的怀疑度无意义
-            for(int j=1;j<=gs.getPlayerSum();j++)
-            {
-                if(gs.gc[j].whyDie != whyDie.NONE) continue;//死人的怀疑度无意义
-                int p0 = ConstNum.randomInt(1, 100);
-                if (i == j)
-                    gs.gc[i].suspicionValue[j] = -INF;//对于自身，固定-INF怀疑度
-                else
-                {
-                    switch(gs.gc[j].claimedRole)
-                    {
-                        //对于职业co者，随时间增加怀疑度
-                        //占灵猎 5 10 15
-                        case 1:gs.gc[i].suspicionValue[j] += 5 + 5 * zhans.size();break;
-                        case 2:gs.gc[i].suspicionValue[j] += 10 + 10 * lings.size();break;
-                        case 3:gs.gc[i].suspicionValue[j] += 15 + 5 *lies.size();break;
-                    }
-                    gs.gc[i].suspicionValue[j] += lasySuspicionValue[j];
-                    if (zhenying(gs.gc[i]) == 0)
-                    {
-                        //村侧对他人的怀疑
-                        int fr = feiren(gs.gc[j]);
-                        if(fr == 0)
-                        {
-                            //村-村
-                            if(p0 <= 10) gs.gc[i].suspicionValue[j] -= 15;
-                            else if(p0 <= 12) gs.gc[i].suspicionValue[j] += 15;
-                            else gs.gc[i].suspicionValue[j] += ConstNum.randomInt(-3,2);
-                        }
-                        else if(fr == -1)
-                        {
-                            //村-白非
-                            if(p0 <= 5) gs.gc[i].suspicionValue[j] -= 15;
-                            else if(p0 <= 10) gs.gc[i].suspicionValue[j] += 15;
-                            else gs.gc[i].suspicionValue[j] += ConstNum.randomInt(-2,2);
-                        }
-                        else
-                        {
-                            //村-狼
-                            if(p0 <= 2) gs.gc[i].suspicionValue[j] -= 15;
-                            else if(p0 <= 12) gs.gc[i].suspicionValue[j] += 15;
-                            else gs.gc[i].suspicionValue[j] += ConstNum.randomInt(-2,3);
-                        }
-                    }
-                    else
-                    {
-                        //非人对他人的怀疑
-                        if(p0 <= 5) gs.gc[i].suspicionValue[j] -= 15;
-                        else if(p0 <= 10) gs.gc[i].suspicionValue[j] += 15;
-                        else gs.gc[i].suspicionValue[j] += ConstNum.randomInt(-2,2);
-                    }
-                    //数值修正
-                    if(gs.gc[i].suspicionValue[j] > INFJ)  gs.gc[i].suspicionValue[j] = INF;
-                    else if(gs.gc[i].suspicionValue[j] < -INFJ) gs.gc[i].suspicionValue[j] = -INF;
-                    else if(gs.gc[i].suspicionValue[j] > MAXN) gs.gc[i].suspicionValue[j]=  MAXN;
-                    else if(gs.gc[i].suspicionValue[j] < 0) gs.gc[i].suspicionValue[j] = 0;
-                }
-            }
-        }
-        //占候补白球存活增加怀疑
-        for(int i=0;i<zhans.size();i++)
-        {
-            for(int j=1;j<=gs.gameDay;j++)
-                if(gs.gc[zhans.get(i)].skillTarget[j] <= gs.getPlayerSum() &&
-                        gs.gc[zhans.get(i)].skillTarget[j] > 0 && gs.gc[gs.gc[zhans.get(i)].skillTarget[j]].whyDie == whyDie.NONE)
-                    for(int k=1;k<= gs.getPlayerSum();k++)
-                    {
-                        if(k == zhans.get(i)) continue;
-                        gs.gc[k].suspicionValue[j] ++;//所有玩家对任何占卜师的任何白球怀疑度每天都增加1,除开占卜师本人以外
-                        if(gs.gc[k].claimedRole == 1)
-                            gs.gc[k].suspicionValue[j] ++;//其他占卜师对任何占卜师的任何白球怀疑度每天都增加1
-                    }
-        }
-
-        //重置怀疑度更新懒惰数组
-        for(int i=1;i<=gs.getPlayerSum();i++)
-            lasySuspicionValue[i] = 0;
-        //怀疑前三的完全重新选取
-            //枚举每个玩家
-        for(int i=1;i<=gs.getPlayerSum();i++)
-        {
-            if(gs.gc[i].whyDie != whyDie.NONE) continue;//跳过已死亡玩家
-            for(int j=1;j<=3;j++)
-            {
-                //每次选取一个下标
-                int maxindex = 0;
-                for(int k=1;k<=gs.getPlayerSum();k++)
-                {
-                    if(i == k || gs.gc[k].whyDie != whyDie.NONE) continue;//已死亡玩家和自己被排除
-                    if(maxindex == 0 || gs.gc[i].suspicionValue[maxindex] < gs.gc[i].suspicionValue[k]) //满足选取大小关系
-                    {
-                        boolean selected = false;//选取过标记
-                        for(int l=1;l<=j-1;l++)
-                            if(k == gs.gc[i].top3SuspectedPlayers[l][gs.gameDay])
-                                selected = true;
-                        if(selected) continue;
-                        maxindex = k;
-                    }
-                }
-                gs.gc[i].top3SuspectedPlayers[j][gs.gameDay] = maxindex;//更新最受怀疑的玩家
-            }
-        }
-    }
-    private int zhenying(GameCharacter gc)//得到游戏角色对应的阵营
-    {
-        //-1 狐侧 0 村侧 1 狼侧
-        switch(gc.actualRole)
-        {
-            case 7: case 8: case 9://狼 狂 狂信
-                return 1;
-            case 10: case 11://狐 背
-                return -1;
-            default:
-                return 0;
-        }
-    }
-    private int feiren(GameCharacter gc)//得到游戏角色关于非人的三分类
-    {
-        //-1白非人 0 村侧 1人狼
-        switch(gc.actualRole)
-        {
-            case 7: //狼
-                return 1;
-            case 10: case 11:case 8: case 9://狐 背 狂 狂信
-                return -1;
-            default:
-                return 0;
-        }
-    }
-    private int getOne(int val[]) //通用处理函数：根据权重，随机选择一名玩家 1开始计数
-    {
-        //参数：权重数组val
-        //返回值：随机生成的玩家编号
-        //工作：根据权重数组，随机生成一个玩家编号。权重正比于被选中的概率，若权重小于等于0，则永远不可能被选中。
-        //特殊：若所有权重都小于等于0，则将最大和次大权重等量增加，使得次大权重为5
-        //（若次大权重为非法值，则直接返回最大对应的玩家，次大权重不会增加）
-        
-        // 1. 获取玩家数量并校验合法性
-        int playerNum = gs.getPlayerSum();
-        if (playerNum < 1) {
-            throw new IllegalArgumentException("玩家数量不能小于1，当前数量：" + playerNum);
-        }
-        if (val == null || val.length < playerNum + 1) {
-            throw new IllegalArgumentException("权重数组为空或长度不足，需至少包含" + (playerNum + 1) + "个元素");
-        }
-
-        // 2. 遍历找到最大/次大权重及其对应的玩家编号
-        int maxVal = Integer.MIN_VALUE;   // 最大权重值
-        int maxIdx = -1;                  // 最大权重对应的玩家编号
-        int secondVal = Integer.MIN_VALUE;// 次大权重值
-        int secondIdx = -1;               // 次大权重对应的玩家编号
-
-        for (int i = 1; i <= playerNum; i++) {
-            int currWeight = val[i];
-            // 若当前权重大于最大值，更新次大/最大值
-            if (currWeight > maxVal) {
-                secondVal = maxVal;
-                secondIdx = maxIdx;
-                maxVal = currWeight;
-                maxIdx = i;
-            }
-            // 若当前权重不大于最大值，但大于次大值，更新次大值
-            else if (currWeight > secondVal) {
-                secondVal = currWeight;
-                secondIdx = i;
-            }
-        }
-
-        // 3. 创建临时权重数组（避免修改原数组的副作用）
-        int[] tempWeights = new int[playerNum + 1];
-        System.arraycopy(val, 1, tempWeights, 1, playerNum);
-
-        // 4. 处理「所有权重≤0」的特殊场景
-        boolean isAllNonPositive = maxVal <= 0;
-        if (isAllNonPositive) {
-            // 次大权重为非法值（< -INFJ），直接返回最大权重玩家
-            if (secondVal < -INFJ) {
-                return maxIdx;
-            }
-            // 等量增加最大/次大权重，使次大权重为5
-            int delta = 5 - secondVal;
-            tempWeights[maxIdx] = maxVal + delta;
-            tempWeights[secondIdx] = 5; // 次大权重固定为5
-        }
-
-        // 5. 计算正权重总和（仅正权重参与随机选择）
-        int totalWeight = 0;
-        for (int i = 1; i <= playerNum; i++) {
-            if (tempWeights[i] > 0) {
-                totalWeight += tempWeights[i];
-            }
-        }
-        // 理论上经过特殊处理后总权重必>0，兜底校验
-        if (totalWeight <= 0) {
-            throw new IllegalStateException("无有效正权重玩家，无法随机选择");
-        }
-
-        // 6. 生成随机数并按权重占比选择玩家
-        int randomNum = ConstNum.randomInt(0,totalWeight-1);
-        int cumulativeWeight = 0; // 累加权重
-        for (int i = 1; i <= playerNum; i++) {
-            int weight = tempWeights[i];
-            if (weight > 0) {
-                cumulativeWeight += weight;
-                // 累加权重超过随机数时，选中当前玩家
-                if (cumulativeWeight > randomNum) {
-                    return i;
-                }
-            }
-        }
-
-        // 兜底返回（理论上不会执行到此处）
-        return maxIdx;
     }
     private int zhenzhan(int znum)
     {
@@ -3072,7 +2599,7 @@ public class MainLogic implements MainLogicInterface
             istarget[ztarget] = false;//标记已经占卜过的玩家为非法占卜对象
         }
         //不能直接修改预告数组，记录需要使用，所以需要引入istarget数组来标记是否是合法的占卜对象
-        //流程：首先处理占卜权重初值，若为预告，则初值为50.否则初值为-INF.
+        //流程：首先处理占卜权重初值，若为预告，则初值为50.否则初值为-GameConstants.INF.
         int claimedRoleScheduledSkillTargetssum = 0;//记录合法占卜对象数量，预告为0,1，复数时，采取不同的逻辑
         if(gs.gc[znum].claimedRole == 1)//不是潜伏占
         {
@@ -3085,8 +2612,8 @@ public class MainLogic implements MainLogicInterface
                     continue;//没出现在预告中，直接退出
                 }
                 if( (gs.gc[i].whyDie != whyDie.NONE &&
-                        (gs.gc[i].dieDay != gs.gameDay || isDayDie(gs.gc[i].whyDie)))
-                        || i == znum || isackwhite(i) )
+                        (gs.gc[i].dieDay != gs.gameDay || GameLogicUtils.isDayDie(gs.gc[i].whyDie)))
+                        || i == znum || suspicion.isAckWhite(i) )
                 {
                     //非法的占卜预告：占卜对象已经死亡并且不是当天死亡的（当天死亡的是夜间死亡，也可以被占卜），占卜自己，占卜确定白
                     //标记为非法的占卜对象
@@ -3115,7 +2642,7 @@ public class MainLogic implements MainLogicInterface
                     istarget[i] = false;//标记为非法的占卜对象
                     continue;//没出现在预告中，直接退出
                 }
-                if((gs.gc[i].whyDie != whyDie.NONE && (gs.gc[i].dieDay != gs.gameDay || isDayDie(gs.gc[i].whyDie)) )|| i == znum || isackwhite(i))
+                if((gs.gc[i].whyDie != whyDie.NONE && (gs.gc[i].dieDay != gs.gameDay || GameLogicUtils.isDayDie(gs.gc[i].whyDie)) )|| i == znum || suspicion.isAckWhite(i))
                 {
                     //非法的占卜预告：占卜对象已经在之前死亡，占卜自己，占卜确定白
                     //标记为非法的占卜对象
@@ -3142,7 +2669,7 @@ public class MainLogic implements MainLogicInterface
         {
             for(int i=1;i<=gs.getPlayerSum();i++)
             {
-                if((gs.gc[i].whyDie != whyDie.NONE && (gs.gc[i].dieDay != gs.gameDay || isDayDie(gs.gc[i].whyDie)) )|| i == znum || isackwhite(i))
+                if((gs.gc[i].whyDie != whyDie.NONE && (gs.gc[i].dieDay != gs.gameDay || GameLogicUtils.isDayDie(gs.gc[i].whyDie)) )|| i == znum || suspicion.isAckWhite(i))
                 {
                     istarget[i] = false;//标记为非法的占卜对象
                     continue;//退出
@@ -3169,7 +2696,7 @@ public class MainLogic implements MainLogicInterface
         for(int i=1;i<=gs.getPlayerSum();i++)
         {
             if(weight[i] < 50)
-                weight[i] = -INF;//若为非合法占卜对象，则初值为-INF
+                weight[i] = -GameConstants.INF;//若为非合法占卜对象，则初值为-GameConstants.INF
         }
         //统一处理所有合法的占卜对象
             //1,对方接到对抗球的相关逻辑
@@ -3250,7 +2777,7 @@ public class MainLogic implements MainLogicInterface
                     weight[i] += diff;//增加对应的差值
             }
         }
-        int ztarget = getOne(weight);
+        int ztarget = suspicion.getOne(weight);
         if(gs.gc[ztarget].actualRole != 7)
             return gs.gc[znum].skillTarget[gs.gameDay] = ztarget;//白结果
         else
@@ -3346,7 +2873,7 @@ public class MainLogic implements MainLogicInterface
                                 //通过判定
                                 if (actualRoleindex[3] < 1 || rlsl || claimedRoleaskday[3] > 0) actualRoleCo(num, 5);
                                 else if (actualRoleindex[5] < 1 || rlsm || claimedRoleaskday[5] > 0) actualRoleCo(num, 3);
-                                else actualRoleCo(num, 5 - 2 * getEventIndexByProbability
+                                else actualRoleCo(num, 5 - 2 * GameLogicUtils.getEventIndexByProbability
                                             (new ArrayList<Integer>(List.of(50 + 50 * lies.size(), 50 + 50 * maos.size()))));
                             }
                             break;
@@ -3357,8 +2884,8 @@ public class MainLogic implements MainLogicInterface
                                 //通过判定
                                 if (actualRoleindex[3] < 1 || claimedRoleaskday[3] > 0) actualRoleCo(num, 5);
                                 else if (actualRoleindex[5] < 1 || claimedRoleaskday[5] > 0) actualRoleCo(num, 3);
-                                else actualRoleCo(num, 5 - 2 * getEventIndexByProbability
-                                        (new ArrayList<Integer>(List.of(50 + 50 * lies.size(), 50 + 50 * maos.size()))));
+                                else actualRoleCo(num, 5 - 2 * GameLogicUtils.getEventIndexByProbability
+                                            (new ArrayList<Integer>(List.of(50 + 50 * lies.size(), 50 + 50 * maos.size()))));
                             }
                             break;
                     }
@@ -3481,7 +3008,7 @@ public class MainLogic implements MainLogicInterface
                 if(gs.gc[i].whyDie == whyDie.NONE)
                     mztarget[i] = 1;
             }
-            int mz = getOne(mztarget);
+            int mz = suspicion.getOne(mztarget);
             dieaux(mz,whyDie.daymaozhou);
             if(mz == actualRoleindex[10] && actualRoleindex[11] > 0 && gs.gc[actualRoleindex[11]].whyDie == whyDie.NONE)
             {
@@ -3509,9 +3036,9 @@ public class MainLogic implements MainLogicInterface
                 if(gs.end == 1 && gs.gc[i].actualRole < 7) weight[i] = 1;
                 else if(gs.end == 2 && gs.gc[i].actualRole == 7) weight[i] = 1;
                 else if(gs.end == 3 && gs.gc[i].actualRole == 10) weight[i] = 1;
-                else weight[i] = -INF;
+                else weight[i] = -GameConstants.INF;
             }
-            CharacterEnglishName player = CharacterEnglishName.values()[gs.gc[getOne(weight)].number];//获取发表获奖感言的玩家
+            CharacterEnglishName player = CharacterEnglishName.values()[gs.gc[suspicion.getOne(weight)].number];//获取发表获奖感言的玩家
             switch(gs.end)
             {
                 case 1:
@@ -3547,12 +3074,12 @@ public class MainLogic implements MainLogicInterface
             {
                 if(gs.gc[j].whyDie != whyDie.NONE || i == j || (gs.gc[i].actualRole == 4 && gs.gc[j].actualRole == 4))
                 {
-                    weight[j] = -INF;//已死亡玩家或该玩家本身，或该玩家的共有同伴,被投票权重固定为-INF
+                    weight[j] = -GameConstants.INF;//已死亡玩家或该玩家本身，或该玩家的共有同伴,被投票权重固定为-GameConstants.INF
                     continue;
                 }
-                if(!votable[j]) weight[j] = -INFJ;//不是合法投票目标，被投票权重固定为-INFJ
+                if(!votable[j]) weight[j] = -GameConstants.INFJ;//不是合法投票目标，被投票权重固定为-GameConstants.INFJ
                 else weight[j] = gs.gc[i].suspicionValue[j];//基于怀疑度数组，分配权重
-                if(gs.gc[j].actualRole == 5 && weight[j] < -INFJ)
+                if(gs.gc[j].actualRole == 5 && weight[j] < -GameConstants.INFJ)
                     weight[j] = 5;//正常权重，放置残局不能处刑唯一猫
             }
 
@@ -3565,11 +3092,11 @@ public class MainLogic implements MainLogicInterface
                 }
                 DebugLogger.log(sb.toString());
             }
-            int shokeitaregt = getOne(weight);
+            int shokeitaregt = suspicion.getOne(weight);
             gs.gc[i].voteTarget[gs.gameDay][shokeinum] = shokeitaregt;//得到该名玩家的票型
-            updatetop3SuspectedPlayersaux2(i,shokeitaregt,1,1);//更新二人之间怀疑度
+            suspicion.updateTop3Aux2(i,shokeitaregt,1,1);//更新二人之间怀疑度
             if(gs.gc[shokeitaregt].voteTarget[gs.gameDay][shokeinum] == i)
-                updatetop3SuspectedPlayersaux2(i,shokeitaregt,1,1);//额外更新二人之间怀疑度：二人互投
+                suspicion.updateTop3Aux2(i,shokeitaregt,1,1);//额外更新二人之间怀疑度：二人互投
         }
         //敌人的敌人是朋友逻辑
         for(int i=1;i<=gs.getPlayerSum();i++)
@@ -3585,7 +3112,7 @@ public class MainLogic implements MainLogicInterface
                     if(i == k || j == k) continue;//不同的玩家
                     if(gs.gc[i].voteTarget[gs.gameDay][shokeinum] == j
                     && gs.gc[j].voteTarget[gs.gameDay][shokeinum] == k)
-                        updatetop3SuspectedPlayersaux2(i,k,-1,0);//更新二者怀疑度:i->k -1 k->i 0
+                        suspicion.updateTop3Aux2(i,k,-1,0);//更新二者怀疑度:i->k -1 k->i 0
                 }
             }
         }
@@ -3599,7 +3126,7 @@ public class MainLogic implements MainLogicInterface
         //得到最大被投票数
         for(int i=1;i<=gs.getPlayerSum();i++)
         {
-            maxcnt = max(maxcnt,shokeicnt[i]);//得到最大被投票数
+            maxcnt = Math.max(maxcnt,shokeicnt[i]);//得到最大被投票数
         }
         int topsum = 0;//被投了最大票数的玩家数量
         int topnum = 0;//被投了最大票数的玩家
@@ -3617,11 +3144,6 @@ public class MainLogic implements MainLogicInterface
         }
         if(topsum == 1) return topnum;//没有平票
         else  return 0;//存在平票
-    }
-    private int max(int a,int b)
-    {
-        if(a>b) return a;
-        return b;
     }
     public void askCo(Role aclaimedRole)
     {
@@ -3744,7 +3266,7 @@ public class MainLogic implements MainLogicInterface
                     break;
             }
         }
-        response = shuffleList(response);//打乱回应数组
+        response = GameLogicUtils.shuffleList(response);//打乱回应数组
         if(aclaimedRole == Role.gong && response.size() > 1)
             response.remove(1);//去掉复数的潜伏共有解除的事件
         for(int i=0;i<response.size();i++)
@@ -3881,7 +3403,7 @@ public class MainLogic implements MainLogicInterface
                         }
                         option = 0;
                         if(actualRoleindex[5] != 0)//have cat
-                            option = getEventIndexByProbability(new ArrayList<Integer>(List.of(50+50*maos.size(),50+50*lies.size())));
+                            option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(50+50*maos.size(),50+50*lies.size())));
                         //没有人狼co猫或者co猎，决定猫猎co的选择 0猎 1猫
                         response.add(new IntPair(num,3+2*option));//3 lie 5 mao
                         break;
@@ -3898,14 +3420,14 @@ public class MainLogic implements MainLogicInterface
                         }
                         option = 0;
                         if(actualRoleindex[5] != 0)
-                            option = getEventIndexByProbability(new ArrayList<Integer>(List.of(50+50*maos.size(),50+50*lies.size())));
+                            option = GameLogicUtils.getEventIndexByProbability(new ArrayList<Integer>(List.of(50+50*maos.size(),50+50*lies.size())));
                         //没有人狼co猫或者co猎，决定猫猎co的选择 0猎 1猫
                         response.add(new IntPair(num,3+2*option));//3 lie 5 mao
                         break;
                 }
             }
         }
-        response = shuffleList(response);//打乱回应数组
+        response = GameLogicUtils.shuffleList(response);//打乱回应数组
         for(int i=0;i<response.size();i++)
         {
             actualRoleCo(response.get(i).first,response.get(i).second);//co职业

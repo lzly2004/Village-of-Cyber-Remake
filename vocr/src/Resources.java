@@ -385,18 +385,27 @@ public class Resources implements ResourcesInterface {
     }
     @Override
     public void save(GameInfo GameInfo, int cnt) {
-
+        // 存档功能暂未实现
+        if(DebugLogger.getInstance().isEnabled()){
+            DebugLogger.log("[Resources.save] 存档功能暂未实现");
+        }
     }
-
 
     @Override
     public GameInfo load(int cnt) {
+        // 读档功能暂未实现
+        if(DebugLogger.getInstance().isEnabled()){
+            DebugLogger.log("[Resources.load] 读档功能暂未实现，返回null");
+        }
         return null;
     }
 
     @Override
     public GameRecord getRecord() {
-        // 可在此实现从文件加载/初始化游戏记录
+        // 获取游戏记录功能暂未实现
+        if(DebugLogger.getInstance().isEnabled()){
+            DebugLogger.log("[Resources.getRecord] 获取游戏记录功能暂未实现，返回null");
+        }
         return null;
     }
 
@@ -422,5 +431,3 @@ public class Resources implements ResourcesInterface {
         public Map<String, Object> getSpecial() { return special; }
     }
 }
-
-

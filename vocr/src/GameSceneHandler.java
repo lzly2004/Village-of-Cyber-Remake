@@ -49,12 +49,22 @@ public class GameSceneHandler implements SceneHandler {
                 ui.run();
             });
         }
+        JButton backBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
+                1050, 560,
+                GameConstants.RETURN_WIDTH * 6 / 10, GameConstants.RETURN_HEIGHT * 6 / 10,
+                ui.resources.getImage("PVBtitile.png"));
+        backBtn.addActionListener(e -> {
+            ui.resources.playSound("click.wav");
+            ui.currentScene = UI.Scene.START_SCENE;
+            ui.run();
+        });
+        ui.jPanel.add(backBtn);
         JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("title_base_resized.png"));
         ui.jPanel.add(background);
-        ui.resizeComponents();
         ui.jFrame.setVisible(true);
+        ui.resizeComponents();
     }
 
     private void renderNight(UI ui) {
@@ -108,34 +118,26 @@ public class GameSceneHandler implements SceneHandler {
             return;
         }
         ui.jPanel.removeAll();
-        JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("komorebi002.png"));
-        ImageIcon backIcon = ui.resources.getImage("messageframe.png");
-        JPanel dialogPanel = PanelSimpleFactory.createSimplePanel(260, 450, 760, 230, false, true);
-        ui.jPanel.add(dialogPanel);
-        JLabel back = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0, 760, 230, backIcon);
-        JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
-        dialogText.setBounds(20, 50, 710, 200);
-        JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 0, 0, 760, 230, null, null);
+        DialogueBox.Components dc = DialogueBox.create(ui.resources, "komorebi002.png");
+        ui.jPanel.add(dc.dialogPanel);
         String dayText = ui.gs.gameDay + "日目になりました。";
-        dialogPanel.setVisible(false);
-        Timer typeTimer = ui.bindTypewriter(dialogText, dayText, nextBtn, () -> {
+        dc.dialogPanel.setVisible(false);
+        Timer typeTimer = UIHelpers.bindTypewriter(dc.dialogText, dayText, dc.nextBtn, () -> {
             ui.currentScene = UI.Scene.DIALOGUE_DEATH;
             ui.run();
         });
-        dialogPanel.add(nextBtn);
-        dialogPanel.add(dialogText);
-        dialogPanel.add(back);
+        dc.dialogPanel.add(dc.nextBtn);
+        dc.dialogPanel.add(dc.dialogText);
+        dc.dialogPanel.add(dc.back);
         ui.resources.playSound("狼嚎音效.wav");
         Timer timer = new Timer(GameConstants.HOWL_TRANSITION_MS, e -> {
-            dialogPanel.setVisible(true);
+            dc.dialogPanel.setVisible(true);
             typeTimer.start();
             ((Timer) e.getSource()).stop();
         });
         timer.start();
-        ui.jPanel.add(dialogPanel);
-        ui.jPanel.add(background);
+        ui.jPanel.add(dc.dialogPanel);
+        ui.jPanel.add(dc.background);
         ui.resizeComponents();
         ui.jFrame.setVisible(true);
     }

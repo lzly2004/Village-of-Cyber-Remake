@@ -1,4 +1,4 @@
-﻿# 编译产物
+﻿﻿# 编译产物
 out/
 *.class
 
@@ -13,3 +13,9 @@ Thumbs.db
 
 # 备份
 *.bak
+
+# Office临时文件
+~$*
+
+# Native库
+vocr/src/*.dll

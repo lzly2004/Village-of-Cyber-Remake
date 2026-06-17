@@ -6,23 +6,9 @@ public class DialogueDayDeathHandler implements SceneHandler {
     public void render(UI ui) {
         if (ui.events.getFirst().eventname == EventName.wsw) {
             ui.resources.playSound("平和音效.wav");
-            ui.diaPanel.removeAll();
-            ui.diaPanel.setVisible(true);
-            JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                    GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                    ui.resources.getImage("haikei3.png"));
-            ImageIcon backIcon = ui.resources.getImage("messageframe.png");
-            JPanel dialogPanel = PanelSimpleFactory.makePanel(PanelConst.Simple_Panel, 260, 450,
-                    backIcon.getIconWidth(), backIcon.getIconHeight(), false, true);
-            ui.diaPanel.add(dialogPanel);
-            JLabel back = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                    backIcon.getIconWidth(), backIcon.getIconHeight(), backIcon);
-            JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
-            dialogText.setBounds(20, 50, 710, 200);
-            JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 0, 0,
-                    backIcon.getIconWidth(), backIcon.getIconHeight(), null, null);
+            DialogueBox.Components dc = DialogueBox.setup(ui, "haikei3.png");
             ui.resources.getEventText(ui.events.poll());
-            ui.bindTypewriter(dialogText, "犠牲者はいませんでした。\n", nextBtn, () -> {
+            UIHelpers.bindTypewriter(dc.dialogText, "犠牲者はいませんでした。\n", dc.nextBtn, () -> {
                 if ((ui.gs.aliveCounter - 1) / 2 == 1) {
                     ui.resources.playBgm("西江紫堂 - 灯り無き眼光.wav");
                 } else {
@@ -31,15 +17,8 @@ public class DialogueDayDeathHandler implements SceneHandler {
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
                 ui.run();
             });
-            dialogPanel.setVisible(true);
-            dialogPanel.add(nextBtn);
-            dialogPanel.add(dialogText);
-            dialogPanel.add(back);
-            ui.diaPanel.add(background);
-            ui.jPanel.add(ui.diaPanel);
-            ui.jPanel.setComponentZOrder(ui.diaPanel, 0);
-            ui.diaPanel.setVisible(true);
-            ui.resizeComponents();
+            dc.dialogPanel.setVisible(true);
+            DialogueBox.finalize(ui, dc);
         } else {
             Event event = ui.events.poll();
             if (event == null) {
@@ -48,29 +27,15 @@ public class DialogueDayDeathHandler implements SceneHandler {
                 return;
             }
             ui.jPanel.removeAll();
-            ui.diaPanel.removeAll();
-            ui.diaPanel.setVisible(true);
-            JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                    GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                    ui.resources.getImage("haikei3.png"));
-            ImageIcon backIcon = ui.resources.getImage("messageframe.png");
-            JPanel dialogPanel = PanelSimpleFactory.makePanel(PanelConst.Simple_Panel, 260, 450,
-                    backIcon.getIconWidth(), backIcon.getIconHeight(), false, true);
-            ui.diaPanel.add(dialogPanel);
+            DialogueBox.Components dc = DialogueBox.setup(ui, "haikei3.png");
             ImageIcon[] CharIcon = ui.resources.getEventImage(event);
-            JLabel back = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                    backIcon.getIconWidth(), backIcon.getIconHeight(), backIcon);
             JLabel nameLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label, 40, 10, 1000, 30,
                     ui.uiComponentFactory.getCharacterFullName(event.ch1));
-            dialogPanel.add(nameLabel);
-            JTextArea dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
-            dialogText.setBounds(20, 50, 710, 200);
-            JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 0, 0,
-                    backIcon.getIconWidth(), backIcon.getIconHeight(), null, null);
-            nextBtn.setVisible(false);
-            nextBtn.setEnabled(false);
+            dc.dialogPanel.add(nameLabel);
+            dc.nextBtn.setVisible(false);
+            dc.nextBtn.setEnabled(false);
             String text = ui.resources.getEventText(event);
-            Timer typeTimer = ui.bindTypewriter(dialogText, text, nextBtn, () -> {
+            Timer typeTimer = UIHelpers.bindTypewriter(dc.dialogText, text, dc.nextBtn, () -> {
                 if (ui.events.isEmpty() || ui.events.getFirst().eventname != EventName.yjsw) {
                     if ((ui.gs.aliveCounter - 1) / 2 == 1) {
                         ui.resources.playBgm("西江紫堂 - 灯り無き眼光.wav");
@@ -81,10 +46,10 @@ public class DialogueDayDeathHandler implements SceneHandler {
                 }
                 ui.run();
             });
-            dialogPanel.setVisible(true);
+            dc.dialogPanel.setVisible(true);
             if (CharIcon.length != 0) {
                 typeTimer.stop();
-                dialogPanel.setVisible(false);
+                dc.dialogPanel.setVisible(false);
                 JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
                         (1280 - CharIcon[0].getIconWidth()) / 2,
                         720 - CharIcon[0].getIconHeight() - 30,
@@ -106,23 +71,16 @@ public class DialogueDayDeathHandler implements SceneHandler {
                 });
                 t1.start();
                 Timer t2 = new Timer(GameConstants.TRANSITION_MEDIUM_MS, e -> {
-                    dialogPanel.setVisible(true);
-                    nextBtn.setVisible(true);
-                    nextBtn.setEnabled(true);
+                    dc.dialogPanel.setVisible(true);
+                    dc.nextBtn.setVisible(true);
+                    dc.nextBtn.setEnabled(true);
                     typeTimer.start();
                     ((Timer) e.getSource()).stop();
                 });
                 t2.start();
             }
-            dialogPanel.add(nextBtn);
-            dialogPanel.add(dialogText);
-            dialogPanel.add(back);
-            nextBtn.setVisible(false);
-            ui.diaPanel.add(background);
-            ui.jPanel.add(ui.diaPanel);
-            ui.jPanel.setComponentZOrder(ui.diaPanel, 0);
-            ui.diaPanel.setVisible(true);
-            ui.resizeComponents();
+            dc.nextBtn.setVisible(false);
+            DialogueBox.finalize(ui, dc);
         }
     }
 }

@@ -7,8 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GameSceneVoteHandler implements SceneHandler {
+    private UI ui;
+
     @Override
     public void render(UI ui) {
+        this.ui = ui;
         ui.jPanel.removeAll();
         if (DebugLogger.getInstance().isEnabled()) {
             ui.testBtn();
@@ -465,7 +468,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         doubtBtn.addActionListener(e -> {
             ui.resources.playSound("click.wav");
             doubtBtn.setVisible(false); votehisBtn.setVisible(false); infoText.setVisible(false);
-            ui.createDoubt();
+            createDoubt();
         });
 
         JPanel hisPanel = PanelSimpleFactory.createSimplePanel(0, 0, false, false);
@@ -502,22 +505,22 @@ public class GameSceneVoteHandler implements SceneHandler {
                 nextResult1.setVisible(false); ui.jPanel.add(nextResult1);
                 ui.jPanel.setComponentZOrder(nextResult1, 0);
                 nextResult.addActionListener(e1 -> {
-                    ui.createDayPiao(2, gameday, ui.voteMethods.get(gameday - 2));
+                    createDayPiao(2, gameday, ui.voteMethods.get(gameday - 2));
                     backResult.setVisible(true); nextResult.setVisible(false);
                     if (roundMax == 3) nextResult1.setVisible(true);
                 });
                 backResult.addActionListener(e1 -> {
-                    ui.createDayPiao(1, gameday, ui.voteMethods.get(gameday - 2));
+                    createDayPiao(1, gameday, ui.voteMethods.get(gameday - 2));
                     backResult.setVisible(false); nextResult.setVisible(true);
                     nextResult1.setVisible(false);
                 });
                 nextResult1.addActionListener(e1 -> {
-                    ui.createDayPiao(3, gameday, ui.voteMethods.get(gameday - 2));
+                    createDayPiao(3, gameday, ui.voteMethods.get(gameday - 2));
                     backResult1.setVisible(true); nextResult1.setVisible(false);
                     backResult.setVisible(false);
                 });
                 backResult1.addActionListener(e1 -> {
-                    ui.createDayPiao(2, gameday, ui.voteMethods.get(gameday - 2));
+                    createDayPiao(2, gameday, ui.voteMethods.get(gameday - 2));
                     backResult1.setVisible(false); nextResult1.setVisible(true);
                     backResult.setVisible(true);
                 });
@@ -525,7 +528,7 @@ public class GameSceneVoteHandler implements SceneHandler {
                 JButton dayBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, dayIcon);
                 dayBtn.setSize(dayIcon.getIconWidth(), dayIcon.getIconHeight());
                 dayBtn.addActionListener(e1 -> {
-                    ui.createDayPiao(1, gameday, ui.voteMethods.get(gameday - 2));
+                    createDayPiao(1, gameday, ui.voteMethods.get(gameday - 2));
                     hisPanel.setVisible(false);
                     if (roundMax != 1) nextResult.setVisible(true);
                 });
@@ -665,7 +668,7 @@ public class GameSceneVoteHandler implements SceneHandler {
                     ui.greyCharas[f][trueDay] = cxList.get(f);
                 ui.voteMethods.add(1); cxList.clear();
                 ui.gs = ui.mainLogic.getGameStatus();
-                ui.createPiao("-投票結果/" + (trueDay) + "日目-グレラン：\n" + greyText + "\n", round[0], isReVote);
+                createPiao("-投票結果/" + (trueDay) + "日目-グレラン：\n" + greyText + "\n", round[0], isReVote);
                 if (isReVote[0]) { againBtn.setVisible(true); nextBtn.setVisible(false); round[0]++; }
                 else { nextBtn.setVisible(true); againBtn.setVisible(false); }
             } else {
@@ -686,7 +689,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         recordBtn.addActionListener(e -> {
             ui.resources.playSound("click.wav");
             if (ui.gs.gameDay == 2) {
-                ui.createTishi("まだ特に疑い先もなく、\n投票の履歴もないようだ。");
+                createTishi("まだ特に疑い先もなく、\n投票の履歴もないようだ。");
             } else {
                 voteBtn.setVisible(false); pointBtn.setVisible(false); avoidBtn.setVisible(false);
                 recordBtn.setVisible(false); avoidBtn1.setVisible(false);
@@ -763,7 +766,7 @@ public class GameSceneVoteHandler implements SceneHandler {
                     ui.currentScene = UI.Scene.DIALOGUE_DAY;
                     ui.run();
                 } else {
-                    ui.createTishi(GameStrings.MSG_NO_CO);
+                    createTishi(GameStrings.MSG_NO_CO);
                 }
             }
             ui.resizeComponents();
@@ -780,10 +783,11 @@ public class GameSceneVoteHandler implements SceneHandler {
             if (ui.mainLogic.shokei(0, chuxingList, ui.isAvoid)) {
                 ui.voteMethods.add(0); chuxingList.clear();
                 ui.gs = ui.mainLogic.getGameStatus();
-                if (ui.gs.end == 0)
-                    ui.createPiao("-投票結果/" + (ui.gs.gameDay - 1) + "日目-自由投票\n\n", round[0], isReVote);
-                else
-                    ui.createPiao("-投票結果/" + (ui.gs.gameDay) + "日目-自由投票\n\n", round[0], isReVote);
+                if (ui.gs.end == 0) {
+                    createPiao("-投票結果/" + (ui.gs.gameDay - 1) + "日目-自由投票\n\n", round[0], isReVote);
+                } else {
+                    createPiao("-投票結果/" + (ui.gs.gameDay) + "日目-自由投票\n\n", round[0], isReVote);
+                }
                 if (isReVote[0]) { againBtn.setVisible(true); nextBtn.setVisible(false); round[0]++; }
                 else { nextBtn.setVisible(true); againBtn.setVisible(false); }
             } else {
@@ -804,10 +808,11 @@ public class GameSceneVoteHandler implements SceneHandler {
         againBtn.addActionListener(e -> {
             ui.resources.playSound("click.wav");
             boolean[] isReVote = {false};
-            if (ui.gs.end == 0)
-                ui.createPiao("-投票結果/" + (ui.gs.gameDay - 1) + "日目-重新投票\n\n", round[0], isReVote);
-            else
-                ui.createPiao("-投票結果/" + (ui.gs.gameDay) + "日目-重新投票\n\n", round[0], isReVote);
+            if (ui.gs.end == 0) {
+                createPiao("-投票結果/" + (ui.gs.gameDay - 1) + "日目-重新投票\n\n", round[0], isReVote);
+            } else {
+                createPiao("-投票結果/" + (ui.gs.gameDay) + "日目-重新投票\n\n", round[0], isReVote);
+            }
             if (isReVote[0]) { againBtn.setVisible(true); nextBtn.setVisible(false); if (round[0] < 3) round[0]++; }
             else { nextBtn.setVisible(true); againBtn.setVisible(false); }
         });
@@ -840,7 +845,7 @@ public class GameSceneVoteHandler implements SceneHandler {
                 for (int i = 0; i < chuxingList.size(); ++i)
                     isSelectedVoteTargetText.append(ui.uiComponentFactory.getJobText(ui.gs.gc[chuxingList.get(i)].number)).append(",");
                 DebugLogger.log(isSelectedVoteTargetText);
-                ui.createPiao("-投票結果/" + trueDay + "日目-指定投票\n" + isSelectedVoteTargetText + "\n", round[0], isReVote);
+                createPiao("-投票結果/" + trueDay + "日目-指定投票\n" + isSelectedVoteTargetText + "\n", round[0], isReVote);
                 chuxingList.clear();
                 if (isReVote[0]) { againBtn.setVisible(true); nextBtn.setVisible(false); round[0]++; }
                 else { nextBtn.setVisible(true); againBtn.setVisible(false); }
@@ -1076,7 +1081,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             ui.resources.playSound("click.wav");
             ui.mainLogic.askCo(Role.ling);
             if (ui.events.isEmpty()) {
-                ui.createTishi(GameStrings.MSG_NO_MEDIUM);
+                createTishi(GameStrings.MSG_NO_MEDIUM);
             } else {
                 ui.gs = ui.mainLogic.getGameStatus();
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
@@ -1087,7 +1092,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             ui.resources.playSound("click.wav");
             ui.mainLogic.askCo(Role.lie);
             if (ui.events.isEmpty()) {
-                ui.createTishi(GameStrings.MSG_NO_HUNTER);
+                createTishi(GameStrings.MSG_NO_HUNTER);
             } else {
                 ui.gs = ui.mainLogic.getGameStatus();
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
@@ -1098,7 +1103,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             ui.resources.playSound("click.wav");
             ui.mainLogic.askCo(Role.zhan);
             if (ui.events.isEmpty()) {
-                ui.createTishi(GameStrings.MSG_NO_SEER);
+                createTishi(GameStrings.MSG_NO_SEER);
             } else {
                 ui.gs = ui.mainLogic.getGameStatus();
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
@@ -1109,7 +1114,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             ui.resources.playSound("click.wav");
             ui.mainLogic.askCo(Role.gong);
             if (ui.events.isEmpty()) {
-                ui.createTishi(GameStrings.MSG_NO_SHARED);
+                createTishi(GameStrings.MSG_NO_SHARED);
             } else {
                 ui.gs = ui.mainLogic.getGameStatus();
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
@@ -1120,7 +1125,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             ui.resources.playSound("click.wav");
             ui.mainLogic.askCo(Role.mao);
             if (ui.events.isEmpty()) {
-                ui.createTishi(GameStrings.MSG_NO_CAT);
+                createTishi(GameStrings.MSG_NO_CAT);
             } else {
                 ui.gs = ui.mainLogic.getGameStatus();
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
@@ -1129,19 +1134,19 @@ public class GameSceneVoteHandler implements SceneHandler {
         });
 
         fixedVoteBtn.addActionListener(e -> {
-            ui.hideButtons(fixedVoteBtn, fixedUranaiBtn, protectBtn);
+            UIHelpers.hideButtons(fixedVoteBtn, fixedUranaiBtn, protectBtn);
             infoText.setVisible(false); returnBtn.setVisible(true);
-            ui.createCharacterSelectionPanel(UI.SelectionType.VOTE, infoPanel, ui.voteChosen, ui.isVote, boardIcon);
+            createCharacterSelectionPanel(SelectionType.VOTE, infoPanel, ui.voteChosen, ui.isVote, boardIcon);
         });
         fixedUranaiBtn.addActionListener(e -> {
-            ui.hideButtons(fixedVoteBtn, fixedUranaiBtn, protectBtn);
+            UIHelpers.hideButtons(fixedVoteBtn, fixedUranaiBtn, protectBtn);
             infoText.setVisible(false); returnBtn.setVisible(true);
-            ui.createCharacterSelectionPanel(UI.SelectionType.DIVINATION, infoZhanPanel, ui.zhanChosen, ui.isZhan, boardIcon);
+            createCharacterSelectionPanel(SelectionType.DIVINATION, infoZhanPanel, ui.zhanChosen, ui.isZhan, boardIcon);
         });
         protectBtn.addActionListener(e -> {
-            ui.hideButtons(fixedVoteBtn, fixedUranaiBtn, protectBtn);
+            UIHelpers.hideButtons(fixedVoteBtn, fixedUranaiBtn, protectBtn);
             infoText.setVisible(false); returnBtn.setVisible(true);
-            ui.createCharacterSelectionPanel(UI.SelectionType.GUARD, infoHuPanel, ui.huChosen, ui.isHu, boardIcon);
+            createCharacterSelectionPanel(SelectionType.GUARD, infoHuPanel, ui.huChosen, ui.isHu, boardIcon);
         });
 
         ui.jPanel.add(scrollPane);
@@ -1149,5 +1154,523 @@ public class GameSceneVoteHandler implements SceneHandler {
         ui.jPanel.add(background);
         ui.jFrame.setVisible(true);
         ui.resizeComponents();
+    }
+
+    private void stylePiaoTextArea(JTextArea area, String text, int x, int y, int w, int h) {
+        area.setText(text);
+        area.setForeground(Color.black);
+        area.setFont(new Font(GameConstants.FONT_FAMILY, Font.BOLD, GameConstants.FONT_SIZE_VOTE));
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        area.setEditable(false);
+        area.setFocusable(false);
+        area.setOpaque(false);
+        area.setBackground(GameConstants.COLOR_TRANSPARENT);
+        area.setBorder(BorderFactory.createEmptyBorder());
+        area.setBounds(x, y, w, h);
+        this.ui.jPanel.add(area);
+        this.ui.jPanel.setComponentZOrder(area, 0);
+    }
+
+    private void createTishi(String str) {
+        JTextArea tishiText = TextareaSimpleFactory.createTranslucentTipTextArea(str);
+        tishiText.setBounds(300, 300, 500, 200);
+        this.ui.jPanel.add(tishiText);
+        this.ui.jPanel.setComponentZOrder(tishiText, 0);
+        Timer timer = new Timer(GameConstants.TRANSITION_SHORT_MS, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tishiText.setVisible(false);
+                ((Timer) e.getSource()).stop();
+            }
+        });
+        timer.start();
+        this.ui.resizeComponents();
+    }
+
+    private void createDayPiao(int round, int gameDay, int dailyVotingRule) {
+        this.ui.piaoText.setVisible(true);
+        this.ui.piaoText1.setVisible(true);
+        int[][] voteTotal = new int[this.ui.gs.gc.length][4];
+        for (int i = 1; i < this.ui.gs.gc.length; ++i) {
+            voteTotal[this.ui.gs.gc[i].voteTarget[gameDay][round]][round]++;
+        }
+        StringBuilder extraText = new StringBuilder();
+        switch (dailyVotingRule) {
+            case 0:
+                extraText.append(GameStrings.VOTE_FREE);
+                break;
+            case 1:
+                extraText.append(GameStrings.VOTE_GREY);
+                for (int i = 0; i < this.ui.gs.gc.length; ++i) {
+                    if (this.ui.greyCharas[i][gameDay] != 0) {
+                        extraText.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[this.ui.greyCharas[i][gameDay]].number));
+                    }
+                }
+                break;
+            case 2:
+                extraText.append(GameStrings.VOTE_DESIGNATED);
+                for (int i = 0; i < this.ui.gs.gc.length; ++i) {
+                    if (this.ui.isSelectedVoteTargetCharas[i][gameDay] != 0) {
+                        extraText.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[this.ui.isSelectedVoteTargetCharas[i][gameDay]].number)).append(",");
+                    }
+                }
+                break;
+        }
+        StringBuilder leftPiao = new StringBuilder("-投票結果/" + gameDay + "日目-第" + round + "轮" + extraText + "\n");
+        StringBuilder rightPiao = new StringBuilder("\n\n");
+        int leftCnt = 0;
+        for (int i = 1; i < this.ui.gs.gc.length; ++i) {
+            if (this.ui.gs.gc[i].whyDie == whyDie.NONE || this.ui.gs.gc[i].dieDay >= gameDay) {
+                if (leftCnt >= 10) {
+                    rightPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
+                            .append("投票先→").append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[this.ui.gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
+                } else {
+                    leftPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
+                            .append("投票先→").append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[this.ui.gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
+                    leftCnt++;
+                }
+            }
+        }
+        if (DebugLogger.getInstance().isEnabled()) {
+            DebugLogger.log(leftPiao);
+            DebugLogger.log(rightPiao);
+        }
+        stylePiaoTextArea(this.ui.piaoText, leftPiao.toString(), 40, 228, 1000, 430);
+        stylePiaoTextArea(this.ui.piaoText1, rightPiao.toString(), 400, 228, 450, 430);
+        this.ui.resizeComponents();
+    }
+
+    private void createPiao(String str, int round, boolean[] isReVote) {
+        if (DebugLogger.getInstance().isEnabled()) {
+            DebugLogger.log("***当前gameDay等于" + this.ui.gs.gameDay + "***");
+        }
+        this.ui.piaoText.setVisible(true);
+        this.ui.piaoText1.setVisible(true);
+        int gameDay;
+        if (this.ui.gs.end == 0) {
+            gameDay = this.ui.gs.gameDay - 1;
+        } else {
+            gameDay = this.ui.gs.gameDay;
+        }
+        int[][] voteTotal = new int[this.ui.gs.gc.length][4];
+        for (int i = 1; i < this.ui.gs.gc.length; ++i) {
+            if (this.ui.gs.gc[i].whyDie == whyDie.NONE || this.ui.gs.gc[i].dieDay == gameDay) {
+                voteTotal[this.ui.gs.gc[i].voteTarget[gameDay][round]][round]++;
+            }
+        }
+        StringBuilder leftPiao = new StringBuilder(str);
+        StringBuilder rightPiao = new StringBuilder("\n\n");
+        int leftCnt = 0;
+        int max = voteTotal[1][round];
+        for (int i = 2; i < this.ui.gs.gc.length; ++i) {
+            if (voteTotal[i][round] > max) max = voteTotal[i][round];
+        }
+        int maxCnt = 0;
+        List<Integer> maxPos = new ArrayList<>();
+        for (int i = 1; i < this.ui.gs.gc.length; ++i) {
+            if (voteTotal[i][round] == max) { maxCnt++; maxPos.add(i); }
+        }
+        for (int i = 1; i < this.ui.gs.gc.length; ++i) {
+            if (this.ui.gs.gc[i].whyDie == whyDie.NONE || this.ui.gs.gc[i].dieDay == gameDay) {
+                if (leftCnt >= 10) {
+                    rightPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
+                            .append("投票先→").append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[this.ui.gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
+                } else {
+                    leftPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[i].number)).append("：").append(voteTotal[i][round]).append("票  ")
+                            .append("投票先→").append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[this.ui.gs.gc[i].voteTarget[gameDay][round]].number)).append("\n");
+                    leftCnt++;
+                }
+            }
+            if (i == this.ui.gs.gc.length - 1) {
+                for (int i1 = 0; i1 < 10 - leftCnt; ++i1) leftPiao.append("\n");
+                if (maxCnt == 1) {
+                    leftPiao.append(max).append("票で").append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[maxPos.get(0)].number)).append("さんが処刑されました。");
+                    isReVote[0] = false;
+                    this.ui.chuxingWho = maxPos.get(0);
+                    maxPos.clear();
+                } else {
+                    leftPiao.append("投票が同点となりました。再投票を行います。");
+                    isReVote[0] = true;
+                    maxPos.clear();
+                }
+            }
+        }
+        DebugLogger.log(leftPiao);
+        DebugLogger.log(rightPiao);
+        stylePiaoTextArea(this.ui.piaoText, leftPiao.toString(), 40, 228, 900, 430);
+        stylePiaoTextArea(this.ui.piaoText1, rightPiao.toString(), 530, 228, 450, 430);
+        this.ui.resizeComponents();
+    }
+
+    private void createDoubt() {
+        this.ui.piaoText.setVisible(true);
+        this.ui.piaoText1.setVisible(true);
+        StringBuilder leftPiao = new StringBuilder("- 疑い先 - 全体表示\n\n");
+        StringBuilder rightPiao = new StringBuilder("\n\n");
+        int leftCnt = 0;
+        for (int i = 1; i < this.ui.gs.gc.length; ++i) {
+            if (this.ui.gs.gc[i].whyDie == whyDie.NONE) {
+                ArrayList<Integer> charas = new ArrayList<>();
+                for (int t = 1; t <= 3; ++t) {
+                    if (t < this.ui.gs.gc[i].top3SuspectedPlayers.length && this.ui.gs.gc[i].top3SuspectedPlayers[t][this.ui.gs.gameDay] != 0) {
+                        charas.add(this.ui.gs.gc[i].top3SuspectedPlayers[t][this.ui.gs.gameDay]);
+                    }
+                }
+                ArrayList<String> cmps = new ArrayList<>();
+                for (int t = 0; t <= charas.size() - 2; ++t) {
+                    int temp = this.ui.gs.gc[i].suspicionValue[charas.get(t)] - this.ui.gs.gc[i].suspicionValue[charas.get(t + 1)];
+                    if (temp <= 2) cmps.add("=");
+                    else if (temp <= 5) cmps.add("≧");
+                    else if (temp <= 10) cmps.add(">");
+                    else cmps.add("≫");
+                }
+                if (leftCnt >= 10) {
+                    for (int u = 1; u < 4; ++u) {
+                        if (u < this.ui.gs.gc[i].top3SuspectedPlayers.length && this.ui.gs.gc[i].top3SuspectedPlayers[u][this.ui.gs.gameDay] != 0) {
+                            if (u == 1) rightPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[i].number)).append("：");
+                            rightPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[this.ui.gs.gc[i].top3SuspectedPlayers[u][this.ui.gs.gameDay]].number));
+                            if (!cmps.isEmpty()) { rightPiao.append(cmps.getFirst()); cmps.removeFirst(); }
+                        }
+                    }
+                    rightPiao.append("\n");
+                } else {
+                    for (int u = 1; u < 4; ++u) {
+                        if (u < this.ui.gs.gc[i].top3SuspectedPlayers.length && this.ui.gs.gc[i].top3SuspectedPlayers[u][this.ui.gs.gameDay] != 0) {
+                            if (u == 1) leftPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[i].number)).append("：");
+                            leftPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.gs.gc[this.ui.gs.gc[i].top3SuspectedPlayers[u][this.ui.gs.gameDay]].number));
+                            if (!cmps.isEmpty()) { leftPiao.append(cmps.getFirst()); cmps.removeFirst(); }
+                        }
+                    }
+                    leftPiao.append("\n");
+                    leftCnt++;
+                }
+            }
+        }
+        DebugLogger.log(leftPiao);
+        DebugLogger.log(rightPiao);
+        stylePiaoTextArea(this.ui.piaoText, leftPiao.toString(), 40, 228, 900, 430);
+        stylePiaoTextArea(this.ui.piaoText1, rightPiao.toString(), 530, 228, 450, 430);
+        this.ui.resizeComponents();
+    }
+
+    private int charGridX(int i, int baseX, int spacing) {
+        int half = (this.ui.gs.gc.length) / 2;
+        return baseX + spacing * (i <= half ? i : i - (this.ui.gs.gc.length - 1) / 2);
+    }
+
+    private int charGridY(int i, int yTop, int yBottom) {
+        return i <= (this.ui.gs.gc.length) / 2 ? yTop : yBottom;
+    }
+
+    private void updateFlagFromVoteTargets(boolean[] flag) {
+        for (int y = 1; y < this.ui.gs.gc.length; ++y) {
+            if (this.ui.gs.gc[y].isSelectedVoteTarget[this.ui.gs.gameDay]) { flag[0] = true; return; }
+        }
+        flag[0] = false;
+    }
+
+    private void updateFlagFromScheduledTargets(java.util.List<Integer> trueNums, boolean[] flag, boolean isSeer) {
+        for (int b = 0; b < trueNums.size(); ++b) {
+            for (int j = 1; j < this.ui.gs.gc.length; ++j) {
+                if (this.ui.gs.gc[trueNums.get(b)].claimedRoleScheduledSkillTargets[j][this.ui.gs.gameDay]) {
+                    flag[0] = true; return;
+                }
+            }
+        }
+        for (int y = 1; y < this.ui.gs.gc.length; ++y) {
+            if (isSeer && this.ui.gs.hiddenSeerScheduledSkillTargets[y][this.ui.gs.gameDay]) { flag[0] = true; return; }
+            if (!isSeer && this.ui.gs.hiddenHunterScheduledSkillTargets[y][this.ui.gs.gameDay]) { flag[0] = true; return; }
+        }
+        flag[0] = false;
+    }
+
+    private void createCharacterSelectionPanel(SelectionType type, JPanel panel,
+                                                java.util.List<Integer> chosenList, boolean[] flag,
+                                                ImageIcon boardIcon) {
+        panel.setVisible(false);
+        panel.removeAll();
+        this.ui.jPanel.add(panel);
+        this.ui.jPanel.setComponentZOrder(panel, 0);
+        int n = this.ui.gs.gc.length;
+
+        String frameIconName = switch (type) {
+            case VOTE -> "frameSBlue.png";
+            case DIVINATION -> "frameSRed.png";
+            case GUARD -> "frameOrange.png";
+        };
+        String resultAllIconName = switch (type) {
+            case VOTE -> "result2_all.png";
+            case DIVINATION -> "result1_all.png";
+            case GUARD -> "result3_all.png";
+        };
+        String dragAllIconName = switch (type) {
+            case VOTE -> "touhyou.png";
+            case DIVINATION -> "uranaiAll.png";
+            case GUARD -> "goeiAll.png";
+        };
+        int claimedRoleFilter = switch (type) {
+            case VOTE -> 0;
+            case DIVINATION -> 1;
+            case GUARD -> 3;
+        };
+
+        java.util.List<Integer> roleNums = new java.util.ArrayList<>();
+        java.util.List<Integer> roleOrders = new java.util.ArrayList<>();
+        java.util.List<Integer> trueNums = new java.util.ArrayList<>();
+        for (int i = 1; i <= n - 1; i++) {
+            if (this.ui.gs.gc[i].claimedRole == claimedRoleFilter && this.ui.gs.gc[i].whyDie == whyDie.NONE) {
+                roleNums.add(i);
+                roleOrders.add(this.ui.gs.gc[i].claimedRoleorder);
+            }
+            if ((this.ui.gs.gc[i].actualRole == claimedRoleFilter || this.ui.gs.gc[i].claimedRole == claimedRoleFilter)
+                    && this.ui.gs.gc[i].whyDie == whyDie.NONE) {
+                trueNums.add(i);
+            }
+        }
+
+        java.util.List<JLabel> targetLabels = new java.util.ArrayList<>();
+        java.util.List<JLabel> frameLabels = new java.util.ArrayList<>();
+        java.util.List<JLabel> resultLabels = new java.util.ArrayList<>();
+        java.util.List<JLabel> zbLabels = new java.util.ArrayList<>();
+
+        for (int i = 1; i <= n - 1; i++) {
+            StringBuilder imageName = new StringBuilder();
+            if (this.ui.gs.gc[i].number <= 9) imageName.append("0");
+            imageName.append(this.ui.gs.gc[i].number);
+            if (this.ui.gs.gc[i].whyDie != whyDie.NONE) imageName.append("g");
+            imageName.append("s.png");
+
+            if (this.ui.gs.gc[i].claimedRole > 0 && this.ui.gs.gc[i].claimedRole < 6) {
+                StringBuilder crName = new StringBuilder("yaku");
+                if (this.ui.gs.gc[i].claimedRole <= 3)
+                    crName.append(this.ui.gs.gc[i].claimedRole).append("_").append(this.ui.gs.gc[i].claimedRoleorder).append(".png");
+                else
+                    crName.append(this.ui.gs.gc[i].claimedRole).append(".png");
+                JLabel crLabel = new JLabel(this.ui.resources.getImage(crName.toString()));
+                crLabel.setBounds(charGridX(i, 60, 74), charGridY(i, 20, 128),
+                        crLabel.getIcon().getIconWidth(), crLabel.getIcon().getIconHeight());
+                panel.add(crLabel);
+            }
+
+            JLabel chooseLabel = new JLabel(this.ui.resources.getImage(frameIconName));
+            frameLabels.add(chooseLabel);
+            chooseLabel.setBounds(charGridX(i, 60, 74), charGridY(i, 20, 128), 64, 98);
+            panel.add(chooseLabel);
+            chooseLabel.setVisible(chosenList.contains(i));
+
+            if (type == SelectionType.VOTE) {
+                JLabel voteLabel = new JLabel(this.ui.resources.getImage("result2_all.png"));
+                voteLabel.setBounds(charGridX(i, 65, 74), charGridY(i, 20, 128),
+                        voteLabel.getIcon().getIconWidth(), voteLabel.getIcon().getIconHeight());
+                panel.add(voteLabel);
+                panel.setComponentZOrder(voteLabel, 0);
+                voteLabel.setVisible(this.ui.gs.gc[i].isSelectedVoteTarget[this.ui.gs.gameDay]);
+            }
+
+            JLabel resultLabel = new JLabel(this.ui.resources.getImage(resultAllIconName));
+            resultLabels.add(resultLabel);
+            resultLabel.setBounds(charGridX(i, 65, 74), charGridY(i, 40, 148),
+                    resultLabel.getIcon().getIconWidth(), resultLabel.getIcon().getIconHeight());
+            panel.add(resultLabel);
+            resultLabel.setVisible(chosenList.contains(i));
+
+            if (type != SelectionType.VOTE) {
+                String zbIconPrefix = (type == SelectionType.DIVINATION) ? "result1_" : "result3_";
+                String zbSuffix = (type == SelectionType.DIVINATION) ? "white.png" : ".png";
+                for (int r = 0; r < roleNums.size(); r++) {
+                    JLabel zbLabel = new JLabel(this.ui.resources.getImage(zbIconPrefix + roleOrders.get(r) + zbSuffix));
+                    zbLabels.add(zbLabel);
+                    zbLabel.setBounds(charGridX(i, 65 + zbLabel.getIcon().getIconWidth(), 74),
+                            charGridY(i, 20 + zbLabel.getIcon().getIconHeight() * roleOrders.get(r),
+                                    128 + zbLabel.getIcon().getIconHeight() * roleOrders.get(r)),
+                            zbLabel.getIcon().getIconWidth(), zbLabel.getIcon().getIconHeight());
+                    panel.add(zbLabel);
+                    zbLabel.setVisible(chosenList.contains(i));
+                }
+            }
+
+            ImageIcon charImg = this.ui.resources.getImage(imageName.toString());
+            JLabel label = new JLabel(charImg);
+            targetLabels.add(label);
+            label.setBounds(charGridX(i, 60, charImg.getIconWidth() + 10),
+                    charGridY(i, 20, 30 + charImg.getIconHeight()),
+                    charImg.getIconWidth(), charImg.getIconHeight());
+            panel.add(label);
+        }
+
+        for (int k = 2; k <= this.ui.gs.gameDay; ++k) {
+            for (int j = 1; j < this.ui.gs.gc.length; ++j) {
+                if (this.ui.skillTargetPeople[j][k] == 0) continue;
+                int i1 = this.ui.skillTargetPeople[j][k];
+                int zynum = this.ui.claimedRolenum[j][k];
+                if (zynum == 3) continue;
+                if (zynum == 1 && this.ui.gs.gc[j].dieDay != 0 && this.ui.gs.gc[j].dieDay < k) continue;
+                if (zynum == 2 && this.ui.gs.gc[j].dieDay != 0 && this.ui.gs.gc[j].dieDay < k) continue;
+                JLabel stLabel = new JLabel(this.ui.resources.getImage(this.ui.skillTargetNames[j][k]));
+                stLabel.setBounds(charGridX(i1, 50 + 74, 74) - stLabel.getIcon().getIconWidth() * zynum,
+                        charGridY(i1, 20 + (this.ui.skillTargetOrder[j][k] - 1) * stLabel.getIcon().getIconHeight(),
+                                128 + (this.ui.skillTargetOrder[j][k] - 1) * stLabel.getIcon().getIconHeight()),
+                        stLabel.getIcon().getIconWidth(), stLabel.getIcon().getIconHeight());
+                panel.add(stLabel);
+                panel.setComponentZOrder(stLabel, 0);
+            }
+        }
+
+        panel.setBounds(GameConstants.INFO_PANEL_X, GameConstants.INFO_PANEL_Y,
+                200 + boardIcon.getIconWidth(), 50 + boardIcon.getIconHeight());
+        panel.add(LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+                200 + boardIcon.getIconWidth(), 50 + boardIcon.getIconHeight(), boardIcon));
+
+        // === "全部"拖拽按钮 ===
+        JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button, 250, 350,
+                this.ui.resources.getImage(dragAllIconName).getIconWidth() / 2,
+                this.ui.resources.getImage(dragAllIconName).getIconHeight() / 2,
+                this.ui.resources.getImage(dragAllIconName));
+        dragBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                java.awt.Container parent = dragBtn.getParent();
+                if (parent == null || targetLabels.isEmpty()) return;
+                java.awt.Rectangle btnRect = dragBtn.getBounds();
+                int cx = btnRect.x + btnRect.width / 2, cy = btnRect.y + btnRect.height / 2;
+                for (JLabel label : targetLabels) {
+                    if (label.getParent() != parent || !label.isVisible()) continue;
+                    if (!label.getBounds().contains(cx, cy)) continue;
+                    int idx = targetLabels.indexOf(label);
+                    if (ui.gs.gc[idx + 1].whyDie != whyDie.NONE) break;
+                    ui.resources.playSound("click.wav");
+                    switch (type) {
+                        case VOTE -> {
+                            ui.gs.gc[idx + 1].isSelectedVoteTarget[ui.gs.gameDay] = true;
+                            if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
+                            updateFlagFromVoteTargets(flag);
+                        }
+                        case DIVINATION -> {
+                            ui.gs.hiddenSeerScheduledSkillTargets[idx + 1][ui.gs.gameDay] = true;
+                            for (int a = 0; a < trueNums.size(); a++)
+                                ui.gs.gc[trueNums.get(a)].claimedRoleScheduledSkillTargets[idx + 1][ui.gs.gameDay] = true;
+                            flag[0] = true;
+                            if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
+                        }
+                        case GUARD -> {
+                            ui.gs.hiddenHunterScheduledSkillTargets[idx + 1][ui.gs.gameDay] = true;
+                            for (int a = 0; a < trueNums.size(); a++)
+                                ui.gs.gc[trueNums.get(a)].claimedRoleScheduledSkillTargets[idx + 1][ui.gs.gameDay] = true;
+                            flag[0] = true;
+                            if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
+                        }
+                    }
+                    resultLabels.get(idx).setVisible(true);
+                    frameLabels.get(idx).setVisible(true);
+                    frameLabels.get(idx).repaint();
+                    ui.jPanel.repaint(label.getBounds());
+                    break;
+                }
+                dragBtn.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+            }
+        });
+        panel.add(dragBtn);
+        panel.setComponentZOrder(dragBtn, 0);
+
+        // === 逐职业拖拽按钮 ===
+        if (type != SelectionType.VOTE) {
+            String perIconPrefix = (type == SelectionType.DIVINATION) ? "uranai" : "goei";
+            for (int r = 0; r < roleNums.size(); r++) {
+                final int cur = r;
+                JButton perBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,
+                        roleOrders.get(r) * (type == SelectionType.DIVINATION ? 100 : 150)
+                                + (type == SelectionType.DIVINATION ? 150 : 250), 350,
+                        this.ui.resources.getImage(perIconPrefix + roleOrders.get(r) + ".png").getIconWidth() / 2,
+                        this.ui.resources.getImage(perIconPrefix + roleOrders.get(r) + ".png").getIconHeight() / 2,
+                        this.ui.resources.getImage(perIconPrefix + roleOrders.get(r) + ".png"));
+                perBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseReleased(java.awt.event.MouseEvent e) {
+                        java.awt.Container parent = perBtn.getParent();
+                        if (parent == null || targetLabels.isEmpty()) return;
+                        java.awt.Rectangle btnRect = perBtn.getBounds();
+                        int cx = btnRect.x + btnRect.width / 2, cy = btnRect.y + btnRect.height / 2;
+                        for (JLabel label : targetLabels) {
+                            if (label.getParent() != parent || !label.isVisible()) continue;
+                            if (!label.getBounds().contains(cx, cy)) continue;
+                            int idx = targetLabels.indexOf(label);
+                            if (ui.gs.gc[idx + 1].whyDie != whyDie.NONE) break;
+                            ui.resources.playSound("click.wav");
+                            ui.gs.gc[roleNums.get(cur)].claimedRoleScheduledSkillTargets[idx + 1][ui.gs.gameDay] = true;
+                            flag[0] = true;
+                            if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
+                            zbLabels.get(idx + cur * (ui.gs.gc.length - 1)).setVisible(true);
+                            frameLabels.get(idx).setVisible(true);
+                            frameLabels.get(idx).repaint();
+                            ui.jPanel.repaint(label.getBounds());
+                            break;
+                        }
+                        perBtn.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+                    }
+                });
+                panel.add(perBtn);
+                panel.setComponentZOrder(perBtn, 0);
+            }
+        }
+
+        // === 删除按钮 ===
+        JButton delBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,
+                (type == SelectionType.VOTE) ? 500 : 800, 350,
+                this.ui.resources.getImage("delete.png").getIconWidth() / 2,
+                this.ui.resources.getImage("delete.png").getIconHeight() / 2,
+                this.ui.resources.getImage("delete.png"));
+        delBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                java.awt.Container parent = delBtn.getParent();
+                if (parent == null || targetLabels.isEmpty()) return;
+                java.awt.Rectangle btnRect = delBtn.getBounds();
+                int cx = btnRect.x + btnRect.width / 2, cy = btnRect.y + btnRect.height / 2;
+                for (JLabel label : targetLabels) {
+                    if (label.getParent() != parent || !label.isVisible()) continue;
+                    if (!label.getBounds().contains(cx, cy)) continue;
+                    int idx = targetLabels.indexOf(label);
+                    if (ui.gs.gc[idx + 1].whyDie != whyDie.NONE) break;
+                    ui.resources.playSound("click.wav");
+                    chosenList.remove(Integer.valueOf(idx + 1));
+                    switch (type) {
+                        case VOTE -> {
+                            ui.gs.gc[idx + 1].isSelectedVoteTarget[ui.gs.gameDay] = false;
+                            updateFlagFromVoteTargets(flag);
+                        }
+                        case DIVINATION -> {
+                            ui.gs.hiddenSeerScheduledSkillTargets[idx + 1][ui.gs.gameDay] = false;
+                            for (int a = 0; a < trueNums.size(); a++)
+                                ui.gs.gc[trueNums.get(a)].claimedRoleScheduledSkillTargets[idx + 1][ui.gs.gameDay] = false;
+                            updateFlagFromScheduledTargets(trueNums, flag, true);
+                        }
+                        case GUARD -> {
+                            ui.gs.hiddenHunterScheduledSkillTargets[idx + 1][ui.gs.gameDay] = false;
+                            for (int a = 0; a < trueNums.size(); a++)
+                                ui.gs.gc[trueNums.get(a)].claimedRoleScheduledSkillTargets[idx + 1][ui.gs.gameDay] = false;
+                            updateFlagFromScheduledTargets(trueNums, flag, false);
+                        }
+                    }
+                    if (type != SelectionType.VOTE) {
+                        for (int u = 0; u < roleNums.size(); u++)
+                            zbLabels.get(idx + u * (ui.gs.gc.length - 1)).setVisible(false);
+                    }
+                    resultLabels.get(idx).setVisible(false);
+                    frameLabels.get(idx).setVisible(false);
+                    frameLabels.get(idx).repaint();
+                    ui.jPanel.repaint(label.getBounds());
+                    break;
+                }
+                delBtn.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+            }
+        });
+        panel.add(delBtn);
+        panel.setComponentZOrder(delBtn, 0);
+
+        panel.setVisible(true);
+        panel.revalidate();
+        panel.repaint();
+        this.ui.resizeComponents();
     }
 }

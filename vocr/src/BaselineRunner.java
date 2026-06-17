@@ -2,7 +2,7 @@
  * 回归测试基线运行器 — 第0步验证工具。
  *
  * 使用固定随机种子运行所有7种配役的游戏初始化阶段,
- * 录制完整的游戏事件到 baseline/ 目录,
+ * 录制完整的游戏事件和随机数序列到 baseline/ 目录,
  * 作为后续重构的"黄金标准"对照基线。
  *
  * 运行方式:
@@ -12,6 +12,7 @@
  *   重构后重新运行此脚本,使用 diff 对比 baseline/ 目录下的新旧输出:
  *     diff baseline/peiyi_1_seed_42.txt baseline_new/peiyi_1_seed_42.txt
  *   若输出完全一致(除时间戳行外),则重构未引入功能变化。
+ *   同时校验随机数序列: 比较checksum行,确保size和sum一致。
  */
 public class BaselineRunner
 {
@@ -32,6 +33,9 @@ public class BaselineRunner
 
             // 固定随机种子
             ConstNum.setRandomSeed(seed);
+
+            // 开始录制随机数序列
+            ConstNum.startRandomRecording();
 
             // 创建录像器
             GameRecorder recorder = new GameRecorder(label);
@@ -62,6 +66,12 @@ public class BaselineRunner
 
             // 录制角色初始状态
             recorder.recordStateSnapshot(1, gs);
+
+            // 停止录制随机数序列并保存校验和
+            ConstNum.stopRandomRecording();
+            String checksum = ConstNum.getRandomChecksum();
+            recorder.recordEvent("RANDOM_CHECKSUM", checksum);
+            DebugLogger.info("随机数序列校验: " + checksum);
 
             // 保存录制文件
             recorder.save("baseline_new/" + label + ".txt");

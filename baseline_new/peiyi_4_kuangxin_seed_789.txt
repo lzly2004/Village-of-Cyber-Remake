@@ -1,6 +1,6 @@
 # ==========================================
 # Game Baseline Recording: peiyi_4_kuangxin_seed_789
-# Time: 2026-06-15 16:24:11
+# Time: 2026-06-16 19:51:14
 # Peiyi: kuangxin (ordinal=4)
 # Seed: 789
 # PlayerCount: 17
@@ -18,8 +18,9 @@ GAME_EVENT|day=1|event=jbdh8r|ch1=Michael|ch2=Klemens|ch3=null
 GAME_EVENT|day=1|event=gyfo1|ch1=David|ch2=Karl|ch3=null
 GAME_EVENT|day=1|event=gyfo1r|ch1=Karl|ch2=David|ch3=null
 STATE|day=1|{1:n=33,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{2:n=44,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{3:n=34,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{4:n=5,r=4,cr=4,cro=0,dd=0,wd=0,nm=false}{5:n=41,r=3,cr=0,cro=0,dd=0,wd=0,nm=false}{6:n=32,r=9,cr=1,cro=1,dd=0,wd=0,nm=false}{7:n=30,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{8:n=14,r=2,cr=2,cro=1,dd=0,wd=0,nm=false}{9:n=37,r=7,cr=2,cro=2,dd=0,wd=0,nm=false}{10:n=38,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{11:n=17,r=6,cr=0,cro=0,dd=0,wd=0,nm=false}{12:n=16,r=7,cr=1,cro=2,dd=0,wd=0,nm=false}{13:n=26,r=10,cr=0,cro=0,dd=0,wd=0,nm=false}{14:n=10,r=6,cr=0,cro=0,dd=1,wd=4,nm=false}{15:n=22,r=7,cr=0,cro=0,dd=0,wd=0,nm=false}{16:n=21,r=1,cr=1,cro=3,dd=0,wd=0,nm=false}{17:n=19,r=4,cr=4,cro=0,dd=0,wd=0,nm=false}
+EVENT|RANDOM_CHECKSUM|size=522 sum=14480
 # ==========================================
 # End of recording: peiyi_4_kuangxin_seed_789
 # Duration: 0 days
-# Saved: 2026-06-15 16:24:11
+# Saved: 2026-06-16 19:51:14
 # ==========================================

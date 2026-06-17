@@ -134,4 +134,9 @@ public final class GameConstants
     public static final int RETURN_HEIGHT    = 127;
     public static final int MAX_GAME_DAYS    = 50;
     public static final int CHARACTER_SUM    = 44;
+
+    // ==================== 游戏逻辑常量 ====================
+    public static final int INF  = 999;
+    public static final int INFJ = 500;
+    public static final int MAXN = 100;
 }
