@@ -33,9 +33,9 @@ class GameLogicUtils
         throw new IllegalStateException("概率计算异常，未匹配到有效索引！");
     }
 
-    public static int zhenying(GameCharacter gc)
+    public static int zhenying(int actualRole)
     {
-        switch (gc.actualRole)
+        switch (actualRole)
         {
             case 7: case 8: case 9: return 1;
             case 10: case 11: return -1;
@@ -43,9 +43,9 @@ class GameLogicUtils
         }
     }
 
-    public static int feiren(GameCharacter gc)
+    public static int feiren(int actualRole)
     {
-        switch (gc.actualRole)
+        switch (actualRole)
         {
             case 7: return 1;
             case 10: case 11: case 8: case 9: return -1;
@@ -72,7 +72,7 @@ class GameLogicUtils
         return shuffledList;
     }
 
-    public static ArrayList<Integer> getpriority(int array[], boolean maxfirst)
+    public static ArrayList<Integer> getPriority(int[] array, boolean maxFirst)
     {
         ArrayList<Integer> result = new ArrayList<>();
 
@@ -95,7 +95,7 @@ class GameLogicUtils
         {
             for (int j = 0; j < validLen - 1 - i; j++)
             {
-                boolean needSwap = maxfirst ? valArr[j] < valArr[j + 1] : valArr[j] > valArr[j + 1];
+                boolean needSwap = maxFirst ? valArr[j] < valArr[j + 1] : valArr[j] > valArr[j + 1];
                 if (needSwap)
                 {
                     int tempVal = valArr[j];
@@ -132,5 +132,13 @@ class GameLogicUtils
         }
 
         return result;
+    }
+
+    public static boolean probabilityJudge(int p)
+    {
+        if (p >= 100) return true;
+        if (p <= 0) return false;
+        int p0 = ConstNum.randomInt(1, 100);
+        return p0 <= p;
     }
 }

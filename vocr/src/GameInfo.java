@@ -4,9 +4,9 @@ class GameInfo
     GameStatus gs[];
     GameInfo(GameStatus ggs[],int days)
     {
-        //赋值,深度拷贝
+        //赋值
         this.days = days;
-        gs = new GameStatus[days];
+        gs = new GameStatus[days + 1];
         for(int i=0;i<=days;i++)
             gs[i] = ggs[i];
     }

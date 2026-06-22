@@ -52,7 +52,7 @@ public class UIComponentFactory
         }
         return str;
     }
-    public String getwhyDie(whyDie i)//获取角色死因，用于测试信息的显示
+    public String getWhyDie(whyDie i)//获取角色死因，用于测试信息的显示
     {
         String str = "";
         switch(i){

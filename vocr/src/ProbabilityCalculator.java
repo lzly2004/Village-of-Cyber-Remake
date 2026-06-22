@@ -21,9 +21,6 @@ public class ProbabilityCalculator {
     // 使用Map存储概率，键为组合的字符串表示
     private Map<String, Integer> probabilityMap;
 
-    // 默认概率值
-    private static final int DEFAULT_PROBABILITY = 20;
-
     // 配置文件路径
     private final String configFilePath;
 
@@ -65,7 +62,7 @@ public class ProbabilityCalculator {
         String key = String.format("%d %d %d %d", zhi, situation, p1, p2);
 
         // 从Map中获取概率，如果不存在则返回默认值
-        return probabilityMap.getOrDefault(key, DEFAULT_PROBABILITY);
+        return probabilityMap.getOrDefault(key, GameConstants.DEFAULT_PROBABILITY);
     }
 
     /**
@@ -73,7 +70,7 @@ public class ProbabilityCalculator {
      */
     private void loadFromConfig() {
         if (configFilePath == null) {
-            DebugLogger.log("未指定配置文件，使用默认概率值" + DEFAULT_PROBABILITY);
+            DebugLogger.log("未指定配置文件，使用默认概率值" + GameConstants.DEFAULT_PROBABILITY);
             initWithDefaultValues();
             return;
         }
@@ -150,7 +147,7 @@ public class ProbabilityCalculator {
                 for (int p1 = P1_MIN; p1 <= P1_MAX; p1++) {
                     for (int p2 = P2_MIN; p2 <= P2_MAX; p2++) {
                         String key = String.format("%d %d %d %d", zhi, situation, p1, p2);
-                        probabilityMap.put(key, DEFAULT_PROBABILITY);
+                        probabilityMap.put(key, GameConstants.DEFAULT_PROBABILITY);
                     }
                 }
             }
@@ -175,7 +172,7 @@ public class ProbabilityCalculator {
                     for (int p1 = P1_MIN; p1 <= P1_MAX; p1++) {
                         for (int p2 = P2_MIN; p2 <= P2_MAX; p2++) {
                             writer.printf("%d %d %d %d %d%n",
-                                    zhi, situation, p1, p2, DEFAULT_PROBABILITY);
+                                    zhi, situation, p1, p2, GameConstants.DEFAULT_PROBABILITY);
                         }
                     }
                 }

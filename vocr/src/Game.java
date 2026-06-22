@@ -1,9 +1,3 @@
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 public class Game
 {   //单例模式
     //公共成员，三个类共同维护的外部类的数据成员
@@ -17,7 +11,6 @@ public class Game
         this.resources = new Resources();
         this.mainlogic = new MainLogic();
         this.ui = new UI();
-        this.init(); // 再调用初始化方法
     }
     public static Game getInstance()
     {

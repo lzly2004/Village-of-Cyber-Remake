@@ -5,9 +5,6 @@ import java.util.ArrayList;
 class ConstNum
 {
     //常量类，定义游戏常量以及静态方法
-    public static int CharacterSum = 44;// 游戏角色数量
-    public static int N = 50;//最大游戏天数
-    public static int M = 20;//职业状态数量
 
     // ==================== 可复现随机数系统(第0步重构) ====================
     private static java.util.Random rng = new java.util.Random();

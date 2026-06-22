@@ -1,0 +1,114 @@
+================================================================================
+  电脑村 (Village of Cyber Remake) — 重构进度记录
+  创建日期: 2026-06-17
+================================================================================
+
+一、项目概述
+────────────────────────────────────────────────────────────────────
+  项目: 电脑村重置版 (VOCR)
+  语言: Java
+  类型: 人狼游戏（Werewolf/Mafia）文字模拟器
+  核心类: MainLogic.java (3477行) — 重构的主要目标
+  架构: Game(单例) -> UI / Resources / MainLogic 三模块
+
+二、重构目标
+────────────────────────────────────────────────────────────────────
+  原始问题: MainLogic.java 过于庞大（3477行），所有游戏逻辑、状态管理、
+           概率计算、怀疑度系统混在一起，难以维护和扩展。
+
+  重构策略: 分阶段解耦
+  Phase 1: 提取独立子系统（工具类、概率计算、怀疑度、常量）
+  Phase 2: 创建 GameContext 统一状态管理（封装 GameStatus + 核心数组）
+  Phase 3: 统一数组引用，消除 MainLogic 中的裸字段和 gs 直接访问
+  Phase 4: 进一步拆分 MainLogic 方法到独立的 Handler 类
+  Phase 5: 修复 Bug 清单（见"目前的目标.txt"）
+
+三、已完成工作
+────────────────────────────────────────────────────────────────────
+
+  [Phase 1] ✅ 提取独立子系统
+  ─────────────────────
+  - GameLogicUtils.java    — 静态工具方法（阵营判断、概率索引、洗牌等）
+  - ProbabilityCalculator.java — 概率计算器（560种组合的猫猎co概率）
+  - SuspicionSystem.java   — 怀疑度子系统（更新、白确、Top3）
+  - GameConstants.java     — 游戏常量（INF, MAXN, INFJ等）
+  - DebugLogger.java       — 日志系统
+  - GameRecord.java        — 对局记录
+
+  [Phase 2] ✅ 创建 GameContext 统一状态管理
+  ─────────────────────
+  - GameContextView.java   — 只读视图接口（~60个查询方法）
+  - GameContext.java       — 实现类，封装：
+    ├ 核心状态数组（isDoubleDeathOccurred, actualRoleindex, rlindex,
+    │  gyindex, claimedRoleorder, nonHumanPlan, zw, ybzw, lined,
+    │  zhans, lings, lies, maos, diebody）
+    ├ 标量状态（kyojin, exposureProgress, initialWolfCount,
+    │  initialNonHumanCount, rlsl, rlsm, kz）
+    ├ GameContextView 只读查询（getPlayerSum, isAlive, isDead, 等）
+    └ Action API 状态修改（setClaimedRole, setSkillTarget, addZhan, 等）
+
+  [Phase 3] 🔄 统一数组引用（进行中，约38%完成）
+  ─────────────────────
+  ✅ MainLogic.start() 方法中：
+     - 本地数组全部指向 ctx 数组（isDoubleDeathOccurred = ctx.isDoubleDeathOccurred 等）
+     - 部分代码已迁移到 ctx.xxx() 调用方式
+  ✅ 新增文件已纳入 .gitignore
+
+  当前迁移统计:
+    ctx. 引用:  ~430 处（新方式）
+    gs. 引用:  ~690 处（旧方式，含 gs.gc[ 274处）
+    迁移率:    ~38%
+
+四、尚未完成的工作
+────────────────────────────────────────────────────────────────────
+
+  [Phase 3 续] 消除 MainLogic 中的 gs 直接访问
+  ─────────────────────
+  以下方法中仍有大量 gs.gc[xxx] 需要替换为 ctx.xxx():
+
+  - feireninitilal()       — 非人初始工作（大量 gs.gc[ 访问）
+  - nightaction()          — 夜间行动
+  - frlyingaux()           — 非人撒谎辅助
+  - frlying()              — 非人撒谎主逻辑
+  - dayaction()            — 白天行动
+  - dielogic()             — 夜间死亡逻辑
+  - dieaux()               — 死亡辅助
+  - judgeend()             — 胜负判定
+  - gylogic()              — 共有者逻辑
+  - zhanresult()           — 占卜结果报告
+  - lingresult()           — 灵能结果报告
+  - actualRoleCo()         — 职业CO处理
+  - wolfwork()             — 狼咬逻辑
+  - zhenlie()              — 真猎人护卫
+  - zhenzhan()             — 真占占卜
+  - shokei()               — 处刑判定
+  - shokeiaux()            — 处刑辅助
+  - askCo()                — 询问CO
+  - getp1() / getp2()      — 参数计算
+
+  [Phase 4] 进一步拆分
+  ─────────────────────
+  - 尚未开始。计划将 MainLogic 中的方法按职责拆分到独立的 Handler 类
+  - 候选拆分: NightHandler, DayHandler, VotingHandler, DeathHandler, CoHandler
+
+  [Phase 5] Bug 修复
+  ─────────────────────
+  见"目前的目标.txt"（12项待修复），尚未开始。
+
+五、关键设计决策
+────────────────────────────────────────────────────────────────────
+  1. GameContext 同时提供只读接口(GameContextView)和包级Action API
+     — 子系统通过 GameContextView 查询，通过 Action API 修改
+  2. MainLogic 本地数组指向 ctx 数组（而非删除本地数组）
+     — 减少对现有代码的破坏，渐进式迁移
+  3. ProbabilityCalculator 使用纯文本 config 文件
+     — 从 JSON 配置改为 .txt，简化格式
+  4. Game 类使用单例模式，管理 UI/Resources/MainLogic 三模块
+
+六、下次对话建议
+────────────────────────────────────────────────────────────────────
+  1. 从 MainLogic 的某个方法开始，逐步替换 gs. 为 ctx.
+  2. 优先处理低频修改的方法（如 getp1, getp2, dieaux, shokeiaux）
+  3. 每次改完一个方法就 Git commit
+  4. 同步更新本文件
+================================================================================

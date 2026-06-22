@@ -2,55 +2,54 @@ import java.util.ArrayList;
 
 class SuspicionSystem
 {
-    private GameStatus gs;
-    private int[] lasySuspicionValue;
-    private ArrayList<Integer> zhans, lings, lies, maos;
-    private boolean[] isDoubleDeathOccurred;
-    private int[] claimedRoleaskday;
+    private GameContext ctx;
+    private int[] lazySuspicionValue;
 
-    public SuspicionSystem(GameStatus gs, ArrayList<Integer> zhans, ArrayList<Integer> lings,
-                           ArrayList<Integer> lies, ArrayList<Integer> maos,
-                           boolean[] isDoubleDeathOccurred, int[] claimedRoleaskday)
+    public SuspicionSystem(GameContext ctx)
     {
-        this.gs = gs;
-        this.lasySuspicionValue = new int[gs.getPlayerSum() + 1];
-        this.zhans = zhans;
-        this.lings = lings;
-        this.lies = lies;
-        this.maos = maos;
-        this.isDoubleDeathOccurred = isDoubleDeathOccurred;
-        this.claimedRoleaskday = claimedRoleaskday;
+        this.ctx = ctx;
+        int n = ctx.getPlayerSum();
+        this.lazySuspicionValue = new int[n + 1];
+        
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+                if (i == j)
+                    ctx.setSuspicionValue(i, j, -GameConstants.INF);
+                else
+                    ctx.setSuspicionValue(i, j, 50);
+            }
+        }
     }
 
-    public int[] getLasySuspicionValue() { return lasySuspicionValue; }
+    public int[] getLazySuspicionValue() { return lazySuspicionValue; }
+    public void addLazySuspicionValue(int player, int delta) { lazySuspicionValue[player] += delta; }
+    public void setLazySuspicionValue(int player, int value) { lazySuspicionValue[player] = value; }
 
     public void updateTop3Aux2(int num1, int num2, int w1, int w2)
     {
-        gs.gc[num1].suspicionValue[num2] += w1;
-        gs.gc[num2].suspicionValue[num1] += w2;
+        ctx.addSuspicionValue(num1, num2, w1);
+        ctx.addSuspicionValue(num2, num1, w2);
     }
 
-    public void printTop3()
-    {
-        logicTools.log("当前怀疑值情况：");
-    }
-
-    public boolean isAckWhite(int num)
+    public boolean isAckWhite(int num, ArrayList<Integer> maos,
+                              boolean[] isDoubleDeathOccurred, int[] claimedRoleaskday)
     {
         if (num < 1) return false;
-        if (gs.gc[num].claimedRole == 4) return true;
-        if (gs.gc[num].actualRole != 5 || claimedRoleaskday[5] < 1) return false;
+        if (ctx.getClaimedRole(num) == 4) return true;
+        if (ctx.getActualRole(num) != 5 || claimedRoleaskday[5] < 1) return false;
 
         ArrayList<Integer> mao = new ArrayList<>(maos);
-        for (int i = 0; i < mao.size(); i++)
+        for (int i = mao.size() - 1; i >= 0; i--)
         {
-            if (gs.gc[mao.get(i)].nonHumanMarker)
+            if (ctx.isNonHumanMarked(mao.get(i)))
                 mao.remove(i);
         }
         if (mao.size() > 1 || (mao.size() == 1 && mao.get(0) != num)) return false;
 
         int firsttimemoredie = -1;
-        for (int i = 1; i <= gs.gameDay; i++)
+        for (int i = 1; i <= ctx.getGameDay(); i++)
         {
             if (isDoubleDeathOccurred[i])
             {
@@ -60,14 +59,20 @@ class SuspicionSystem
         }
         if (firsttimemoredie != -1 && firsttimemoredie < claimedRoleaskday[5]) return false;
 
-        lasySuspicionValue[num] -= GameConstants.INF;
-        logicTools.log("玩家" + num + " 确定猫");
         return true;
     }
 
-    public int getOne(int val[])
+    public void markAckWhite(int num)
     {
-        int playerNum = gs.getPlayerSum();
+        if (num < 1) return;
+        if (ctx.getClaimedRole(num) == 4) return;
+        lazySuspicionValue[num] -= GameConstants.INF;
+        DebugLogger.log("玩家" + num + " 确定猫");
+    }
+
+    public int getOne(int[] val)
+    {
+        int playerNum = ctx.getPlayerSum();
         if (playerNum < 1)
             throw new IllegalArgumentException("玩家数量不能小于1，当前数量：" + playerNum);
         if (val == null || val.length < playerNum + 1)
@@ -132,109 +137,116 @@ class SuspicionSystem
         return maxIdx;
     }
 
-    public void updateTop3SuspectedPlayers()
+    public void updateTop3SuspectedPlayers(ArrayList<Integer> zhans,
+                                            ArrayList<Integer> lings,
+                                            ArrayList<Integer> lies)
     {
-        for (int i = 1; i <= gs.getPlayerSum(); i++)
+        int n = ctx.getPlayerSum();
+        int gd = ctx.getGameDay();
+        for (int i = 1; i <= n; i++)
         {
-            if (gs.gc[i].whyDie != whyDie.NONE) continue;
-            for (int j = 1; j <= gs.getPlayerSum(); j++)
+            if (ctx.isDead(i)) continue;
+            for (int j = 1; j <= n; j++)
             {
-                if (gs.gc[j].whyDie != whyDie.NONE) continue;
+                if (ctx.isDead(j)) continue;
                 int p0 = ConstNum.randomInt(1, 100);
                 if (i == j)
-                    gs.gc[i].suspicionValue[j] = -GameConstants.INF;
+                    ctx.setSuspicionValue(i, j, -GameConstants.INF);
                 else
                 {
-                    switch (gs.gc[j].claimedRole)
+                    switch (ctx.getClaimedRole(j))
                     {
                         case 1:
-                            gs.gc[i].suspicionValue[j] += 5 + 5 * zhans.size();
+                            ctx.addSuspicionValue(i, j, 5 + 5 * zhans.size());
                             break;
                         case 2:
-                            gs.gc[i].suspicionValue[j] += 10 + 10 * lings.size();
+                            ctx.addSuspicionValue(i, j, 10 + 10 * lings.size());
                             break;
                         case 3:
-                            gs.gc[i].suspicionValue[j] += 15 + 5 * lies.size();
+                            ctx.addSuspicionValue(i, j, 15 + 5 * lies.size());
                             break;
                     }
-                    gs.gc[i].suspicionValue[j] += lasySuspicionValue[j];
-                    if (GameLogicUtils.zhenying(gs.gc[i]) == 0)
+                    ctx.addSuspicionValue(i, j, lazySuspicionValue[j]);
+                    if (GameLogicUtils.zhenying(ctx.getActualRole(i)) == 0)
                     {
-                        int fr = GameLogicUtils.feiren(gs.gc[j]);
+                        int fr = GameLogicUtils.feiren(ctx.getActualRole(j));
                         if (fr == 0)
                         {
-                            if (p0 <= 10) gs.gc[i].suspicionValue[j] -= 15;
-                            else if (p0 <= 12) gs.gc[i].suspicionValue[j] += 15;
-                            else gs.gc[i].suspicionValue[j] += ConstNum.randomInt(-3, 2);
+                            if (p0 <= 10) ctx.addSuspicionValue(i, j, -15);
+                            else if (p0 <= 12) ctx.addSuspicionValue(i, j, 15);
+                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-3, 2));
                         }
                         else if (fr == -1)
                         {
-                            if (p0 <= 5) gs.gc[i].suspicionValue[j] -= 15;
-                            else if (p0 <= 10) gs.gc[i].suspicionValue[j] += 15;
-                            else gs.gc[i].suspicionValue[j] += ConstNum.randomInt(-2, 2);
+                            if (p0 <= 5) ctx.addSuspicionValue(i, j, -15);
+                            else if (p0 <= 10) ctx.addSuspicionValue(i, j, 15);
+                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 2));
                         }
                         else
                         {
-                            if (p0 <= 2) gs.gc[i].suspicionValue[j] -= 15;
-                            else if (p0 <= 12) gs.gc[i].suspicionValue[j] += 15;
-                            else gs.gc[i].suspicionValue[j] += ConstNum.randomInt(-2, 3);
+                            if (p0 <= 2) ctx.addSuspicionValue(i, j, -15);
+                            else if (p0 <= 12) ctx.addSuspicionValue(i, j, 15);
+                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 3));
                         }
                     }
                     else
                     {
-                        if (p0 <= 5) gs.gc[i].suspicionValue[j] -= 15;
-                        else if (p0 <= 10) gs.gc[i].suspicionValue[j] += 15;
-                        else gs.gc[i].suspicionValue[j] += ConstNum.randomInt(-2, 2);
+                        if (p0 <= 5) ctx.addSuspicionValue(i, j, -15);
+                        else if (p0 <= 10) ctx.addSuspicionValue(i, j, 15);
+                        else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 2));
                     }
-                    if (gs.gc[i].suspicionValue[j] > GameConstants.INFJ)
-                        gs.gc[i].suspicionValue[j] = GameConstants.INF;
-                    else if (gs.gc[i].suspicionValue[j] < -GameConstants.INFJ)
-                        gs.gc[i].suspicionValue[j] = -GameConstants.INF;
-                    else if (gs.gc[i].suspicionValue[j] > GameConstants.MAXN)
-                        gs.gc[i].suspicionValue[j] = GameConstants.MAXN;
-                    else if (gs.gc[i].suspicionValue[j] < 0)
-                        gs.gc[i].suspicionValue[j] = 0;
+                    int sv = ctx.getSuspicionValue(i, j);
+                    if (sv > GameConstants.INFJ)
+                        ctx.setSuspicionValue(i, j, GameConstants.INF);
+                    else if (sv < -GameConstants.INFJ)
+                        ctx.setSuspicionValue(i, j, -GameConstants.INF);
+                    else if (sv > GameConstants.MAXN)
+                        ctx.setSuspicionValue(i, j, GameConstants.MAXN);
+                    else if (sv < 0)
+                        ctx.setSuspicionValue(i, j, 0);
                 }
             }
         }
         for (int i = 0; i < zhans.size(); i++)
         {
-            for (int j = 1; j <= gs.gameDay; j++)
-                if (gs.gc[zhans.get(i)].skillTarget[j] <= gs.getPlayerSum()
-                        && gs.gc[zhans.get(i)].skillTarget[j] > 0
-                        && gs.gc[gs.gc[zhans.get(i)].skillTarget[j]].whyDie == whyDie.NONE)
-                    for (int k = 1; k <= gs.getPlayerSum(); k++)
+            int zhan = zhans.get(i);
+            for (int j = 1; j <= gd; j++)
+            {
+                int target = ctx.getSkillTarget(zhan, j);
+                if (target <= n && target > 0 && ctx.isAlive(target))
+                    for (int k = 1; k <= n; k++)
                     {
-                        if (k == zhans.get(i)) continue;
-                        gs.gc[k].suspicionValue[j]++;
-                        if (gs.gc[k].claimedRole == 1)
-                            gs.gc[k].suspicionValue[j]++;
+                        if (k == zhan) continue;
+                        ctx.addSuspicionValue(k, target, 1);
+                        if (ctx.getClaimedRole(k) == 1)
+                            ctx.addSuspicionValue(k, target, 1);
                     }
+            }
         }
 
-        for (int i = 1; i <= gs.getPlayerSum(); i++)
-            lasySuspicionValue[i] = 0;
+        for (int i = 1; i <= n; i++)
+            lazySuspicionValue[i] = 0;
 
-        for (int i = 1; i <= gs.getPlayerSum(); i++)
+        for (int i = 1; i <= n; i++)
         {
-            if (gs.gc[i].whyDie != whyDie.NONE) continue;
+            if (ctx.isDead(i)) continue;
             for (int j = 1; j <= 3; j++)
             {
                 int maxindex = 0;
-                for (int k = 1; k <= gs.getPlayerSum(); k++)
+                for (int k = 1; k <= n; k++)
                 {
-                    if (i == k || gs.gc[k].whyDie != whyDie.NONE) continue;
-                    if (maxindex == 0 || gs.gc[i].suspicionValue[maxindex] < gs.gc[i].suspicionValue[k])
+                    if (i == k || ctx.isDead(k)) continue;
+                    if (maxindex == 0 || ctx.getSuspicionValue(i, maxindex) < ctx.getSuspicionValue(i, k))
                     {
                         boolean selected = false;
                         for (int l = 1; l <= j - 1; l++)
-                            if (k == gs.gc[i].top3SuspectedPlayers[l][gs.gameDay])
+                            if (k == ctx.getTop3SuspectedPlayer(i, l, gd))
                                 selected = true;
                         if (selected) continue;
                         maxindex = k;
                     }
                 }
-                gs.gc[i].top3SuspectedPlayers[j][gs.gameDay] = maxindex;
+                ctx.setTop3SuspectedPlayer(i, j, gd, maxindex);
             }
         }
     }

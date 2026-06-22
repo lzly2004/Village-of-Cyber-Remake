@@ -24,10 +24,8 @@ public class StartSceneHandler implements SceneHandler {
         ui.huChosen.clear();
 
         // 清空事件队列
-        ui.events.clear();
-        if (DebugLogger.getInstance().isEnabled()) {
-            DebugLogger.log("事件成功清空");
-        }
+        ui.getEvents().clear();
+        DebugLogger.log("事件成功清空");
 
         // 清空面板
         ui.jPanel.removeAll();
@@ -55,14 +53,7 @@ public class StartSceneHandler implements SceneHandler {
                 ButtonConst.Simple_Button, x, y, width, height,
                 ui.resources.getImage("startButton.png")
         );
-        btnStart.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ui.resources.playSound("click.wav");
-                ui.currentScene = UI.Scene.GAME_SCENE_SELECT;
-                ui.run();
-            }
-        });
+        btnStart.addActionListener(e -> ui.transitionTo(UI.Scene.GAME_SCENE_SELECT));
         ui.jPanel.add(btnStart);
 
         // 继续游戏按钮

@@ -1,7 +1,7 @@
 import java.util.List;
 public interface MainLogicInterface
 {
-    GameStatus getGameStatus();//提供给UI类，让UI类得到当前的游戏状态
+    GameContextView getGameContext();//提供给UI类，封装后的游戏状态只读访问
     GameStatus start(peiyi p);
     //提供给UI类，开始一局游戏
     //参数：配役p

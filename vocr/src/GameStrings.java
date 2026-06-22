@@ -99,7 +99,39 @@ public final class GameStrings
     /** 無人CO */
     public static final String MSG_NO_CO           = "無人CO";
 
+    // ==================== 结局展示 ====================
+    /** 公称職業: */
+    public static final String CLAIMED_ROLE_PREFIX = "公称職業:\n";
+    /** 真の職業: */
+    public static final String ACTUAL_ROLE_PREFIX  = "\n真の職業:\n";
+    /** {0}日目狼噛 */
+    public static final String DEATH_BITE_FORMAT   = "%d日目狼噛";
+    /** {0}日目処刑 */
+    public static final String DEATH_EXECUTE_FORMAT = "%d日目処刑 ";
+    /** {0}日目呪殺 */
+    public static final String DEATH_CURSE_FORMAT  = "%d日目呪殺 ";
+    /** {0}日目後追 */
+    public static final String DEATH_FOLLOW_FORMAT = "%d日目後追 ";
+    /** {0}日目猫呪 */
+    public static final String DEATH_CAT_FORMAT    = "%d日目猫呪";
+    /** 最終存活 */
+    public static final String END_SURVIVE         = "最終存活";
+    /** 最終死亡 */
+    public static final String END_DEAD            = "最終死亡";
+    /** 最終胜利 */
+    public static final String END_WIN             = "最終胜利";
+    /** 村人勝利 */
+    public static final String WIN_VILLAGER        = "村人勝利";
+    /** 人狼勝利 */
+    public static final String WIN_WOLF            = "人狼勝利";
+    /** 妖狐勝利 */
+    public static final String WIN_FOX             = "妖狐勝利";
+
     // ==================== 其他提示 ====================
     /** まだ特に疑い先もなく、\n投票の履歴もないようだ。 */
     public static final String MSG_NO_DOUBT_YET    = "まだ特に疑い先もなく、\n投票の履歴もないようだ。";
+
+    // ==================== 投票记录格式 ====================
+    /** %s：%d票  投票先→%s\n */
+    public static final String VOTE_LINE_FORMAT    = "%s：%d票  投票先→%s\n";
 }

@@ -1,531 +1,58 @@
-[2026-06-15 15:21:43.321] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-15 15:21:43.336] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-15 15:21:43.341] [INFO] 随机种子已固定: 42
-[2026-06-15 15:21:44.300] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-15 15:21:44.301] [INFO] 初始事件数: 6
-[2026-06-15 15:21:44.305] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (20 条记录)
-[2026-06-15 15:21:44.305] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:21:44.305] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-15 15:21:44.305] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-15 15:21:44.305] [INFO] 随机种子已固定: 123
-[2026-06-15 15:21:44.327] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-15 15:21:44.327] [INFO] 初始事件数: 9
-[2026-06-15 15:21:44.329] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (23 条记录)
-[2026-06-15 15:21:44.329] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:21:44.329] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-15 15:21:44.329] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-15 15:21:44.329] [INFO] 随机种子已固定: 456
-[2026-06-15 15:21:44.349] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-15 15:21:44.349] [INFO] 初始事件数: 8
-[2026-06-15 15:21:44.351] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (22 条记录)
-[2026-06-15 15:21:44.351] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:21:44.351] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-15 15:21:44.351] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-15 15:21:44.351] [INFO] 随机种子已固定: 789
-[2026-06-15 15:21:44.368] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-15 15:21:44.368] [INFO] 初始事件数: 11
-[2026-06-15 15:21:44.370] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (25 条记录)
-[2026-06-15 15:21:44.370] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:21:44.371] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-15 15:21:44.371] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-15 15:21:44.371] [INFO] 随机种子已固定: 101
-[2026-06-15 15:21:44.385] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-15 15:21:44.385] [INFO] 初始事件数: 8
-[2026-06-15 15:21:44.387] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (22 条记录)
-[2026-06-15 15:21:44.387] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:21:44.387] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-15 15:21:44.388] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-15 15:21:44.388] [INFO] 随机种子已固定: 202
-[2026-06-15 15:21:44.400] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-15 15:21:44.400] [INFO] 初始事件数: 8
-[2026-06-15 15:21:44.402] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (22 条记录)
-[2026-06-15 15:21:44.402] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:21:44.402] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-15 15:21:44.402] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-15 15:21:44.402] [INFO] 随机种子已固定: 303
-[2026-06-15 15:21:44.418] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-15 15:21:44.418] [INFO] 初始事件数: 11
-[2026-06-15 15:21:44.421] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (25 条记录)
-[2026-06-15 15:21:44.421] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:21:44.421] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-15 15:21:44.421] [INFO] === 日志文件已关闭 ===
-[2026-06-15 15:38:31.594] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-15 15:38:31.610] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-15 15:38:31.613] [INFO] 随机种子已固定: 42
-[2026-06-15 15:38:32.550] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-15 15:38:32.551] [INFO] 初始事件数: 6
-[2026-06-15 15:38:32.553] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (20 条记录)
-[2026-06-15 15:38:32.553] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:38:32.553] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-15 15:38:32.553] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-15 15:38:32.554] [INFO] 随机种子已固定: 123
-[2026-06-15 15:38:32.574] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-15 15:38:32.575] [INFO] 初始事件数: 9
-[2026-06-15 15:38:32.576] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (23 条记录)
-[2026-06-15 15:38:32.576] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:38:32.576] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-15 15:38:32.576] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-15 15:38:32.576] [INFO] 随机种子已固定: 456
-[2026-06-15 15:38:32.594] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-15 15:38:32.594] [INFO] 初始事件数: 8
-[2026-06-15 15:38:32.595] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (22 条记录)
-[2026-06-15 15:38:32.596] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:38:32.596] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-15 15:38:32.596] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-15 15:38:32.596] [INFO] 随机种子已固定: 789
-[2026-06-15 15:38:32.613] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-15 15:38:32.613] [INFO] 初始事件数: 11
-[2026-06-15 15:38:32.614] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (25 条记录)
-[2026-06-15 15:38:32.614] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:38:32.614] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-15 15:38:32.614] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-15 15:38:32.615] [INFO] 随机种子已固定: 101
-[2026-06-15 15:38:32.628] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-15 15:38:32.628] [INFO] 初始事件数: 8
-[2026-06-15 15:38:32.630] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (22 条记录)
-[2026-06-15 15:38:32.630] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:38:32.630] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-15 15:38:32.630] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-15 15:38:32.630] [INFO] 随机种子已固定: 202
-[2026-06-15 15:38:32.642] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-15 15:38:32.643] [INFO] 初始事件数: 8
-[2026-06-15 15:38:32.644] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (22 条记录)
-[2026-06-15 15:38:32.644] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:38:32.644] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-15 15:38:32.644] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-15 15:38:32.644] [INFO] 随机种子已固定: 303
-[2026-06-15 15:38:32.664] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-15 15:38:32.664] [INFO] 初始事件数: 11
-[2026-06-15 15:38:32.667] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (25 条记录)
-[2026-06-15 15:38:32.667] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:38:32.667] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-15 15:38:32.667] [INFO] === 日志文件已关闭 ===
-[2026-06-15 15:39:20.591] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-15 15:39:20.607] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-15 15:39:20.611] [INFO] 随机种子已固定: 42
-[2026-06-15 15:39:21.508] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-15 15:39:21.508] [INFO] 初始事件数: 6
-[2026-06-15 15:39:21.510] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (20 条记录)
-[2026-06-15 15:39:21.510] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:39:21.510] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-15 15:39:21.511] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-15 15:39:21.511] [INFO] 随机种子已固定: 123
-[2026-06-15 15:39:21.536] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-15 15:39:21.536] [INFO] 初始事件数: 9
-[2026-06-15 15:39:21.538] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (23 条记录)
-[2026-06-15 15:39:21.538] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:39:21.538] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-15 15:39:21.538] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-15 15:39:21.538] [INFO] 随机种子已固定: 456
-[2026-06-15 15:39:21.560] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-15 15:39:21.560] [INFO] 初始事件数: 8
-[2026-06-15 15:39:21.561] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (22 条记录)
-[2026-06-15 15:39:21.561] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:39:21.561] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-15 15:39:21.561] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-15 15:39:21.561] [INFO] 随机种子已固定: 789
-[2026-06-15 15:39:21.576] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-15 15:39:21.576] [INFO] 初始事件数: 11
-[2026-06-15 15:39:21.579] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (25 条记录)
-[2026-06-15 15:39:21.579] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:39:21.579] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-15 15:39:21.579] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-15 15:39:21.579] [INFO] 随机种子已固定: 101
-[2026-06-15 15:39:21.592] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-15 15:39:21.592] [INFO] 初始事件数: 8
-[2026-06-15 15:39:21.594] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (22 条记录)
-[2026-06-15 15:39:21.595] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:39:21.595] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-15 15:39:21.595] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-15 15:39:21.595] [INFO] 随机种子已固定: 202
-[2026-06-15 15:39:21.608] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-15 15:39:21.608] [INFO] 初始事件数: 8
-[2026-06-15 15:39:21.610] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (22 条记录)
-[2026-06-15 15:39:21.610] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:39:21.610] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-15 15:39:21.610] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-15 15:39:21.610] [INFO] 随机种子已固定: 303
-[2026-06-15 15:39:21.630] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-15 15:39:21.630] [INFO] 初始事件数: 11
-[2026-06-15 15:39:21.632] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (25 条记录)
-[2026-06-15 15:39:21.632] [INFO] 随机种子已重置为系统时间
-[2026-06-15 15:39:21.632] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-15 15:39:21.632] [INFO] === 日志文件已关闭 ===
-[2026-06-15 16:01:21.143] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-15 16:01:21.159] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-15 16:01:21.163] [INFO] 随机种子已固定: 42
-[2026-06-15 16:01:22.031] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-15 16:01:22.032] [INFO] 初始事件数: 6
-[2026-06-15 16:01:22.035] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (20 条记录)
-[2026-06-15 16:01:22.035] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:01:22.035] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-15 16:01:22.035] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-15 16:01:22.035] [INFO] 随机种子已固定: 123
-[2026-06-15 16:01:22.056] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-15 16:01:22.056] [INFO] 初始事件数: 9
-[2026-06-15 16:01:22.058] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (23 条记录)
-[2026-06-15 16:01:22.058] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:01:22.058] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-15 16:01:22.058] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-15 16:01:22.058] [INFO] 随机种子已固定: 456
-[2026-06-15 16:01:22.076] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-15 16:01:22.076] [INFO] 初始事件数: 8
-[2026-06-15 16:01:22.077] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (22 条记录)
-[2026-06-15 16:01:22.078] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:01:22.078] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-15 16:01:22.078] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-15 16:01:22.078] [INFO] 随机种子已固定: 789
-[2026-06-15 16:01:22.095] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-15 16:01:22.095] [INFO] 初始事件数: 11
-[2026-06-15 16:01:22.097] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (25 条记录)
-[2026-06-15 16:01:22.097] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:01:22.097] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-15 16:01:22.097] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-15 16:01:22.097] [INFO] 随机种子已固定: 101
-[2026-06-15 16:01:22.112] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-15 16:01:22.112] [INFO] 初始事件数: 8
-[2026-06-15 16:01:22.114] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (22 条记录)
-[2026-06-15 16:01:22.114] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:01:22.114] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-15 16:01:22.114] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-15 16:01:22.114] [INFO] 随机种子已固定: 202
-[2026-06-15 16:01:22.129] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-15 16:01:22.129] [INFO] 初始事件数: 8
-[2026-06-15 16:01:22.131] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (22 条记录)
-[2026-06-15 16:01:22.131] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:01:22.131] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-15 16:01:22.131] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-15 16:01:22.131] [INFO] 随机种子已固定: 303
-[2026-06-15 16:01:22.149] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-15 16:01:22.149] [INFO] 初始事件数: 11
-[2026-06-15 16:01:22.151] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (25 条记录)
-[2026-06-15 16:01:22.151] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:01:22.151] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-15 16:01:22.151] [INFO] === 日志文件已关闭 ===
-[2026-06-15 16:09:52.752] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-15 16:09:52.768] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-15 16:09:52.772] [INFO] 随机种子已固定: 42
-[2026-06-15 16:09:53.621] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-15 16:09:53.621] [INFO] 初始事件数: 6
-[2026-06-15 16:09:53.624] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (20 条记录)
-[2026-06-15 16:09:53.624] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:09:53.624] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-15 16:09:53.624] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-15 16:09:53.624] [INFO] 随机种子已固定: 123
-[2026-06-15 16:09:53.646] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-15 16:09:53.646] [INFO] 初始事件数: 9
-[2026-06-15 16:09:53.648] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (23 条记录)
-[2026-06-15 16:09:53.648] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:09:53.648] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-15 16:09:53.648] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-15 16:09:53.648] [INFO] 随机种子已固定: 456
-[2026-06-15 16:09:53.666] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-15 16:09:53.668] [INFO] 初始事件数: 8
-[2026-06-15 16:09:53.669] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (22 条记录)
-[2026-06-15 16:09:53.669] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:09:53.669] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-15 16:09:53.669] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-15 16:09:53.669] [INFO] 随机种子已固定: 789
-[2026-06-15 16:09:53.683] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-15 16:09:53.683] [INFO] 初始事件数: 11
-[2026-06-15 16:09:53.685] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (25 条记录)
-[2026-06-15 16:09:53.685] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:09:53.685] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-15 16:09:53.685] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-15 16:09:53.686] [INFO] 随机种子已固定: 101
-[2026-06-15 16:09:53.698] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-15 16:09:53.698] [INFO] 初始事件数: 8
-[2026-06-15 16:09:53.700] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (22 条记录)
-[2026-06-15 16:09:53.700] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:09:53.700] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-15 16:09:53.700] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-15 16:09:53.700] [INFO] 随机种子已固定: 202
-[2026-06-15 16:09:53.713] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-15 16:09:53.713] [INFO] 初始事件数: 8
-[2026-06-15 16:09:53.715] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (22 条记录)
-[2026-06-15 16:09:53.715] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:09:53.715] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-15 16:09:53.715] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-15 16:09:53.715] [INFO] 随机种子已固定: 303
-[2026-06-15 16:09:53.734] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-15 16:09:53.734] [INFO] 初始事件数: 11
-[2026-06-15 16:09:53.735] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (25 条记录)
-[2026-06-15 16:09:53.735] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:09:53.735] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-15 16:09:53.735] [INFO] === 日志文件已关闭 ===
-[2026-06-15 16:15:49.387] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-15 16:15:49.404] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-15 16:15:49.408] [INFO] 随机种子已固定: 42
-[2026-06-15 16:15:50.329] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-15 16:15:50.330] [INFO] 初始事件数: 6
-[2026-06-15 16:15:50.332] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (20 条记录)
-[2026-06-15 16:15:50.333] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:15:50.333] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-15 16:15:50.333] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-15 16:15:50.333] [INFO] 随机种子已固定: 123
-[2026-06-15 16:15:50.356] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-15 16:15:50.356] [INFO] 初始事件数: 9
-[2026-06-15 16:15:50.358] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (23 条记录)
-[2026-06-15 16:15:50.358] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:15:50.358] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-15 16:15:50.358] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-15 16:15:50.358] [INFO] 随机种子已固定: 456
-[2026-06-15 16:15:50.378] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-15 16:15:50.378] [INFO] 初始事件数: 8
-[2026-06-15 16:15:50.381] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (22 条记录)
-[2026-06-15 16:15:50.381] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:15:50.381] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-15 16:15:50.381] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-15 16:15:50.381] [INFO] 随机种子已固定: 789
-[2026-06-15 16:15:50.397] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-15 16:15:50.397] [INFO] 初始事件数: 11
-[2026-06-15 16:15:50.400] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (25 条记录)
-[2026-06-15 16:15:50.400] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:15:50.400] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-15 16:15:50.400] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-15 16:15:50.400] [INFO] 随机种子已固定: 101
-[2026-06-15 16:15:50.417] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-15 16:15:50.417] [INFO] 初始事件数: 8
-[2026-06-15 16:15:50.419] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (22 条记录)
-[2026-06-15 16:15:50.419] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:15:50.419] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-15 16:15:50.419] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-15 16:15:50.419] [INFO] 随机种子已固定: 202
-[2026-06-15 16:15:50.433] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-15 16:15:50.433] [INFO] 初始事件数: 8
-[2026-06-15 16:15:50.435] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (22 条记录)
-[2026-06-15 16:15:50.435] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:15:50.435] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-15 16:15:50.435] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-15 16:15:50.435] [INFO] 随机种子已固定: 303
-[2026-06-15 16:15:50.457] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-15 16:15:50.457] [INFO] 初始事件数: 11
-[2026-06-15 16:15:50.459] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (25 条记录)
-[2026-06-15 16:15:50.459] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:15:50.459] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-15 16:15:50.459] [INFO] === 日志文件已关闭 ===
-[2026-06-15 16:24:09.779] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-15 16:24:09.794] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-15 16:24:09.798] [INFO] 随机种子已固定: 42
-[2026-06-15 16:24:11.054] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-15 16:24:11.055] [INFO] 初始事件数: 6
-[2026-06-15 16:24:11.058] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (20 条记录)
-[2026-06-15 16:24:11.058] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:24:11.058] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-15 16:24:11.058] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-15 16:24:11.059] [INFO] 随机种子已固定: 123
-[2026-06-15 16:24:11.081] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-15 16:24:11.081] [INFO] 初始事件数: 9
-[2026-06-15 16:24:11.083] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (23 条记录)
-[2026-06-15 16:24:11.083] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:24:11.083] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-15 16:24:11.083] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-15 16:24:11.083] [INFO] 随机种子已固定: 456
-[2026-06-15 16:24:11.101] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-15 16:24:11.101] [INFO] 初始事件数: 8
-[2026-06-15 16:24:11.103] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (22 条记录)
-[2026-06-15 16:24:11.103] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:24:11.103] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-15 16:24:11.103] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-15 16:24:11.103] [INFO] 随机种子已固定: 789
-[2026-06-15 16:24:11.120] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-15 16:24:11.120] [INFO] 初始事件数: 11
-[2026-06-15 16:24:11.122] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (25 条记录)
-[2026-06-15 16:24:11.122] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:24:11.122] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-15 16:24:11.122] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-15 16:24:11.122] [INFO] 随机种子已固定: 101
-[2026-06-15 16:24:11.136] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-15 16:24:11.136] [INFO] 初始事件数: 8
-[2026-06-15 16:24:11.138] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (22 条记录)
-[2026-06-15 16:24:11.138] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:24:11.138] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-15 16:24:11.138] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-15 16:24:11.139] [INFO] 随机种子已固定: 202
-[2026-06-15 16:24:11.152] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-15 16:24:11.152] [INFO] 初始事件数: 8
-[2026-06-15 16:24:11.153] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (22 条记录)
-[2026-06-15 16:24:11.153] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:24:11.153] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-15 16:24:11.154] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-15 16:24:11.154] [INFO] 随机种子已固定: 303
-[2026-06-15 16:24:11.174] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-15 16:24:11.174] [INFO] 初始事件数: 11
-[2026-06-15 16:24:11.175] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (25 条记录)
-[2026-06-15 16:24:11.175] [INFO] 随机种子已重置为系统时间
-[2026-06-15 16:24:11.175] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-15 16:24:11.175] [INFO] === 日志文件已关闭 ===
-[2026-06-16 19:13:45.435] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-16 19:13:45.452] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-16 19:13:45.456] [INFO] 随机种子已固定: 42
-[2026-06-16 19:13:46.497] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-16 19:13:46.497] [INFO] 初始事件数: 6
-[2026-06-16 19:13:46.504] [INFO] 随机数序列校验: size=255 sum=7629
-[2026-06-16 19:13:46.506] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (21 条记录)
-[2026-06-16 19:13:46.507] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:13:46.507] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-16 19:13:46.508] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-16 19:13:46.508] [INFO] 随机种子已固定: 123
-[2026-06-16 19:13:46.559] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-16 19:13:46.559] [INFO] 初始事件数: 9
-[2026-06-16 19:13:46.560] [INFO] 随机数序列校验: size=457 sum=11924
-[2026-06-16 19:13:46.563] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (24 条记录)
-[2026-06-16 19:13:46.563] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:13:46.563] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-16 19:13:46.563] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-16 19:13:46.564] [INFO] 随机种子已固定: 456
-[2026-06-16 19:13:46.601] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-16 19:13:46.601] [INFO] 初始事件数: 8
-[2026-06-16 19:13:46.601] [INFO] 随机数序列校验: size=405 sum=10614
-[2026-06-16 19:13:46.604] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (23 条记录)
-[2026-06-16 19:13:46.605] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:13:46.605] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-16 19:13:46.605] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-16 19:13:46.605] [INFO] 随机种子已固定: 789
-[2026-06-16 19:13:46.644] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-16 19:13:46.644] [INFO] 初始事件数: 11
-[2026-06-16 19:13:46.644] [INFO] 随机数序列校验: size=522 sum=14480
-[2026-06-16 19:13:46.646] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (26 条记录)
-[2026-06-16 19:13:46.646] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:13:46.647] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-16 19:13:46.647] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-16 19:13:46.647] [INFO] 随机种子已固定: 101
-[2026-06-16 19:13:46.683] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-16 19:13:46.683] [INFO] 初始事件数: 8
-[2026-06-16 19:13:46.683] [INFO] 随机数序列校验: size=575 sum=16094
-[2026-06-16 19:13:46.686] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (23 条记录)
-[2026-06-16 19:13:46.686] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:13:46.686] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-16 19:13:46.686] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-16 19:13:46.686] [INFO] 随机种子已固定: 202
-[2026-06-16 19:13:46.723] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-16 19:13:46.723] [INFO] 初始事件数: 8
-[2026-06-16 19:13:46.723] [INFO] 随机数序列校验: size=586 sum=17287
-[2026-06-16 19:13:46.725] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (23 条记录)
-[2026-06-16 19:13:46.725] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:13:46.726] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-16 19:13:46.726] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-16 19:13:46.726] [INFO] 随机种子已固定: 303
-[2026-06-16 19:13:46.762] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-16 19:13:46.762] [INFO] 初始事件数: 11
-[2026-06-16 19:13:46.763] [INFO] 随机数序列校验: size=759 sum=20665
-[2026-06-16 19:13:46.766] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (26 条记录)
-[2026-06-16 19:13:46.766] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:13:46.766] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-16 19:13:46.767] [INFO] === 日志文件已关闭 ===
-[2026-06-16 19:18:59.277] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-16 19:18:59.292] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-16 19:18:59.295] [INFO] 随机种子已固定: 42
-[2026-06-16 19:19:00.296] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-16 19:19:00.298] [INFO] 初始事件数: 6
-[2026-06-16 19:19:00.304] [INFO] 随机数序列校验: size=255 sum=7629
-[2026-06-16 19:19:00.307] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (21 条记录)
-[2026-06-16 19:19:00.307] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:19:00.307] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-16 19:19:00.308] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-16 19:19:00.308] [INFO] 随机种子已固定: 123
-[2026-06-16 19:19:00.348] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-16 19:19:00.349] [INFO] 初始事件数: 9
-[2026-06-16 19:19:00.349] [INFO] 随机数序列校验: size=457 sum=11924
-[2026-06-16 19:19:00.351] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (24 条记录)
-[2026-06-16 19:19:00.351] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:19:00.351] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-16 19:19:00.351] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-16 19:19:00.353] [INFO] 随机种子已固定: 456
-[2026-06-16 19:19:00.387] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-16 19:19:00.387] [INFO] 初始事件数: 8
-[2026-06-16 19:19:00.387] [INFO] 随机数序列校验: size=405 sum=10614
-[2026-06-16 19:19:00.390] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (23 条记录)
-[2026-06-16 19:19:00.390] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:19:00.390] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-16 19:19:00.390] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-16 19:19:00.390] [INFO] 随机种子已固定: 789
-[2026-06-16 19:19:00.417] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-16 19:19:00.417] [INFO] 初始事件数: 11
-[2026-06-16 19:19:00.418] [INFO] 随机数序列校验: size=522 sum=14480
-[2026-06-16 19:19:00.420] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (26 条记录)
-[2026-06-16 19:19:00.420] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:19:00.420] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-16 19:19:00.421] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-16 19:19:00.421] [INFO] 随机种子已固定: 101
-[2026-06-16 19:19:00.445] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-16 19:19:00.446] [INFO] 初始事件数: 8
-[2026-06-16 19:19:00.446] [INFO] 随机数序列校验: size=575 sum=16094
-[2026-06-16 19:19:00.448] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (23 条记录)
-[2026-06-16 19:19:00.448] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:19:00.448] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-16 19:19:00.449] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-16 19:19:00.449] [INFO] 随机种子已固定: 202
-[2026-06-16 19:19:00.476] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-16 19:19:00.476] [INFO] 初始事件数: 8
-[2026-06-16 19:19:00.476] [INFO] 随机数序列校验: size=586 sum=17287
-[2026-06-16 19:19:00.479] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (23 条记录)
-[2026-06-16 19:19:00.480] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:19:00.480] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-16 19:19:00.480] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-16 19:19:00.480] [INFO] 随机种子已固定: 303
-[2026-06-16 19:19:00.511] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-16 19:19:00.511] [INFO] 初始事件数: 11
-[2026-06-16 19:19:00.511] [INFO] 随机数序列校验: size=759 sum=20665
-[2026-06-16 19:19:00.513] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (26 条记录)
-[2026-06-16 19:19:00.513] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:19:00.514] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-16 19:19:00.514] [INFO] === 日志文件已关闭 ===
-[2026-06-16 19:51:13.184] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
-[2026-06-16 19:51:13.199] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
-[2026-06-16 19:51:13.203] [INFO] 随机种子已固定: 42
-[2026-06-16 19:51:14.180] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
-[2026-06-16 19:51:14.181] [INFO] 初始事件数: 6
-[2026-06-16 19:51:14.187] [INFO] 随机数序列校验: size=255 sum=7629
-[2026-06-16 19:51:14.190] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (21 条记录)
-[2026-06-16 19:51:14.191] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:51:14.191] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
-[2026-06-16 19:51:14.192] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
-[2026-06-16 19:51:14.192] [INFO] 随机种子已固定: 123
-[2026-06-16 19:51:14.235] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
-[2026-06-16 19:51:14.235] [INFO] 初始事件数: 9
-[2026-06-16 19:51:14.235] [INFO] 随机数序列校验: size=457 sum=11924
-[2026-06-16 19:51:14.238] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (24 条记录)
-[2026-06-16 19:51:14.238] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:51:14.238] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
-[2026-06-16 19:51:14.238] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
-[2026-06-16 19:51:14.239] [INFO] 随机种子已固定: 456
-[2026-06-16 19:51:14.273] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
-[2026-06-16 19:51:14.273] [INFO] 初始事件数: 8
-[2026-06-16 19:51:14.274] [INFO] 随机数序列校验: size=405 sum=10614
-[2026-06-16 19:51:14.277] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (23 条记录)
-[2026-06-16 19:51:14.277] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:51:14.277] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
-[2026-06-16 19:51:14.277] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
-[2026-06-16 19:51:14.277] [INFO] 随机种子已固定: 789
-[2026-06-16 19:51:14.306] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
-[2026-06-16 19:51:14.306] [INFO] 初始事件数: 11
-[2026-06-16 19:51:14.306] [INFO] 随机数序列校验: size=522 sum=14480
-[2026-06-16 19:51:14.309] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (26 条记录)
-[2026-06-16 19:51:14.309] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:51:14.309] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
-[2026-06-16 19:51:14.309] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
-[2026-06-16 19:51:14.310] [INFO] 随机种子已固定: 101
-[2026-06-16 19:51:14.337] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
-[2026-06-16 19:51:14.337] [INFO] 初始事件数: 8
-[2026-06-16 19:51:14.338] [INFO] 随机数序列校验: size=575 sum=16094
-[2026-06-16 19:51:14.340] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (23 条记录)
-[2026-06-16 19:51:14.340] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:51:14.340] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
-[2026-06-16 19:51:14.341] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
-[2026-06-16 19:51:14.341] [INFO] 随机种子已固定: 202
-[2026-06-16 19:51:14.365] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
-[2026-06-16 19:51:14.365] [INFO] 初始事件数: 8
-[2026-06-16 19:51:14.365] [INFO] 随机数序列校验: size=586 sum=17287
-[2026-06-16 19:51:14.367] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (23 条记录)
-[2026-06-16 19:51:14.367] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:51:14.367] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
-[2026-06-16 19:51:14.367] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
-[2026-06-16 19:51:14.368] [INFO] 随机种子已固定: 303
-[2026-06-16 19:51:14.399] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
-[2026-06-16 19:51:14.399] [INFO] 初始事件数: 11
-[2026-06-16 19:51:14.399] [INFO] 随机数序列校验: size=759 sum=20665
-[2026-06-16 19:51:14.401] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (26 条记录)
-[2026-06-16 19:51:14.401] [INFO] 随机种子已重置为系统时间
-[2026-06-16 19:51:14.401] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
-[2026-06-16 19:51:14.401] [INFO] === 日志文件已关闭 ===
+[2026-06-17 17:27:07.711] [INFO] === 日志文件已开启: baseline_new/full_output.log ===
+[2026-06-17 17:27:07.726] [INFO] ========== 开始基线录制: peiyi_1_jianyi_seed_42 ==========
+[2026-06-17 17:27:07.730] [INFO] 随机种子已固定: 42
+[2026-06-17 17:27:08.603] [INFO] [GameRecorder] 开始录制游戏: peiyi_1_jianyi_seed_42 (peiyi=jianyi, seed=42, players=12)
+[2026-06-17 17:27:08.603] [INFO] 初始事件数: 6
+[2026-06-17 17:27:08.608] [INFO] 随机数序列校验: size=255 sum=7629
+[2026-06-17 17:27:08.611] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_1_jianyi_seed_42.txt (21 条记录)
+[2026-06-17 17:27:08.611] [INFO] 随机种子已重置为系统时间
+[2026-06-17 17:27:08.612] [INFO] ========== peiyi_1_jianyi_seed_42 录制完成 ==========
+[2026-06-17 17:27:08.612] [INFO] ========== 开始基线录制: peiyi_2_tongchang_seed_123 ==========
+[2026-06-17 17:27:08.612] [INFO] 随机种子已固定: 123
+[2026-06-17 17:27:08.659] [INFO] [GameRecorder] 开始录制游戏: peiyi_2_tongchang_seed_123 (peiyi=tongchang, seed=123, players=16)
+[2026-06-17 17:27:08.659] [INFO] 初始事件数: 9
+[2026-06-17 17:27:08.660] [INFO] 随机数序列校验: size=457 sum=11924
+[2026-06-17 17:27:08.662] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_2_tongchang_seed_123.txt (24 条记录)
+[2026-06-17 17:27:08.662] [INFO] 随机种子已重置为系统时间
+[2026-06-17 17:27:08.663] [INFO] ========== peiyi_2_tongchang_seed_123 录制完成 ==========
+[2026-06-17 17:27:08.663] [INFO] ========== 开始基线录制: peiyi_3_yaoohu_seed_456 ==========
+[2026-06-17 17:27:08.663] [INFO] 随机种子已固定: 456
+[2026-06-17 17:27:08.700] [INFO] [GameRecorder] 开始录制游戏: peiyi_3_yaoohu_seed_456 (peiyi=yaoohu, seed=456, players=16)
+[2026-06-17 17:27:08.701] [INFO] 初始事件数: 8
+[2026-06-17 17:27:08.701] [INFO] 随机数序列校验: size=405 sum=10614
+[2026-06-17 17:27:08.703] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_3_yaoohu_seed_456.txt (23 条记录)
+[2026-06-17 17:27:08.705] [INFO] 随机种子已重置为系统时间
+[2026-06-17 17:27:08.705] [INFO] ========== peiyi_3_yaoohu_seed_456 录制完成 ==========
+[2026-06-17 17:27:08.705] [INFO] ========== 开始基线录制: peiyi_4_kuangxin_seed_789 ==========
+[2026-06-17 17:27:08.705] [INFO] 随机种子已固定: 789
+[2026-06-17 17:27:08.742] [INFO] [GameRecorder] 开始录制游戏: peiyi_4_kuangxin_seed_789 (peiyi=kuangxin, seed=789, players=17)
+[2026-06-17 17:27:08.742] [INFO] 初始事件数: 11
+[2026-06-17 17:27:08.743] [INFO] 随机数序列校验: size=522 sum=14480
+[2026-06-17 17:27:08.746] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_4_kuangxin_seed_789.txt (26 条记录)
+[2026-06-17 17:27:08.746] [INFO] 随机种子已重置为系统时间
+[2026-06-17 17:27:08.746] [INFO] ========== peiyi_4_kuangxin_seed_789 录制完成 ==========
+[2026-06-17 17:27:08.746] [INFO] ========== 开始基线录制: peiyi_5_beide_seed_101 ==========
+[2026-06-17 17:27:08.747] [INFO] 随机种子已固定: 101
+[2026-06-17 17:27:08.777] [INFO] [GameRecorder] 开始录制游戏: peiyi_5_beide_seed_101 (peiyi=beide, seed=101, players=18)
+[2026-06-17 17:27:08.777] [INFO] 初始事件数: 8
+[2026-06-17 17:27:08.777] [INFO] 随机数序列校验: size=575 sum=16094
+[2026-06-17 17:27:08.779] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_5_beide_seed_101.txt (23 条记录)
+[2026-06-17 17:27:08.780] [INFO] 随机种子已重置为系统时间
+[2026-06-17 17:27:08.780] [INFO] ========== peiyi_5_beide_seed_101 录制完成 ==========
+[2026-06-17 17:27:08.780] [INFO] ========== 开始基线录制: peiyi_6_maoyou_seed_202 ==========
+[2026-06-17 17:27:08.780] [INFO] 随机种子已固定: 202
+[2026-06-17 17:27:08.811] [INFO] [GameRecorder] 开始录制游戏: peiyi_6_maoyou_seed_202 (peiyi=maoyou, seed=202, players=18)
+[2026-06-17 17:27:08.811] [INFO] 初始事件数: 8
+[2026-06-17 17:27:08.811] [INFO] 随机数序列校验: size=586 sum=17287
+[2026-06-17 17:27:08.813] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_6_maoyou_seed_202.txt (23 条记录)
+[2026-06-17 17:27:08.814] [INFO] 随机种子已重置为系统时间
+[2026-06-17 17:27:08.814] [INFO] ========== peiyi_6_maoyou_seed_202 录制完成 ==========
+[2026-06-17 17:27:08.814] [INFO] ========== 开始基线录制: peiyi_7_daxing_seed_303 ==========
+[2026-06-17 17:27:08.814] [INFO] 随机种子已固定: 303
+[2026-06-17 17:27:08.853] [INFO] [GameRecorder] 开始录制游戏: peiyi_7_daxing_seed_303 (peiyi=daxing, seed=303, players=20)
+[2026-06-17 17:27:08.853] [INFO] 初始事件数: 11
+[2026-06-17 17:27:08.853] [INFO] 随机数序列校验: size=759 sum=20665
+[2026-06-17 17:27:08.856] [INFO] [GameRecorder] 录制文件已保存: baseline_new/peiyi_7_daxing_seed_303.txt (26 条记录)
+[2026-06-17 17:27:08.856] [INFO] 随机种子已重置为系统时间
+[2026-06-17 17:27:08.857] [INFO] ========== peiyi_7_daxing_seed_303 录制完成 ==========
+[2026-06-17 17:27:08.857] [INFO] === 日志文件已关闭 ===

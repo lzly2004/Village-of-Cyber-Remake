@@ -8,6 +8,58 @@ public class UIHelpers {
         for (JButton b : buttons) b.setVisible(false);
     }
 
+    /** 对话角色立绘定位：根据事件类型决定左侧/居中，并标记是否需要加入linkIcon */
+    public static JLabel createCharacterLabel(Event event, ImageIcon[] CharIcon,
+                                              boolean[] shouldAddToLinkIcon) {
+        JLabel Chara;
+        switch (event.eventname) {
+            case gyfo1:
+            case qfjc5:
+            case zjgh8b:
+            case zjgb8:
+            case gprz11p:
+            case zcrh12:
+                Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 300,
+                        GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                        CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
+                shouldAddToLinkIcon[0] = true;
+                break;
+            default:
+                Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                        (GameConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
+                        GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                        CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
+                shouldAddToLinkIcon[0] = false;
+                break;
+        }
+        return Chara;
+    }
+
+    /** 连接事件角色对显示：当前事件角色(右)+linkIcon中缓存的上一事件角色(左) */
+    public static void renderLinkIconPair(UI ui, ImageIcon[] CharIcon) {
+        JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 650,
+                GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
+        ui.diaPanel.add(Chara);
+        ui.resizeComponents();
+        JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 300,
+                GameConstants.WINDOW_HEIGHT - ui.linkIcon.get(0).getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                ui.linkIcon.get(0).getIconWidth(), ui.linkIcon.get(0).getIconHeight(),
+                ui.linkIcon.get(0));
+        ui.diaPanel.add(Chara2);
+        ui.diaPanel.setComponentZOrder(Chara2, 1);
+        ui.linkIcon.remove(0);
+    }
+
+    /** 白天阶段BGM选择：存活人数≤3时切换紧张BGM */
+    public static void playDayPhaseBgm(UI ui) {
+        if ((ui.ctx.getAliveCounter() - 1) / 2 == 1) {
+            ui.resources.playBgm("西江紫堂 - 灯り無き眼光.wav");
+        } else {
+            ui.resources.playBgm("Emotionally Unstable.wav");
+        }
+    }
+
     /** 打字机效果：逐字显示文本，nextBtn点击时跳到末尾或触发回调 */
     public static Timer bindTypewriter(JTextArea target, String fullText,
                                        JButton nextBtn, Runnable onComplete) {
@@ -21,6 +73,8 @@ public class UIHelpers {
             }
         });
         timer.start();
+        for (ActionListener al : nextBtn.getActionListeners())
+            nextBtn.removeActionListener(al);
         nextBtn.addActionListener(e -> {
             if (index[0] < fullText.length()) {
                 target.setText(fullText);
@@ -31,5 +85,23 @@ public class UIHelpers {
             }
         });
         return timer;
+    }
+
+    public record DialogueSetup(DialogueBox.Components dc, String text, ImageIcon[] charIcon) {}
+
+    public static DialogueSetup prepareDialogueEvent(UI ui, String bgImage, Event event) {
+        DialogueBox.Components dc = DialogueBox.setup(ui, bgImage);
+        JLabel nameLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label, 40, 10, 1000, 30,
+                ui.uiComponentFactory.getCharacterFullName(event.ch1));
+        dc.dialogPanel.add(nameLabel);
+        return new DialogueSetup(dc, ui.resources.getEventText(event), ui.resources.getEventImage(event));
+    }
+
+    public static void renderDialogueCharacter(UI ui, Event event, ImageIcon[] CharIcon) {
+        boolean[] shouldAdd = {false};
+        JLabel Chara = createCharacterLabel(event, CharIcon, shouldAdd);
+        if (shouldAdd[0]) ui.linkIcon.add(CharIcon[0]);
+        ui.diaPanel.add(Chara);
+        ui.resizeComponents();
     }
 }

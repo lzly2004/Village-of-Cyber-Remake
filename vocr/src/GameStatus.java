@@ -1,42 +1,29 @@
-import java.util.Date;
-
 class GameStatus
 {//游戏状态封装类
-    /*
-    * public static int CharacterSum = 44;// 游戏角色数量
-    public static int N = 50;//最大游戏天数
-    public static int M = 20;//职业状态数量
-    * */
     public peiyi p;//游戏配役
-    public Date date;//游戏开始时间
-    boolean isInGame;//当前是否在游戏中
+    public boolean isInGame;//当前是否在游戏中
     public int end;//当前游戏是否结束 int 0未结束 1村胜 2狼胜 3狐胜
-    boolean isHeInGame[];//这个角色是否在游戏中 int[CharecterSum+1]
     public int gameDay;//游戏进行到多少日目
     public int deathCounter;//游戏中当前的死亡人数计数
     public int aliveCounter;//游戏中当前的存活人数计数
-    public int dailyVotingRule[];//游戏中每天的处刑方法，每一天的默认值都是-1   0：自由投票 1：随机灰吊 2：指定投票 int[N+1]
-    GameCharacter gc[];//游戏角色数组 int[CharecterSum+1]
-    boolean hiddenSeerScheduledSkillTargets[][];//潜伏占卜师的预告 int[getPlayerSum()+1][N+1]N:最大游戏天数 最大可以取50
-    boolean hiddenHunterScheduledSkillTargets[][];//潜伏猎人的预告 int[getPlayerSum()+1][N+1]  N:最大游戏天数 最大可以取50
+    GameCharacter[] gc;//游戏角色数组 int[CharecterSum+1]
+    boolean[][] hiddenSeerScheduledSkillTargets;//潜伏占卜师的预告 int[getPlayerSum()+1][N+1]N:最大游戏天数 最大可以取50
+    boolean[][] hiddenHunterScheduledSkillTargets;//潜伏猎人的预告 int[getPlayerSum()+1][N+1]  N:最大游戏天数 最大可以取50
     public GameStatus()
     {//普通的构造函数。构造时赋初值-1，表示游戏还未开始
         //初始化游戏状态的其他字段
-        this.date = new Date();
         this.isInGame = true;
         this.end = 0;
-        this.isHeInGame = new boolean[ConstNum.CharacterSum+1];
         this.gameDay = 1;
         this.deathCounter = 0;
-        this.dailyVotingRule = new int [ConstNum.N+1];
     }
     public void startGame(peiyi p)  //开始一局游戏
     {
         //游戏初始化，参数：游戏配役编号
         //...
         this.p = p;
-        int characters[] = new int[30];//登场的角色编号
-        int zysz[] = new int[30];//本局游戏职业配置
+        int[] characters = new int[30];//登场的角色编号
+        int[] zysz = new int[30];//本局游戏职业配置
         /*
         * 0 NONE,
     1 zhan,//占卜师
@@ -93,32 +80,28 @@ class GameStatus
         }
         //实现发身份的随机洗牌
         int cnt = characters.length;
-        //System.out.println("玩家数量%："+cnt);
 
         for(int i=0;i<cnt-1;i++)
         {
             DebugLogger.log("当前随机交换玩家：" + i);
-            int rd = ConstNum.randomInt(i+1,cnt-1),tmp;
+            int rd = ConstNum.randomInt(i,cnt-1),tmp;
             tmp = characters[i];//随机交换
             characters[i] = characters[rd];
             characters[rd] = tmp;
 
-            int rd1 = ConstNum.randomInt(i+1,cnt-1);
+            int rd1 = ConstNum.randomInt(i,cnt-1);
             tmp = zysz[i];
             zysz[i] = zysz[rd1];
             zysz[rd1] = tmp;
         }
-        /**/
 
         //初始化游戏状态的其他字段
         this.aliveCounter = cnt;
         gc = new GameCharacter[getPlayerSum()+1];//初始化gc
-        //System.out.println("初始化startgame时，gc长度："+gc.length);
         //初始化每一个角色
         for(int i=1;i<=cnt;i++)
         {
             gc[i] = new GameCharacter(characters[i-1],zysz[i-1]);
-            this.isHeInGame[characters[i-1]] = true;
         }
         for(int i=1;i<=cnt;i++)
         {
@@ -127,14 +110,14 @@ class GameStatus
                 DebugLogger.error("第"+i+"个角色初始化失败");
             }
         }
-        this.hiddenHunterScheduledSkillTargets = new boolean[getPlayerSum()+1][ConstNum.N+1];
-        this.hiddenSeerScheduledSkillTargets = new boolean[getPlayerSum()+1][ConstNum.N+1];
+        this.hiddenHunterScheduledSkillTargets = new boolean[getPlayerSum()+1][GameConstants.MAX_GAME_DAYS+1];
+        this.hiddenSeerScheduledSkillTargets = new boolean[getPlayerSum()+1][GameConstants.MAX_GAME_DAYS+1];
     }
     public int getPlayerSum()
     {//得到本局游戏的玩家数
         return deathCounter + aliveCounter;//死亡人数+存活人数=总人数
     }
-    public static int[] generateRandomCharacterArray()  //得到一个合法的大型村玩家编号数组
+    private static int[] generateRandomCharacterArray()  //得到一个合法的大型村玩家编号数组
     {
         // 1. 定义核心常量
         final int MIN_VALUE = 1;

@@ -16,8 +16,9 @@ public class InfoSceneHandler implements SceneHandler {
     }
 
     private boolean isFirstLevel(UI.Scene scene) {
-        int ord = scene.ordinal();
-        return ord >= UI.Scene.INFO_SCENE_1.ordinal() && ord <= UI.Scene.INFO_SCENE_5.ordinal();
+        return scene == UI.Scene.INFO_SCENE_1 || scene == UI.Scene.INFO_SCENE_2
+            || scene == UI.Scene.INFO_SCENE_3 || scene == UI.Scene.INFO_SCENE_4
+            || scene == UI.Scene.INFO_SCENE_5;
     }
 
     private void renderMain(UI ui) {
@@ -29,11 +30,7 @@ public class InfoSceneHandler implements SceneHandler {
             btn_next[i] = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 80, 10 + 70 * i, 220, 50,
                     ui.resources.getHelpText("Info" + i + ".txt"), btnNext);
             btn_next[i].setHorizontalTextPosition(SwingConstants.CENTER);
-            btn_next[i].addActionListener(e -> {
-                ui.resources.playSound("click.wav");
-                ui.currentScene = UI.Scene.valueOf("INFO_SCENE_" + j);
-                ui.run();
-            });
+            btn_next[i].addActionListener(e -> ui.transitionTo(UI.Scene.valueOf("INFO_SCENE_" + j)));
             ui.jPanel.add(btn_next[i]);
         }
         JLabel backgroundLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
@@ -44,11 +41,7 @@ public class InfoSceneHandler implements SceneHandler {
         JButton btnMenu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
                 GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBtitile.png"));
-        btnMenu.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            ui.currentScene = UI.Scene.START_SCENE;
-            ui.run();
-        });
+        btnMenu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(btnMenu);
         ui.jPanel.add(backgroundLabel_2);
         ui.jPanel.add(backgroundLabel);
@@ -56,31 +49,39 @@ public class InfoSceneHandler implements SceneHandler {
         ui.resizeComponents();
     }
 
-    private void renderSecond(UI ui, UI.Scene scene) {
+    private record InfoBackground(UI ui, JLabel bg, JLabel bg2, JButton menu, JButton back) {}
+
+    private InfoBackground createInfoBackground(UI ui, UI.Scene backTarget) {
         ui.jPanel.removeAll();
-        JLabel backgroundLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        JLabel bg = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("PVBG.png"));
-        JLabel backgroundLabel_2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
+        JLabel bg2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage("avg1_resized(3).png"));
-        JButton btnMenu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
+        JButton menu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
                 GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBtitile.png"));
-        btnMenu.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            ui.currentScene = UI.Scene.START_SCENE;
-            ui.run();
-        });
-        JButton btnBack = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 400,
+        menu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
+        JButton back = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 400,
                 GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBreturn.png"));
-        btnBack.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            ui.currentScene = scene.FatherScene(scene);
-            ui.run();
-        });
+        back.addActionListener(e -> ui.transitionTo(backTarget));
+        return new InfoBackground(ui, bg, bg2, menu, back);
+    }
+
+    private void finishInfoRender(InfoBackground ib) {
+        ib.ui.jPanel.add(ib.menu);
+        ib.ui.jPanel.add(ib.back);
+        ib.ui.jPanel.add(ib.bg2);
+        ib.ui.jPanel.add(ib.bg);
+        ib.ui.jFrame.setVisible(true);
+        ib.ui.resizeComponents();
+    }
+
+    private void renderSecond(UI ui, UI.Scene scene) {
+        InfoBackground ib = createInfoBackground(ui, scene.FatherScene());
         JTextArea dialogText = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 24,
-                ui.resources.getHelpText(scene.toString()), true);
+                ui.resources.getHelpText(scene.toString()));
         JScrollPane scrollPane = new JScrollPane(dialogText);
         scrollPane.setBounds(50, 50, 880, 630);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -88,39 +89,13 @@ public class InfoSceneHandler implements SceneHandler {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
-        ui.jPanel.add(btnMenu);
-        ui.jPanel.add(btnBack);
         ui.jPanel.add(scrollPane);
-        ui.jPanel.add(backgroundLabel_2);
-        ui.jPanel.add(backgroundLabel);
-        ui.jFrame.setVisible(true);
-        ui.resizeComponents();
+        finishInfoRender(ib);
     }
 
     private void renderFirst(UI ui, UI.Scene scene) {
-        ui.jPanel.removeAll();
-        JLabel backgroundLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("PVBG.png"));
-        JLabel backgroundLabel_2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
-                ui.resources.getImage("avg1_resized(3).png"));
-        ImageIcon menu = ui.resources.getImage("PVBtitile.png");
-        JButton btnMenu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
-                GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT, menu);
-        btnMenu.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            ui.currentScene = UI.Scene.START_SCENE;
-            ui.run();
-        });
-        ImageIcon back = ui.resources.getImage("PVBreturn.png");
-        JButton btnBack = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 400,
-                GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT, back);
-        btnBack.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            ui.currentScene = UI.Scene.INFO_SCENE;
-            ui.run();
-        });
-        int subSum = scene.SubInfoSum(scene);
+        InfoBackground ib = createInfoBackground(ui, UI.Scene.INFO_SCENE);
+        int subSum = scene.SubInfoSum();
         ImageIcon btnNext[] = new ImageIcon[subSum + 1];
         JButton btn_next[] = new JButton[subSum + 1];
         for (int i = 1; i <= subSum; i++) {
@@ -128,20 +103,11 @@ public class InfoSceneHandler implements SceneHandler {
             btnNext[i] = ui.resources.getImage("avg_button2.png");
             btn_next[i] = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                     80, 70 * i + 10, 222, 50,
-                    ui.resources.getHelpText("Info" + scene.FirstInfoNum(scene) + "-" + i + ".txt"), btnNext[i]);
+                    ui.resources.getHelpText("Info" + scene.FirstInfoNum() + "-" + i + ".txt"), btnNext[i]);
             btn_next[i].setHorizontalTextPosition(SwingConstants.CENTER);
-            btn_next[i].addActionListener(e -> {
-                ui.resources.playSound("click.wav");
-                ui.currentScene = UI.Scene.values()[scene.ordinal() + currentIndex];
-                ui.run();
-            });
+            btn_next[i].addActionListener(e -> ui.transitionTo(UI.Scene.values()[scene.ordinal() + currentIndex]));
             ui.jPanel.add(btn_next[i]);
         }
-        ui.jPanel.add(btnMenu);
-        ui.jPanel.add(btnBack);
-        ui.jPanel.add(backgroundLabel_2);
-        ui.jPanel.add(backgroundLabel);
-        ui.jFrame.setVisible(true);
-        ui.resizeComponents();
+        finishInfoRender(ib);
     }
 }

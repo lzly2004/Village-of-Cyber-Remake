@@ -12,54 +12,50 @@ public class EndAnimeHandler implements SceneHandler {
                 1130, 720 - GameConstants.RETURN_HEIGHT,
                 GameConstants.RETURN_WIDTH * 6 / 10, GameConstants.RETURN_HEIGHT * 6 / 10,
                 ui.resources.getImage("PVBtitile.png"));
-        nextBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            ui.currentScene = UI.Scene.START_SCENE;
-            ui.run();
-        });
+        nextBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(nextBtn);
-        for (int i = 1; i < ui.gs.gc.length; i++) {
+        for (int i = 1; i <= ui.ctx.getPlayerSum(); i++) {
             StringBuilder infoText = new StringBuilder();
-            infoText.append("公称職業:\n").append(ui.uiComponentFactory.getZY(ui.gs.gc[i].claimedRole))
-                    .append("\n真の職業:\n").append(ui.uiComponentFactory.getZY(ui.gs.gc[i].actualRole)).append("\n");
-            if (ui.gs.gc[i].whyDie != whyDie.NONE) {
-                switch (ui.gs.gc[i].whyDie) {
-                    case beiyao:    infoText.append(ui.gs.gc[i].dieDay).append("日目狼噛"); break;
-                    case chuxing:   infoText.append(ui.gs.gc[i].dieDay).append("日目処刑 "); break;
-                    case zhousha:   infoText.append(ui.gs.gc[i].dieDay).append("日目呪殺 "); break;
+            infoText.append(GameStrings.CLAIMED_ROLE_PREFIX).append(ui.uiComponentFactory.getZY(ui.ctx.getClaimedRole(i)))
+                    .append(GameStrings.ACTUAL_ROLE_PREFIX).append(ui.uiComponentFactory.getZY(ui.ctx.getActualRole(i))).append("\n");
+            if (!ui.ctx.isAlive(i)) {
+                switch (ui.ctx.getDeathReason(i)) {
+                    case beiyao:    infoText.append(String.format(GameStrings.DEATH_BITE_FORMAT, ui.ctx.getDeathDay(i))); break;
+                    case chuxing:   infoText.append(String.format(GameStrings.DEATH_EXECUTE_FORMAT, ui.ctx.getDeathDay(i))); break;
+                    case zhousha:   infoText.append(String.format(GameStrings.DEATH_CURSE_FORMAT, ui.ctx.getDeathDay(i))); break;
                     case dayhouzhui:
-                    case nighthouzhui: infoText.append(ui.gs.gc[i].dieDay).append("日目後追 "); break;
+                    case nighthouzhui: infoText.append(String.format(GameStrings.DEATH_FOLLOW_FORMAT, ui.ctx.getDeathDay(i))); break;
                     case daymaozhou:
-                    case nightmaozhou: infoText.append(ui.gs.gc[i].dieDay).append("日目猫呪"); break;
+                    case nightmaozhou: infoText.append(String.format(GameStrings.DEATH_CAT_FORMAT, ui.ctx.getDeathDay(i))); break;
                     default: break;
                 }
             } else {
-                if (ui.gs.end == 1) {
-                    infoText.append("最終存活");
-                } else if (ui.gs.end == 2) {
-                    if (ui.gs.gc[i].actualRole < 7 || ui.gs.gc[i].actualRole > 9) {
-                        infoText.append("最終死亡");
+                if (ui.ctx.getEndResult() == 1) {
+                    infoText.append(GameStrings.END_SURVIVE);
+                } else if (ui.ctx.getEndResult() == 2) {
+                    if (ui.ctx.getActualRole(i) < 7 || ui.ctx.getActualRole(i) > 9) {
+                        infoText.append(GameStrings.END_DEAD);
                     } else {
-                        infoText.append("最終胜利");
+                        infoText.append(GameStrings.END_WIN);
                     }
-                } else if (ui.gs.end == 3) {
-                    if (ui.gs.gc[i].actualRole < 10) {
-                        infoText.append("最終死亡");
+                } else if (ui.ctx.getEndResult() == 3) {
+                    if (ui.ctx.getActualRole(i) < 10) {
+                        infoText.append(GameStrings.END_DEAD);
                     } else {
-                        infoText.append("最終胜利");
+                        infoText.append(GameStrings.END_WIN);
                     }
                 }
             }
             DebugLogger.log(infoText);
             JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 16,
-                    infoText.toString(), false);
+                    infoText.toString());
             StringBuilder xName = new StringBuilder();
             StringBuilder imageName = new StringBuilder();
-            if (ui.gs.gc[i].number <= 9) imageName.append("0");
-            imageName.append(ui.gs.gc[i].number);
-            switch (ui.gs.gc[i].whyDie) {
+            if (ui.ctx.getCharacterNumber(i) <= 9) imageName.append("0");
+            imageName.append(ui.ctx.getCharacterNumber(i));
+            switch (ui.ctx.getDeathReason(i)) {
                 case NONE:
-                    switch (ui.gs.gc[i].actualRole) {
+                    switch (ui.ctx.getActualRole(i)) {
                         case 5:  imageName.append("cs"); break;
                         case 10: imageName.append("fs"); break;
                         case 11: imageName.append("hs"); break;
@@ -75,19 +71,19 @@ public class EndAnimeHandler implements SceneHandler {
                 default:          imageName.append("gs"); xName.append("kami.png");   break;
             }
             imageName.append(".png");
-            String textName = ui.gs.gc[i].number + "job.png";
+            String textName = ui.ctx.getCharacterNumber(i) + "job.png";
             ImageIcon characterImage = ui.resources.getImage(imageName.toString());
             ImageIcon characterText = ui.resources.getImage(textName);
             if (!xName.isEmpty()) {
                 ImageIcon deathImage = ui.resources.getImage(xName.toString());
                 JLabel deathLabel;
-                if (i <= (ui.gs.gc.length - 1 + 1) / 2) {
+                if (i <= (ui.ctx.getPlayerSum() + 1) / 2) {
                     deathLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
                             22 + (characterImage.getIconWidth() + 40) * i, 110,
                             deathImage.getIconWidth(), deathImage.getIconHeight(), deathImage);
                 } else {
                     deathLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                            22 + (characterImage.getIconWidth() + 40) * (i - ((ui.gs.gc.length - 1 + 1) / 2)),
+                            22 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
                             260 + characterImage.getIconHeight(),
                             deathImage.getIconWidth(), deathImage.getIconHeight(), deathImage);
                 }
@@ -95,7 +91,7 @@ public class EndAnimeHandler implements SceneHandler {
             }
             JLabel label;
             JLabel textLabel;
-            if (i <= (ui.gs.gc.length - 1 + 1) / 2) {
+            if (i <= (ui.ctx.getPlayerSum() + 1) / 2) {
                 label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
                         20 + (characterImage.getIconWidth() + 40) * i, 100,
                         characterImage.getIconWidth(), characterImage.getIconHeight(), characterImage);
@@ -106,14 +102,14 @@ public class EndAnimeHandler implements SceneHandler {
                 infoLabel.setBounds(20 + (characterImage.getIconWidth() + 40) * i, 210, 100, 150);
             } else {
                 label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        20 + (characterImage.getIconWidth() + 40) * (i - ((ui.gs.gc.length - 1 + 1) / 2)),
+                        20 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
                         250 + characterImage.getIconHeight(),
                         characterImage.getIconWidth(), characterImage.getIconHeight(), characterImage);
                 textLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label,
-                        35 + (characterImage.getIconWidth() + 40) * (i - ((ui.gs.gc.length - 1 + 1) / 2)),
+                        35 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
                         250 + 2 * characterImage.getIconHeight() - characterText.getIconHeight() / 2,
                         characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
-                infoLabel.setBounds(20 + (characterImage.getIconWidth() + 40) * (i - ((ui.gs.gc.length - 1 + 1) / 2)),
+                infoLabel.setBounds(20 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
                         460, 100, 150);
             }
             ui.jPanel.add(infoLabel);
@@ -122,15 +118,15 @@ public class EndAnimeHandler implements SceneHandler {
         }
         String winIconText = "";
         String winText = "";
-        switch (ui.gs.end) {
-            case 1: winIconText = "Icon1_0.png"; winText = "村人勝利"; break;
-            case 2: winIconText = "Icon2.png";   winText = "人狼勝利"; break;
-            case 3: winIconText = "Icon4.png";   winText = "妖狐勝利"; break;
+        switch (ui.ctx.getEndResult()) {
+            case 1: winIconText = "Icon1_0.png"; winText = GameStrings.WIN_VILLAGER; break;
+            case 2: winIconText = "Icon2.png";   winText = GameStrings.WIN_WOLF; break;
+            case 3: winIconText = "Icon4.png";   winText = GameStrings.WIN_FOX; break;
         }
         JLabel winLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 50, 25, 40, 40,
                 ui.resources.getImage(winIconText));
         ui.jPanel.add(winLabel);
-        JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, winText, false);
+        JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, winText);
         infoLabel.setBounds(100, 29, 200, 100);
         ui.jPanel.add(infoLabel);
         ui.jPanel.add(background);

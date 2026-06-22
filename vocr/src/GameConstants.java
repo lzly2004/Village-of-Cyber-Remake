@@ -99,6 +99,8 @@ public final class GameConstants
     public static final int CHAR_ICON_W      = 64;
     /** 头像尺寸(高) */
     public static final int CHAR_ICON_H      = 98;
+    /** 角色立绘底部边距 */
+    public static final int CHAR_ICON_BOTTOM_MARGIN = 30;
 
     // ==================== 信息面板 ====================
     /** 信息面板X */
@@ -139,4 +141,8 @@ public final class GameConstants
     public static final int INF  = 999;
     public static final int INFJ = 500;
     public static final int MAXN = 100;
+    /** 概率计算器默认概率值 */
+    public static final int DEFAULT_PROBABILITY = 20;
+    /** 怀疑前三数组大小(3+1) */
+    public static final int TOP3_ARRAY_SIZE = 4;
 }

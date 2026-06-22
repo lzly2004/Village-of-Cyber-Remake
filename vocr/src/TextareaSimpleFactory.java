@@ -32,13 +32,12 @@ public class TextareaSimpleFactory
       * @param text 初始文本（可选，无则传空字符串）
       * @param focusable 是否允许获取焦点（默认false）
       */
-    public static JTextArea createBoldTitleTextArea(Color color,int fontSize, String text, boolean focusable)
+    public static JTextArea createBoldTitleTextArea(Color color,int fontSize, String text)
     {
         return createTextAreaBuilder()
                 .fontStyle(Font.BOLD)
                 .fontSize(fontSize)
                 .text(text)
-                .focusable(focusable)
                 .foreground(color)
                 .build();
     }
@@ -142,13 +141,11 @@ public class TextareaSimpleFactory
             textArea.setEditable(DEFAULT_EDITABLE);
             textArea.setLineWrap(DEFAULT_LINE_WRAP);
             textArea.setWrapStyleWord(DEFAULT_WRAP_STYLE_WORD);
-            textArea.setOpaque(DEFAULT_OPAQUE);
             textArea.setBorder(DEFAULT_BORDER);
             // 可变参数配置
             textArea.setFont(new Font(GameConstants.FONT_FAMILY, fontStyle, fontSize));
             textArea.setForeground(foreground);
             textArea.setBackground(background);
-            textArea.setFocusable(focusable);
             //后续添加更正
             textArea.setOpaque(this.opaque);
             textArea.setFocusable(false); // 先禁用焦点（无焦点则无法触发选择）

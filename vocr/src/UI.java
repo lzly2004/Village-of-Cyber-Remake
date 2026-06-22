@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import javax.sound.sampled.*;
 import java.util.List;
 //****************前言*******************
 //后悔一开始只顾着写，没想过代码复用了
@@ -20,120 +19,100 @@ import java.util.List;
 //希望以后我能吸取第一次开发项目的教训，重视这些问题
 public class UI implements UIInterface
 {
-    public GameStatus getGameStatus()
-    {//提供给MainLogic类，得到当前的游戏状态
-        return gs;
-    }//返回给mainLogic类，方便其获取gs
     public LinkedList<Event> getEvents()
     {
         return events;
     }
     public enum Scene  //定义界面枚举类型,当前处于什么界面
     {
-        DIALOGUE_AFTERNOON,//下午
-        DIALOGUE_DEATH,//白天死亡或和平
-        DIALOGUE_CHUXING,//处刑
-        DIALOGUE_DAY,//白天对话
-        START_SCENE,//开始界面
-        INFO_SCENE,//信息界面
-        INFO_SCENE_1,//信息下一页界面
-        INFO_SCENE_1_1,//信息下一页界面
-        INFO_SCENE_1_2,//新增
-        INFO_SCENE_1_3,//新增
-        INFO_SCENE_1_4,//新增
-        INFO_SCENE_1_5,//新增
-        INFO_SCENE_1_6,//新增
-        INFO_SCENE_1_7, //新增
-        INFO_SCENE_2,//信息下一页界面
-        INFO_SCENE_2_1,//信息下一页界面
-        INFO_SCENE_2_2,//新增
-        INFO_SCENE_2_3,//新增
-        INFO_SCENE_2_4,//新增
-        INFO_SCENE_2_5,//新增
-        INFO_SCENE_2_6,//新增
-        INFO_SCENE_3,//信息下一页界面
-        INFO_SCENE_3_1,//信息下一页界面
-        INFO_SCENE_3_2,//新增
-        INFO_SCENE_3_3,//新增
-        INFO_SCENE_3_4,//新增
-        INFO_SCENE_3_5,//新增
-        INFO_SCENE_3_6,//新增
-        INFO_SCENE_4,//信息下一页界面
-        INFO_SCENE_4_1,//信息下一页界面
-        INFO_SCENE_4_2,//新增
-        INFO_SCENE_4_3,//新增
-        INFO_SCENE_4_4,//新增
-        INFO_SCENE_4_5,//新增
-        INFO_SCENE_4_6,//新增
-        INFO_SCENE_4_7,//新增
-        INFO_SCENE_4_8,//新增
-        INFO_SCENE_5,//信息下一页界面
-        INFO_SCENE_5_1,//新增
-        INFO_SCENE_5_2,//新增
-        INFO_SCENE_5_3,//新增
-        INFO_SCENE_5_4,//新增
-        INFO_SCENE_5_5,//新增
-        INFO_SCENE_5_6,//新增
-        INFO_SCENE_5_7,//新增
-        INFO_SCENE_5_8,//新增
-        INFO_SCENE_5_9,//新增
-        GAME_SCENE_VOTE,//投票主界面
-        GAME_SCENE_SELECT,//选择关卡界面
-        GAME_SCENE_DAY,//进入白天
-        GAME_SCENE_NIGHT,//入夜
-        END_VILLAGE,//村人获胜
-        END_WOLF,//狼人获胜
-        END_FOX,//妖狐获胜
-        END_ANIME,//结束动画场景
+        DIALOGUE_AFTERNOON(null, 0, 0),//下午
+        DIALOGUE_DEATH(null, 0, 0),//白天死亡或和平
+        DIALOGUE_CHUXING(null, 0, 0),//处刑
+        DIALOGUE_DAY(null, 0, 0),//白天对话
+        START_SCENE(null, 0, 0),//开始界面
+        INFO_SCENE(null, 0, 0),//信息界面
+        INFO_SCENE_1(INFO_SCENE, 1, 7),//信息下一页界面
+        INFO_SCENE_1_1(INFO_SCENE_1, 0, 0),//信息下一页界面
+        INFO_SCENE_1_2(INFO_SCENE_1, 0, 0),//新增
+        INFO_SCENE_1_3(INFO_SCENE_1, 0, 0),//新增
+        INFO_SCENE_1_4(INFO_SCENE_1, 0, 0),//新增
+        INFO_SCENE_1_5(INFO_SCENE_1, 0, 0),//新增
+        INFO_SCENE_1_6(INFO_SCENE_1, 0, 0),//新增
+        INFO_SCENE_1_7(INFO_SCENE_1, 0, 0),//新增
+        INFO_SCENE_2(INFO_SCENE, 2, 6),//信息下一页界面
+        INFO_SCENE_2_1(INFO_SCENE_2, 0, 0),//信息下一页界面
+        INFO_SCENE_2_2(INFO_SCENE_2, 0, 0),//新增
+        INFO_SCENE_2_3(INFO_SCENE_2, 0, 0),//新增
+        INFO_SCENE_2_4(INFO_SCENE_2, 0, 0),//新增
+        INFO_SCENE_2_5(INFO_SCENE_2, 0, 0),//新增
+        INFO_SCENE_2_6(INFO_SCENE_2, 0, 0),//新增
+        INFO_SCENE_3(INFO_SCENE, 3, 6),//信息下一页界面
+        INFO_SCENE_3_1(INFO_SCENE_3, 0, 0),//信息下一页界面
+        INFO_SCENE_3_2(INFO_SCENE_3, 0, 0),//新增
+        INFO_SCENE_3_3(INFO_SCENE_3, 0, 0),//新增
+        INFO_SCENE_3_4(INFO_SCENE_3, 0, 0),//新增
+        INFO_SCENE_3_5(INFO_SCENE_3, 0, 0),//新增
+        INFO_SCENE_3_6(INFO_SCENE_3, 0, 0),//新增
+        INFO_SCENE_4(INFO_SCENE, 4, 8),//信息下一页界面
+        INFO_SCENE_4_1(INFO_SCENE_4, 0, 0),//信息下一页界面
+        INFO_SCENE_4_2(INFO_SCENE_4, 0, 0),//新增
+        INFO_SCENE_4_3(INFO_SCENE_4, 0, 0),//新增
+        INFO_SCENE_4_4(INFO_SCENE_4, 0, 0),//新增
+        INFO_SCENE_4_5(INFO_SCENE_4, 0, 0),//新增
+        INFO_SCENE_4_6(INFO_SCENE_4, 0, 0),//新增
+        INFO_SCENE_4_7(INFO_SCENE_4, 0, 0),//新增
+        INFO_SCENE_4_8(INFO_SCENE_4, 0, 0),//新增
+        INFO_SCENE_5(INFO_SCENE, 5, 9),//信息下一页界面
+        INFO_SCENE_5_1(INFO_SCENE_5, 0, 0),//新增
+        INFO_SCENE_5_2(INFO_SCENE_5, 0, 0),//新增
+        INFO_SCENE_5_3(INFO_SCENE_5, 0, 0),//新增
+        INFO_SCENE_5_4(INFO_SCENE_5, 0, 0),//新增
+        INFO_SCENE_5_5(INFO_SCENE_5, 0, 0),//新增
+        INFO_SCENE_5_6(INFO_SCENE_5, 0, 0),//新增
+        INFO_SCENE_5_7(INFO_SCENE_5, 0, 0),//新增
+        INFO_SCENE_5_8(INFO_SCENE_5, 0, 0),//新增
+        INFO_SCENE_5_9(INFO_SCENE_5, 0, 0),//新增
+        GAME_SCENE_VOTE(null, 0, 0),//投票主界面
+        GAME_SCENE_SELECT(null, 0, 0),//选择关卡界面
+        GAME_SCENE_DAY(null, 0, 0),//进入白天
+        GAME_SCENE_NIGHT(null, 0, 0),//入夜
+        END_VILLAGE(null, 0, 0),//村人获胜
+        END_WOLF(null, 0, 0),//狼人获胜
+        END_FOX(null, 0, 0),//妖狐获胜
+        END_ANIME(null, 0, 0),//结束动画场景
         ;
-        public Scene FatherScene(Scene scene)   //得到当前场景的父亲场景
-        {
-            //目前仅限于帮助文本的5个父亲场景
-            if(scene.ordinal() < 14) return INFO_SCENE_1;
-            if(scene.ordinal() < 21) return INFO_SCENE_2;
-            if(scene.ordinal() < 28) return INFO_SCENE_3;
-            if(scene.ordinal() < 37) return INFO_SCENE_4;
-            if(scene.ordinal() < 47) return INFO_SCENE_5;
-            return INFO_SCENE_1;//非法情况
+
+        private final Scene parent;
+        private final int firstInfoNum;
+        private final int subInfoSum;
+
+        Scene(Scene parent, int firstInfoNum, int subInfoSum) {
+            this.parent = parent;
+            this.firstInfoNum = firstInfoNum;
+            this.subInfoSum = subInfoSum;
         }
+
+        public Scene FatherScene() {
+            return parent != null ? parent : INFO_SCENE;
+        }
+
         @Override
         public String toString()    //toString方法，获取二级帮助目录的对应的文本文件名字符串
         {
-            // 获取枚举常量的原始名称（如 INFO_SCENE_4_3）
             String originalName = super.toString();
-
-            // 只处理 INFO_SCENE_* 开头的枚举，其他保持原名称
             if (originalName.startsWith("INFO_SCENE"))
             {
-                // 替换前缀 + 处理下划线，生成 InfoX-X 格式
                 String infoPart = originalName.replace("INFO_SCENE", "Info")
-                        .replaceFirst("_", "")  // 第一个下划线替换为 -
-                        .replace("_", "-");      // 剩余下划线也替换为 -
-                // 拼接固定后缀 -1.txt
+                        .replaceFirst("_", "")
+                        .replace("_", "-");
                 return infoPart + "-1.txt";
             }
-
-            // 非信息类场景，返回原始名称（可根据需求修改）
             return originalName;
         }
-        public int SubInfoSum(Scene scene) //帮助界面一级目录下的子目录数量
-        {
-            if(scene == INFO_SCENE_1) return 7;
-            if(scene == INFO_SCENE_2) return 6;
-            if(scene == INFO_SCENE_3) return 6;
-            if(scene == INFO_SCENE_4) return 8;
-            if(scene == INFO_SCENE_5) return 9;
-            return -1;//未知情况
-        }
-        public int FirstInfoNum(Scene scene)    //帮助界面一级目录的编号
-        {
-            if(scene == INFO_SCENE_1) return 1;
-            if(scene == INFO_SCENE_2) return 2;
-            if(scene == INFO_SCENE_3) return 3;
-            if(scene == INFO_SCENE_4) return 4;
-            if(scene == INFO_SCENE_5) return 5;
-            return -1;//未知情况
-        }
+
+        public int SubInfoSum() { return subInfoSum; }
+
+        public int FirstInfoNum() { return firstInfoNum; }
     }
     Scene currentScene;//当前是什么场景
 
@@ -143,10 +122,14 @@ public class UI implements UIInterface
 
     //定义当前待处理的事件
     UI() {}
-    GameStatus gs;//从主逻辑类拿到的游戏状态
+    GameContextView ctx;//封装后的游戏状态只读访问
     ResourcesInterface resources;//资源接口
     MainLogicInterface mainLogic;//主逻辑接口
     UIComponentFactory uiComponentFactory;
+
+    /** 获取玩家职业图标文本（便捷转发） */
+    public String getJobText(int player) { return uiComponentFactory.getJobText(ctx.getCharacterNumber(player)); }
+
     private DialogueBox dialogueBox;//对话框封装逻辑
     private Map<Scene, SceneHandler> sceneHandlers = new HashMap<>();//场景处理器注册表
     // 在UI类中添加这个方法
@@ -178,15 +161,15 @@ public class UI implements UIInterface
         sceneHandlers.put(Scene.END_FOX, new EndGameHandler());
         sceneHandlers.put(Scene.END_ANIME, new EndAnimeHandler());
         currentScene = Scene.START_SCENE;//初始为开始界面
-        jFrame = new JFrame("Village of Cyber:Remake v1.0.3.1");
+        jFrame = new JFrame(GameConstants.WINDOW_TITLE);
         jFrame.setResizable(false);
-        jFrame.setSize(1280,720);
+        jFrame.setSize(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setLocationRelativeTo(null);
         ImageIcon frameIcon = new ImageIcon("vocr/resources/images/Icon2.png");
         jFrame.setIconImage(frameIcon.getImage());
-        jPanel = PanelSimpleFactory.createSimplePanel(1280,720,true,false);
-        diaPanel = PanelSimpleFactory.createSimplePanel(1280,720,false,false);
+        jPanel = PanelSimpleFactory.createSimplePanel(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, true, false);
+        diaPanel = PanelSimpleFactory.createSimplePanel(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, false, false);
         jFrame.add(jPanel);
     }//初始化
     public void resizeComponents()
@@ -198,6 +181,7 @@ public class UI implements UIInterface
     {
         resources = Game.getInstance().getResources();
         mainLogic = Game.getInstance().getMainLogic();
+        ctx = mainLogic.getGameContext();
 
         // 优先走 Handler 分发
         SceneHandler handler = sceneHandlers.get(currentScene);
@@ -208,12 +192,19 @@ public class UI implements UIInterface
 
     }//运行，每次run都会到一个场景
 
-    public LinkedList<Event> events = new LinkedList<>();//作为事件队列
+    /** 播放点击音效并跳转到指定场景 */
+    public void transitionTo(Scene scene) {
+        resources.playSound("click.wav");
+        currentScene = scene;
+        run();
+    }
+
+    private LinkedList<Event> events = new LinkedList<>();//作为事件队列
 
     public void addEvent(Event event)
     {
         events.add(event);
-        if(DebugLogger.getInstance().isEnabled() && event != null && !events.isEmpty())DebugLogger.log("事件添加成功且不为空");
+        if(event != null && !events.isEmpty())DebugLogger.log("事件添加成功且不为空");
     }//添加event
     public void testBtn()
     {
@@ -221,16 +212,16 @@ public class UI implements UIInterface
         JButton test = new JButton("点我进入");
         test.setBounds(0,0,60,30);
         test.addActionListener(e -> {
-            for(int i = 1;i < gs.gc.length;++i)
+            for(int i = 1;i <= ctx.getPlayerSum();++i)
             {
-                DebugLogger.log("编号"+i+" "+uiComponentFactory.getJobText(gs.gc[i].number) + " 真实职业："+uiComponentFactory.getZY(gs.gc[i].actualRole)+" 声称职业："+uiComponentFactory.getZY(gs.gc[i].claimedRole)
-                +" 死亡日期"+gs.gc[i].dieDay + " 死亡原因" + uiComponentFactory.getwhyDie(gs.gc[i].whyDie) + " 怀疑度：");
-                for(int j = 1;j < gs.gc.length;++j)
+                DebugLogger.log("编号"+i+" "+uiComponentFactory.getJobText(ctx.getCharacterNumber(i)) + " 真实职业："+uiComponentFactory.getZY(ctx.getActualRole(i))+" 声称职业："+uiComponentFactory.getZY(ctx.getClaimedRole(i))
+                +" 死亡日期"+ctx.getDeathDay(i) + " 死亡原因" + uiComponentFactory.getWhyDie(ctx.getDeathReason(i)) + " 怀疑度：");
+                for(int j = 1;j <= ctx.getPlayerSum();++j)
                 {
-                    DebugLogger.print(uiComponentFactory.getJobText(gs.gc[j].number)+" 为"+gs.gc[i].suspicionValue[j]+" ");
+                    DebugLogger.print(uiComponentFactory.getJobText(ctx.getCharacterNumber(j))+" 为"+ctx.getSuspicionValue(i, j)+" ");
                 }
                 DebugLogger.log("");
-                DebugLogger.print(uiComponentFactory.getJobText(gs.gc[i].number) + " 怀疑前三为" + gs.gc[i].top3SuspectedPlayers[1][gs.gameDay] + " "+ gs.gc[i].top3SuspectedPlayers[2][gs.gameDay] + " "+ gs.gc[i].top3SuspectedPlayers[3][gs.gameDay] + " ");
+                DebugLogger.print(uiComponentFactory.getJobText(ctx.getCharacterNumber(i)) + " 怀疑前三为" + ctx.getTop3SuspectedPlayer(i, 1, ctx.getGameDay()) + " "+ ctx.getTop3SuspectedPlayer(i, 2, ctx.getGameDay()) + " "+ ctx.getTop3SuspectedPlayer(i, 3, ctx.getGameDay()) + " ");
                 DebugLogger.log("");
             }
         });
@@ -264,8 +255,8 @@ public class UI implements UIInterface
 
     /** 指定面板类型 */
 
-    JTextArea piaoText = new JTextArea();//票型/怀疑文本
-    JTextArea piaoText1 = new JTextArea();//票型/怀疑文本
+    JTextArea piaoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, "");
+    JTextArea piaoText1 = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, "");
 
     int chuxingWho = 0;//记录到底处刑的是谁，用于处刑人名显示
     List<Integer> voteRounds = new ArrayList<>();//记录每天投票是第几轮的票

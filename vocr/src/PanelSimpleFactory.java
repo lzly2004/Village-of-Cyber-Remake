@@ -8,7 +8,7 @@ public class PanelSimpleFactory
     {
         switch (kind)
         {
-            case LabelConst.Simple_Label ->
+            case PanelConst.Simple_Panel ->
             {
                 return createSimplePanel(width,height,isOpaque,isWhiteBk);
             }
@@ -34,7 +34,7 @@ public class PanelSimpleFactory
     {
         switch (kind)
         {
-            case LabelConst.Simple_Label ->
+            case PanelConst.Simple_Panel ->
             {
                 return createSimplePanel(x,y,width,height,isOpaque,isWhiteBk);
             }

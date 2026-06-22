@@ -1,15 +1,13 @@
 import javax.swing.*;
 import javax.sound.sampled.*;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -35,8 +33,6 @@ public class Resources implements ResourcesInterface {
     private Map<String, Map<String, ImageLineData>> eventImageMapping;
     // 图片配置文件路径
     private static final String IMAGE_MAPPING_PATH = "/config/event_image_mapping.json";
-    // 图片基础目录
-    private static final String EVENT_IMAGE_BASE_DIR = "";
 
     // 构造器
     public Resources() {
@@ -48,69 +44,66 @@ public class Resources implements ResourcesInterface {
     }
 
     public void run() {
-        if(DebugLogger.getInstance().isEnabled()){
-        DebugLogger.log("资源类已启动，进入常态运行");}
+        DebugLogger.log("资源类已启动，进入常态运行");
     }
 
     //事件图片获取（返回ImageIcon数组）
     @Override
     public ImageIcon[] getEventImage(Event event) {
-        //入参校验：空值返回长度1的兜底数组（下标0为全局兜底图）
-        if (event == null || event.ch1 == null || event.eventname == null) {
-            if(DebugLogger.getInstance().isEnabled()){
-            DebugLogger.error("事件/角色/事件名为空，返回全局兜底图数组");}
+        Object[] lookup = resolveResourceLookup(eventImageMapping, event, "图片");
+        if (lookup == null) return new ImageIcon[]{getGlobalDefaultImage()};
+        String ch2Name = (String) lookup[0];
+        ImageLineData imageLineData = (ImageLineData) lookup[1];
+
+        String[] targetImageNames = parseImageNames(
+            resolveSpecialOrDefault(imageLineData, ch2Name, ImageLineData::getSpecial, ImageLineData::getDefaultImage));
+        if (targetImageNames == null || targetImageNames.length == 0) {
+            DebugLogger.error("角色" + event.ch1.name() + "事件" + event.eventname.name() + "无默认图片，返回全局兜底图数组");
             return new ImageIcon[]{getGlobalDefaultImage()};
         }
 
-        // 提取关键信息（枚举转字符串，匹配JSON配置）
-        String ch1Name = event.ch1.name();       // 说话者角色名（如Abel）
-        String ch2Name = event.ch2 != null ? event.ch2.name() : ""; // 对话目标（如Betti）
-        String eventName = event.eventname.name(); // 事件名（如gyfo1）
-
-        //查找角色的图片配置
-        Map<String, ImageLineData> characterImageConfig = eventImageMapping.get(ch1Name);
-        if (characterImageConfig == null) {
-            DebugLogger.error("角色" + ch1Name + "无图片配置，返回全局兜底图数组");
-            return new ImageIcon[]{getGlobalDefaultImage()};
-        }
-
-        //查找该角色下对应事件的图片配置
-        ImageLineData imageLineData = characterImageConfig.get(eventName);
-        if (imageLineData == null) {
-            DebugLogger.error("角色" + ch1Name + "无事件" + eventName + "的图片配置，返回全局兜底图数组");
-            return new ImageIcon[]{getGlobalDefaultImage()};
-        }
-
-        //优先匹配特殊图片（ch2存在且匹配special时）
-        String[] targetImageNames;
-        Map<String, Object> specialImages = imageLineData.getSpecial();
-        if (ch2Name != null && !ch2Name.isEmpty()
-                && specialImages != null && specialImages.containsKey(ch2Name)) {
-            // 解析special值（兼容字符串/数组）
-            targetImageNames = parseImageNames(specialImages.get(ch2Name));
-            if(DebugLogger.getInstance().isEnabled()){
-            DebugLogger.log("匹配到特殊图片：" + ch1Name + "_" + eventName + "_" + ch2Name + "，共" + targetImageNames.length + "张");}
-        } else {
-            // 无特殊图片，解析default值（兼容字符串/数组）
-            targetImageNames = parseImageNames(imageLineData.getDefaultImage());
-            if (targetImageNames == null || targetImageNames.length == 0) {
-                DebugLogger.error("角色" + ch1Name + "事件" + eventName + "无默认图片，返回全局兜底图数组");
-                return new ImageIcon[]{getGlobalDefaultImage()};
-            }
-        }
-
-        //加载图片数组（按下标依次加载，失败则替换为兜底图）
         ImageIcon[] imageIcons = new ImageIcon[targetImageNames.length];
         for (int i = 0; i < targetImageNames.length; i++) {
-            String imagePath = EVENT_IMAGE_BASE_DIR + targetImageNames[i];
-            ImageIcon icon = getImage(imagePath);
+            ImageIcon icon = getImage(targetImageNames[i]);
             imageIcons[i] = (icon != null) ? icon : getGlobalDefaultImage();
         }
-
         return imageIcons;
     }
 
 
+
+    /**
+     * 解析事件资源的核心查找逻辑：角色配置 → 事件配置 → 返回[ch2Name, eventConfig]
+     */
+    private Object[] resolveResourceLookup(Map<String, ? extends Map<String, ?>> resourceMap, Event event, String ctx) {
+        if (event == null || event.ch1 == null || event.eventname == null) {
+            DebugLogger.error(ctx + "：事件/角色/事件名为空");
+            return null;
+        }
+        String ch1Name = event.ch1.name();
+        Map<String, ?> charConfig = resourceMap.get(ch1Name);
+        if (charConfig == null) {
+            DebugLogger.error(ctx + "：角色" + ch1Name + "无配置");
+            return null;
+        }
+        Object eventConfig = charConfig.get(event.eventname.name());
+        if (eventConfig == null) {
+            DebugLogger.error(ctx + "：角色" + ch1Name + "无事件" + event.eventname.name() + "的配置");
+            return null;
+        }
+        String ch2Name = event.ch2 != null ? event.ch2.name() : "";
+        return new Object[]{ch2Name, eventConfig};
+    }
+
+    /** 优先匹配special(ch2)，否则返回default */
+    private <T> Object resolveSpecialOrDefault(T eventConfig, String ch2Name,
+            Function<T, Map<String, ?>> getSpecial,
+            Function<T, ?> getDefault) {
+        Map<String, ?> specials = getSpecial.apply(eventConfig);
+        if (!ch2Name.isEmpty() && specials != null && specials.containsKey(ch2Name))
+            return specials.get(ch2Name);
+        return getDefault.apply(eventConfig);
+    }
 
     private String[] parseImageNames(Object imageObj) {
         if (imageObj == null) {
@@ -145,7 +138,7 @@ public class Resources implements ResourcesInterface {
                 defaultImageName = (String) defaultMap.get("all");
             }
         }
-        return getImage(EVENT_IMAGE_BASE_DIR + defaultImageName);
+        return getImage(defaultImageName);
     }
 
     //基础资源加载方法
@@ -177,8 +170,7 @@ public class Resources implements ResourcesInterface {
                     is,
                     new TypeReference<Map<String, Map<String, LineData>>>() {}
             );
-            if(DebugLogger.getInstance().isEnabled()){
-            DebugLogger.log("成功加载 " + lineResource.size() + " 个角色的台词配置");}
+            DebugLogger.log("成功加载 " + lineResource.size() + " 个角色的台词配置");
         } catch (IOException e) {
             DebugLogger.error("加载失败！");
             e.printStackTrace();
@@ -197,8 +189,7 @@ public class Resources implements ResourcesInterface {
                     is,
                     new TypeReference<Map<String, Map<String, ImageLineData>>>() {}
             );
-            if(DebugLogger.getInstance().isEnabled()){
-            DebugLogger.log("成功加载 " + eventImageMapping.size() + " 个角色的图片映射配置");}
+            DebugLogger.log("成功加载 " + eventImageMapping.size() + " 个角色的图片映射配置");
         } catch (IOException e) {
             DebugLogger.error("加载失败！");
             e.printStackTrace();
@@ -210,8 +201,10 @@ public class Resources implements ResourcesInterface {
     @Override
     public boolean playBgm(String bgmName) {
         if (bgmName == null || bgmName.trim().isEmpty()) {
-            currentBgm.stop();
-            currentBgm.close();
+            if (currentBgm != null) {
+                currentBgm.stop();
+                currentBgm.close();
+            }
             return true; // 停止操作视为成功
         }
 
@@ -228,6 +221,7 @@ public class Resources implements ResourcesInterface {
             );
             currentBgm = AudioSystem.getClip();
             currentBgm.open(ais);
+            ais.close();
             currentBgm.loop(Clip.LOOP_CONTINUOUSLY); // 循环播放
             currentBgm.start();
             return true;
@@ -260,8 +254,14 @@ public class Resources implements ResourcesInterface {
                     }
                 }
             });
-            clip.open(ais);
-            clip.start();
+            try {
+                clip.open(ais);
+                clip.start();
+            } catch (Exception openEx) {
+                clip.close();
+                try { ais.close(); } catch (IOException ex) { ex.printStackTrace(); }
+                throw openEx;
+            }
             return true;
         } catch (Exception e) {
             DebugLogger.error("音效 " + soundName + " 播放失败");
@@ -272,46 +272,15 @@ public class Resources implements ResourcesInterface {
 
     @Override
     public String getEventText(Event event) {
-        // 入参校验
-        if (event == null) return "错误：事件对象为空";
-        if (event.ch1 == null) return "错误：说话角色(ch1)为空";
-        if (event.eventname == null) return "错误：事件名(eventname)为空";
+        Object[] lookup = resolveResourceLookup(lineResource, event, "台词");
+        if (lookup == null) return "错误：" + (event == null ? "事件对象为空" : event.ch1 == null ? "说话角色为空" : "事件名为空");
+        String ch2Name = (String) lookup[0];
+        LineData lineData = (LineData) lookup[1];
 
-        // 提取枚举对象（而非直接转字符串）
-        CharacterEnglishName ch1Enum = event.ch1;
-        CharacterEnglishName ch2Enum = event.ch2;
-        String ch1Name = ch1Enum.name();
-        String eventName = event.eventname.name();
-
-        // 查找台词数据
-        Map<String, LineData> characterLines = lineResource.get(ch1Name);
-        if (characterLines == null) {
-            return String.format("未找到角色%s的台词配置", ch1Name);
-        }
-
-        LineData lineData = characterLines.get(eventName);
-        if (lineData == null) {
-            return String.format("角色%s无事件%s的台词", ch1Name, eventName);
-        }
-
-        // 4. 优先匹配特殊台词
-        String targetLine;
-        String ch2Name = ch2Enum != null ? ch2Enum.name() : "";
-        Map<String, String> specialLines = lineData.getSpecial();
-        if (ch2Name != null && !ch2Name.isEmpty()
-                && specialLines != null && specialLines.containsKey(ch2Name)) {
-            targetLine = specialLines.get(ch2Name);
-        } else {
-            targetLine = lineData.getDefaultLine();
-        }
-
-        // 5. 台词空值校验
-        if (targetLine == null || targetLine.isEmpty()) {
-            return String.format("角色%s事件%s无可用台词", ch1Name, eventName);
-        }
-
-        // 6. 替换参数占位符
-        return replaceParams(targetLine, ch1Enum, ch2Enum);
+        String targetLine = (String) resolveSpecialOrDefault(lineData, ch2Name, LineData::getSpecial, LineData::getDefaultLine);
+        if (targetLine == null || targetLine.isEmpty())
+            return String.format("角色%s事件%s无可用台词", event.ch1.name(), event.eventname.name());
+        return replaceParams(targetLine, event.ch1, event.ch2);
     }
 
     //枚举→日文名转换方法
@@ -331,11 +300,9 @@ public class Resources implements ResourcesInterface {
 
     private String replaceParams(String line, CharacterEnglishName talkerEnum, CharacterEnglishName targetEnum) {
         // 日志排查（可选，方便验证）
-        if(DebugLogger.getInstance().isEnabled()){
-        DebugLogger.log("原始台词：" + line);}
+        DebugLogger.log("原始台词：" + line);
         String targetKana = getKatakanaName(targetEnum); // ch2的日文名
-        if(DebugLogger.getInstance().isEnabled()){
-        DebugLogger.log("目标角色(ch2)日文名：" + targetKana);}
+        DebugLogger.log("目标角色(ch2)日文名：" + targetKana);
 
         Matcher matcher = PARAM_PATTERN.matcher(line);
         StringBuffer result = new StringBuffer();
@@ -349,8 +316,7 @@ public class Resources implements ResourcesInterface {
             matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
         }
         matcher.appendTail(result);
-        if(DebugLogger.getInstance().isEnabled()){
-        DebugLogger.log("最终台词：" + result.toString());}
+        DebugLogger.log("最终台词：" + result.toString());
         return result.toString();
     }
 
@@ -386,26 +352,20 @@ public class Resources implements ResourcesInterface {
     @Override
     public void save(GameInfo GameInfo, int cnt) {
         // 存档功能暂未实现
-        if(DebugLogger.getInstance().isEnabled()){
-            DebugLogger.log("[Resources.save] 存档功能暂未实现");
-        }
+        DebugLogger.log("[Resources.save] 存档功能暂未实现");
     }
 
     @Override
     public GameInfo load(int cnt) {
         // 读档功能暂未实现
-        if(DebugLogger.getInstance().isEnabled()){
-            DebugLogger.log("[Resources.load] 读档功能暂未实现，返回null");
-        }
+        DebugLogger.log("[Resources.load] 读档功能暂未实现，返回null");
         return null;
     }
 
     @Override
     public GameRecord getRecord() {
         // 获取游戏记录功能暂未实现
-        if(DebugLogger.getInstance().isEnabled()){
-            DebugLogger.log("[Resources.getRecord] 获取游戏记录功能暂未实现，返回null");
-        }
+        DebugLogger.log("[Resources.getRecord] 获取游戏记录功能暂未实现，返回null");
         return null;
     }
 

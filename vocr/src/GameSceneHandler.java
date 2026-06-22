@@ -32,14 +32,16 @@ public class GameSceneHandler implements SceneHandler {
             btn1.addActionListener(e -> {
                 ui.levelName = "game" + j + "-1.png";
                 ui.resources.playSound("click.wav");
-                ui.gs = ui.mainLogic.start(peiyi.values()[j]);
-                ui.skillTargetPeople = new int[ui.gs.gc.length][GameConstants.MAX_GAME_DAYS];
-                ui.skillTargetNames = new String[ui.gs.gc.length][GameConstants.MAX_GAME_DAYS];
-                ui.skillTargetOrder = new int[ui.gs.gc.length][GameConstants.MAX_GAME_DAYS];
-                ui.claimedRolenum = new int[ui.gs.gc.length][GameConstants.MAX_GAME_DAYS];
+                ui.mainLogic.start(peiyi.values()[j]);
+                ui.ctx = ui.mainLogic.getGameContext();
+                int playerSum = ui.ctx.getPlayerSum();
+                ui.skillTargetPeople = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];
+                ui.skillTargetNames = new String[playerSum + 1][GameConstants.MAX_GAME_DAYS];
+                ui.skillTargetOrder = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];
+                ui.claimedRolenum = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];
                 if (DebugLogger.getInstance().isEnabled()) {
-                    DebugLogger.log("启动后事件数量: " + ui.events.size());
-                    if (ui.events.isEmpty()) {
+                    DebugLogger.log("启动后事件数量: " + ui.getEvents().size());
+                    if (ui.getEvents().isEmpty()) {
                         DebugLogger.log("events为空，添加测试事件");
                         Event testEvent = new Event(EventName.yjsw, CharacterEnglishName.Beatrice);
                         ui.addEvent(testEvent);
@@ -53,11 +55,7 @@ public class GameSceneHandler implements SceneHandler {
                 1050, 560,
                 GameConstants.RETURN_WIDTH * 6 / 10, GameConstants.RETURN_HEIGHT * 6 / 10,
                 ui.resources.getImage("PVBtitile.png"));
-        backBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            ui.currentScene = UI.Scene.START_SCENE;
-            ui.run();
-        });
+        backBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(backBtn);
         JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
@@ -75,7 +73,7 @@ public class GameSceneHandler implements SceneHandler {
         ui.voteChosen.clear();
         ui.zhanChosen.clear();
         ui.huChosen.clear();
-        if (!ui.events.isEmpty()) {
+        if (!ui.getEvents().isEmpty()) {
             DebugLogger.log("事件不为空");
         }
         ui.jPanel.removeAll();
@@ -90,7 +88,7 @@ public class GameSceneHandler implements SceneHandler {
         Timer timer = new Timer(GameConstants.NIGHT_SCREEN_DURATION_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                switch (ui.gs.end) {
+                switch (ui.ctx.getEndResult()) {
                     case 0: ui.currentScene = UI.Scene.GAME_SCENE_DAY;    break;
                     case 1: ui.currentScene = UI.Scene.END_VILLAGE;       break;
                     case 2: ui.currentScene = UI.Scene.END_WOLF;          break;
@@ -104,12 +102,11 @@ public class GameSceneHandler implements SceneHandler {
     }
 
     private void renderDay(UI ui) {
-        ui.gs = ui.mainLogic.getGameStatus();
-        if (ui.gs.end >= 1 && ui.gs.end <= 3) {
+        if (ui.ctx.getEndResult() >= 1 && ui.ctx.getEndResult() <= 3) {
             ui.jPanel.removeAll();
             ui.jPanel.revalidate();
             ui.jPanel.repaint();
-            switch (ui.gs.end) {
+            switch (ui.ctx.getEndResult()) {
                 case 1: ui.currentScene = UI.Scene.END_VILLAGE; break;
                 case 2: ui.currentScene = UI.Scene.END_WOLF;    break;
                 case 3: ui.currentScene = UI.Scene.END_FOX;     break;
@@ -120,12 +117,13 @@ public class GameSceneHandler implements SceneHandler {
         ui.jPanel.removeAll();
         DialogueBox.Components dc = DialogueBox.create(ui.resources, "komorebi002.png");
         ui.jPanel.add(dc.dialogPanel);
-        String dayText = ui.gs.gameDay + "日目になりました。";
+        String dayText = String.format(GameStrings.DAY_START_FORMAT, ui.ctx.getGameDay());
         dc.dialogPanel.setVisible(false);
         Timer typeTimer = UIHelpers.bindTypewriter(dc.dialogText, dayText, dc.nextBtn, () -> {
             ui.currentScene = UI.Scene.DIALOGUE_DEATH;
             ui.run();
         });
+        typeTimer.stop();
         dc.dialogPanel.add(dc.nextBtn);
         dc.dialogPanel.add(dc.dialogText);
         dc.dialogPanel.add(dc.back);

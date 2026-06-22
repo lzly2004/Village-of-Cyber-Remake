@@ -266,22 +266,6 @@ public class DebugLogger
         }
     }
 
-    private void print(LogLevel level, String message)
-    {
-        if (!enabled) return;
-
-        if (level.level >= minConsoleLevel.level)
-        {
-            System.out.print(message);
-        }
-
-        if (fileWriter != null && level.level >= minFileLevel.level)
-        {
-            fileWriter.print(message);
-            fileWriter.flush();
-        }
-    }
-
     private String formatMessage(LogLevel level, String message)
     {
         String timestamp = LocalDateTime.now().format(TIME_FMT);

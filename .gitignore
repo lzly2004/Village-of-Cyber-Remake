@@ -1,4 +1,4 @@
-﻿﻿# 编译产物
+﻿﻿﻿# 编译产物
 out/
 *.class
 
@@ -19,3 +19,13 @@ Thumbs.db
 
 # Native库
 vocr/src/*.dll
+
+# 回归测试基线
+baseline/
+baseline_new/
+
+# 临时输出
+*.log
+
+# JAR
+*.jar
