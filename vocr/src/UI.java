@@ -80,6 +80,7 @@ public class UI implements UIInterface
         END_WOLF(null, 0, 0),//狼人获胜
         END_FOX(null, 0, 0),//妖狐获胜
         END_ANIME(null, 0, 0),//结束动画场景
+        RECORD_SCENE(null, 0, 0),//战绩统计界面
         ;
 
         private final Scene parent;
@@ -115,6 +116,7 @@ public class UI implements UIInterface
         public int FirstInfoNum() { return firstInfoNum; }
     }
     Scene currentScene;//当前是什么场景
+    int recordPage = 0; // 战绩页面：0=総合, 1~7=各配役村
 
     JFrame jFrame;//窗口
     JPanel jPanel;//容器
@@ -160,6 +162,7 @@ public class UI implements UIInterface
         sceneHandlers.put(Scene.END_WOLF, new EndGameHandler());
         sceneHandlers.put(Scene.END_FOX, new EndGameHandler());
         sceneHandlers.put(Scene.END_ANIME, new EndAnimeHandler());
+        sceneHandlers.put(Scene.RECORD_SCENE, new RecordSceneHandler());
         currentScene = Scene.START_SCENE;//初始为开始界面
         jFrame = new JFrame(GameConstants.WINDOW_TITLE);
         jFrame.setResizable(false);

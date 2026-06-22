@@ -188,6 +188,8 @@ public class ExecutionManager
         ctx.setEndResult(gameEndChecker.check());
         if (ctx.getEndResult() != 0) {
             presentGameEnd(ctx.getEndResult());
+            DebugLogger.info("[战绩] 游戏结束(ExecutionManager): peiyi=" + ctx.getPeiyi() + ", end=" + ctx.getEndResult());
+            GameRecordManager.getInstance().updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult());
             return true;
         }
         nightaction.run();

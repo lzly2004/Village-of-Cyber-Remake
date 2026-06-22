@@ -1,0 +1,16 @@
+{
+  "playcnt" : [ 0, 3, 0, 0, 0, 0, 0, 1 ],
+  "winrate" : [ 0.0, 66.667, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+  "villageWincnt" : [ 0, 2, 0, 0, 0, 0, 0, 0 ],
+  "wolfWincnt" : [ 0, 1, 0, 0, 0, 0, 0, 0 ],
+  "foxWincnt" : [ 0, 0, 0, 0, 0, 0, 0, 1 ],
+  "maxStreak" : [ 0, 2, 0, 0, 0, 0, 0, 0 ],
+  "currentStreak" : [ 0, 0, 0, 0, 0, 0, 0, 0 ],
+  "wincnt" : [ 0, 0, 0, 0, 0, 0, 0, 0 ],
+  "totalPlayCnt" : 4,
+  "totalWinRate" : 50.0,
+  "totalVillageWin" : 2,
+  "totalWolfWin" : 1,
+  "totalFoxWin" : 1,
+  "totalMaxStreak" : 2
+}

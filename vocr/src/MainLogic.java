@@ -159,6 +159,9 @@ public class MainLogic implements MainLogicInterface
         if(gs.end != 0) //游戏结束
         {
             executionManager.presentGameEnd(gs.end);
+            DebugLogger.info("[战绩] 游戏结束，准备更新记录: peiyi=" + gs.p + "(ordinal=" + gs.p.ordinal() + "), end=" + gs.end);
+            GameRecordManager.getInstance().updateRecord(gs.p.ordinal(), gs.end);
+            DebugLogger.info("[战绩] 记录更新完成");
             return;//胜负已分
         }
         //6,非人占灵猎编造结果逻辑

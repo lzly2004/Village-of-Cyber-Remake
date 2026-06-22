@@ -91,6 +91,8 @@ public class StartSceneHandler implements SceneHandler {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ui.resources.playSound("click.wav");
+                ui.recordPage = 0;
+                ui.transitionTo(UI.Scene.RECORD_SCENE);
             }
         });
         ui.jPanel.add(btnRecord);

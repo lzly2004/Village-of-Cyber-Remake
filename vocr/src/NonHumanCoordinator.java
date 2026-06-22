@@ -667,7 +667,8 @@ public class NonHumanCoordinator
                         coManager.processActualCo(i,ctx.nonHumanPlan[i],diebody);
                     }
                 }
-                if(ctx.getClaimedRole(ctx.gyindex[1]) != 4 && ctx.getClaimedRole(ctx.gyindex[2]) != 4)
+                if((ctx.gyindex[1] <= 0 || ctx.getClaimedRole(ctx.gyindex[1]) != 4) &&
+                   (ctx.gyindex[2] <= 0 || ctx.getClaimedRole(ctx.gyindex[2]) != 4))
                     gylogic.run();
             }
             response.clear();
