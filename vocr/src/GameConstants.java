@@ -48,7 +48,7 @@ public final class GameConstants
 
     // ==================== 窗口尺寸 ====================
     /** 游戏窗口标题 */
-    public static final String WINDOW_TITLE = "Village of Cyber:Remake v1.0.3.2";
+    public static final String WINDOW_TITLE = "Village of Cyber:Remake v1.0.3.3";
     /** 窗口宽度 */
     public static final int WINDOW_WIDTH  = 1280;
     /** 窗口高度 */

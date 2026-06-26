@@ -21,6 +21,7 @@ public class MainLogic implements MainLogicInterface
     private NonHumanCoordinator nonHumanCoordinator;
     private DayActionCoordinator dayActionCoordinator;
     private ExecutionManager executionManager;
+    private GameRecorder recorder;
 
     /*
      * 参数取值表
@@ -43,6 +44,10 @@ public class MainLogic implements MainLogicInterface
     public GameContextView getGameContext()
     {//提供给UI类，封装后的游戏状态只读访问
         return ctx;
+    }
+    public GameRecorder getRecorder()
+    {//提供给Replay系统，获取当前对局的录制器
+        return recorder;
     }
     public GameStatus start(peiyi p)
     {
@@ -104,6 +109,10 @@ public class MainLogic implements MainLogicInterface
                 ctx.gyindex[nowgy++] = i;
         }
         // 怀疑度初始化已由 SuspicionSystem 构造自动完成
+        // Replay系统: 初始化录制器
+        this.recorder = new GameRecorder("replay_" + p.name());
+        this.recorder.startGame(p, 0L, gs.getPlayerSum(), gs);
+        DebugLogger.info("[Replay] 录制器已初始化: " + p.name());
         //初始职业工作
         initialWork();//首夜和第一个白天开始的行动
         return gs;//返回游戏状态
@@ -125,11 +134,13 @@ public class MainLogic implements MainLogicInterface
         DebugLogger.log("死体逻辑：");
         ctx.diebody.clear();
         ctx.diebody.addAll(dielogic(wolf[0],wolf[1],zhantarget,0));//死体逻辑，并且返回当天夜间死体
+        // Replay系统: 第1天在非人初始工作后录制（gs.gameDay已被+1，用-1取回正确的day编号）
         gs.gameDay++;//增加一天时间
         DebugLogger.log("死体逻辑结果：");
         feirenInitial();//非人的初始工作 + 第一天的进行（占灵共co）
         DebugLogger.log("非人的初始工作结果：");
         suspicion.updateTop3SuspectedPlayers(ctx.zhans, ctx.lings, ctx.lies);//更新怀疑度
+        executionManager.recordReplayDailySnapshot(gs.gameDay);
         DebugLogger.log("目前总人数：" + gs.getPlayerSum());
     }
     private void feirenInitial()
@@ -158,6 +169,8 @@ public class MainLogic implements MainLogicInterface
         gs.end = judgeend();
         if(gs.end != 0) //游戏结束
         {
+            executionManager.recordReplayDailySnapshot(gs.gameDay + 1);
+            executionManager.recordReplayGameEnd(gs.end, gs.gameDay);
             executionManager.presentGameEnd(gs.end);
             DebugLogger.info("[战绩] 游戏结束，准备更新记录: peiyi=" + gs.p + "(ordinal=" + gs.p.ordinal() + "), end=" + gs.end);
             GameRecordManager.getInstance().updateRecord(gs.p.ordinal(), gs.end);
@@ -166,6 +179,8 @@ public class MainLogic implements MainLogicInterface
         }
         //6,非人占灵猎编造结果逻辑
         frlying();
+        // Replay系统: 记录每日快照（录制下一天的开始状态）
+        executionManager.recordReplayDailySnapshot(gs.gameDay + 1);
         //7,增加一天时间
         gs.gameDay++;
         //8，白天起身逻辑

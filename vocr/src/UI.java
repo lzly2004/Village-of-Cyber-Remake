@@ -81,6 +81,8 @@ public class UI implements UIInterface
         END_FOX(null, 0, 0),//妖狐获胜
         END_ANIME(null, 0, 0),//结束动画场景
         RECORD_SCENE(null, 0, 0),//战绩统计界面
+        REPLAY_BROWSER_SCENE(null, 0, 0),//存档浏览器
+        REPLAY_PLAYER_SCENE(null, 0, 0),//回放播放器
         ;
 
         private final Scene parent;
@@ -117,6 +119,9 @@ public class UI implements UIInterface
     }
     Scene currentScene;//当前是什么场景
     int recordPage = 0; // 战绩页面：0=総合, 1~7=各配役村
+    int replayPage = 0; // Replay浏览器页码: 0~2 (每页3槽位)
+    int replayDay = 1; // Replay播放器当前查看日目
+    ReplaySave currentReplaySave = null; // 当前正在查看的存档
 
     JFrame jFrame;//窗口
     JPanel jPanel;//容器
@@ -163,6 +168,8 @@ public class UI implements UIInterface
         sceneHandlers.put(Scene.END_FOX, new EndGameHandler());
         sceneHandlers.put(Scene.END_ANIME, new EndAnimeHandler());
         sceneHandlers.put(Scene.RECORD_SCENE, new RecordSceneHandler());
+        sceneHandlers.put(Scene.REPLAY_BROWSER_SCENE, new ReplayBrowserHandler());
+        sceneHandlers.put(Scene.REPLAY_PLAYER_SCENE, new ReplayPlayerHandler());
         currentScene = Scene.START_SCENE;//初始为开始界面
         jFrame = new JFrame(GameConstants.WINDOW_TITLE);
         jFrame.setResizable(false);

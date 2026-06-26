@@ -78,6 +78,8 @@ public class StartSceneHandler implements SceneHandler {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ui.resources.playSound("click.wav");
+                ui.replayPage = 0;
+                ui.transitionTo(UI.Scene.REPLAY_BROWSER_SCENE);
             }
         });
         ui.jPanel.add(btnSave);

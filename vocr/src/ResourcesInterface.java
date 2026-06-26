@@ -9,6 +9,8 @@ public interface ResourcesInterface
     //参数：背景音乐名称
     //提供给UI类，调用后循环播放背景音乐，之前播放的背景音乐自动停止并释放资源
     //默认返回值true，播放失败返回false
+    String getCurrentBgmName();
+    //返回当前正在播放的BGM文件名
     boolean playSound(String soundName);
     //参数：音频名称
     //提供给UI类，调用后播放一段音效，不可暂停，一次性播放不会循环

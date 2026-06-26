@@ -154,6 +154,18 @@ public class ExecutionManager
                         +CharacterKanjiName.values()[ctx.getCharacterNumber(ctx.getVoteTarget(i, gd, k))]);
             }
         }
+
+        // Replay系统: 在投票完成后立即记录投票数据（此时voteTarget已被填充）
+        try {
+            MainLogic ml = (MainLogic) Game.getInstance().getMainLogic();
+            if (ml != null && ml.getRecorder() != null) {
+                ml.getRecorder().recordVoteData(gd, ctx, dailyVotingRule, chuxingList);
+                DebugLogger.info("[Replay] 投票数据已记录: day=" + gd + ", rounds=" + shokeicnt);
+            }
+        } catch (Exception e) {
+            DebugLogger.warn("[Replay] 记录投票数据失败: " + e.getMessage());
+        }
+
         deliverEvents.run();
         dieaux.accept(topnum,whyDie.chuxing);
         if(topnum == ctx.actualRoleindex[5])
@@ -187,9 +199,11 @@ public class ExecutionManager
         deliverEvents.run();
         ctx.setEndResult(gameEndChecker.check());
         if (ctx.getEndResult() != 0) {
+            recordReplayDailySnapshot(gd + 1);
             presentGameEnd(ctx.getEndResult());
             DebugLogger.info("[战绩] 游戏结束(ExecutionManager): peiyi=" + ctx.getPeiyi() + ", end=" + ctx.getEndResult());
             GameRecordManager.getInstance().updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult());
+            recordReplayEnd(ctx.getEndResult(), gd + 1);
             return true;
         }
         nightaction.run();
@@ -259,12 +273,43 @@ public class ExecutionManager
                 if ((ctx.getNonHumanLeader() > 0 && ctx.isAlive(ctx.getNonHumanLeader())))
                     ctx.eventarray.add(new Event(EventName.krsl, ctx.getCharacterName(ctx.getNonHumanLeader()), null));
                 else
-                ctx.eventarray.add(new Event(EventName.rlsl, player, null));
+                    ctx.eventarray.add(new Event(EventName.rlsl, player, null));
                 break;
             case 3:
                 ctx.eventarray.add(new Event(EventName.yhsl, player, null));
                 break;
         }
         deliverEvents.run();
+    }
+    
+    /** Replay系统: 记录游戏结束 */
+    private void recordReplayEnd(int endResult, int gameDay) {
+        try {
+            MainLogic mainLogic = (MainLogic) Game.getInstance().getMainLogic();
+            if (mainLogic != null && mainLogic.getRecorder() != null) {
+                mainLogic.getRecorder().endGame(endResult, gameDay);
+                DebugLogger.info("[Replay] 游戏结束已记录: result=" + endResult + " day=" + gameDay);
+            }
+        } catch (Exception e) {
+            DebugLogger.warn("[Replay] 记录游戏结束失败: " + e.getMessage());
+        }
+    }
+
+    /** Replay系统: 公开接口，供MainLogic.nightaction在游戏结束时调用 */
+    public void recordReplayGameEnd(int endResult, int gameDay) {
+        recordReplayEnd(endResult, gameDay);
+    }
+    
+    /** Replay系统: 记录每日快照（投票后） */
+    public void recordReplayDailySnapshot(int day) {
+        try {
+            MainLogic mainLogic = (MainLogic) Game.getInstance().getMainLogic();
+            if (mainLogic != null && mainLogic.getRecorder() != null) {
+                mainLogic.getRecorder().recordDailySnapshot(day, ctx);
+                DebugLogger.info("[Replay] 每日快照已记录: day=" + day);
+            }
+        } catch (Exception e) {
+            DebugLogger.warn("[Replay] 记录每日快照失败: " + e.getMessage());
+        }
     }
 }

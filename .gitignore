@@ -29,3 +29,51 @@ baseline_new/
 
 # JAR
 *.jar
+
+# 运行时数据（游戏记录、录像存档，每局游戏都会修改）
++data/
+
+# 构建输出目录中的 META-INF
++META-INF/
+
+# 外部依赖 JAR 目录（bin/ 下的 jar 虽然 *.jar 排除了，但目录本身最好也排除）
++bin/
+
+# 空占位文件
++git
+
+# 运行时数据
+data/
+replay_saves.json
+portable_app/
+
+# 根目录截图和参考图
+/*.png
+/replay参考图*.png
+
+# IDE 模块文件
+*.iml
+
+# 临时调试笔记
+/控制台记录*.txt
+/整理封装exe方法.txt
+/重新整理打包方式.txt
+/多余的箭头.png
+/当前状态.png
+/实际对局.png
+/当前效果*.png
+/最新现状.png
+/投票结果.png
+/最后的问题*.png
+/役职确认.png
+/现状.png
+/空白信息.png
+/缺少前进后退对应的按钮.png
+/你的复盘界面.png
+/信息面板的问题.png
+/角色名显示异常问题.png
+/战绩系统目标样式.png
+/战绩系统目标样式其二.png
+/灵能给自己发白问题1.png
+/灵能给自己发白问题2.png
+/当前票型显示投票对象的问题.png

@@ -25,7 +25,7 @@ public class GameRecorder
 {
     private final String runLabel;           // 本次运行的标签
     private final List<String> records;      // 结构化记录
-    private boolean active = false;          // 是否正在录制
+    public boolean active = false;          // 是否正在录制
     private peiyi gamePeiyi = null;
     private long gameSeed = 0;
     private int playerCount = 0;
@@ -56,6 +56,15 @@ public class GameRecorder
         records.add("# Peiyi: " + p + " (ordinal=" + p.ordinal() + ")");
         records.add("# Seed: " + seed);
         records.add("# PlayerCount: " + playerCount);
+        try {
+            GameRecord record = GameRecordManager.getInstance().getRecord();
+            int peiyiVillage = (p.ordinal() >= 1 && p.ordinal() <= 7) ? record.playcnt[p.ordinal()] + 1 : -1;
+            int totalVillage = record.totalPlayCnt + 1;
+            records.add("# VillageCount: " + peiyiVillage + "/" + totalVillage);
+        } catch (Exception e) {
+            DebugLogger.warn("[GameRecorder] 获取村数信息失败: " + e.getMessage());
+            records.add("# VillageCount: -1/-1");
+        }
         records.add("# ==========================================");
 
         // 录制初始角色分配
@@ -214,6 +223,100 @@ public class GameRecorder
                     .append("}");
         }
         records.add(sb.toString());
+    }
+
+    /**
+     * 记录每日完整快照（包含存活/死亡状态、技能结果、投票明细）
+     * 用于Replay系统的回放数据采集
+     */
+    public void recordDailySnapshot(int day, GameContext ctx)
+    {
+        if (!active) return;
+
+        int playerSum = ctx.getPlayerSum();
+
+        // 基础状态快照
+        int aliveCount = 0;
+        for (int i = 1; i <= playerSum; i++) {
+            if (ctx.isAlive(i)) aliveCount++;
+        }
+        records.add("DAILY_SNAPSHOT|day=" + day + "|alive=" + aliveCount);
+
+        // 详细角色状态
+        StringBuilder sb = new StringBuilder("STATE|day=" + day + "|");
+        for (int i = 1; i <= playerSum; i++) {
+            int charNum = ctx.getCharacterNumber(i);
+            if (charNum == 0) {
+                DebugLogger.warn("[GameRecorder] ⚠️ 玩家" + i + "的characterNumber=0!");
+            }
+            sb.append("{").append(i).append(":")
+                    .append("n=").append(charNum)
+                    .append(",r=").append(ctx.getActualRole(i))
+                    .append(",cr=").append(ctx.getClaimedRole(i))
+                    .append(",cro=").append(ctx.getClaimedRoleOrder(i))
+                    .append(",dd=").append(ctx.getDeathDay(i))
+                    .append(",wd=").append(ctx.getDeathReason(i).ordinal())
+                    .append(",nm=").append(ctx.isNonHumanMarked(i) ? 1 : 0)
+                    .append(",cod=").append(ctx.getComingOutDay(i))
+                    .append(",st=").append(ctx.getSkillTarget(i, day - 1))
+                    .append("}");
+        }
+        String stateLine = sb.toString();
+        records.add(stateLine);
+        DebugLogger.info("[GameRecorder] STATE行: " + stateLine);
+
+        DebugLogger.info("[GameRecorder] 每日快照已记录: day=" + day + " alive=" + aliveCount);
+    }
+
+    /**
+     * 在投票完成后单独记录投票明细数据
+     * 必须在 VoteSelector.select() 执行后调用，此时 voteTarget 已被填充
+     */
+    public void recordVoteData(int day, GameContext ctx, int dailyVotingRule, List<Integer> greyTargets) {
+        if (!active) return;
+
+        // 记录投票方式额外信息
+        StringBuilder methodSb = new StringBuilder("VOTE_METHOD|day=" + day + "|rule=" + dailyVotingRule);
+        if (greyTargets != null && !greyTargets.isEmpty()) {
+            methodSb.append("|grey=");
+            for (int g : greyTargets) methodSb.append(g).append(",");
+            methodSb.setLength(methodSb.length() - 1);
+        }
+        // 指定投票対象从ctx读取
+        StringBuilder designSb = new StringBuilder();
+        for (int i = 1; i <= ctx.getPlayerSum(); i++) {
+            if (ctx.isSelectedVoteTarget(i, day)) {
+                designSb.append(ctx.getCharacterNumber(i)).append(",");
+            }
+        }
+        if (designSb.length() > 0) {
+            designSb.setLength(designSb.length() - 1);
+            methodSb.append("|design=").append(designSb);
+        }
+        records.add(methodSb.toString());
+        DebugLogger.info("[GameRecorder] " + methodSb.toString());
+
+        int playerSum = ctx.getPlayerSum();
+
+        // 投票明细（多轮）- 从ctx读取实际的voteTarget数据
+        for (int round = 1; round <= 3; round++) {
+            boolean hasVote = false;
+            int validVoteCnt = 0;
+            StringBuilder voteSb = new StringBuilder("VOTE_DETAIL|day=" + day + "|round=" + round + "|");
+            for (int i = 1; i <= playerSum; i++) {
+                int target = ctx.getVoteTarget(i, day, round);
+                if (target > 0 || ctx.getDeathDay(i) == day) {
+                    voteSb.append(i).append("->").append(target).append(",");
+                    hasVote = true;
+                    if (target > 0) validVoteCnt++;
+                }
+            }
+            if (hasVote && validVoteCnt > 0) {
+                voteSb.setLength(voteSb.length() - 1);
+                records.add(voteSb.toString());
+                DebugLogger.info("[GameRecorder] VOTE_DETAIL: " + voteSb.toString());
+            }
+        }
     }
 
     // ==================== 保存 ====================

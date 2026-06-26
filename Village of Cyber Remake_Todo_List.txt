@@ -1,0 +1,221 @@
+================================================================================
+        Village of Cyber Remake — 重构 Todo List
+        生成日期：2026-06-26 | 版本：v1.0.3.4
+        共 39 项任务，按优先级 P0/P1/P2 分三档
+================================================================================
+
+================================================================================
+P0 — 高优先级 | 健壮性 / 逻辑正确性 / 工程基础（6 项）
+================================================================================
+
+[P0-1] 修复潜在的死循环与 NPE 风险
+       来源: #24 #55 #56 #78
+       - SuspicionSystem.getOne() 权重全为负时抛出异常而非降级
+       - EndGameHandler 轮询事件队列可能死循环
+       - GameSceneHandler 的 Timer 在场景切换后未取消
+       - ZhanFabricator 中 divine() 被调用两次，第一次副作用污染状态
+
+[P0-2] 添加全局异常处理器
+       来源: #70
+       - 使用 Thread.setDefaultUncaughtExceptionHandler() 包裹主循环
+       - 崩溃时至少保存 Replay 录制进度
+
+[P0-3] 添加游戏初始化合法性验证
+       来源: #75
+       - MainLogic.start() 开头检查 playerSum > 0、gs 非空、角色分配正确
+
+[P0-4] 引入 Gradle/Maven 构建系统
+       来源: #12
+       - 替代 200+ 行的 build.bat
+       - 自动化依赖管理（Jackson 等 JAR 不再手动放在 bin/）
+       - 支持跨平台构建和自动化测试集成
+
+[P0-5] 为零依赖纯逻辑类添加单元测试
+       来源: #13
+       - ProbabilityCalculator、GameLogicUtils、GameEndChecker
+       - GreyListCalculator、RuleEngine、WeightRule 等优先覆盖
+
+[P0-6] 修复 GameEndChecker 重复计算
+       来源: #36
+       - check() 在同一天内被多次调用但每次都重新遍历
+       - 应缓存结果或在 aliveCounter/deathCounter 变化时更新
+
+================================================================================
+P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
+================================================================================
+
+--- 架构分层与封装 ---
+
+[P1-1] GameContext 瘦身 + 访问路径统一
+       来源: #2 #26 #46
+       - 将 getp1()/getp2() 等业务方法移回使用它们的类
+       - 统一 playerSum 只能通过 ctx.getPlayerSum() 访问
+       - 逐步将 gs.gc[i] 的直接访问替换为 ctx 封装方法
+
+[P1-2] 解决 MainLogic 的循环依赖构造
+       来源: #49
+       - GameContext 构造时 suspicion 为 null 后回填
+       - 改为工厂方法或将 SuspicionSystem 创建内聚到 GameContext 内部
+
+[P1-3] 统一依赖注入风格，消除单例不一致
+       来源: #3 #33
+       - ReplayManager 和 GameRecordManager 使用全局 getInstance()
+       - 与其他组件的构造函数注入矛盾 → 统一为构造函数注入
+       - ExecutionManager 8 参数构造函数过重 → 引入 GameModule 容器
+
+[P1-4] 消除 MainLogic 的方法引用回调链
+       来源: #4
+       - this::gylogic、this::deliverEvents 等方法引用传递形成隐式回调链
+       - 改为显式的协调器模式或事件总线
+
+[P1-5] 修复分层泄漏
+       来源: #31 #65 #67 #73
+       - GreyListCalculator 接受 UI 而非 GameContextView
+       - PlayerStatusRenderer 依赖 Handler 获取图标名
+       - Fabricator 是薄委托层可消除
+       - jFrame 和 GameRecorder.active 不应 public
+
+[P1-6] ResultPresenter 职责拆分
+       来源: #37
+       - 当前同时做事件生成 + 怀疑度修改 + CO状态修改 + 非人标记
+       - 拆分为 ResultEffectApplicator（应用效果）和 EventGenerator（生成事件）
+
+[P1-7] SharedExposer 暴露进度归属修正
+       来源: #38
+       - exposureProgress 存储在 GameContext 中但语义上属于 SharedExposer
+       - 将 SharedExposer 改为有状态的生命周期对象
+
+--- 代码质量与可读性 ---
+
+[P1-8] 命名规范与魔法数字统一清理
+       来源: #5 #6 #27 #42
+       - 拼音缩写 (peiyi、zhan、whyDie) → 英文全称
+       - EventName 缩写 (wz17、zjgh8b) → 可读名称
+       - -50、10 等魔法数字 → 命名常量
+       - actualRoleindex[10] → getActualRoleIndex(Role.yaohu)
+
+[P1-9] 消除 1-based 数组索引或统一加边界检查
+       来源: #28
+       - 所有 weights[i] (i=1..n) 的数组操作添加 assert 或改为 0-based
+
+[P1-10] NonHumanCoordinator.coordinate() 方法拆分
+       来源: #29
+       - 300+ 行方法拆分为 coordinateWolfZhan()、coordinateWolfLing()
+         coordinateMadman()、coordinateFox() 等独立子方法
+
+[P1-11] UI 事件处理中匿名类提取为独立方法
+       来源: #32 #68
+       - GameSceneVoteHandler.wireAllEventHandlers() 中 100+ 行匿名 listener
+       - 提取为命名方法，分离 UI 渲染和业务逻辑
+
+[P1-12] COManager.askCoByRole/askCoByList 消除重复
+       来源: #66
+       - 两个方法共享 80% 逻辑 → 提取公共方法 buildCoResponse()
+
+[P1-13] ZhanFabricator.switch 改为策略模式
+       来源: #43
+       - 5 个 case 分支遵循相同模式 → 每个角色类型实现 BlackBallStrategy 接口
+
+[P1-14] 消除 RuleEngine 的隐式顺序依赖
+       来源: #41
+       - 文档化规则之间的依赖关系，或添加规则优先级/阶段分组机制
+
+[P1-15] VoteSelector 遵守 CQS 原则
+       来源: #35
+       - select() 拆分为纯查询 computeVoteTargets() 和命令 applyVoteTargets()
+
+--- 数据持久化与配置管理 ---
+
+[P1-16] 存档/Replay 添加版本号与迁移机制
+       来源: #19 #45 #64
+       - GameRecord、ReplaySave 的 JSON 序列化添加 version 字段
+       - ReplaySave.fromRecorder() 的字符串解析改为结构化 JSON 解析
+
+[P1-17] AI 概率参数集中管理
+       来源: #20 #30
+       - 分散在 6-7 个类中的硬编码概率值迁移到概率配置文件
+       - 配置文件改为"默认值 + 覆盖项"模式
+
+[P1-18] 统一文件路径管理
+       来源: #14
+       - 所有 data/、config/ 路径通过 PathConfig 类管理
+
+--- UI 状态管理 ---
+
+[P1-19] UI 状态集中管理
+       来源: #1 #51
+       - UI.java 中散落的状态变量封装为 VotePanelState 等视图状态对象
+       - StartSceneHandler 中手动重置改为 UI.resetGameState()
+
+[P1-20] 按钮可见性状态机化
+       来源: #53
+       - VoteButtonPanel 的 20+ 按钮可见性切换
+       - 引入 ButtonVisibilityState 枚举或状态机
+
+--- 日志系统 ---
+
+[P1-21] 日志系统改实例注入
+       来源: #25 #60
+       - DebugLogger 的静态方法改为通过构造函数注入的实例方法
+       - 支持单元测试中 mock 和按模块隔离日志级别
+
+================================================================================
+P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
+================================================================================
+
+[P2-1] 窗口缩放 / 全屏 / 高DPI 支持
+       来源: #15
+       - 1280×720 固定窗口 + setResizable(false) → 支持等比缩放或全屏模式
+
+[P2-2] 字体回退机制
+       来源: #22
+       - "Takao Mincho" 硬编码 → 使用 GraphicsEnvironment 检测可用字体
+
+[P2-3] BGM 状态管理统一
+       来源: #34
+       - 分散在多个 Handler 中的 BGM 切换逻辑收敛到 BgmManager 单例
+
+[P2-4] PlayerStatusRenderer 布局动态化
+       来源: #52 #59
+       - 160 + 64*i 硬编码像素偏移 → 根据 playerSum 动态计算
+       - GameCharacter 数组改为按配役人数动态分配
+
+[P2-5] GameStrings 添加格式化方法
+       来源: #61
+       - String.format(...) 收敛为 GameStrings.getDayStart(int day) 等语义化方法
+
+[P2-6] 修复 GameRecord.winrate 浮点精度
+       来源: #63
+       - 使用 BigDecimal 或整数运算替代 double 计算胜率
+
+[P2-7] probability_config.json 扩展名修正
+       来源: #69
+       - 文件名改为 probability_config.txt 或将内容改为真正的 JSON 格式
+
+[P2-8] 配役数量动态获取
+       来源: #72
+       - for (int i = 1; i <= 7; i++) → peiyi.values().length
+
+[P2-9] 代码现代化细节
+       来源: #50 #58 #74
+       - 双数组洗牌改为单次洗牌
+       - IntPair 用 JDK 21 record 替代
+       - boolean[1] 输出参数模式改为 AtomicBoolean 或重构
+
+[P2-10] JSON 反序列化添加 Schema 校验
+       来源: #23
+       - ReplayManager 和 GameRecordManager 加载 JSON 后验证必填字段和值范围
+
+[P2-11] 添加游戏难度配置
+       来源: #39
+       - 引入"简单/普通/困难"模式，影响 AI 概率参数和怀疑度调整幅度
+
+[P2-12] BaselineRunner 改进为"语义对比"
+       来源: #40
+       - 不只比较输出文本是否完全一致
+       - 比较关键游戏事件序列（胜负、死亡顺序、CO序列）是否一致
+
+================================================================================
+                            统计概览
+  P0: 6 项 | P1: 21 项 | P2: 12 项 | 合计: 39 项
+================================================================================

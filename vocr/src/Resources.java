@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class Resources implements ResourcesInterface {
     // 音频相关
     private Clip currentBgm;
+    private String currentBgmName;
     // 台词资源：角色名 → 事件名 → 台词数据
     private Map<String, Map<String, LineData>> lineResource;
     // 台词参数占位符正则（<param=xxx>）
@@ -205,6 +206,7 @@ public class Resources implements ResourcesInterface {
                 currentBgm.stop();
                 currentBgm.close();
             }
+            currentBgmName = null;
             return true; // 停止操作视为成功
         }
 
@@ -216,20 +218,48 @@ public class Resources implements ResourcesInterface {
 
         try {
             // 加载BGM文件（resources/BGM/目录）
-            AudioInputStream ais = AudioSystem.getAudioInputStream(
-                    Objects.requireNonNull(getClass().getResource("/BGM/" + bgmName))
+            URL bgmUrl = getClass().getResource("/BGM/" + bgmName);
+            if (bgmUrl == null) {
+                DebugLogger.error("BGM " + bgmName + " 未找到资源! 路径=/BGM/" + bgmName);
+                return false;
+            }
+            DebugLogger.info("[BGM] 找到资源: " + bgmUrl);
+            AudioInputStream ais = AudioSystem.getAudioInputStream(bgmUrl);
+            AudioFormat originalFormat = ais.getFormat();
+            DebugLogger.info("[BGM] 音频格式: " + originalFormat);
+
+            // 如果不是标准PCM格式，自动转码
+            AudioFormat targetFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    originalFormat.getSampleRate(),
+                    16,
+                    originalFormat.getChannels(),
+                    originalFormat.getChannels() * 2,
+                    originalFormat.getSampleRate(),
+                    false
             );
+            if (!originalFormat.matches(targetFormat)) {
+                DebugLogger.info("[BGM] 转码: " + originalFormat.getEncoding() + " -> PCM_SIGNED");
+                ais = AudioSystem.getAudioInputStream(targetFormat, ais);
+            }
+
             currentBgm = AudioSystem.getClip();
             currentBgm.open(ais);
             ais.close();
             currentBgm.loop(Clip.LOOP_CONTINUOUSLY); // 循环播放
             currentBgm.start();
+            currentBgmName = bgmName;
+            DebugLogger.info("[BGM] 播放成功: " + bgmName);
             return true;
         } catch (Exception e) {
-            DebugLogger.error("BGM " + bgmName + " 播放失败");
+            DebugLogger.error("BGM " + bgmName + " 播放失败: " + e.getClass().getName() + " - " + e.getMessage());
             e.printStackTrace();
             return false;
         }
+    }
+
+    public String getCurrentBgmName() {
+        return currentBgmName;
     }
 
     @Override
