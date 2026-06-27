@@ -37,12 +37,12 @@ public class BaselineRunner
             // 开始录制随机数序列
             ConstNum.startRandomRecording();
 
-            // 创建录像器
-            GameRecorder recorder = new GameRecorder(label);
-
             // 初始化游戏
             Game game = Game.getInstance();
             game.init();
+
+            // 创建录像器 (需要GameRecordManager)
+            GameRecorder recorder = new GameRecorder(label, game.getGameRecordManager());
 
             MainLogic mainLogic = (MainLogic) game.getMainLogic();
             GameStatus gs = mainLogic.start(peiyiValue);
