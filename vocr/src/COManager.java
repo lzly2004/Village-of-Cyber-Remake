@@ -87,8 +87,8 @@ public class COManager
                                     && Math.abs(ctx.getSkillTarget(ctx.lings.get(i), k)
                                     - ctx.getSkillTarget(num, j)) == gd)
                             {
-                                ctx.addLazySuspicionValue(num, 5);
-                                ctx.addLazySuspicionValue(ctx.lings.get(i), 5);
+                                ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_CONFLICT);
+                                ctx.addLazySuspicionValue(ctx.lings.get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
                                 suspicion.updateTop3Aux2(num, ctx.lings.get(i), GameConstants.INF, GameConstants.INF);
                                 ctx.lined[num][ctx.lings.get(i)] = 0;
                             }
@@ -107,15 +107,15 @@ public class COManager
                 }
                 if (!ctx.zhans.contains(num))
                     ctx.zhans.add(num);
-                ctx.addLazySuspicionValue(num, -50);
+                ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_SEER_CO);
                 if (gd > 2)
-                    ctx.addLazySuspicionValue(num, 10);
+                    ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_LATE_CO);
                 int target = ctx.getSkillTarget(num, 1);
                 if (ctx.isBlackResult(target))
                 {
                     target -= ctx.getPlayerSum();
-                    ctx.addLazySuspicionValue(target, 10);
-                    ctx.addLazySuspicionValue(num, 2);
+                    ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_INCREASE_BLACK_BALL_TARGET);
+                    ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_BLACK_BALL_CASTER);
                     suspicion.updateTop3Aux2(num, target, GameConstants.INF, GameConstants.INF);
                     ctx.eventarray.add(new Event(EventName.zjgh8b,
                             ctx.getCharacterName(num),
@@ -126,7 +126,7 @@ public class COManager
                 }
                 else if (target > 0)
                 {
-                    ctx.addLazySuspicionValue(target, -10);
+                    ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_DECREASE_WHITE_BALL_TARGET);
                     suspicion.updateTop3Aux2(num, target, -5, -10);
                     ctx.eventarray.add(new Event(EventName.zjgb8,
                             ctx.getCharacterName(num),
@@ -138,7 +138,7 @@ public class COManager
                 }
                 if (gd == 3)
                 {
-                    ctx.addLazySuspicionValue(num, 10);
+                    ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_LATE_CO);
                     resultPresenter.presentZhan(num, diebody);
                 }
                 break;
@@ -155,7 +155,7 @@ public class COManager
                 }
                 if (ctx.getClaimedRoleOrder(num) == 0)
                     ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(2));
-                ctx.addLazySuspicionValue(num, -30);
+                ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 if (gd == 2)
                 {
                     ctx.eventarray.add(new Event(EventName.lnco18,
@@ -164,7 +164,7 @@ public class COManager
                 }
                 else
                 {
-                    ctx.addLazySuspicionValue(num, 10);
+                    ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_LATE_CO);
                     resultPresenter.presentLing(num);
                 }
                 break;
@@ -178,7 +178,7 @@ public class COManager
                 }
                 if (ctx.getClaimedRoleOrder(num) == 0)
                     ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(3));
-                ctx.addLazySuspicionValue(num, -30);
+                ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 ctx.eventarray.add(new Event(EventName.lrco, ctx.getCharacterName(num)));
                 if (ctx.getActualRole(num) == 7)
                     ctx.rlsl = true;
@@ -210,7 +210,7 @@ public class COManager
                 }
                 if (ctx.getClaimedRoleOrder(num) == 0)
                     ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(5));
-                ctx.addLazySuspicionValue(num, -30);
+                ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 ctx.eventarray.add(new Event(EventName.mco, ctx.getCharacterName(num)));
                 if (ctx.getActualRole(num) == 7)
                     ctx.rlsm = true;

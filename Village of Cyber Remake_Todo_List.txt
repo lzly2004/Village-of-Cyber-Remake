@@ -100,9 +100,9 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
        来源: #5 #6 #27 #42
        - ✅ actualRoleindex[x] → 语义化方法（GameContext新增getCat/getFox/getDeviant等）
        - ✅ 替换多处actualRoleindex引用（COManager、ExecutionManager、NonHumanCoordinator、DielogicCarrier、WolfBiter）
+       - ✅ 魔法数字(-50/-30/-10/10/2/5) → GameConstants命名常量（GameConstants新增8个怀疑度常量）
        - 未完成: 拼音缩写(peiyi/zhan/whyDie) → 英文全称
        - 未完成: EventName缩写(wz17/zjgh8b) → 可读名称
-       - 未完成: 魔法数字(-50/10) → 命名常量
 
 [P1-9] 消除 1-based 数组索引或统一加边界检查
        来源: #28

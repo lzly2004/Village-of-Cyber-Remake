@@ -337,7 +337,7 @@ public class NonHumanCoordinator
             if(ctx.getClaimedRoleOrder(ctx.zhans.get(i)) == 0)
                 ctx.setClaimedRoleOrder(ctx.zhans.get(i), ctx.incrementClaimedRoleOrder(1));
             ctx.setComingOutDay(ctx.zhans.get(i), gd);
-            ctx.addLazySuspicionValue(ctx.zhans.get(i), -50);
+            ctx.addLazySuspicionValue(ctx.zhans.get(i), GameConstants.SUSPICION_DECREASE_SEER_CO);
             for(int j=0;j<i;j++)
                 suspicion.updateTop3Aux2(ctx.zhans.get(i),ctx.zhans.get(j),GameConstants.INF,GameConstants.INF);
         }
@@ -364,7 +364,7 @@ public class NonHumanCoordinator
             if(ctx.getClaimedRoleOrder(ctx.lings.get(i)) == 0)
                 ctx.setClaimedRoleOrder(ctx.lings.get(i), ctx.incrementClaimedRoleOrder(2));
             ctx.setComingOutDay(ctx.lings.get(i), gd);
-            ctx.addLazySuspicionValue(ctx.lings.get(i), -30);
+            ctx.addLazySuspicionValue(ctx.lings.get(i), GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
             for(int j=0;j<i;j++)
                 suspicion.updateTop3Aux2(ctx.lings.get(i),ctx.lings.get(j),GameConstants.INF,GameConstants.INF);
         }
@@ -492,7 +492,7 @@ public class NonHumanCoordinator
             if(role == 1 && ctx.zhans.contains(respPlayer)) alreadyProcessed = true;
             if(role == 2 && ctx.lings.contains(respPlayer)) alreadyProcessed = true;
 
-            ctx.addLazySuspicionValue(respPlayer, 10);
+            ctx.addLazySuspicionValue(respPlayer, GameConstants.SUSPICION_INCREASE_BLACK_RESPONSE);
             if(!alreadyProcessed)
                 coManager.processActualCo(respPlayer, role, diebody);
             if(role == 5)

@@ -145,4 +145,22 @@ public final class GameConstants
     public static final int DEFAULT_PROBABILITY = 20;
     /** 怀疑前三数组大小(3+1) */
     public static final int TOP3_ARRAY_SIZE = 4;
+
+    // ==================== 怀疑度变化常量 ====================
+    /** 占卜师CO时怀疑度减少 */
+    public static final int SUSPICION_DECREASE_SEER_CO = -50;
+    /** 灵能者CO时怀疑度减少 */
+    public static final int SUSPICION_DECREASE_MEDIUM_CO = -30;
+    /** 3日及以后CO时额外增加的怀疑度 */
+    public static final int SUSPICION_INCREASE_LATE_CO = 10;
+    /** 白球占文目标怀疑度减少 */
+    public static final int SUSPICION_DECREASE_WHITE_BALL_TARGET = -10;
+    /** 黑球占文目标怀疑度增加 */
+    public static final int SUSPICION_INCREASE_BLACK_BALL_TARGET = 10;
+    /** 出黒球时占卜师自身轻微怀疑度增加 */
+    public static final int SUSPICION_INCREASE_BLACK_BALL_CASTER = 2;
+    /** 占灵冲突/矛盾时怀疑度增加 */
+    public static final int SUSPICION_INCREASE_CONFLICT = 5;
+    /** 接黒回复时怀疑度增加 */
+    public static final int SUSPICION_INCREASE_BLACK_RESPONSE = 10;
 }

@@ -27,8 +27,8 @@ public class ResultPresenter
             if (ctx.isBlackResult(target))
             {
                 target -= n;
-                ctx.addLazySuspicionValue(target, 10);
-                ctx.addLazySuspicionValue(num, 2);
+                ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_INCREASE_BLACK_BALL_TARGET);
+                ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_BLACK_BALL_CASTER);
                 suspicion.updateTop3Aux2(num, target, GameConstants.INF, GameConstants.INF);
                 ctx.eventarray.add(new Event(EventName.zjgh8b, ctx.getCharacterName(num),
                         ctx.getCharacterName(target)));
@@ -36,7 +36,7 @@ public class ResultPresenter
             }
             else if (ctx.getDeathReason(target) == whyDie.NONE)
             {
-                ctx.addLazySuspicionValue(target, -10);
+                ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_DECREASE_WHITE_BALL_TARGET);
                 suspicion.updateTop3Aux2(num, target, -5, -10);
                 ctx.eventarray.add(new Event(EventName.zjgb8, ctx.getCharacterName(num),
                         ctx.getCharacterName(target)));
@@ -90,7 +90,7 @@ public class ResultPresenter
                 }
                 else if (target <= n)
                 {
-                    ctx.addLazySuspicionValue(target, -10);
+                    ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_DECREASE_WHITE_BALL_TARGET);
                     suspicion.updateTop3Aux2(num, target, -5, -10);
                     ctx.eventarray.add(new Event(EventName.zjgb8,
                             ctx.getCharacterName(num),
@@ -170,9 +170,9 @@ public class ResultPresenter
             }
             if (!ctx.lings.contains(num))
                 ctx.lings.add(num);
-            ctx.addLazySuspicionValue(num, -30);
+            ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
             if (gd > 2)
-                ctx.addLazySuspicionValue(num, 10);
+                ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_LATE_CO);
         }
         int diePlayer = ctx.getDiePlayerNum(whyDie.chuxing, gd - 1);
         if (ctx.isBlackResult(ctx.getSkillTarget(num, gd - 1)))
@@ -195,8 +195,8 @@ public class ResultPresenter
                         && Math.abs(ctx.getSkillTarget(num, gd - 1)
                         - ctx.getSkillTarget(ctx.zhans.get(i), j)) == gd)
                 {
-                    ctx.addLazySuspicionValue(num, 5);
-                    ctx.addLazySuspicionValue(ctx.zhans.get(i), 5);
+                    ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_CONFLICT);
+                    ctx.addLazySuspicionValue(ctx.zhans.get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
                     suspicion.updateTop3Aux2(num, ctx.zhans.get(i), GameConstants.INF, GameConstants.INF);
                 }
                 if (ctx.getSuspicionValue(num, ctx.zhans.get(i)) <= GameConstants.INFJ
