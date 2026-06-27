@@ -119,7 +119,10 @@ class SuspicionSystem
                 totalWeight += tempWeights[i];
         }
         if (totalWeight <= 0)
-            throw new IllegalStateException("无有效正权重玩家，无法随机选择");
+        {
+            DebugLogger.error("getOne: 无有效正权重玩家，降级返回maxIdx=" + maxIdx);
+            return maxIdx >= 1 ? maxIdx : 1;
+        }
 
         int randomNum = ConstNum.randomInt(0, totalWeight - 1);
         int cumulativeWeight = 0;

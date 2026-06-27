@@ -157,11 +157,11 @@ public class WolfBiter
 
         // --- 角色修正 ---
         engine.addSimpleRule("R03_猎人加权",
-                i -> i == ctx.actualRoleindex[3],
+                i -> i == ctx.getHunter(),
                 i -> gd * 2);
 
         engine.addSimpleRule("R04_狂信减权",
-                i -> ctx.getKyojin() == 0 && i == ctx.actualRoleindex[9],
+                i -> ctx.getKyojin() == 0 && i == ctx.getActualRoleIndex(9),
                 i -> -45);
 
         // --- 末狼猫嫌 ---

@@ -83,6 +83,12 @@ class GameContext implements GameContextView
     public int getMedium() { return actualRoleindex[2]; }
     /** 猎人（役职3） */
     public int getHunter() { return actualRoleindex[3]; }
+    /** 猫又（役职5） */
+    public int getCat() { return actualRoleindex[5]; }
+    /** 妖狐（役职10） */
+    public int getFox() { return actualRoleindex[10]; }
+    /** 背德者（役职11） */
+    public int getDeviant() { return actualRoleindex[11]; }
 
     public int getClaimedRole(int player) { return gs.gc[player].claimedRole; }
     public int getComingOutDay(int player) { return gs.gc[player].comingOutDay; }

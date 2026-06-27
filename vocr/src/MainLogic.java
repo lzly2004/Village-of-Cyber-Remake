@@ -57,6 +57,14 @@ public class MainLogic implements MainLogicInterface
         //函数体中有可能向UI类添加一系列事件
         gs         = new GameStatus();
         gs.startGame(p);
+        if (gs.getPlayerSum() <= 0) {
+            throw new IllegalStateException("游戏初始化失败: playerSum=" + gs.getPlayerSum());
+        }
+        for (int i = 1; i <= gs.getPlayerSum(); i++) {
+            if (gs.gc[i] == null || gs.gc[i].actualRole == 0) {
+                throw new IllegalStateException("游戏初始化失败: 玩家" + i + "角色未分配");
+            }
+        }
         ctx = new GameContext(gs, suspicion);
         suspicion = new SuspicionSystem(ctx);
         ctx.setSuspicion(suspicion);

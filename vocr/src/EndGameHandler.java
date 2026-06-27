@@ -9,24 +9,18 @@ public class EndGameHandler implements SceneHandler {
         ImageIcon bgIcon;
         switch (scene) {
             case END_FOX:
-                while (event.eventname != EventName.yhsl) {
-                    event = ui.getEvents().poll();
-                }
+                event = seekEvent(ui, event, EventName.yhsl);
                 ui.resources.playBgm("失败画面.wav");
                 bgIcon = ui.resources.getImage("endFox.png");
                 break;
             case END_WOLF:
-                while (event.eventname != EventName.krsl && event.eventname != EventName.rlsl) {
-                    event = ui.getEvents().poll();
-                }
+                event = seekEvent(ui, event, EventName.krsl, EventName.rlsl);
                 ui.resources.playBgm("失败画面.wav");
                 bgIcon = ui.resources.getImage("endWolf.png");
                 break;
             case END_VILLAGE:
             default:
-                while (event.eventname != EventName.crsl) {
-                    event = ui.getEvents().poll();
-                }
+                event = seekEvent(ui, event, EventName.crsl);
                 ui.resources.playBgm("胜利画面.wav");
                 bgIcon = ui.resources.getImage("endVillage.png");
                 break;
@@ -58,5 +52,25 @@ public class EndGameHandler implements SceneHandler {
             UIHelpers.renderDialogueCharacter(ui, event, CharIcon);
         }
         DialogueBox.finalize(ui, dc);
+    }
+
+    private static final int MAX_SEEK_ITERATIONS = 200;
+
+    private static Event seekEvent(UI ui, Event current, EventName... targets) {
+        int iterations = 0;
+        Event event = current;
+        while (event != null && iterations < MAX_SEEK_ITERATIONS) {
+            for (EventName t : targets) {
+                if (event.eventname == t) return event;
+            }
+            event = ui.getEvents().poll();
+            iterations++;
+        }
+        if (event == null) {
+            DebugLogger.error("EndGameHandler: 事件队列为空，未找到目标事件");
+        } else if (iterations >= MAX_SEEK_ITERATIONS) {
+            DebugLogger.error("EndGameHandler: 超过最大迭代次数，未找到目标事件");
+        }
+        return event;
     }
 }

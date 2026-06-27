@@ -24,13 +24,33 @@ public class Game
     }
     public void run()
     {
-        init();
-        DebugLogger.info("Village of Cyber Remake - 游戏启动");
-        resources.run();
-        ui.run();
+        try {
+            init();
+            DebugLogger.info("Village of Cyber Remake - 游戏启动");
+            resources.run();
+            ui.run();
+        } catch (Exception e) {
+            DebugLogger.error("未捕获异常，游戏崩溃: " + e.getMessage());
+            e.printStackTrace();
+            if (mainlogic != null && mainlogic.getRecorder() != null) {
+                try {
+                    mainlogic.getRecorder().endGame(0, 0);
+                    DebugLogger.info("崩溃时已尝试保存Replay数据（endResult=0, gameDay=0）");
+                } catch (Exception ex) {
+                    DebugLogger.error("保存Replay数据失败: " + ex.getMessage());
+                }
+            }
+            javax.swing.JOptionPane.showMessageDialog(null,
+                "游戏发生错误，请查看日志。\n错误信息: " + e.getMessage(),
+                "错误", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }
     public static void main(String[] args)
    {
+       Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+           DebugLogger.error("线程[" + t.getName() + "]未捕获异常: " + e.getMessage());
+           e.printStackTrace();
+       });
        getInstance().run();
    }
     public UIInterface getUI()

@@ -23,7 +23,7 @@ public class GameSceneHandler implements SceneHandler {
         int x_div = 30 + width;
         int y_div = 30 + height;
         JButton btn1;
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i < peiyi.values().length; i++) {
             final int j = i;
             btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                     x + (i / 5) * x_div, y + (i - 1) % 4 * y_div, width, height,
@@ -88,6 +88,7 @@ public class GameSceneHandler implements SceneHandler {
         Timer timer = new Timer(GameConstants.NIGHT_SCREEN_DURATION_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (ui.currentScene != UI.Scene.GAME_SCENE_NIGHT) return;
                 switch (ui.ctx.getEndResult()) {
                     case 0: ui.currentScene = UI.Scene.GAME_SCENE_DAY;    break;
                     case 1: ui.currentScene = UI.Scene.END_VILLAGE;       break;
@@ -129,6 +130,7 @@ public class GameSceneHandler implements SceneHandler {
         dc.dialogPanel.add(dc.back);
         ui.resources.playSound("狼嚎音效.wav");
         Timer timer = new Timer(GameConstants.HOWL_TRANSITION_MS, e -> {
+            if (ui.currentScene != UI.Scene.GAME_SCENE_DAY) return;
             dc.dialogPanel.setVisible(true);
             typeTimer.start();
             ((Timer) e.getSource()).stop();

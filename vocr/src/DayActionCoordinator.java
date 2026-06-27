@@ -74,7 +74,7 @@ public class DayActionCoordinator
         // 1接黒
         ArrayList<IntPair> response = new ArrayList<>();
         boolean havecatco = false;
-        if(ctx.claimedRoleaskday[3] == 0 || (ctx.actualRoleindex[5] != 0 && ctx.claimedRoleaskday[5] == 0))
+        if(ctx.claimedRoleaskday[3] == 0 || (ctx.getCat() != 0 && ctx.claimedRoleaskday[5] == 0))
         {
             for(int i=0;i<ctx.zhans.size();i++)
             {
@@ -97,7 +97,7 @@ public class DayActionCoordinator
                             {
                                 int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
                                 if(ctx.rlsl || ctx.claimedRoleaskday[3] != 0) lweight = 0;
-                                if(ctx.rlsm || ctx.actualRoleindex[5] == 0 || ctx.claimedRoleaskday[5] != 0) mweight = 0;
+                                if(ctx.rlsm || ctx.getCat() == 0 || ctx.claimedRoleaskday[5] != 0) mweight = 0;
                                 if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
                                 else
                                 {
@@ -117,7 +117,7 @@ public class DayActionCoordinator
                             {
                                 int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
                                 if(ctx.claimedRoleaskday[3] != 0) lweight = 0;
-                                if(ctx.actualRoleindex[5] == 0 || ctx.claimedRoleaskday[5] != 0) mweight = 0;
+                                if(ctx.getCat() == 0 || ctx.claimedRoleaskday[5] != 0) mweight = 0;
                                 if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
                                 else
                                 {

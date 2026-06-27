@@ -71,7 +71,7 @@ public class GameRecord
     {
         totalPlayCnt = 0; totalVillageWin = 0;
         totalWolfWin = 0; totalFoxWin = 0; totalMaxStreak = 0;
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i < peiyi.values().length; i++) {
             totalPlayCnt += playcnt[i];
             totalVillageWin += villageWincnt[i];
             totalWolfWin += wolfWincnt[i];

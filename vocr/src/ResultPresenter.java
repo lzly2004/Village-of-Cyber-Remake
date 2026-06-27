@@ -53,10 +53,10 @@ public class ResultPresenter
         }
         else
         {
-            boolean ackWhiteCat = suspicion.isAckWhite(ctx.actualRoleindex[5], ctx.maos,
+            boolean ackWhiteCat = suspicion.isAckWhite(ctx.getCat(), ctx.maos,
                     ctx.isDoubleDeathOccurred, ctx.claimedRoleaskday);
-            if (ackWhiteCat) suspicion.markAckWhite(ctx.actualRoleindex[5]);
-            if (ctx.actualRoleindex[5] > 0 && ackWhiteCat && !diebody.contains(ctx.actualRoleindex[5])
+            if (ackWhiteCat) suspicion.markAckWhite(ctx.getCat());
+            if (ctx.getCat() > 0 && ackWhiteCat && !diebody.contains(ctx.getCat())
                     && !diebody.contains(target))
             {
                 ctx.eventarray.add(new Event(EventName.zspz15,

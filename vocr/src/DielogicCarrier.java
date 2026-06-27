@@ -17,7 +17,7 @@ public class DielogicCarrier
     {
         ArrayList<Integer> diebody = new ArrayList<>();
         ctx.eventarray.clear();
-        if (wolfbite != lietarget && ctx.actualRoleindex[10] != wolfbite)
+        if (wolfbite != lietarget && ctx.getFox() != wolfbite)
         {
             diebody.add(wolfbite);
             dieaux(wolfbite, whyDie.beiyao);
@@ -31,10 +31,10 @@ public class DielogicCarrier
         {
             diebody.add(zhantarget);
             dieaux(zhantarget, whyDie.zhousha);
-            if (ctx.actualRoleindex[11] > 0 && ctx.isAlive(ctx.actualRoleindex[11]))
+            if (ctx.getDeviant() > 0 && ctx.isAlive(ctx.getDeviant()))
             {
-                diebody.add(ctx.actualRoleindex[11]);
-                dieaux(ctx.actualRoleindex[11], whyDie.nighthouzhui);
+                diebody.add(ctx.getDeviant());
+                dieaux(ctx.getDeviant(), whyDie.nighthouzhui);
             }
         }
         ArrayList<Event> shuffled = GameLogicUtils.shuffleList(ctx.eventarray);
@@ -50,7 +50,7 @@ public class DielogicCarrier
             for (int i = 0; i < ctx.zhans.size(); i++)
             {
                 int zhan = ctx.zhans.get(i);
-                if (zhan == ctx.actualRoleindex[1]) continue;
+                if (zhan == ctx.getActualRoleIndex(1)) continue;
                 for (int j = 1; j <= ctx.getGameDay(); j++)
                 {
                     int target = ctx.getSkillTarget(zhan, j) - ctx.getPlayerSum();
@@ -70,7 +70,7 @@ public class DielogicCarrier
                 for (int i = 0; i < ctx.zhans.size(); i++)
                 {
                     int zhan = ctx.zhans.get(i);
-                    if (zhan == ctx.actualRoleindex[1]) continue;
+                    if (zhan == ctx.getActualRoleIndex(1)) continue;
                     for (int j = 1; j <= ctx.getGameDay(); j++)
                     {
                         int target = ctx.getSkillTarget(zhan, j) - ctx.getPlayerSum();

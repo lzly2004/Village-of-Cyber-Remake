@@ -168,7 +168,7 @@ public class ExecutionManager
 
         deliverEvents.run();
         dieaux.accept(topnum,whyDie.chuxing);
-        if(topnum == ctx.actualRoleindex[5])
+        if(topnum == ctx.getCat())
         {
             if(ctx.getClaimedRole(topnum) != 5)
             {
@@ -183,18 +183,18 @@ public class ExecutionManager
             }
             int mz = suspicion.getOne(mztarget);
             dieaux.accept(mz,whyDie.daymaozhou);
-            if(mz == ctx.actualRoleindex[10] && ctx.actualRoleindex[11] > 0 && ctx.isAlive(ctx.actualRoleindex[11]))
+            if(mz == ctx.getFox() && ctx.getDeviant() > 0 && ctx.isAlive(ctx.getDeviant()))
             {
-                dieaux.accept(ctx.actualRoleindex[11],whyDie.dayhouzhui);
-                ctx.markNonHuman(ctx.actualRoleindex[10]);
-                ctx.markNonHuman(ctx.actualRoleindex[11]);
+                dieaux.accept(ctx.getDeviant(),whyDie.dayhouzhui);
+                ctx.markNonHuman(ctx.getFox());
+                ctx.markNonHuman(ctx.getDeviant());
             }
         }
-        else if(topnum == ctx.actualRoleindex[10] && ctx.actualRoleindex[11] > 0 && ctx.isAlive(ctx.actualRoleindex[11]))
+        else if(topnum == ctx.getFox() && ctx.getDeviant() > 0 && ctx.isAlive(ctx.getDeviant()))
         {
-            dieaux.accept(ctx.actualRoleindex[11],whyDie.dayhouzhui);
-            ctx.markNonHuman(ctx.actualRoleindex[10]);
-            ctx.markNonHuman(ctx.actualRoleindex[11]);
+            dieaux.accept(ctx.getDeviant(),whyDie.dayhouzhui);
+            ctx.markNonHuman(ctx.getFox());
+            ctx.markNonHuman(ctx.getDeviant());
         }
         deliverEvents.run();
         ctx.setEndResult(gameEndChecker.check());
