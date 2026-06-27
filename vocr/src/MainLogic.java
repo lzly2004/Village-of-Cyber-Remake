@@ -50,6 +50,11 @@ public class MainLogic implements MainLogicInterface
     {//提供给Replay系统，获取当前对局的录制器
         return recorder;
     }
+    // 接口要求的单参数版本
+    public GameStatus start(peiyi p)
+    {
+        return start(p, Game.getInstance().getGameRecordManager());
+    }
     public GameStatus start(peiyi p, GameRecordManager gameRecordManager)
     {
         //提供给UI类，开始一局游戏
