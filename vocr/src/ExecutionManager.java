@@ -241,12 +241,12 @@ public class ExecutionManager
                     switch (ctx.getActualRole(num))
                     {
                         case 7:
-                            if (GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(0, 0, ctx.getp1(7), ctx.getp2(7))))
+                            if (GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(0, 0, coManager.getp1(7), coManager.getp2(7))))
                                 coManager.processMaoLieCo(num, true, ctx.diebody);
                             break;
                         default:
                             if (GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco
-                                    (ctx.getActualRole(num) - 7, 0, ctx.getp1(ctx.getActualRole(num)), ctx.getp2(ctx.getActualRole(num)))))
+                                    (ctx.getActualRole(num) - 7, 0, coManager.getp1(ctx.getActualRole(num)), coManager.getp2(ctx.getActualRole(num)))))
                                 coManager.processMaoLieCo(num, false, ctx.diebody);
                             break;
                     }

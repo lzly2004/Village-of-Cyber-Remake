@@ -257,39 +257,6 @@ class GameContext implements GameContextView
     void shuffleZhans() { java.util.Collections.shuffle(zhans); }
     void shuffleLings() { java.util.Collections.shuffle(lings); }
 
-    /** 猫又CO概率参数p1：狼队中已CO且非默认CO（claimedRole=6）的人数 */
-    public int getp1(int zhi)
-    {
-        if (zhi != 7) return 0;
-        int p1 = 0;
-        for (int i = 1; i <= initialWolfCount; i++)
-            if (gs.gc[rlindex[i]].claimedRole != 0 && gs.gc[rlindex[i]].claimedRole != 6)
-                p1++;
-        return p1;
-    }
-
-    /** 猫又CO概率参数p2：case 7/9返回狼队生存人数-1，其余返回死亡计数器映射值 */
-    public int getp2(int zhi)
-    {
-        if (zhi == 7 || zhi == 9)
-        {
-            int p2 = 0;
-            for (int i = 1; i <= initialWolfCount; i++)
-                if (gs.gc[rlindex[i]].whyDie == whyDie.NONE)
-                    p2++;
-            return p2 - 1;
-        }
-        return deathCounterP2();
-    }
-
-    private int deathCounterP2()
-    {
-        if (gs.deathCounter <= 3) return 0;
-        if (gs.deathCounter <= gs.aliveCounter) return 1;
-        if (gs.aliveCounter > 6) return 2;
-        return 3;
-    }
-
     /** 获取指定日期夜间死亡玩家列表 */
     public ArrayList<Integer> dieAtNight(int day)
     {

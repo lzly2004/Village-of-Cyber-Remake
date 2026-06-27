@@ -93,7 +93,7 @@ public class DayActionCoordinator
                     switch(zhi)
                     {
                         case  7:
-                            if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(0,1,ctx.getp1(7),ctx.getp2(7))))
+                            if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(0,1,coManager.getp1(7),coManager.getp2(7))))
                             {
                                 int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
                                 if(ctx.rlsl || ctx.claimedRoleaskday[3] != 0) lweight = 0;
@@ -113,7 +113,7 @@ public class DayActionCoordinator
                                 ctx.nonHumanPlan[target] = 0;
                             break;
                         default:
-                            if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(zhi-7,1,ctx.getp1(zhi),ctx.getp2(zhi))))
+                            if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(zhi-7,1,coManager.getp1(zhi),coManager.getp2(zhi))))
                             {
                                 int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
                                 if(ctx.claimedRoleaskday[3] != 0) lweight = 0;

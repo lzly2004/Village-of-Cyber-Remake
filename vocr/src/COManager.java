@@ -17,6 +17,39 @@ public class COManager
         this.probabilityCalculator = probabilityCalculator;
     }
 
+    /** 猫又CO概率参数p1：狼队中已CO且非默认CO（claimedRole=6）的人数 */
+    public int getp1(int zhi)
+    {
+        if (zhi != 7) return 0;
+        int p1 = 0;
+        for (int i = 1; i <= ctx.getInitialWolfCount(); i++)
+            if (ctx.getClaimedRole(ctx.getRlIndex(i)) != 0 && ctx.getClaimedRole(ctx.getRlIndex(i)) != 6)
+                p1++;
+        return p1;
+    }
+
+    /** 猫又CO概率参数p2：case 7/9返回狼队生存人数-1，其余返回死亡计数器映射值 */
+    public int getp2(int zhi)
+    {
+        if (zhi == 7 || zhi == 9)
+        {
+            int p2 = 0;
+            for (int i = 1; i <= ctx.getInitialWolfCount(); i++)
+                if (ctx.isAlive(ctx.getRlIndex(i)))
+                    p2++;
+            return p2 - 1;
+        }
+        return deathCounterP2();
+    }
+
+    private int deathCounterP2()
+    {
+        if (ctx.getDeathCounter() <= 3) return 0;
+        if (ctx.getDeathCounter() <= ctx.getAliveCounter()) return 1;
+        if (ctx.getAliveCounter() > 6) return 2;
+        return 3;
+    }
+
     public void processActualCo(int num, int zhi, ArrayList<Integer> diebody)
     {
         int gd = ctx.getGameDay();
@@ -281,7 +314,7 @@ public class COManager
                 case 7:
                     if (zhi == 3 && ctx.rlsl) break;
                     if (zhi == 5 && ctx.rlsm) break;
-                    int probability = probabilityCalculator.maolieco(0, 3, ctx.getp1(7), ctx.getp2(7));
+                    int probability = probabilityCalculator.maolieco(0, 3, getp1(7), getp2(7));
                     if (GameLogicUtils.probabilityJudge(probability))
                     {
                         response.add(new IntPair(i, zhi));
@@ -293,7 +326,7 @@ public class COManager
                     break;
                 default:
                     if (GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(
-                            ctx.getActualRole(i) - 7, 3, ctx.getp1(ctx.getActualRole(i)), ctx.getp2(ctx.getActualRole(i)))))
+                            ctx.getActualRole(i) - 7, 3, getp1(ctx.getActualRole(i)), getp2(ctx.getActualRole(i)))))
                     {
                         response.add(new IntPair(i, zhi));
                     }
@@ -338,7 +371,7 @@ public class COManager
                             response.add(new IntPair(num, 6));
                             break;
                         }
-                        probability = probabilityCalculator.maolieco(0, 2, ctx.getp1(7), ctx.getp2(7));
+                        probability = probabilityCalculator.maolieco(0, 2, getp1(7), getp2(7));
                         if (!GameLogicUtils.probabilityJudge(probability))
                         {
                             response.add(new IntPair(num, 6));
@@ -371,7 +404,7 @@ public class COManager
                     case 10:
                     case 11:
                         probability = probabilityCalculator.maolieco(ctx.getActualRole(num) - 7, 2,
-                                ctx.getp1(ctx.getActualRole(num)), ctx.getp2(ctx.getActualRole(num)));
+                                getp1(ctx.getActualRole(num)), getp2(ctx.getActualRole(num)));
                         if (!GameLogicUtils.probabilityJudge(probability))
                         {
                             response.add(new IntPair(num, 6));
