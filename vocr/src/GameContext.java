@@ -10,7 +10,7 @@ import java.util.List;
 class GameContext implements GameContextView
 {
     private final GameStatus gs;
-    private SuspicionSystem suspicion;
+    private final SuspicionSystem suspicion;
 
     // === 核心状态数组 ===
     final boolean[] isDoubleDeathOccurred;
@@ -39,10 +39,9 @@ class GameContext implements GameContextView
     boolean rlsm;
     int kz;
 
-    GameContext(GameStatus gs, SuspicionSystem suspicion)
+    GameContext(GameStatus gs)
     {
         this.gs = gs;
-        this.suspicion = suspicion;
 
         int n = gs.getPlayerSum();
         this.isDoubleDeathOccurred = new boolean[GameConstants.MAX_GAME_DAYS + 1];
@@ -62,6 +61,8 @@ class GameContext implements GameContextView
         this.maos = new ArrayList<>();
         this.diebody = new ArrayList<>();
         this.eventarray = new ArrayList<>();
+
+        this.suspicion = new SuspicionSystem(this);
     }
 
     // ==================== GameContextView 实现 ====================
@@ -127,13 +128,13 @@ class GameContext implements GameContextView
     public int getTop3SuspectedPlayer(int player, int rank, int day) { return gs.gc[player].top3SuspectedPlayers[rank][day]; }
     public void setTop3SuspectedPlayer(int player, int rank, int day, int value) { gs.gc[player].top3SuspectedPlayers[rank][day] = value; }
     public int[] getSuspicionValueArray(int player) { return gs.gc[player].suspicionValue; }
-    public int getLazySuspicionValue(int player) { return suspicion != null ? suspicion.getLazySuspicionValue()[player] : 0; }
-    public void addLazySuspicionValue(int player, int delta) { if (suspicion != null) suspicion.addLazySuspicionValue(player, delta); }
-    public void setLazySuspicionValue(int player, int value) { if (suspicion != null) suspicion.setLazySuspicionValue(player, value); }
+    public int getLazySuspicionValue(int player) { return suspicion.getLazySuspicionValue()[player]; }
+    public void addLazySuspicionValue(int player, int delta) { suspicion.addLazySuspicionValue(player, delta); }
+    public void setLazySuspicionValue(int player, int value) { suspicion.setLazySuspicionValue(player, value); }
     public int[] getTop3SuspectedPlayers(int player, int day) { return gs.gc[player].top3SuspectedPlayers[day]; }
-    public boolean isAckWhite(int player) { return suspicion != null && suspicion.isAckWhite(player, maos, isDoubleDeathOccurred, claimedRoleaskday); }
+    public boolean isAckWhite(int player) { return suspicion.isAckWhite(player, maos, isDoubleDeathOccurred, claimedRoleaskday); }
 
-    void setSuspicion(SuspicionSystem s) { this.suspicion = s; }
+    public SuspicionSystem getSuspicion() { return suspicion; }
 
     // --- 游戏状态 ---
     public int getGameDay() { return gs.gameDay; }

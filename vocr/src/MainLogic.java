@@ -65,9 +65,8 @@ public class MainLogic implements MainLogicInterface
                 throw new IllegalStateException("游戏初始化失败: 玩家" + i + "角色未分配");
             }
         }
-        ctx = new GameContext(gs, suspicion);
-        suspicion = new SuspicionSystem(ctx);
-        ctx.setSuspicion(suspicion);
+        ctx = new GameContext(gs);
+        suspicion = ctx.getSuspicion();
         seerDiviner = new SeerDiviner(ctx, suspicion);
         hunterGuarder = new HunterGuarder(ctx, suspicion);
         wolfBiter = new WolfBiter(ctx, suspicion);
