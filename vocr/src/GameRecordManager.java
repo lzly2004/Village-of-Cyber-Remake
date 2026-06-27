@@ -4,16 +4,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class GameRecordManager {
-    private static GameRecordManager instance;
     private GameRecord record;
     private static final String SAVE_PATH = "data/game_record.json";
 
-    private GameRecordManager() { load(); }
-
-    public static synchronized GameRecordManager getInstance() {
-        if (instance == null) instance = new GameRecordManager();
-        return instance;
-    }
+    public GameRecordManager() { load(); }
 
     public void load() {
         File file = new File(SAVE_PATH);

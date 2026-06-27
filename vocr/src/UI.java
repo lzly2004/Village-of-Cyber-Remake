@@ -132,6 +132,8 @@ public class UI implements UIInterface
     GameContextView ctx;//封装后的游戏状态只读访问
     ResourcesInterface resources;//资源接口
     MainLogicInterface mainLogic;//主逻辑接口
+    ReplayManager replayManager;//回放管理器
+    GameRecordManager gameRecordManager;//战绩管理器
     UIComponentFactory uiComponentFactory;
 
     /** 获取玩家职业图标文本（便捷转发） */
@@ -191,6 +193,8 @@ public class UI implements UIInterface
     {
         resources = Game.getInstance().getResources();
         mainLogic = Game.getInstance().getMainLogic();
+        replayManager = Game.getInstance().getReplayManager();
+        gameRecordManager = Game.getInstance().getGameRecordManager();
         ctx = mainLogic.getGameContext();
 
         // 优先走 Handler 分发

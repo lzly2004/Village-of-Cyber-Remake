@@ -14,12 +14,14 @@ public class ExecutionManager
     private final Runnable deliverEvents;
     private final BiConsumer<Integer, whyDie> dieaux;
     private final Runnable nightaction;
+    private final GameRecordManager gameRecordManager;
 
     public ExecutionManager(GameContext ctx, SuspicionSystem suspicion,
                             COManager coManager, ProbabilityCalculator probabilityCalculator,
                             VoteSelector voteSelector, GameEndChecker gameEndChecker,
                             Runnable gylogic, Runnable deliverEvents,
-                            BiConsumer<Integer, whyDie> dieaux, Runnable nightaction)
+                            BiConsumer<Integer, whyDie> dieaux, Runnable nightaction,
+                            GameRecordManager gameRecordManager)
     {
         this.ctx = ctx;
         this.suspicion = suspicion;
@@ -31,6 +33,7 @@ public class ExecutionManager
         this.deliverEvents = deliverEvents;
         this.dieaux = dieaux;
         this.nightaction = nightaction;
+        this.gameRecordManager = gameRecordManager;
     }
 
     public boolean execute(int dailyVotingRule, List<Integer> chuxingList, boolean huibi)
@@ -202,7 +205,7 @@ public class ExecutionManager
             recordReplayDailySnapshot(gd + 1);
             presentGameEnd(ctx.getEndResult());
             DebugLogger.info("[战绩] 游戏结束(ExecutionManager): peiyi=" + ctx.getPeiyi() + ", end=" + ctx.getEndResult());
-            GameRecordManager.getInstance().updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult());
+            gameRecordManager.updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult());
             recordReplayEnd(ctx.getEndResult(), gd + 1);
             return true;
         }

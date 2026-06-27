@@ -22,6 +22,7 @@ public class MainLogic implements MainLogicInterface
     private DayActionCoordinator dayActionCoordinator;
     private ExecutionManager executionManager;
     private GameRecorder recorder;
+    private GameRecordManager gameRecordManager;
 
     /*
      * 参数取值表
@@ -49,12 +50,13 @@ public class MainLogic implements MainLogicInterface
     {//提供给Replay系统，获取当前对局的录制器
         return recorder;
     }
-    public GameStatus start(peiyi p)
+    public GameStatus start(peiyi p, GameRecordManager gameRecordManager)
     {
         //提供给UI类，开始一局游戏
         //参数：配役p
         //返回值：游戏状态
         //函数体中有可能向UI类添加一系列事件
+        this.gameRecordManager = gameRecordManager;
         gs         = new GameStatus();
         gs.startGame(p);
         if (gs.getPlayerSum() <= 0) {
@@ -117,7 +119,7 @@ public class MainLogic implements MainLogicInterface
         }
         // 怀疑度初始化已由 SuspicionSystem 构造自动完成
         // Replay系统: 初始化录制器
-        this.recorder = new GameRecorder("replay_" + p.name());
+        this.recorder = new GameRecorder("replay_" + p.name(), gameRecordManager);
         this.recorder.startGame(p, 0L, gs.getPlayerSum(), gs);
         DebugLogger.info("[Replay] 录制器已初始化: " + p.name());
         //初始职业工作
@@ -180,7 +182,7 @@ public class MainLogic implements MainLogicInterface
             executionManager.recordReplayGameEnd(gs.end, gs.gameDay);
             executionManager.presentGameEnd(gs.end);
             DebugLogger.info("[战绩] 游戏结束，准备更新记录: peiyi=" + gs.p + "(ordinal=" + gs.p.ordinal() + "), end=" + gs.end);
-            GameRecordManager.getInstance().updateRecord(gs.p.ordinal(), gs.end);
+            gameRecordManager.updateRecord(gs.p.ordinal(), gs.end);
             DebugLogger.info("[战绩] 记录更新完成");
             return;//胜负已分
         }

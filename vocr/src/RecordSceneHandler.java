@@ -41,7 +41,7 @@ public class RecordSceneHandler implements SceneHandler {
     private void doRender(UI ui) {
         ui.jPanel.removeAll();
         DebugLogger.info("[RecordSceneHandler] 开始渲染战绩页面, page=" + ui.recordPage);
-        GameRecord record = GameRecordManager.getInstance().getRecord();
+        GameRecord record = ui.gameRecordManager.getRecord();
         int page = ui.recordPage; // 0=総合, 1~7=各配役村
 
         // ====== 左上角：标题 ======

@@ -46,7 +46,7 @@ public class ReplayBrowserHandler implements SceneHandler {
             browserBgmSwitched = true;
         }
 
-        ReplayManager manager = ReplayManager.getInstance();
+        ReplayManager manager = ui.replayManager;
         int page = ui.replayPage;
 
         DebugLogger.info("[ReplayBrowserHandler] 渲染存档浏览器: page=" + page +
@@ -227,7 +227,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         
         if (choice == JOptionPane.YES_OPTION) {
             ReplaySave save = ReplaySave.fromRecorder(slotIndex, recorder);
-            ReplayManager.getInstance().saveToSlot(slotIndex, save);
+            ui.replayManager.saveToSlot(slotIndex, save);
             recorder.endGame(recorder.isActive() ? 0 : 0, 0);
             recorder.active = false;
             ui.resources.playSound("click.wav");
@@ -286,7 +286,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         JButton yesBtn = createDialogButton(ui, "Yes", Color.CYAN, 320, 150);
         yesBtn.addActionListener(e -> {
             ReplaySave save = ReplaySave.fromRecorder(slotIndex, finalRecorder);
-            ReplayManager.getInstance().saveToSlot(slotIndex, save);
+            ui.replayManager.saveToSlot(slotIndex, save);
             finalRecorder.endGame(finalRecorder.isActive() ? 0 : 0, 0);
             finalRecorder.active = false;
             ui.resources.playSound("click.wav");

@@ -7,15 +7,9 @@ public class ReplayManager {
     public static final int MAX_SLOTS = 9;
     private static final String SAVE_FILE = "data/replay_saves.json";
 
-    private static ReplayManager instance;
     private ReplaySave[] slots = new ReplaySave[MAX_SLOTS];
 
-    private ReplayManager() { load(); }
-
-    public static synchronized ReplayManager getInstance() {
-        if (instance == null) instance = new ReplayManager();
-        return instance;
-    }
+    public ReplayManager() { load(); }
 
     public void load() {
         File file = new File(SAVE_FILE);

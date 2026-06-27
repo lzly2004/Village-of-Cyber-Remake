@@ -6,10 +6,14 @@ public class Game
     UI ui;
     Resources resources;
     MainLogic mainlogic;
+    ReplayManager replayManager;
+    GameRecordManager gameRecordManager;
     private Game()
     {
         this.resources = new Resources();
         this.mainlogic = new MainLogic();
+        this.replayManager = new ReplayManager();
+        this.gameRecordManager = new GameRecordManager();
         this.ui = new UI();
     }
     public static Game getInstance()
@@ -64,5 +68,13 @@ public class Game
     public ResourcesInterface getResources()
     {
         return resources;
+    }
+    public ReplayManager getReplayManager()
+    {
+        return replayManager;
+    }
+    public GameRecordManager getGameRecordManager()
+    {
+        return gameRecordManager;
     }
 }

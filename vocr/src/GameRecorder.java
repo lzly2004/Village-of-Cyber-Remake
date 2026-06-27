@@ -30,14 +30,16 @@ public class GameRecorder
     private long gameSeed = 0;
     private int playerCount = 0;
     private int gameDurationDays = 0;
+    private final GameRecordManager gameRecordManager;
 
     private static final DateTimeFormatter DT_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public GameRecorder(String runLabel)
+    public GameRecorder(String runLabel, GameRecordManager gameRecordManager)
     {
         this.runLabel = runLabel;
         this.records = new ArrayList<>();
+        this.gameRecordManager = gameRecordManager;
     }
 
     // ==================== 游戏生命周期 ====================
@@ -57,7 +59,7 @@ public class GameRecorder
         records.add("# Seed: " + seed);
         records.add("# PlayerCount: " + playerCount);
         try {
-            GameRecord record = GameRecordManager.getInstance().getRecord();
+            GameRecord record = gameRecordManager.getRecord();
             int peiyiVillage = (p.ordinal() >= 1 && p.ordinal() <= 7) ? record.playcnt[p.ordinal()] + 1 : -1;
             int totalVillage = record.totalPlayCnt + 1;
             records.add("# VillageCount: " + peiyiVillage + "/" + totalVillage);
