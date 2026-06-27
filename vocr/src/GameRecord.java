@@ -1,3 +1,6 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class GameRecord
 {
     public int[] playcnt;
@@ -61,7 +64,7 @@ public class GameRecord
         }
 
         if (playcnt[peiyiIndex] > 0) {
-            winrate[peiyiIndex] = Math.round((double)villageWincnt[peiyiIndex] / playcnt[peiyiIndex] * 100000.0) / 100000.0 * 100;
+            winrate[peiyiIndex] = calculateWinRate(villageWincnt[peiyiIndex], playcnt[peiyiIndex]);
         }
 
         aggregateTotal();
@@ -79,7 +82,15 @@ public class GameRecord
             if (maxStreak[i] > totalMaxStreak) totalMaxStreak = maxStreak[i];
         }
         if (totalPlayCnt > 0) {
-            totalWinRate = Math.round((double)totalVillageWin / totalPlayCnt * 100000.0) / 100000.0 * 100;
+            totalWinRate = calculateWinRate(totalVillageWin, totalPlayCnt);
         }
+    }
+
+    private double calculateWinRate(int wins, int total)
+    {
+        return BigDecimal.valueOf(wins)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(total), 5, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 }

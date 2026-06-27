@@ -11,9 +11,15 @@ public class VoteSelector
 
     public int select(int shokeinum, boolean[] votable)
     {
-        int n = ctx.getPlayerSum();
-        int gd = ctx.getGameDay();
+        int[] voteTargets = computeVoteTargets(shokeinum, votable);
+        applyVoteTargets(shokeinum, voteTargets);
+        return computeVoteResult(shokeinum, votable);
+    }
 
+    private int[] computeVoteTargets(int shokeinum, boolean[] votable)
+    {
+        int n = ctx.getPlayerSum();
+        int[] voteTargets = new int[n + 1];
         for (int i = 1; i <= n; i++)
         {
             if (ctx.isDead(i)) continue;
@@ -33,7 +39,6 @@ public class VoteSelector
                 if (ctx.getActualRole(j) == 5 && weight[j] < -GameConstants.INFJ)
                     weight[j] = 5;
             }
-
             StringBuilder sb = new StringBuilder("玩家"
                     + CharacterKanjiName.values()[ctx.getCharacterNumber(i)] + "投票权重:");
             for (int j = 1; j <= n; j++)
@@ -43,10 +48,22 @@ public class VoteSelector
                         .append(",").append(weight[j]).append(";");
             }
             DebugLogger.log(sb.toString());
-            int shokeitaregt = suspicion.getOne(weight);
+            voteTargets[i] = suspicion.getOne(weight);
+        }
+        return voteTargets;
+    }
+
+    private void applyVoteTargets(int shokeinum, int[] voteTargets)
+    {
+        int n = ctx.getPlayerSum();
+        int gd = ctx.getGameDay();
+        for (int i = 1; i <= n; i++)
+        {
+            if (ctx.isDead(i)) continue;
+            int shokeitaregt = voteTargets[i];
             ctx.setVoteTarget(i, gd, shokeinum, shokeitaregt);
             suspicion.updateTop3Aux2(i, shokeitaregt, 1, 1);
-            if (ctx.getVoteTarget(shokeitaregt, gd, shokeinum) == i)
+            if (voteTargets[shokeitaregt] == i)
                 suspicion.updateTop3Aux2(i, shokeitaregt, 1, 1);
         }
         for (int i = 1; i <= n; i++)
@@ -59,15 +76,22 @@ public class VoteSelector
                 {
                     if (ctx.isDead(k)) continue;
                     if (i == k || j == k) continue;
-                    if (ctx.getVoteTarget(i, gd, shokeinum) == j
-                            && ctx.getVoteTarget(j, gd, shokeinum) == k)
+                    if (voteTargets[i] == j && voteTargets[j] == k)
                         suspicion.updateTop3Aux2(i, k, -1, 0);
                 }
             }
         }
-        int maxcnt = -1, shokeicnt[] = new int[n + 1];
+    }
+
+    private int computeVoteResult(int shokeinum, boolean[] votable)
+    {
+        int n = ctx.getPlayerSum();
+        int gd = ctx.getGameDay();
+        int maxcnt = -1;
+        int[] shokeicnt = new int[n + 1];
         for (int i = 1; i <= n; i++)
         {
+            if (ctx.isDead(i)) continue;
             shokeicnt[ctx.getVoteTarget(i, gd, shokeinum)]++;
         }
         for (int i = 1; i <= n; i++)
@@ -87,7 +111,6 @@ public class VoteSelector
             else
                 votable[i] = false;
         }
-        if (topsum == 1) return topnum;
-        else return 0;
+        return topsum == 1 ? topnum : 0;
     }
 }
