@@ -1,4 +1,4 @@
-﻿﻿﻿# 编译产物
+﻿﻿﻿﻿# 编译产物
 out/
 *.class
 
@@ -77,3 +77,8 @@ portable_app/
 /灵能给自己发白问题1.png
 /灵能给自己发白问题2.png
 /当前票型显示投票对象的问题.png
+
+# Gradle
+.gradle/
+build/
+!gradle-wrapper.jar

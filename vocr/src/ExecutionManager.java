@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class ExecutionManager
 {
+    private final GameModule module;
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
     private final COManager coManager;
@@ -12,28 +12,24 @@ public class ExecutionManager
     private final GameEndChecker gameEndChecker;
     private final Runnable gylogic;
     private final Runnable deliverEvents;
-    private final BiConsumer<Integer, whyDie> dieaux;
+    private final java.util.function.BiConsumer<Integer, whyDie> dieaux;
     private final Runnable nightaction;
     private final GameRecordManager gameRecordManager;
 
-    public ExecutionManager(GameContext ctx, SuspicionSystem suspicion,
-                            COManager coManager, ProbabilityCalculator probabilityCalculator,
-                            VoteSelector voteSelector, GameEndChecker gameEndChecker,
-                            Runnable gylogic, Runnable deliverEvents,
-                            BiConsumer<Integer, whyDie> dieaux, Runnable nightaction,
-                            GameRecordManager gameRecordManager)
+    public ExecutionManager(GameModule module)
     {
-        this.ctx = ctx;
-        this.suspicion = suspicion;
-        this.coManager = coManager;
-        this.probabilityCalculator = probabilityCalculator;
-        this.voteSelector = voteSelector;
-        this.gameEndChecker = gameEndChecker;
-        this.gylogic = gylogic;
-        this.deliverEvents = deliverEvents;
-        this.dieaux = dieaux;
-        this.nightaction = nightaction;
-        this.gameRecordManager = gameRecordManager;
+        this.module = module;
+        this.ctx = module.getCtx();
+        this.suspicion = module.getSuspicion();
+        this.coManager = module.getCoManager();
+        this.probabilityCalculator = module.getProbabilityCalculator();
+        this.voteSelector = module.getVoteSelector();
+        this.gameEndChecker = module.getGameEndChecker();
+        this.gylogic = module.getGylogic();
+        this.deliverEvents = module.getDeliverEvents();
+        this.dieaux = module.getDieaux();
+        this.nightaction = module.getNightaction();
+        this.gameRecordManager = module.getGameRecordManager();
     }
 
     public boolean execute(int dailyVotingRule, List<Integer> chuxingList, boolean huibi)
@@ -158,7 +154,6 @@ public class ExecutionManager
             }
         }
 
-        // Replay系统: 在投票完成后立即记录投票数据（此时voteTarget已被填充）
         try {
             MainLogic ml = (MainLogic) Game.getInstance().getMainLogic();
             if (ml != null && ml.getRecorder() != null) {
@@ -256,7 +251,6 @@ public class ExecutionManager
             }
         }
     }
-    /** 游戏结束事件生成（MainLogic.nightaction 共用） */
     void presentGameEnd(int endResult) {
         DebugLogger.log("游戏结束，添加结束事件");
         int[] weight = new int[ctx.getPlayerSum() + 1];
@@ -285,7 +279,6 @@ public class ExecutionManager
         deliverEvents.run();
     }
     
-    /** Replay系统: 记录游戏结束 */
     private void recordReplayEnd(int endResult, int gameDay) {
         try {
             MainLogic mainLogic = (MainLogic) Game.getInstance().getMainLogic();
@@ -298,12 +291,10 @@ public class ExecutionManager
         }
     }
 
-    /** Replay系统: 公开接口，供MainLogic.nightaction在游戏结束时调用 */
     public void recordReplayGameEnd(int endResult, int gameDay) {
         recordReplayEnd(endResult, gameDay);
     }
     
-    /** Replay系统: 记录每日快照（投票后） */
     public void recordReplayDailySnapshot(int day) {
         try {
             MainLogic mainLogic = (MainLogic) Game.getInstance().getMainLogic();

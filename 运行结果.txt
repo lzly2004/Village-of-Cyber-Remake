@@ -1,0 +1,1773 @@
+PS C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake> # 用 JDK 21 的 java（路径来自 Gradle 启动日志）
+PS C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake> & "D:\soft\Java\jdk-21\bin\java" -jar junit-standalone.jar --class-path="build/classes/java/main;build/classes/java/test" --select-class=GameLogicUtilsTest --details=verbose
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+Test plan execution started. Number of static tests: 11
+.
++-- JUnit Platform Suite
+'-- JUnit Platform Suite finished after 4 ms.
++-- JUnit Jupiter
+| +-- GameLogicUtilsTest
+| | +-- getEventIndexByProbability_singleItem_shouldReturn0()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:getEventIndexByProbability_singleItem_shouldReturn0()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'getEventIndexByProbability_singleItem_shouldReturn0', methodParameterTypes = '']
+| | |  duration: 24 ms
+| | |    status: [OK] SUCCESSFUL
+| | +-- probabilityJudge_0_shouldAlwaysReturnFalse()
+| | | +-- repetition 1 of 100 dynamically registered
+| | | +-- repetition 1 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#1]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 4 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 2 of 100 dynamically registered
+| | | +-- repetition 2 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#2]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 3 of 100 dynamically registered
+| | | +-- repetition 3 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#3]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 4 of 100 dynamically registered
+| | | +-- repetition 4 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#4]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 5 of 100 dynamically registered
+| | | +-- repetition 5 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#5]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 6 of 100 dynamically registered
+| | | +-- repetition 6 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#6]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 7 of 100 dynamically registered
+| | | +-- repetition 7 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#7]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 8 of 100 dynamically registered
+| | | +-- repetition 8 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#8]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 9 of 100 dynamically registered
+| | | +-- repetition 9 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#9]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 10 of 100 dynamically registered
+| | | +-- repetition 10 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#10]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 11 of 100 dynamically registered
+| | | +-- repetition 11 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#11]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 12 of 100 dynamically registered
+| | | +-- repetition 12 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#12]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 13 of 100 dynamically registered
+| | | +-- repetition 13 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#13]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 14 of 100 dynamically registered
+| | | +-- repetition 14 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#14]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 15 of 100 dynamically registered
+| | | +-- repetition 15 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#15]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 16 of 100 dynamically registered
+| | | +-- repetition 16 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#16]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 17 of 100 dynamically registered
+| | | +-- repetition 17 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#17]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 18 of 100 dynamically registered
+| | | +-- repetition 18 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#18]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 19 of 100 dynamically registered
+| | | +-- repetition 19 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#19]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 20 of 100 dynamically registered
+| | | +-- repetition 20 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#20]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 21 of 100 dynamically registered
+| | | +-- repetition 21 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#21]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 22 of 100 dynamically registered
+| | | +-- repetition 22 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#22]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 23 of 100 dynamically registered
+| | | +-- repetition 23 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#23]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 24 of 100 dynamically registered
+| | | +-- repetition 24 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#24]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 25 of 100 dynamically registered
+| | | +-- repetition 25 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#25]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 26 of 100 dynamically registered
+| | | +-- repetition 26 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#26]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 27 of 100 dynamically registered
+| | | +-- repetition 27 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#27]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 28 of 100 dynamically registered
+| | | +-- repetition 28 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#28]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 29 of 100 dynamically registered
+| | | +-- repetition 29 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#29]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 30 of 100 dynamically registered
+| | | +-- repetition 30 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#30]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 31 of 100 dynamically registered
+| | | +-- repetition 31 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#31]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 32 of 100 dynamically registered
+| | | +-- repetition 32 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#32]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 33 of 100 dynamically registered
+| | | +-- repetition 33 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#33]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 34 of 100 dynamically registered
+| | | +-- repetition 34 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#34]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 35 of 100 dynamically registered
+| | | +-- repetition 35 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#35]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 36 of 100 dynamically registered
+| | | +-- repetition 36 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#36]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 37 of 100 dynamically registered
+| | | +-- repetition 37 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#37]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 38 of 100 dynamically registered
+| | | +-- repetition 38 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#38]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 39 of 100 dynamically registered
+| | | +-- repetition 39 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#39]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 40 of 100 dynamically registered
+| | | +-- repetition 40 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#40]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 41 of 100 dynamically registered
+| | | +-- repetition 41 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#41]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 42 of 100 dynamically registered
+| | | +-- repetition 42 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#42]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 43 of 100 dynamically registered
+| | | +-- repetition 43 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#43]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 44 of 100 dynamically registered
+| | | +-- repetition 44 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#44]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 45 of 100 dynamically registered
+| | | +-- repetition 45 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#45]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 46 of 100 dynamically registered
+| | | +-- repetition 46 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#46]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 47 of 100 dynamically registered
+| | | +-- repetition 47 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#47]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 48 of 100 dynamically registered
+| | | +-- repetition 48 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#48]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 49 of 100 dynamically registered
+| | | +-- repetition 49 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#49]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 50 of 100 dynamically registered
+| | | +-- repetition 50 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#50]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 51 of 100 dynamically registered
+| | | +-- repetition 51 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#51]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 52 of 100 dynamically registered
+| | | +-- repetition 52 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#52]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 53 of 100 dynamically registered
+| | | +-- repetition 53 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#53]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 54 of 100 dynamically registered
+| | | +-- repetition 54 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#54]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 55 of 100 dynamically registered
+| | | +-- repetition 55 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#55]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 56 of 100 dynamically registered
+| | | +-- repetition 56 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#56]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 57 of 100 dynamically registered
+| | | +-- repetition 57 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#57]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 58 of 100 dynamically registered
+| | | +-- repetition 58 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#58]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 59 of 100 dynamically registered
+| | | +-- repetition 59 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#59]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 60 of 100 dynamically registered
+| | | +-- repetition 60 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#60]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 61 of 100 dynamically registered
+| | | +-- repetition 61 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#61]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 62 of 100 dynamically registered
+| | | +-- repetition 62 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#62]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 63 of 100 dynamically registered
+| | | +-- repetition 63 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#63]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 64 of 100 dynamically registered
+| | | +-- repetition 64 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#64]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 65 of 100 dynamically registered
+| | | +-- repetition 65 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#65]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 66 of 100 dynamically registered
+| | | +-- repetition 66 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#66]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 67 of 100 dynamically registered
+| | | +-- repetition 67 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#67]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 68 of 100 dynamically registered
+| | | +-- repetition 68 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#68]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 69 of 100 dynamically registered
+| | | +-- repetition 69 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#69]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 70 of 100 dynamically registered
+| | | +-- repetition 70 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#70]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 71 of 100 dynamically registered
+| | | +-- repetition 71 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#71]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 72 of 100 dynamically registered
+| | | +-- repetition 72 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#72]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 73 of 100 dynamically registered
+| | | +-- repetition 73 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#73]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 74 of 100 dynamically registered
+| | | +-- repetition 74 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#74]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 75 of 100 dynamically registered
+| | | +-- repetition 75 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#75]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 76 of 100 dynamically registered
+| | | +-- repetition 76 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#76]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 77 of 100 dynamically registered
+| | | +-- repetition 77 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#77]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 78 of 100 dynamically registered
+| | | +-- repetition 78 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#78]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 79 of 100 dynamically registered
+| | | +-- repetition 79 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#79]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 80 of 100 dynamically registered
+| | | +-- repetition 80 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#80]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 81 of 100 dynamically registered
+| | | +-- repetition 81 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#81]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 82 of 100 dynamically registered
+| | | +-- repetition 82 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#82]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 83 of 100 dynamically registered
+| | | +-- repetition 83 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#83]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 84 of 100 dynamically registered
+| | | +-- repetition 84 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#84]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 85 of 100 dynamically registered
+| | | +-- repetition 85 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#85]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 86 of 100 dynamically registered
+| | | +-- repetition 86 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#86]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 87 of 100 dynamically registered
+| | | +-- repetition 87 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#87]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 88 of 100 dynamically registered
+| | | +-- repetition 88 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#88]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 89 of 100 dynamically registered
+| | | +-- repetition 89 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#89]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 90 of 100 dynamically registered
+| | | +-- repetition 90 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#90]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 91 of 100 dynamically registered
+| | | +-- repetition 91 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#91]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 92 of 100 dynamically registered
+| | | +-- repetition 92 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#92]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 93 of 100 dynamically registered
+| | | +-- repetition 93 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#93]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 94 of 100 dynamically registered
+| | | +-- repetition 94 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#94]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 95 of 100 dynamically registered
+| | | +-- repetition 95 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#95]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 96 of 100 dynamically registered
+| | | +-- repetition 96 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#96]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 97 of 100 dynamically registered
+| | | +-- repetition 97 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#97]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 98 of 100 dynamically registered
+| | | +-- repetition 98 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#98]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 99 of 100 dynamically registered
+| | | +-- repetition 99 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#99]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 100 of 100 dynamically registered
+| | | +-- repetition 100 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]/[test-template-invocation:#100]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_0_shouldAlwaysReturnFalse()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_0_shouldAlwaysReturnFalse', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | '-- probabilityJudge_0_shouldAlwaysReturnFalse() finished after 224 ms.
+| | +-- feiren_madman_shouldReturn2()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:feiren_madman_shouldReturn2()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'feiren_madman_shouldReturn2', methodParameterTypes = '']
+| | |    caught: org.opentest4j.AssertionFailedError: 狂人类型应为2 ==> expected: <2> but was: <-1>
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+| | |                   at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+| | |                   at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+| | |                   at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+| | |                   at GameLogicUtilsTest.feiren_madman_shouldReturn2(GameLogicUtilsTest.java:38)
+| | |                   at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |  duration: 20 ms
+| | |    status: [X] FAILED
+| | +-- feiren_wolf_shouldReturn1()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:feiren_wolf_shouldReturn1()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'feiren_wolf_shouldReturn1', methodParameterTypes = '']
+| | |  duration: 0 ms
+| | |    status: [OK] SUCCESSFUL
+| | +-- isDayDie_chuxing_shouldReturnTrue()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:isDayDie_chuxing_shouldReturnTrue()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'isDayDie_chuxing_shouldReturnTrue', methodParameterTypes = '']
+| | |  duration: 3 ms
+| | |    status: [OK] SUCCESSFUL
+| | +-- zhenying_nonHumanRoles_shouldReturn1()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:zhenying_nonHumanRoles_shouldReturn1()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'zhenying_nonHumanRoles_shouldReturn1', methodParameterTypes = '']
+| | |    caught: org.opentest4j.AssertionFailedError: 妖狐应为非人侧 ==> expected: <1> but was: <-1>
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+| | |                   at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+| | |                   at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+| | |                   at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+| | |                   at GameLogicUtilsTest.zhenying_nonHumanRoles_shouldReturn1(GameLogicUtilsTest.java:25)
+| | |                   at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |  duration: 4 ms
+| | |    status: [X] FAILED
+| | +-- zhenying_villageRoles_shouldReturn0()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:zhenying_villageRoles_shouldReturn0()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'zhenying_villageRoles_shouldReturn0', methodParameterTypes = '']
+| | |  duration: 1 ms
+| | |    status: [OK] SUCCESSFUL
+| | +-- isDayDie_beiyao_shouldReturnFalse()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:isDayDie_beiyao_shouldReturnFalse()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'isDayDie_beiyao_shouldReturnFalse', methodParameterTypes = '']
+| | |  duration: 0 ms
+| | |    status: [OK] SUCCESSFUL
+| | +-- probabilityJudge_100_shouldAlwaysReturnTrue()
+| | | +-- repetition 1 of 100 dynamically registered
+| | | +-- repetition 1 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#1]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 2 of 100 dynamically registered
+| | | +-- repetition 2 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#2]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 3 of 100 dynamically registered
+| | | +-- repetition 3 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#3]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 4 of 100 dynamically registered
+| | | +-- repetition 4 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#4]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 5 of 100 dynamically registered
+| | | +-- repetition 5 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#5]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 6 of 100 dynamically registered
+| | | +-- repetition 6 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#6]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 7 of 100 dynamically registered
+| | | +-- repetition 7 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#7]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 8 of 100 dynamically registered
+| | | +-- repetition 8 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#8]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 9 of 100 dynamically registered
+| | | +-- repetition 9 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#9]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 10 of 100 dynamically registered
+| | | +-- repetition 10 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#10]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 11 of 100 dynamically registered
+| | | +-- repetition 11 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#11]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 12 of 100 dynamically registered
+| | | +-- repetition 12 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#12]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 13 of 100 dynamically registered
+| | | +-- repetition 13 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#13]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 14 of 100 dynamically registered
+| | | +-- repetition 14 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#14]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 15 of 100 dynamically registered
+| | | +-- repetition 15 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#15]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 16 of 100 dynamically registered
+| | | +-- repetition 16 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#16]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 17 of 100 dynamically registered
+| | | +-- repetition 17 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#17]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 18 of 100 dynamically registered
+| | | +-- repetition 18 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#18]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 19 of 100 dynamically registered
+| | | +-- repetition 19 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#19]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 20 of 100 dynamically registered
+| | | +-- repetition 20 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#20]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 21 of 100 dynamically registered
+| | | +-- repetition 21 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#21]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 22 of 100 dynamically registered
+| | | +-- repetition 22 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#22]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 23 of 100 dynamically registered
+| | | +-- repetition 23 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#23]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 24 of 100 dynamically registered
+| | | +-- repetition 24 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#24]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 25 of 100 dynamically registered
+| | | +-- repetition 25 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#25]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 26 of 100 dynamically registered
+| | | +-- repetition 26 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#26]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 27 of 100 dynamically registered
+| | | +-- repetition 27 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#27]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 28 of 100 dynamically registered
+| | | +-- repetition 28 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#28]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 29 of 100 dynamically registered
+| | | +-- repetition 29 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#29]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 30 of 100 dynamically registered
+| | | +-- repetition 30 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#30]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 31 of 100 dynamically registered
+| | | +-- repetition 31 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#31]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 32 of 100 dynamically registered
+| | | +-- repetition 32 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#32]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 33 of 100 dynamically registered
+| | | +-- repetition 33 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#33]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 34 of 100 dynamically registered
+| | | +-- repetition 34 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#34]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 35 of 100 dynamically registered
+| | | +-- repetition 35 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#35]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 36 of 100 dynamically registered
+| | | +-- repetition 36 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#36]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 37 of 100 dynamically registered
+| | | +-- repetition 37 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#37]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 38 of 100 dynamically registered
+| | | +-- repetition 38 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#38]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 39 of 100 dynamically registered
+| | | +-- repetition 39 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#39]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 40 of 100 dynamically registered
+| | | +-- repetition 40 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#40]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 41 of 100 dynamically registered
+| | | +-- repetition 41 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#41]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 42 of 100 dynamically registered
+| | | +-- repetition 42 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#42]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 43 of 100 dynamically registered
+| | | +-- repetition 43 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#43]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 44 of 100 dynamically registered
+| | | +-- repetition 44 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#44]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 45 of 100 dynamically registered
+| | | +-- repetition 45 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#45]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 46 of 100 dynamically registered
+| | | +-- repetition 46 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#46]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 47 of 100 dynamically registered
+| | | +-- repetition 47 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#47]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 48 of 100 dynamically registered
+| | | +-- repetition 48 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#48]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 49 of 100 dynamically registered
+| | | +-- repetition 49 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#49]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 50 of 100 dynamically registered
+| | | +-- repetition 50 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#50]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 51 of 100 dynamically registered
+| | | +-- repetition 51 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#51]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 52 of 100 dynamically registered
+| | | +-- repetition 52 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#52]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 53 of 100 dynamically registered
+| | | +-- repetition 53 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#53]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 54 of 100 dynamically registered
+| | | +-- repetition 54 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#54]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 55 of 100 dynamically registered
+| | | +-- repetition 55 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#55]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 56 of 100 dynamically registered
+| | | +-- repetition 56 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#56]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 57 of 100 dynamically registered
+| | | +-- repetition 57 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#57]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 58 of 100 dynamically registered
+| | | +-- repetition 58 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#58]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 59 of 100 dynamically registered
+| | | +-- repetition 59 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#59]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 60 of 100 dynamically registered
+| | | +-- repetition 60 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#60]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 61 of 100 dynamically registered
+| | | +-- repetition 61 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#61]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 62 of 100 dynamically registered
+| | | +-- repetition 62 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#62]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 63 of 100 dynamically registered
+| | | +-- repetition 63 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#63]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 64 of 100 dynamically registered
+| | | +-- repetition 64 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#64]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 65 of 100 dynamically registered
+| | | +-- repetition 65 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#65]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 66 of 100 dynamically registered
+| | | +-- repetition 66 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#66]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 67 of 100 dynamically registered
+| | | +-- repetition 67 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#67]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 68 of 100 dynamically registered
+| | | +-- repetition 68 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#68]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 69 of 100 dynamically registered
+| | | +-- repetition 69 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#69]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 70 of 100 dynamically registered
+| | | +-- repetition 70 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#70]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 71 of 100 dynamically registered
+| | | +-- repetition 71 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#71]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 72 of 100 dynamically registered
+| | | +-- repetition 72 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#72]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 73 of 100 dynamically registered
+| | | +-- repetition 73 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#73]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 74 of 100 dynamically registered
+| | | +-- repetition 74 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#74]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 75 of 100 dynamically registered
+| | | +-- repetition 75 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#75]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 76 of 100 dynamically registered
+| | | +-- repetition 76 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#76]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 77 of 100 dynamically registered
+| | | +-- repetition 77 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#77]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 78 of 100 dynamically registered
+| | | +-- repetition 78 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#78]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 79 of 100 dynamically registered
+| | | +-- repetition 79 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#79]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 80 of 100 dynamically registered
+| | | +-- repetition 80 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#80]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 81 of 100 dynamically registered
+| | | +-- repetition 81 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#81]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 82 of 100 dynamically registered
+| | | +-- repetition 82 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#82]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 83 of 100 dynamically registered
+| | | +-- repetition 83 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#83]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 84 of 100 dynamically registered
+| | | +-- repetition 84 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#84]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 85 of 100 dynamically registered
+| | | +-- repetition 85 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#85]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 86 of 100 dynamically registered
+| | | +-- repetition 86 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#86]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 87 of 100 dynamically registered
+| | | +-- repetition 87 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#87]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 88 of 100 dynamically registered
+| | | +-- repetition 88 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#88]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 89 of 100 dynamically registered
+| | | +-- repetition 89 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#89]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 90 of 100 dynamically registered
+| | | +-- repetition 90 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#90]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 91 of 100 dynamically registered
+| | | +-- repetition 91 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#91]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 92 of 100 dynamically registered
+| | | +-- repetition 92 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#92]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 93 of 100 dynamically registered
+| | | +-- repetition 93 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#93]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 94 of 100 dynamically registered
+| | | +-- repetition 94 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#94]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 95 of 100 dynamically registered
+| | | +-- repetition 95 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#95]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 3 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 96 of 100 dynamically registered
+| | | +-- repetition 96 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#96]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 97 of 100 dynamically registered
+| | | +-- repetition 97 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#97]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 98 of 100 dynamically registered
+| | | +-- repetition 98 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#98]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 2 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 99 of 100 dynamically registered
+| | | +-- repetition 99 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#99]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 1 ms
+| | | |    status: [OK] SUCCESSFUL
+| | | +-- repetition 100 of 100 dynamically registered
+| | | +-- repetition 100 of 100
+| | | |      tags: []
+| | | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]/[test-template-invocation:#100]
+| | | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[test-template:probabilityJudge_100_shouldAlwaysReturnTrue()]
+| | | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'probabilityJudge_100_shouldAlwaysReturnTrue', methodParameterTypes = '']
+| | | |  duration: 0 ms
+| | | |    status: [OK] SUCCESSFUL
+| | '-- probabilityJudge_100_shouldAlwaysReturnTrue() finished after 169 ms.
+| | +-- feiren_immoralist_shouldReturn5()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:feiren_immoralist_shouldReturn5()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'feiren_immoralist_shouldReturn5', methodParameterTypes = '']
+| | |    caught: org.opentest4j.AssertionFailedError: 背德者类型应为5 ==> expected: <5> but was: <-1>
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+| | |                   at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+| | |                   at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+| | |                   at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+| | |                   at GameLogicUtilsTest.feiren_immoralist_shouldReturn5(GameLogicUtilsTest.java:53)
+| | |                   at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |  duration: 3 ms
+| | |    status: [X] FAILED
+| | +-- feiren_fox_shouldReturn4()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:feiren_fox_shouldReturn4()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'feiren_fox_shouldReturn4', methodParameterTypes = '']
+| | |    caught: org.opentest4j.AssertionFailedError: 妖狐类型应为4 ==> expected: <4> but was: <-1>
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+| | |                   at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+| | |                   at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+| | |                   at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+| | |                   at GameLogicUtilsTest.feiren_fox_shouldReturn4(GameLogicUtilsTest.java:48)
+| | |                   at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |  duration: 3 ms
+| | |    status: [X] FAILED
+| | +-- getEventIndexByProbability_zeroWeight_shouldReturn0()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:getEventIndexByProbability_zeroWeight_shouldReturn0()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'getEventIndexByProbability_zeroWeight_shouldReturn0', methodParameterTypes = '']
+| | |    caught: java.lang.IllegalArgumentException: 概率数组元素总和必须为正整数！
+| | |                   at GameLogicUtils.getEventIndexByProbability(GameLogicUtils.java:23)
+| | |                   at GameLogicUtilsTest.getEventIndexByProbability_zeroWeight_shouldReturn0(GameLogicUtilsTest.java:82)
+| | |                   at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |  duration: 4 ms
+| | |    status: [X] FAILED
+| | +-- feiren_zealot_shouldReturn3()
+| | |      tags: []
+| | |  uniqueId: [engine:junit-jupiter]/[class:GameLogicUtilsTest]/[method:feiren_zealot_shouldReturn3()]
+| | |    parent: [engine:junit-jupiter]/[class:GameLogicUtilsTest]
+| | |    source: MethodSource [className = 'GameLogicUtilsTest', methodName = 'feiren_zealot_shouldReturn3', methodParameterTypes = '']
+| | |    caught: org.opentest4j.AssertionFailedError: 狂信者类型应为3 ==> expected: <3> but was: <-1>
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+| | |                   at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+| | |                   at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+| | |                   at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+| | |                   at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+| | |                   at GameLogicUtilsTest.feiren_zealot_shouldReturn3(GameLogicUtilsTest.java:43)
+| | |                   at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |                   at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+| | |  duration: 3 ms
+| | |    status: [X] FAILED
+| '-- GameLogicUtilsTest finished after 489 ms.
+'-- JUnit Jupiter finished after 511 ms.
++-- JUnit Vintage
+'-- JUnit Vintage finished after 2 ms.
+Test plan execution finished. Number of all tests: 211
+
+Test run finished after 573 ms
+[         6 containers found      ]
+[         0 containers skipped    ]
+[         6 containers started    ]
+[         0 containers aborted    ]
+[         6 containers successful ]
+[         0 containers failed     ]
+[       211 tests found           ]
+[         0 tests skipped         ]
+[       211 tests started         ]
+[         0 tests aborted         ]
+[       205 tests successful      ]
+[         6 tests failed          ]
+
+
+WARNING: Delegated to the 'execute' command.
+         This behaviour has been deprecated and will be removed in a future release.
+         Please use the 'execute' command directly.
+PS C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake>

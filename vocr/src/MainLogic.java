@@ -99,7 +99,20 @@ public class MainLogic implements MainLogicInterface
         coManager = new COManager(ctx, suspicion, resultPresenter, probabilityCalculator);
         nonHumanCoordinator = new NonHumanCoordinator(ctx, suspicion, coManager, this::gylogic, this::deliverEvents);
         dayActionCoordinator = new DayActionCoordinator(ctx, suspicion, coManager, resultPresenter, probabilityCalculator, this::gylogic, this::deliverEvents);
-        executionManager = new ExecutionManager(ctx, suspicion, coManager, probabilityCalculator, voteSelector, gameEndChecker, this::gylogic, this::deliverEvents, dielogicCarrier::dieaux, this::nightaction);
+        GameModule gameModule = new GameModule.Builder()
+                .ctx(ctx)
+                .suspicion(suspicion)
+                .coManager(coManager)
+                .probabilityCalculator(probabilityCalculator)
+                .voteSelector(voteSelector)
+                .gameEndChecker(gameEndChecker)
+                .gylogic(this::gylogic)
+                .deliverEvents(this::deliverEvents)
+                .dieaux(dielogicCarrier::dieaux)
+                .nightaction(this::nightaction)
+                .gameRecordManager(gameRecordManager)
+                .build();
+        executionManager = new ExecutionManager(gameModule);
 
         // Phase 3: 统一数组引用 —— 所有数组/集合字段统一在 GameContext 中管理
         ctx.initFromPeiyi(p);

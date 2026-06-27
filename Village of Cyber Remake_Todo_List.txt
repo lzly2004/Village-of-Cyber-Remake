@@ -1,44 +1,46 @@
 ================================================================================
         Village of Cyber Remake — 重构 Todo List
-        生成日期：2026-06-26 | 版本：v1.0.3.4
-        共 39 项任务，按优先级 P0/P1/P2 分三档
+        生成日期：2026-06-26 | 更新：2026-06-27 | 版本：v1.0.3.7
+        共 39 项任务，P0 全部完成 / P1: 21 项 / P2: 12 项
 ================================================================================
 
 ================================================================================
-P0 — 高优先级 | 健壮性 / 逻辑正确性 / 工程基础（6 项）
+P0 — 高优先级 | 健壮性 / 逻辑正确性 / 工程基础（6 项）✅ 全部完成
 ================================================================================
 
-[P0-1] 修复潜在的死循环与 NPE 风险
+[P0-1] ✅ 修复潜在的死循环与 NPE 风险
        来源: #24 #55 #56 #78
-       - SuspicionSystem.getOne() 权重全为负时抛出异常而非降级
-       - EndGameHandler 轮询事件队列可能死循环
-       - GameSceneHandler 的 Timer 在场景切换后未取消
-       - ZhanFabricator 中 divine() 被调用两次，第一次副作用污染状态
+       - ✅ SuspicionSystem.getOne(): 权重全负时降级返回最大权重玩家，替代抛异常
+       - ✅ EndGameHandler: 轮询事件队列加 null 检查 + 200次上限
+       - ✅ GameSceneHandler: Timer 回调加场景检查，避免场景切换后误触发
+       - ✅ ZhanFabricator: divine() 调用前保存并恢复中间状态，消除副作用污染
 
-[P0-2] 添加全局异常处理器
+[P0-2] ✅ 添加全局异常处理器
        来源: #70
-       - 使用 Thread.setDefaultUncaughtExceptionHandler() 包裹主循环
-       - 崩溃时至少保存 Replay 录制进度
+       - ✅ Game.run() 外层 try-catch，崩溃时保存 Replay + 弹窗告知
+       - ✅ main() 添加 Thread.setDefaultUncaughtExceptionHandler()
 
-[P0-3] 添加游戏初始化合法性验证
+[P0-3] ✅ 添加游戏初始化合法性验证
        来源: #75
-       - MainLogic.start() 开头检查 playerSum > 0、gs 非空、角色分配正确
+       - ✅ MainLogic.start() 开头检查 playerSum > 0、gs 非空、角色分配正确
 
-[P0-4] 引入 Gradle/Maven 构建系统
+[P0-4] ✅ 引入 Gradle 构建系统
        来源: #12
-       - 替代 200+ 行的 build.bat
-       - 自动化依赖管理（Jackson 等 JAR 不再手动放在 bin/）
-       - 支持跨平台构建和自动化测试集成
+       - ✅ 替代 200+ 行的 build.bat
+       - ✅ 自动化依赖管理（Jackson 等通过 Gradle 管理）
+       - ✅ 支持跨平台构建和自动化测试集成
+       - ✅ 新增 fatJar 打包任务
 
-[P0-5] 为零依赖纯逻辑类添加单元测试
+[P0-5] ✅ 为零依赖纯逻辑类添加单元测试
        来源: #13
-       - ProbabilityCalculator、GameLogicUtils、GameEndChecker
-       - GreyListCalculator、RuleEngine、WeightRule 等优先覆盖
+       - ✅ GameLogicUtilsTest: 209 个测试覆盖 6 个核心方法（zhenying、feiren、
+             probabilityJudge、getEventIndexByProbability、isDayDie、shuffleList）
+       - ✅ 使用 JUnit 5 + ConsoleLauncher，可独立于 Gradle 运行
 
-[P0-6] 修复 GameEndChecker 重复计算
+[P0-6] ✅ 修复 GameEndChecker 重复计算
        来源: #36
-       - check() 在同一天内被多次调用但每次都重新遍历
-       - 应缓存结果或在 aliveCounter/deathCounter 变化时更新
+       - ✅ check() 添加结果缓存，同一天内多次调用直接返回缓存结果
+       - ✅ 仅在 aliveCounter/deathCounter 变化时重新计算
 
 ================================================================================
 P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
@@ -46,22 +48,25 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
 
 --- 架构分层与封装 ---
 
-[P1-1] GameContext 瘦身 + 访问路径统一
+[P1-1] ✅ GameContext 瘦身 + 访问路径统一
        来源: #2 #26 #46
-       - 将 getp1()/getp2() 等业务方法移回使用它们的类
-       - 统一 playerSum 只能通过 ctx.getPlayerSum() 访问
-       - 逐步将 gs.gc[i] 的直接访问替换为 ctx 封装方法
+       - ✅ 将 getp1()/getp2() 业务方法移回 COManager（猫又CO概率参数）
+       - ✅ playerSum 已统一通过 ctx.getPlayerSum() 访问
+       - 待处理: gs.gc[i] 直接访问替换（GameContext内部封装层除外）
 
-[P1-2] 解决 MainLogic 的循环依赖构造
+[P1-2] ✅ 解决 MainLogic 的循环依赖构造
        来源: #49
-       - GameContext 构造时 suspicion 为 null 后回填
-       - 改为工厂方法或将 SuspicionSystem 创建内聚到 GameContext 内部
+       - ✅ SuspicionSystem由GameContext内部创建，消除null状态
+       - ✅ 删除setSuspicion()方法，suspicion字段改为final
+       - ✅ 更新MainLogic初始化流程
 
-[P1-3] 统一依赖注入风格，消除单例不一致
+[P1-3] ✅ 统一依赖注入风格，消除单例不一致
        来源: #3 #33
-       - ReplayManager 和 GameRecordManager 使用全局 getInstance()
-       - 与其他组件的构造函数注入矛盾 → 统一为构造函数注入
-       - ExecutionManager 8 参数构造函数过重 → 引入 GameModule 容器
+       - ✅ ReplayManager和GameRecordManager从单例改为构造函数注入
+       - ✅ Game类中创建两个管理器实例
+       - ✅ MainLogic/ExecutionManager/GameRecorder通过构造函数注入
+       - ✅ UI/ReplayBrowserHandler/RecordSceneHandler通过UI对象访问
+       - ExecutionManager 11参数构造函数过重 → 后续可引入GameModule容器
 
 [P1-4] 消除 MainLogic 的方法引用回调链
        来源: #4
@@ -87,12 +92,13 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
 
 --- 代码质量与可读性 ---
 
-[P1-8] 命名规范与魔法数字统一清理
+[P1-8] ⚠️ 命名规范与魔法数字统一清理（部分完成）
        来源: #5 #6 #27 #42
-       - 拼音缩写 (peiyi、zhan、whyDie) → 英文全称
-       - EventName 缩写 (wz17、zjgh8b) → 可读名称
-       - -50、10 等魔法数字 → 命名常量
-       - actualRoleindex[10] → getActualRoleIndex(Role.yaohu)
+       - ✅ actualRoleindex[x] → 语义化方法（GameContext新增getCat/getFox/getDeviant等）
+       - ✅ 替换多处actualRoleindex引用（COManager、ExecutionManager、NonHumanCoordinator、DielogicCarrier、WolfBiter）
+       - 未完成: 拼音缩写(peiyi/zhan/whyDie) → 英文全称
+       - 未完成: EventName缩写(wz17/zjgh8b) → 可读名称
+       - 未完成: 魔法数字(-50/10) → 命名常量
 
 [P1-9] 消除 1-based 数组索引或统一加边界检查
        来源: #28
@@ -108,9 +114,11 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
        - GameSceneVoteHandler.wireAllEventHandlers() 中 100+ 行匿名 listener
        - 提取为命名方法，分离 UI 渲染和业务逻辑
 
-[P1-12] COManager.askCoByRole/askCoByList 消除重复
+[P1-12] ❌ COManager.askCoByRole/askCoByList 消除重复（已回退）
        来源: #66
-       - 两个方法共享 80% 逻辑 → 提取公共方法 buildCoResponse()
+       - 原计划: 两个方法共享80%逻辑 → 提取公共方法buildCoResponse()
+       - 回退原因: 重构时replace_all未完全生效导致逻辑引用不一致，引入严重bug
+       - 后续计划: 在独立分支上重新实现，每次替换后用grep验证所有引用已一致替换
 
 [P1-13] ZhanFabricator.switch 改为策略模式
        来源: #43
@@ -120,9 +128,9 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
        来源: #41
        - 文档化规则之间的依赖关系，或添加规则优先级/阶段分组机制
 
-[P1-15] VoteSelector 遵守 CQS 原则
+[P1-15] ✅ VoteSelector 遵守 CQS 原则
        来源: #35
-       - select() 拆分为纯查询 computeVoteTargets() 和命令 applyVoteTargets()
+       - ✅ select() 拆分为纯查询 computeVoteTargets() 和命令 applyVoteTargets() + computeVoteResult()
 
 --- 数据持久化与配置管理 ---
 
@@ -184,17 +192,18 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
        来源: #61
        - String.format(...) 收敛为 GameStrings.getDayStart(int day) 等语义化方法
 
-[P2-6] 修复 GameRecord.winrate 浮点精度
+[P2-6] ✅ 修复 GameRecord.winrate 浮点精度
        来源: #63
-       - 使用 BigDecimal 或整数运算替代 double 计算胜率
+       - ✅ 使用 BigDecimal 替代 double 计算胜率
 
 [P2-7] probability_config.json 扩展名修正
        来源: #69
        - 文件名改为 probability_config.txt 或将内容改为真正的 JSON 格式
 
-[P2-8] 配役数量动态获取
+[P2-8] ✅ 配役数量动态获取
        来源: #72
-       - for (int i = 1; i <= 7; i++) → peiyi.values().length
+       - ✅ GameRecord.java: for循环改为peiyi.values().length
+       - ✅ GameSceneHandler.java: for循环改为peiyi.values().length
 
 [P2-9] 代码现代化细节
        来源: #50 #58 #74
@@ -217,5 +226,6 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
 
 ================================================================================
                             统计概览
-  P0: 6 项 | P1: 21 项 | P2: 12 项 | 合计: 39 项
+  P0: 6 项 ✅ 全部完成 | P1: 13 项待处理 + 2 项部分完成 + 1 项已回退 + 5 项✅ | P2: 9 项 + 2 项✅ | 合计: 39 项
+  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅ | 部分完成: P1-8 ⚠️ | 已回退: P1-12 ❌
 ================================================================================
