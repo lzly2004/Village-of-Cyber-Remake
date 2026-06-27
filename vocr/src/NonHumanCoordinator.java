@@ -3,20 +3,21 @@ import java.util.List;
 
 public class NonHumanCoordinator
 {
+    private final GameModule module;
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
     private final COManager coManager;
     private final Runnable gylogic;
     private final Runnable deliverEvents;
 
-    public NonHumanCoordinator(GameContext ctx, SuspicionSystem suspicion,
-                               COManager coManager, Runnable gylogic, Runnable deliverEvents)
+    public NonHumanCoordinator(GameModule module)
     {
-        this.ctx = ctx;
-        this.suspicion = suspicion;
-        this.coManager = coManager;
-        this.gylogic = gylogic;
-        this.deliverEvents = deliverEvents;
+        this.module = module;
+        this.ctx = module.getCtx();
+        this.suspicion = module.getSuspicion();
+        this.coManager = module.getCoManager();
+        this.gylogic = module.getGylogic();
+        this.deliverEvents = module.getDeliverEvents();
     }
 
     public void coordinate(ArrayList<Integer> diebody)

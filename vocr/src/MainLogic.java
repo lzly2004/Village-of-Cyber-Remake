@@ -102,8 +102,8 @@ public class MainLogic implements MainLogicInterface
         }
 
         coManager = new COManager(ctx, suspicion, resultPresenter, probabilityCalculator);
-        nonHumanCoordinator = new NonHumanCoordinator(ctx, suspicion, coManager, this::gylogic, this::deliverEvents);
-        dayActionCoordinator = new DayActionCoordinator(ctx, suspicion, coManager, resultPresenter, probabilityCalculator, this::gylogic, this::deliverEvents);
+
+        // 构建统一的依赖容器
         GameModule gameModule = new GameModule.Builder()
                 .ctx(ctx)
                 .suspicion(suspicion)
@@ -111,12 +111,16 @@ public class MainLogic implements MainLogicInterface
                 .probabilityCalculator(probabilityCalculator)
                 .voteSelector(voteSelector)
                 .gameEndChecker(gameEndChecker)
+                .resultPresenter(resultPresenter)
                 .gylogic(this::gylogic)
                 .deliverEvents(this::deliverEvents)
                 .dieaux(dielogicCarrier::dieaux)
                 .nightaction(this::nightaction)
                 .gameRecordManager(gameRecordManager)
                 .build();
+
+        nonHumanCoordinator = new NonHumanCoordinator(gameModule);
+        dayActionCoordinator = new DayActionCoordinator(gameModule);
         executionManager = new ExecutionManager(gameModule);
 
         // Phase 3: 统一数组引用 —— 所有数组/集合字段统一在 GameContext 中管理

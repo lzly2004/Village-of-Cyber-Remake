@@ -3,6 +3,7 @@ import java.util.List;
 
 public class DayActionCoordinator
 {
+    private final GameModule module;
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
     private final COManager coManager;
@@ -11,18 +12,16 @@ public class DayActionCoordinator
     private final Runnable gylogic;
     private final Runnable deliverEvents;
 
-    public DayActionCoordinator(GameContext ctx, SuspicionSystem suspicion,
-                                COManager coManager, ResultPresenter resultPresenter,
-                                ProbabilityCalculator probabilityCalculator,
-                                Runnable gylogic, Runnable deliverEvents)
+    public DayActionCoordinator(GameModule module)
     {
-        this.ctx = ctx;
-        this.suspicion = suspicion;
-        this.coManager = coManager;
-        this.resultPresenter = resultPresenter;
-        this.probabilityCalculator = probabilityCalculator;
-        this.gylogic = gylogic;
-        this.deliverEvents = deliverEvents;
+        this.module = module;
+        this.ctx = module.getCtx();
+        this.suspicion = module.getSuspicion();
+        this.coManager = module.getCoManager();
+        this.resultPresenter = module.getResultPresenter();
+        this.probabilityCalculator = module.getProbabilityCalculator();
+        this.gylogic = module.getGylogic();
+        this.deliverEvents = module.getDeliverEvents();
     }
 
     public void coordinate(ArrayList<Integer> diebody)

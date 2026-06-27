@@ -7,6 +7,7 @@ public class GameModule {
     private final ProbabilityCalculator probabilityCalculator;
     private final VoteSelector voteSelector;
     private final GameEndChecker gameEndChecker;
+    private final ResultPresenter resultPresenter;
     private final Runnable gylogic;
     private final Runnable deliverEvents;
     private final BiConsumer<Integer, whyDie> dieaux;
@@ -20,6 +21,7 @@ public class GameModule {
         this.probabilityCalculator = builder.probabilityCalculator;
         this.voteSelector = builder.voteSelector;
         this.gameEndChecker = builder.gameEndChecker;
+        this.resultPresenter = builder.resultPresenter;
         this.gylogic = builder.gylogic;
         this.deliverEvents = builder.deliverEvents;
         this.dieaux = builder.dieaux;
@@ -51,6 +53,10 @@ public class GameModule {
         return gameEndChecker;
     }
 
+    public ResultPresenter getResultPresenter() {
+        return resultPresenter;
+    }
+
     public Runnable getGylogic() {
         return gylogic;
     }
@@ -78,6 +84,7 @@ public class GameModule {
         private ProbabilityCalculator probabilityCalculator;
         private VoteSelector voteSelector;
         private GameEndChecker gameEndChecker;
+        private ResultPresenter resultPresenter;
         private Runnable gylogic;
         private Runnable deliverEvents;
         private BiConsumer<Integer, whyDie> dieaux;
@@ -111,6 +118,11 @@ public class GameModule {
 
         public Builder gameEndChecker(GameEndChecker gameEndChecker) {
             this.gameEndChecker = gameEndChecker;
+            return this;
+        }
+
+        public Builder resultPresenter(ResultPresenter resultPresenter) {
+            this.resultPresenter = resultPresenter;
             return this;
         }
 

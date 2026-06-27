@@ -68,10 +68,14 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
        - ✅ UI/ReplayBrowserHandler/RecordSceneHandler通过UI对象访问
        - ✅ ExecutionManager 11参数构造函数过重 → 通过GameModule容器解决（Builder模式）
 
-[P1-4] 消除 MainLogic 的方法引用回调链
+[P1-4] ✅ 消除 MainLogic 的方法引用回调链
        来源: #4
-       - this::gylogic、this::deliverEvents 等方法引用传递形成隐式回调链
-       - 改为显式的协调器模式或事件总线
+       - ✅ 扩展 GameModule 容器，统一管理 gylogic/deliverEvents/dieaux/nightaction 回调
+       - ✅ NonHumanCoordinator 构造函数从 5 参数 → 单一 GameModule 参数
+       - ✅ DayActionCoordinator 构造函数从 7 参数 → 单一 GameModule 参数
+       - ✅ ExecutionManager 已通过 P1-3 使用 GameModule
+       - ✅ 所有上层协调器均通过 GameModule 获取依赖，回调不再逐层传递
+       - 注: DielogicCarrier 保持原样（底层服务，存在循环依赖）
 
 [P1-5] 修复分层泄漏
        来源: #31 #65 #67 #73
@@ -232,5 +236,5 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
 ================================================================================
                             统计概览
   P0: 6 项 ✅ 全部完成 | P1: 13 项待处理 + 2 项部分完成 + 1 项已回退 + 5 项✅ | P2: 9 项 + 2 项✅ | 合计: 39 项
-  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅(含GameModule重构) P1-10 ✅ | 部分完成: P1-8 ⚠️ | 已回退: P1-12 ❌
+  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅(含GameModule重构) P1-10 ✅ P1-4 ✅ | 部分完成: P1-8 ⚠️ | 已回退: P1-12 ❌
 ================================================================================
