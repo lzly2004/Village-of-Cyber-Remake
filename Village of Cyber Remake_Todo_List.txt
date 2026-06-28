@@ -87,10 +87,14 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
          - GameRecorder.active → private + isActive()/setActive()
          - 替换19处 ui.jFrame 引用 + 1处 recorder.active 引用
 
-[P1-6] ResultPresenter 职责拆分
+[P1-6] ✅ ResultPresenter 职责拆分
        来源: #37
-       - 当前同时做事件生成 + 怀疑度修改 + CO状态修改 + 非人标记
-       - 拆分为 ResultEffectApplicator（应用效果）和 EventGenerator（生成事件）
+       - ✅ 拆分为 ResultEventGenerator（生成事件）和 ResultEffectApplicator（应用效果）
+       - ✅ ResultPresenter 作为协调者保留原接口，内部委托给两个专门类
+       - ✅ ResultEventGenerator: 14个事件生成方法，纯事件添加逻辑
+       - ✅ ResultEffectApplicator: 8个效果应用方法，怀疑度/CO状态/非人标记等
+       - ✅ 调用方（COManager、DayActionCoordinator）无需修改，接口保持不变
+       - 验证: 编译通过 + 单元测试通过
 
 [P1-7] ✅ SharedExposer 暴露进度归属修正
        来源: #38
@@ -231,12 +235,11 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
        来源: #15
        - 1280×720 固定窗口 + setResizable(false) → 支持等比缩放或全屏模式
 
-[P2-2] ✅ 字体回退机制
+[P2-2] ⚠️ 字体回退机制（回退）
        来源: #22
-       - ✅ "Takao Mincho" 硬编码 → 使用 GraphicsEnvironment 检测可用字体
-       - ✅ 新增字体回退优先级列表(12种中日文字体): Takao Mincho, Noto Sans CJK, Microsoft YaHei, SimSun, Hiragino, Yu Mincho, Meiryo
-       - ✅ detectFont() 方法自动从高优先级到低优先级检测系统可用字体
-       - ✅ 兜底使用 Font.SERIF
+       - 尝试实现字体回退机制，但因Windows系统字体名称匹配问题导致原字体被替换为难看的字体
+       - 已回退到原始硬编码"Takao Mincho"，保留原始用户体验
+       - 未来改进方向：在Font创建层面做fallback而非替换常量
 
 [P2-3] BGM 状态管理统一
        来源: #34
@@ -289,6 +292,6 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
 
 ================================================================================
                             统计概览
-  P0: 6 项 ✅ 全部完成 | P1: 13 项待处理 + 2 项部分完成 + 1 项已回退 + 5 项✅ | P2: 9 项 + 2 项✅ | 合计: 39 项
-  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅(含GameModule重构) P1-10 ✅ P1-4 ✅ P1-8(部分) ✅ P1-9 ✅ P1-17(部分) ✅ P1-18 ✅ P1-10.2 ✅ P1-11 ✅ P1-7 ✅ P1-13 ✅ | 部分完成: P1-8 ⚠️ P1-17 ⚠️ | 已回退: P1-12 ❌
+  P0: 6 项 ✅ 全部完成 | P1: 12 项待处理 + 2 项部分完成 + 1 项已回退 + 6 项✅ | P2: 9 项 + 2 项✅ | 合计: 39 项
+  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅(含GameModule重构) P1-10 ✅ P1-4 ✅ P1-8(部分) ✅ P1-9 ✅ P1-17(部分) ✅ P1-18 ✅ P1-10.2 ✅ P1-11 ✅ P1-7 ✅ P1-13 ✅ P1-6 ✅ | 部分完成: P1-8 ⚠️ P1-17 ⚠️ | 已回退: P1-12 ❌
 ================================================================================

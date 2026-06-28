@@ -1,6 +1,4 @@
 import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 游戏全局常量 — 第1步重构核心。
@@ -17,37 +15,8 @@ public final class GameConstants
     private GameConstants() {} // 工具类不可实例化
 
     // ==================== 字体 ====================
-    /** 字体回退优先级列表：优先使用日文/中日文混合字体 */
-    private static final List<String> FONT_FALLBACK_LIST = Arrays.asList(
-            "Takao Mincho",
-            "Noto Sans CJK SC",
-            "Noto Sans CJK JP",
-            "Noto Serif CJK SC",
-            "Noto Serif CJK JP",
-            "Microsoft YaHei",
-            "微软雅黑",
-            "SimSun",
-            "宋体",
-            "Hiragino Mincho ProN",
-            "Yu Mincho",
-            "Meiryo"
-    );
-
-    /** 游戏中使用的字体名称（自动检测系统可用字体） */
-    public static final String FONT_FAMILY = detectFont();
-
-    private static String detectFont() {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        String[] availableFonts = ge.getAvailableFontFamilyNames();
-        for (String fontName : FONT_FALLBACK_LIST) {
-            for (String available : availableFonts) {
-                if (available.equalsIgnoreCase(fontName)) {
-                    return available;
-                }
-            }
-        }
-        return Font.SERIF;
-    }
+    /** 游戏中唯一使用的日文字体 */
+    public static final String FONT_FAMILY = "Takao Mincho";
 
     // 字号
     public static final int FONT_SIZE_BUTTON  = 20;  // 按钮文字
