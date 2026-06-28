@@ -90,6 +90,14 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（已交付 14 项）
          - GameRecorder.active → private + isActive()/setActive()
          - 替换19处 ui.jFrame 引用 + 1处 recorder.active 引用
 
+[P1-1] ✅ AI 概率参数集中管理（已完成）
+       来源: #20 #30
+       - ✅ 静态硬编码概率迁移到 GameConstants
+       - ✅ Fabricator、SharedExposer 已使用常量
+       - ✅ ProbabilityCalculator 已实现"默认值+覆盖项"模式
+       - ✅ NonHumanCoordinator 中动态概率(ctx.kz依赖)保持原样（正确决策：动态依赖不适合集中化）
+       - 验证: 编译通过 + 单元测试通过
+
 [P1-6] ✅ ResultPresenter 职责拆分
        来源: #37
        - ✅ 拆分为 ResultEventGenerator（生成事件）和 ResultEffectApplicator（应用效果）
