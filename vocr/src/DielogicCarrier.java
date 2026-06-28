@@ -81,6 +81,7 @@ public class DielogicCarrier
                 }
         }
         deliverEvents.run();
+        ctx.setNightDeathCount(ctx.getGameDay(), diebody.size());
         return diebody;
     }
 

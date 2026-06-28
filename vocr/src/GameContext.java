@@ -14,6 +14,7 @@ class GameContext implements GameContextView
 
     // === 核心状态数组 ===
     final boolean[] isDoubleDeathOccurred;
+    final int[] nightDeathCount;
     final int[] actualRoleindex;
     final int[] gyindex;
     final int[] rlindex;
@@ -44,6 +45,7 @@ class GameContext implements GameContextView
 
         int n = gs.getPlayerSum();
         this.isDoubleDeathOccurred = new boolean[GameConstants.MAX_GAME_DAYS + 1];
+        this.nightDeathCount = new int[GameConstants.MAX_GAME_DAYS + 1];
         this.actualRoleindex = new int[Role.values().length + 1];
         this.gyindex = new int[3];
         this.rlindex = new int[n + 1];
@@ -311,6 +313,41 @@ class GameContext implements GameContextView
 
     /** 设置双死标记 */
     void setDoubleDeathOccurred(int day) { isDoubleDeathOccurred[day] = true; }
+
+    /** 设置夜间死亡人数 */
+    void setNightDeathCount(int day, int count) { nightDeathCount[day] = count; }
+
+    /** 判断猫又是否明确出局 */
+    public boolean isCatDefinitivelyOut()
+    {
+        int cat = getCat();
+        if (cat == 0) return true;
+        
+        whyDie deathReason = getDeathReason(cat);
+        
+        // 条件1: 猫又白天被处刑并发动猫咒（chuxing或daymaozhou）
+        if (deathReason == whyDie.chuxing || deathReason == whyDie.daymaozhou)
+            return true;
+        
+        // 条件2: 累计两晚以上夜间死者不止一个
+        int doubleDeathCount = 0;
+        for (int day = 1; day <= getGameDay(); day++)
+        {
+            if (isDoubleDeathOccurred[day])
+                doubleDeathCount++;
+        }
+        if (doubleDeathCount >= 2)
+            return true;
+        
+        // 条件3: 某个夜间死亡4人
+        for (int day = 1; day <= getGameDay(); day++)
+        {
+            if (nightDeathCount[day] >= 4)
+                return true;
+        }
+        
+        return false;
+    }
 
     /** 添加占候补 */
     void addZhan(int player) { if (!zhans.contains(player)) zhans.add(player); }

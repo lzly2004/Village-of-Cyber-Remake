@@ -698,12 +698,12 @@ public class NonHumanCoordinator
                             break;
                         case 2:
                             ctx.nonHumanPlan[bplayer] = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50 + 50 * ctx.lies.size(),50+50 * ctx.maos.size()))) * 2;
-                            if(ctx.getCat() == 0)
-                                ctx.nonHumanPlan[bplayer] = 3;
-                            if(ctx.nonHumanPlan[bplayer] == 5)
-                                response.add(new IntPair(bplayer,5));
-                            morelmll = true;
-                            break;
+                        if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut())
+                            ctx.nonHumanPlan[bplayer] = 3;
+                        if(ctx.nonHumanPlan[bplayer] == 5)
+                            response.add(new IntPair(bplayer,5));
+                        morelmll = true;
+                        break;
                         case 3:
                             ctx.nonHumanPlan[bplayer] = 0;
                             break;
@@ -732,7 +732,7 @@ public class NonHumanCoordinator
                         break;
                     case 2:
                         ctx.nonHumanPlan[bplayer] = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50 + 50 * ctx.lies.size(),50+50 * ctx.maos.size()))) * 2;
-                        if(ctx.getCat() == 0)
+                        if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut())
                             ctx.nonHumanPlan[bplayer] = 3;
                         if(ctx.nonHumanPlan[bplayer] == 5)
                             response.add(new IntPair(bplayer,5));
