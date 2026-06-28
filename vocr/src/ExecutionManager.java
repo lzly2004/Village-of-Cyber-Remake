@@ -36,40 +36,9 @@ public class ExecutionManager
     {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
-        {
-            for(int i=0;i<ctx.zhans.size();i++)
-            {
-                int zhan = ctx.zhans.get(i);
-                StringBuilder sb = new StringBuilder("占卜师候补编号：" + ctx.getClaimedRoleOrder(zhan) + "预告情况：");
-                for(int j=1;j<=n;j++)
-                    if(ctx.getClaimedRoleScheduledSkillTargets(zhan)[j][gd])
-                        sb.append(CharacterKanjiName.values()[ctx.getCharacterNumber(j)]).append(" ");
-                DebugLogger.log(sb.toString());
-            }
-            for (int i = 0; i < ctx.lies.size(); i++)
-            {
-                int lie = ctx.lies.get(i);
-                StringBuilder sb = new StringBuilder("猎人候补编号：" + ctx.getClaimedRoleOrder(lie) + "指定护卫情况：");
-                for (int j = 1; j <= n; j++)
-                    if (ctx.getClaimedRoleScheduledSkillTargets(lie)[j][gd])
-                        sb.append(CharacterKanjiName.values()[ctx.getCharacterNumber(j)]).append(" ");
-                DebugLogger.log(sb.toString());
-            }
-            StringBuilder sb3 = new StringBuilder("潜伏占预告情况：");
-            for(int i=1;i<=n;i++)
-            {
-                if(ctx.getHiddenSeerScheduledSkillTargets()[i][gd])
-                    sb3.append(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]).append(" ");
-            }
-            DebugLogger.log(sb3.toString());
-            StringBuilder sb4 = new StringBuilder("潜伏猎人指定护卫情况：");
-            for(int i=1;i<=n;i++)
-            {
-                if(ctx.getHiddenHunterScheduledSkillTargets()[i][gd])
-                    sb4.append(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]).append(" ");
-            }
-            DebugLogger.log(sb4.toString());
-        }
+        
+        logSkillSchedule(n, gd);
+        
         ctx.eventarray.clear();
         if(dailyVotingRule == 2) handleAvoidanceCO(chuxingList, huibi);
         if(ctx.eventarray.size() > 0)
@@ -77,6 +46,56 @@ public class ExecutionManager
             deliverEvents.run();
             return false;
         }
+        
+        boolean[] votable = prepareVoting(n, gd, dailyVotingRule, chuxingList);
+        
+        int topnum = executeVoting(n, gd, votable, dailyVotingRule, chuxingList);
+        
+        deliverEvents.run();
+        processExecution(n, gd, topnum);
+        
+        deliverEvents.run();
+        return checkAndHandleGameEnd(gd);
+    }
+    
+    private void logSkillSchedule(int n, int gd)
+    {
+        for(int i=0;i<ctx.zhans.size();i++)
+        {
+            int zhan = ctx.zhans.get(i);
+            StringBuilder sb = new StringBuilder("占卜师候补编号：" + ctx.getClaimedRoleOrder(zhan) + "预告情况：");
+            for(int j=1;j<=n;j++)
+                if(ctx.getClaimedRoleScheduledSkillTargets(zhan)[j][gd])
+                    sb.append(CharacterKanjiName.values()[ctx.getCharacterNumber(j)]).append(" ");
+            DebugLogger.log(sb.toString());
+        }
+        for (int i = 0; i < ctx.lies.size(); i++)
+        {
+            int lie = ctx.lies.get(i);
+            StringBuilder sb = new StringBuilder("猎人候补编号：" + ctx.getClaimedRoleOrder(lie) + "指定护卫情况：");
+            for (int j = 1; j <= n; j++)
+                if (ctx.getClaimedRoleScheduledSkillTargets(lie)[j][gd])
+                    sb.append(CharacterKanjiName.values()[ctx.getCharacterNumber(j)]).append(" ");
+            DebugLogger.log(sb.toString());
+        }
+        StringBuilder sb3 = new StringBuilder("潜伏占预告情况：");
+        for(int i=1;i<=n;i++)
+        {
+            if(ctx.getHiddenSeerScheduledSkillTargets()[i][gd])
+                sb3.append(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]).append(" ");
+        }
+        DebugLogger.log(sb3.toString());
+        StringBuilder sb4 = new StringBuilder("潜伏猎人指定护卫情况：");
+        for(int i=1;i<=n;i++)
+        {
+            if(ctx.getHiddenHunterScheduledSkillTargets()[i][gd])
+                sb4.append(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]).append(" ");
+        }
+        DebugLogger.log(sb4.toString());
+    }
+    
+    private boolean[] prepareVoting(int n, int gd, int dailyVotingRule, List<Integer> chuxingList)
+    {
         boolean[] votable = new boolean[n+1];
         boolean haveVotable = false;
         if(dailyVotingRule == 1)
@@ -129,7 +148,12 @@ public class ExecutionManager
                 }
             }
         }
-        int shokeicnt = 1,topnum = 0;
+        return votable;
+    }
+    
+    private int executeVoting(int n, int gd, boolean[] votable, int dailyVotingRule, List<Integer> chuxingList)
+    {
+        int shokeicnt = 1, topnum = 0;
         while(true)
         {
             topnum = voteSelector.select(shokeicnt,votable);
@@ -153,7 +177,7 @@ public class ExecutionManager
                         +CharacterKanjiName.values()[ctx.getCharacterNumber(ctx.getVoteTarget(i, gd, k))]);
             }
         }
-
+        
         try {
             MainLogic ml = (MainLogic) Game.getInstance().getMainLogic();
             if (ml != null && ml.getRecorder() != null) {
@@ -163,8 +187,12 @@ public class ExecutionManager
         } catch (Exception e) {
             DebugLogger.warn("[Replay] 记录投票数据失败: " + e.getMessage());
         }
-
-        deliverEvents.run();
+        
+        return topnum;
+    }
+    
+    private void processExecution(int n, int gd, int topnum)
+    {
         dieaux.accept(topnum,whyDie.chuxing);
         if(topnum == ctx.getCat())
         {
@@ -194,7 +222,10 @@ public class ExecutionManager
             ctx.markNonHuman(ctx.getFox());
             ctx.markNonHuman(ctx.getDeviant());
         }
-        deliverEvents.run();
+    }
+    
+    private boolean checkAndHandleGameEnd(int gd)
+    {
         ctx.setEndResult(gameEndChecker.check());
         if (ctx.getEndResult() != 0) {
             recordReplayDailySnapshot(gd + 1);
