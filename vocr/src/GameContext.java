@@ -65,6 +65,26 @@ class GameContext implements GameContextView
         this.suspicion = new SuspicionSystem(this);
     }
 
+    // ==================== 边界检查 ====================
+
+    /** 验证玩家索引在有效范围内 (1..playerSum) */
+    public boolean isValidPlayerIndex(int player)
+    {
+        return player >= 1 && player <= getPlayerSum();
+    }
+
+    /** 验证角色索引在有效范围内 (1..RoleCount) */
+    public boolean isValidRoleIndex(int role)
+    {
+        return role >= 1 && role < Role.values().length;
+    }
+
+    /** 验证天数在有效范围内 (1..MAX_GAME_DAYS) */
+    public boolean isValidDayIndex(int day)
+    {
+        return day >= 1 && day <= GameConstants.MAX_GAME_DAYS;
+    }
+
     // ==================== GameContextView 实现 ====================
 
     // --- 玩家状态 ---
@@ -115,16 +135,51 @@ class GameContext implements GameContextView
     public List<Integer> getMaos() { return Collections.unmodifiableList(maos); }
 
     // --- 技能 ---
-    public int getSkillTarget(int player, int day) { return gs.gc[player].skillTarget[day]; }
-    public int getVoteTarget(int player, int day, int round) { return gs.gc[player].voteTarget[day][round]; }
-    void setVoteTarget(int player, int day, int round, int target) { gs.gc[player].voteTarget[day][round] = target; }
+    public int getSkillTarget(int player, int day)
+    {
+        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
+        assert isValidDayIndex(day) : "天数索引越界: " + day;
+        return gs.gc[player].skillTarget[day];
+    }
+    public int getVoteTarget(int player, int day, int round)
+    {
+        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
+        assert isValidDayIndex(day) : "天数索引越界: " + day;
+        return gs.gc[player].voteTarget[day][round];
+    }
+    void setVoteTarget(int player, int day, int round, int target)
+    {
+        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
+        assert isValidDayIndex(day) : "天数索引越界: " + day;
+        gs.gc[player].voteTarget[day][round] = target;
+    }
 
-    public boolean isSelectedVoteTarget(int player, int day) { return gs.gc[player].isSelectedVoteTarget[day]; }
+    public boolean isSelectedVoteTarget(int player, int day)
+    {
+        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
+        assert isValidDayIndex(day) : "天数索引越界: " + day;
+        return gs.gc[player].isSelectedVoteTarget[day];
+    }
 
     // --- 怀疑度 ---
-    public int getSuspicionValue(int subject, int target) { return gs.gc[subject].suspicionValue[target]; }
-    public void setSuspicionValue(int subject, int target, int value) { gs.gc[subject].suspicionValue[target] = value; }
-    public void addSuspicionValue(int subject, int target, int delta) { gs.gc[subject].suspicionValue[target] += delta; }
+    public int getSuspicionValue(int subject, int target)
+    {
+        assert isValidPlayerIndex(subject) : "主体玩家索引越界: " + subject;
+        assert isValidPlayerIndex(target) : "目标玩家索引越界: " + target;
+        return gs.gc[subject].suspicionValue[target];
+    }
+    public void setSuspicionValue(int subject, int target, int value)
+    {
+        assert isValidPlayerIndex(subject) : "主体玩家索引越界: " + subject;
+        assert isValidPlayerIndex(target) : "目标玩家索引越界: " + target;
+        gs.gc[subject].suspicionValue[target] = value;
+    }
+    public void addSuspicionValue(int subject, int target, int delta)
+    {
+        assert isValidPlayerIndex(subject) : "主体玩家索引越界: " + subject;
+        assert isValidPlayerIndex(target) : "目标玩家索引越界: " + target;
+        gs.gc[subject].suspicionValue[target] += delta;
+    }
     public int getTop3SuspectedPlayer(int player, int rank, int day) { return gs.gc[player].top3SuspectedPlayers[rank][day]; }
     public void setTop3SuspectedPlayer(int player, int rank, int day, int value) { gs.gc[player].top3SuspectedPlayers[rank][day] = value; }
     public int[] getSuspicionValueArray(int player) { return gs.gc[player].suspicionValue; }
@@ -148,9 +203,21 @@ class GameContext implements GameContextView
     public boolean isDoubleDeathOccurred(int day) { return isDoubleDeathOccurred[day]; }
 
     // --- 非人策略 ---
-    public int getNonHumanPlan(int player) { return nonHumanPlan[player]; }
-    public int getZW(int player) { return zw[player]; }
-    public int getYBZW(int player) { return ybzw[player]; }
+    public int getNonHumanPlan(int player)
+    {
+        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
+        return nonHumanPlan[player];
+    }
+    public int getZW(int player)
+    {
+        assert player >= 1 && player <= zw.length - 1 : "占文索引越界: " + player;
+        return zw[player];
+    }
+    public int getYBZW(int player)
+    {
+        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
+        return ybzw[player];
+    }
 
     // --- 预告 ---
     public boolean isClaimedRoleScheduled(int player, int target, int day) { return gs.gc[player].claimedRoleScheduledSkillTargets[target][day]; }

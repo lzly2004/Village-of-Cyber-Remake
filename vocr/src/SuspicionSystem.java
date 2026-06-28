@@ -24,11 +24,21 @@ class SuspicionSystem
     }
 
     public int[] getLazySuspicionValue() { return lazySuspicionValue; }
-    public void addLazySuspicionValue(int player, int delta) { lazySuspicionValue[player] += delta; }
-    public void setLazySuspicionValue(int player, int value) { lazySuspicionValue[player] = value; }
+    public void addLazySuspicionValue(int player, int delta)
+    {
+        assert ctx.isValidPlayerIndex(player) : "玩家索引越界: " + player;
+        lazySuspicionValue[player] += delta;
+    }
+    public void setLazySuspicionValue(int player, int value)
+    {
+        assert ctx.isValidPlayerIndex(player) : "玩家索引越界: " + player;
+        lazySuspicionValue[player] = value;
+    }
 
     public void updateTop3Aux2(int num1, int num2, int w1, int w2)
     {
+        assert ctx.isValidPlayerIndex(num1) : "玩家1索引越界: " + num1;
+        assert ctx.isValidPlayerIndex(num2) : "玩家2索引越界: " + num2;
         ctx.addSuspicionValue(num1, num2, w1);
         ctx.addSuspicionValue(num2, num1, w2);
     }
