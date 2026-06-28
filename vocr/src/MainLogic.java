@@ -85,12 +85,11 @@ public class MainLogic implements MainLogicInterface
         fabricator = new Fabricator(ctx, suspicion, seerDiviner, hunterGuarder);
         // 简化概率计算器初始化
         try {
-            File configDir = new File("config");
+            File configDir = new File(PathConfig.CONFIG_DIR);
             if (!configDir.exists()) {
                 configDir.mkdirs();
             }
-            String configPath = "config/probability.txt";
-            probabilityCalculator = new ProbabilityCalculator(configPath);
+            probabilityCalculator = new ProbabilityCalculator(PathConfig.PROBABILITY_CONFIG);
             if(probabilityCalculator != null)
             {
                 DebugLogger.log("概率计算器已初始化");

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class GameRecordManager {
     private GameRecord record;
-    private static final String SAVE_PATH = "data/game_record.json";
+    private static final String SAVE_PATH = PathConfig.GAME_RECORD;
 
     public GameRecordManager() { load(); }
 

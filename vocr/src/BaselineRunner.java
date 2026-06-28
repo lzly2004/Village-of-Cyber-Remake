@@ -74,7 +74,7 @@ public class BaselineRunner
             DebugLogger.info("随机数序列校验: " + checksum);
 
             // 保存录制文件
-            recorder.save("baseline_new/" + label + ".txt");
+            recorder.save(PathConfig.baselineNewFile(label));
 
             // 恢复随机种子
             ConstNum.resetRandomSeed();

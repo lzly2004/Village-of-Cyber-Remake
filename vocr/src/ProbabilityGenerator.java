@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 public class ProbabilityGenerator {
     public static void main(String[] args) {
         try {
-            PrintWriter writer = new PrintWriter(new FileWriter("config/probability.txt"));
+            PrintWriter writer = new PrintWriter(new FileWriter(PathConfig.PROBABILITY_CONFIG));
 
             writer.println("# 猫猎co概率配置文件");
             writer.println("# 格式: zhi situation p1 p2 probability");
@@ -39,7 +39,7 @@ public class ProbabilityGenerator {
             writer.close();
 
             // 打印统计信息
-            DebugLogger.log("配置文件已生成: config/probability.txt");
+            DebugLogger.log("配置文件已生成: " + PathConfig.PROBABILITY_CONFIG);
             DebugLogger.log("总条目数: " + totalCount + " (应为560)");
             DebugLogger.log("最小概率: " + minProb + "%");
             DebugLogger.log("最大概率: " + maxProb + "%");

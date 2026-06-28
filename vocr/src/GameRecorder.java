@@ -350,7 +350,7 @@ public class GameRecorder
         }
     }
 
-    public void save() { save("baseline/" + runLabel + ".txt"); }
+    public void save() { save(PathConfig.baselineFile(runLabel)); }
 
     // ==================== 获取器 ====================
 

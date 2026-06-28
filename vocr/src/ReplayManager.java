@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class ReplayManager {
     public static final int MAX_SLOTS = 9;
-    private static final String SAVE_FILE = "data/replay_saves.json";
+    private static final String SAVE_FILE = PathConfig.REPLAY_SAVES;
 
     private ReplaySave[] slots = new ReplaySave[MAX_SLOTS];
 
