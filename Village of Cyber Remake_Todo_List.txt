@@ -132,10 +132,15 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
        - ✅ 猫猎CO: handleCatHunterCO()
        - ✅ 接黒回复: handleBlackResponses()
 
-[P1-11] UI 事件处理中匿名类提取为独立方法
+[P1-11] ✅ UI 事件处理中匿名类提取为独立方法
        来源: #32 #68
-       - GameSceneVoteHandler.wireAllEventHandlers() 中 100+ 行匿名 listener
-       - 提取为命名方法，分离 UI 渲染和业务逻辑
+       - ✅ GameSceneVoteHandler.wireAllEventHandlers() 中 5 个复杂匿名listener提取为命名方法
+       - ✅ handleVoteButton() - 投票按钮(~90行)
+       - ✅ handleGreyVoteButton() - 灰投票按钮(~33行)
+       - ✅ handleReturnButton() - 返回按钮(~28行)
+       - ✅ handleFreeVoteButton() - 自由投票按钮(~24行)
+       - ✅ handleReadyVoteButton() - 指定投票按钮(~31行)
+       - 注: 简单listener(几行代码)保持匿名, 避免过度设计
 
 [P1-12] ❌ COManager.askCoByRole/askCoByList 消除重复（已回退）
        来源: #66
@@ -261,5 +266,5 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
 ================================================================================
                             统计概览
   P0: 6 项 ✅ 全部完成 | P1: 13 项待处理 + 2 项部分完成 + 1 项已回退 + 5 项✅ | P2: 9 项 + 2 项✅ | 合计: 39 项
-  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅(含GameModule重构) P1-10 ✅ P1-4 ✅ P1-8(部分) ✅ P1-9 ✅ P1-17(部分) ✅ P1-18 ✅ | 部分完成: P1-8 ⚠️ P1-17 ⚠️ | 已回退: P1-12 ❌
+  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅(含GameModule重构) P1-10 ✅ P1-4 ✅ P1-8(部分) ✅ P1-9 ✅ P1-17(部分) ✅ P1-18 ✅ P1-10.2 ✅ P1-11 ✅ | 部分完成: P1-8 ⚠️ P1-17 ⚠️ | 已回退: P1-12 ❌
 ================================================================================
