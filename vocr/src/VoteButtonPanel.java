@@ -14,81 +14,81 @@ class VoteButtonPanel {
     JScrollPane scrollPane1;
 
     void create(UI ui) {
-        voteBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        voteBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126, ui.resources.getImage("goTohyo.png"));
         ui.jPanel.add(voteBtn);
-        recordBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        recordBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 2 - 10, ui.resources.getImage("check.png"));
         ui.jPanel.add(recordBtn);
-        pointBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        pointBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 3 - 20, ui.resources.getImage("shiji.png"));
         ui.jPanel.add(pointBtn);
-        avoidBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        avoidBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 4 - 30, ui.resources.getImage("关闭回避.png"));
         ui.jPanel.add(avoidBtn);
-        avoidBtn1 = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        avoidBtn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 4 - 30, ui.resources.getImage("开启回避.png"));
         avoidBtn1.setVisible(false);
         ui.jPanel.add(avoidBtn1);
-        menuBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        menuBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 5 - 40, ui.resources.getImage("IntroTitle.png"));
         menuBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(menuBtn);
-        greyBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        greyBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 3 - 20, ui.resources.getImage("tohyoGrey.png"));
         greyBtn.setVisible(false); ui.jPanel.add(greyBtn);
-        freeBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        freeBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 2 - 10, ui.resources.getImage("tohyoFree.png"));
         freeBtn.setVisible(false); ui.jPanel.add(freeBtn);
-        doubtBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        doubtBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 3 - 20, ui.resources.getImage("checkUtagai.png"));
         doubtBtn.setVisible(false); ui.jPanel.add(doubtBtn);
-        votehisBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        votehisBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 2 - 10, ui.resources.getImage("checkTohyo.png"));
         votehisBtn.setVisible(false); ui.jPanel.add(votehisBtn);
-        coBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        coBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 3 - 20, ui.resources.getImage("doCO.png"));
         coBtn.setVisible(false); ui.jPanel.add(coBtn);
-        ppBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        ppBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 2 - 10, ui.resources.getImage("doShitei.png"));
         ppBtn.setVisible(false); ui.jPanel.add(ppBtn);
-        returnBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        returnBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126, ui.resources.getImage("return.png"));
         returnBtn.setVisible(false); ui.jPanel.add(returnBtn);
-        nextBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126, ui.resources.getImage("nextDay.png"));
         nextBtn.setVisible(false); ui.jPanel.add(nextBtn);
-        againBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        againBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126, ui.resources.getImage("goTohyo.png"));
         againBtn.setVisible(false); ui.jPanel.add(againBtn);
-        readyVoteBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        readyVoteBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 3 - 20, ui.resources.getImage("tohyoShitei.png"));
         readyVoteBtn.setVisible(false); ui.jPanel.add(readyVoteBtn);
-        askCoBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        askCoBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 4 - 30, ui.resources.getImage("询问CO.png"));
         askCoBtn.setVisible(false); ui.jPanel.add(askCoBtn);
-        reiBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        reiBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 3 - 20, ui.resources.getImage("reiCO.png"));
         reiBtn.setVisible(false); ui.jPanel.add(reiBtn);
-        kariBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        kariBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 2 - 10, ui.resources.getImage("kariCO.png"));
         kariBtn.setVisible(false); ui.jPanel.add(kariBtn);
-        uranaiBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060 - 194 - 30,
+        uranaiBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060 - 194 - 30,
                 720 - 40 - 126 * 3 - 20, ui.resources.getImage("uranaiCO.png"));
         uranaiBtn.setVisible(false); ui.jPanel.add(uranaiBtn);
-        kyouyuBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060 - 194 - 30,
+        kyouyuBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060 - 194 - 30,
                 720 - 40 - 126 * 2 - 10, ui.resources.getImage("kyouyuCO.png"));
         kyouyuBtn.setVisible(false); ui.jPanel.add(kyouyuBtn);
-        catBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060 - 194 - 30,
+        catBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060 - 194 - 30,
                 720 - 40 - 126, ui.resources.getImage("catCO.png"));
         catBtn.setVisible(false); ui.jPanel.add(catBtn);
-        fixedVoteBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        fixedVoteBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 3 - 20, ui.resources.getImage("tohyoShitei.png"));
         fixedVoteBtn.setVisible(false); ui.jPanel.add(fixedVoteBtn);
-        fixedUranaiBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        fixedUranaiBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126 * 2 - 10, ui.resources.getImage("shiteiUranai.png"));
         fixedUranaiBtn.setVisible(false); ui.jPanel.add(fixedUranaiBtn);
-        protectBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+        protectBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                 720 - 40 - 126, ui.resources.getImage("shiteiGoei.png"));
         protectBtn.setVisible(false); ui.jPanel.add(protectBtn);
 

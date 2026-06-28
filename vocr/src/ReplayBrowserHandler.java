@@ -93,7 +93,7 @@ public class ReplayBrowserHandler implements SceneHandler {
 
         ImageIcon bgImg = ui.resources.getImage("PVBG.png");
         if (bgImg != null) {
-            JLabel background = UIFactory.makeLabel(
+            JLabel background = LabelSimpleFactory.makeLabel(
                     LabelConst.Simple_Label, 0, 0,
                     GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                     bgImg
@@ -124,14 +124,14 @@ public class ReplayBrowserHandler implements SceneHandler {
         colorBar.setBackground(bgColor);
         slotPanel.add(colorBar);
 
-        JLabel cardBg = UIFactory.makeLabel(
+        JLabel cardBg = LabelSimpleFactory.makeLabel(
                 LabelConst.Simple_Label, 12, 0, w - 12, h,
                 ui.resources.getImage("avg1_resized(3).png")
         );
         slotPanel.add(cardBg);
 
         if (!isEmpty) {
-            JTextArea infoText = UIFactory.createBoldTitleTextArea(Color.WHITE, 22, "");
+            JTextArea infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 22, "");
             StringBuilder sb = new StringBuilder();
             sb.append(String.format("%d. %s", slotIndex, save.getPeiyiDisplayName()));
             sb.append(String.format("     %s\n", save.saveTime));
@@ -168,7 +168,7 @@ public class ReplayBrowserHandler implements SceneHandler {
                 }
             });
         } else {
-            JTextArea emptyText = UIFactory.createBoldTitleTextArea(
+            JTextArea emptyText = TextareaSimpleFactory.createBoldTitleTextArea(
                     Color.GRAY, 24, String.format("%d. (空槽位)", slotIndex)
             );
             emptyText.setBounds(30, (h - 40) / 2, w - 60, 40);
@@ -287,7 +287,7 @@ public class ReplayBrowserHandler implements SceneHandler {
 
     private JButton createButton(UI ui, String imageName, int x, int y, int w, int h) {
         ImageIcon img = ui.resources.getImage(imageName);
-        return UIFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);
+        return ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);
     }
 
     private Color getPeiyiColor(int ordinal) {

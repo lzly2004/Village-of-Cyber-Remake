@@ -34,7 +34,7 @@ public class StartSceneHandler implements SceneHandler {
         ui.resources.playBgm("start_menu.wav");
 
         // 添加标题
-        JLabel titleLabel = UIFactory.makeLabel(
+        JLabel titleLabel = LabelSimpleFactory.makeLabel(
                 LabelConst.Black_Label, 600, 200, 554, 138,
                 ui.resources.getImage("titleLogo.png")
         );
@@ -49,7 +49,7 @@ public class StartSceneHandler implements SceneHandler {
         int y_div = GameConstants.START_BTN_Y_GAP;
 
         // 新游戏按钮
-        JButton btnStart = UIFactory.makeButton(
+        JButton btnStart = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x, y, width, height,
                 ui.resources.getImage("startButton.png")
         );
@@ -57,7 +57,7 @@ public class StartSceneHandler implements SceneHandler {
         ui.jPanel.add(btnStart);
 
         // 继续游戏按钮
-        JButton btnContinue = UIFactory.makeButton(
+        JButton btnContinue = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x + x_div, y, width, height,
                 ui.resources.getImage("continueButton.png")
         );
@@ -70,7 +70,7 @@ public class StartSceneHandler implements SceneHandler {
         ui.jPanel.add(btnContinue);
 
         // 选择存档按钮
-        JButton btnSave = UIFactory.makeButton(
+        JButton btnSave = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x, y + y_div, width, height,
                 ui.resources.getImage("replayButton.png")
         );
@@ -85,7 +85,7 @@ public class StartSceneHandler implements SceneHandler {
         ui.jPanel.add(btnSave);
 
         // 数据统计按钮
-        JButton btnRecord = UIFactory.makeButton(
+        JButton btnRecord = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x + x_div, y + y_div, width, height,
                 ui.resources.getImage("recordButton.png")
         );
@@ -100,7 +100,7 @@ public class StartSceneHandler implements SceneHandler {
         ui.jPanel.add(btnRecord);
 
         // 信息查看按钮
-        JButton btnInfo = UIFactory.makeButton(
+        JButton btnInfo = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x, y + y_div * 2, width, height,
                 ui.resources.getImage("infoButton.png")
         );
@@ -116,7 +116,7 @@ public class StartSceneHandler implements SceneHandler {
         ui.jPanel.add(btnInfo);
 
         // 角色收集按钮
-        JButton btnCollections = UIFactory.makeButton(
+        JButton btnCollections = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x + x_div, y + y_div * 2, width, height,
                 ui.resources.getImage("collectionsButton.png")
         );
@@ -129,7 +129,7 @@ public class StartSceneHandler implements SceneHandler {
         ui.jPanel.add(btnCollections);
 
         // 背景图片（放在最后添加，确保在最底层）
-        JLabel background = UIFactory.makeLabel(
+        JLabel background = LabelSimpleFactory.makeLabel(
                 LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("title_base_resized.png")

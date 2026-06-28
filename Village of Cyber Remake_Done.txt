@@ -305,33 +305,11 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
        - 收益: Phase1 分析逻辑从335行主方法中分离，可读性显著提升，便于独立测试
        - 验证: 编译通过
 
-[P3-5] UI工厂类合并（2026-06-29）
-  概述: 将 Button/Label/Panel/Textarea 四个 SimpleFactory 合并为统一的 UIFactory
-  实现:
-    - 新增 UIFactory.java，包含:
-      - Button 部分: makeButton, createSimpleButton, createDraggableButton, createSimpleBoundedButton 等
-      - Label 部分: makeLabel, createSimpleLabel, createTextLabel, createBlackLabel 等
-      - Panel 部分: makePanel, createSimplePanel
-      - Textarea 部分: createBasicTextArea, createBoldTitleTextArea, createTranslucentTipTextArea, createBlackTitleTextArea, TextAreaBuilder
-    - ButtonConst/LabelConst/PanelConst 常量类移入 UIFactory.java（标记 @Deprecated）
-    - 更新21个调用文件，全部改用 UIFactory
-    - 保留原4个工厂类（标记@Deprecated）确保向后兼容
-  涉及文件:
-    - 新增: UIFactory.java
-    - 更新: EndAnimeHandler, GameSceneHandler, GameSceneVoteHandler, CoSelectionPanel,
-      PlayerStatusRenderer, ReplayBrowserHandler, ReplayPlayerHandler, StartSceneHandler,
-      RecordSceneHandler, InfoSceneHandler, UI, EndGameHandler, UIHelpers, DialogueDayHandler,
-      DialogueChuxingHandler, DialogueDayDeathHandler, VoteInfoRenderer, VoteHistoryBrowser,
-      VoteButtonPanel, CharacterSelectionPanel, DialogueBox（共21个）
-    - 保留（@Deprecated）: ButtonSimpleFactory, LabelSimpleFactory, PanelSimpleFactory, TextareaSimpleFactory
-  收益: 统一入口，减少类数量，调用方代码更简洁
-  验证: 编译通过
-
 ================================================================================
                             完成统计
   P0: 6 项 ✅ 全部完成
   P1: 14 项 ✅ 完成（部分完成: P1-8, P1-17） | 1 项 ❌ 已回退(P1-12)
   P2: 5 项 ✅ 完成 | 2 项 ⚠️ 已回退(P2-2)
-  P3: 5 项 ✅ 完成
-  合计: 31 项已完成 + 部分完成 2 项 + 已回退 2 项
+  P3: 4 项 ✅ 完成
+  合计: 30 项已完成 + 部分完成 2 项 + 已回退 2 项
 ================================================================================

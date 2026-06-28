@@ -113,11 +113,11 @@ class CoSelectionPanel {
         handler.renderSkillTargets(infoCoPanel, 50, 74, 20, 128);
         infoCoPanel.setBounds(0, 198, 200 + vi.boardIcon.getIconWidth(), 50 + vi.boardIcon.getIconHeight());
 
-        JLabel infoBoard = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        JLabel infoBoard = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 200 + vi.boardIcon.getIconWidth(), 50 + vi.boardIcon.getIconHeight(), vi.boardIcon);
 
         ImageIcon dragIcon = ui.resources.getImage("uranaiAll.png");
-        JButton dragBtn = UIFactory.makeButton(ButtonConst.Draggable_Button, 250, 350,
+        JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button, 250, 350,
                 dragIcon.getIconWidth() / 2, dragIcon.getIconHeight() / 2, dragIcon);
         dragBtn.addMouseListener(new MouseAdapter() {
             @Override
@@ -148,7 +148,7 @@ class CoSelectionPanel {
         infoCoPanel.add(dragBtn);
 
         dragIcon = ui.resources.getImage("delete.png");
-        JButton dragBtn_delete = UIFactory.makeButton(ButtonConst.Draggable_Button, 800, 350,
+        JButton dragBtn_delete = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button, 800, 350,
                 dragIcon.getIconWidth() / 2, dragIcon.getIconHeight() / 2, dragIcon);
         dragBtn_delete.addMouseListener(new MouseAdapter() {
             @Override

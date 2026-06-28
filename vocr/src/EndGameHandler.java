@@ -26,7 +26,7 @@ public class EndGameHandler implements SceneHandler {
                 break;
         }
         DialogueBox.Components dc = DialogueBox.setupWithIcon(ui, bgIcon);
-        JLabel nameLabel = UIFactory.makeLabel(LabelConst.Text_Label, 20, 10, 1000, 30,
+        JLabel nameLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label, 20, 10, 1000, 30,
                 ui.uiComponentFactory.getCharacterFullName(event.ch1));
         dc.dialogPanel.add(nameLabel);
         Timer typeTimer = UIHelpers.bindTypewriter(dc.dialogText, ui.resources.getEventText(event), dc.nextBtn, () -> {

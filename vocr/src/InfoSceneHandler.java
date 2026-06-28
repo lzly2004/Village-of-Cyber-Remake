@@ -27,18 +27,18 @@ public class InfoSceneHandler implements SceneHandler {
         JButton btn_next[] = new JButton[6];
         for (int i = 1; i <= 5; i++) {
             final int j = i;
-            btn_next[i] = UIFactory.makeButton(ButtonConst.Simple_Button, 80, 10 + 70 * i, 220, 50,
+            btn_next[i] = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 80, 10 + 70 * i, 220, 50,
                     ui.resources.getHelpText("Info" + i + ".txt"), btnNext);
             btn_next[i].setHorizontalTextPosition(SwingConstants.CENTER);
             btn_next[i].addActionListener(e -> ui.transitionTo(UI.Scene.valueOf("INFO_SCENE_" + j)));
             ui.jPanel.add(btn_next[i]);
         }
-        JLabel backgroundLabel = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        JLabel backgroundLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("PVBG.png"));
-        JLabel backgroundLabel_2 = UIFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
+        JLabel backgroundLabel_2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage("avg1_resized(3).png"));
-        JButton btnMenu = UIFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
+        JButton btnMenu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
                 GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBtitile.png"));
         btnMenu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
@@ -53,16 +53,16 @@ public class InfoSceneHandler implements SceneHandler {
 
     private InfoBackground createInfoBackground(UI ui, UI.Scene backTarget) {
         ui.jPanel.removeAll();
-        JLabel bg = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        JLabel bg = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("PVBG.png"));
-        JLabel bg2 = UIFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
+        JLabel bg2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage("avg1_resized(3).png"));
-        JButton menu = UIFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
+        JButton menu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
                 GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBtitile.png"));
         menu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
-        JButton back = UIFactory.makeButton(ButtonConst.Simple_Button, 1050, 400,
+        JButton back = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 400,
                 GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBreturn.png"));
         back.addActionListener(e -> ui.transitionTo(backTarget));
@@ -80,7 +80,7 @@ public class InfoSceneHandler implements SceneHandler {
 
     private void renderSecond(UI ui, UI.Scene scene) {
         InfoBackground ib = createInfoBackground(ui, scene.FatherScene());
-        JTextArea dialogText = UIFactory.createBoldTitleTextArea(Color.WHITE, 24,
+        JTextArea dialogText = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 24,
                 ui.resources.getHelpText(scene.toString()));
         JScrollPane scrollPane = new JScrollPane(dialogText);
         scrollPane.setBounds(50, 50, 880, 630);
@@ -101,7 +101,7 @@ public class InfoSceneHandler implements SceneHandler {
         for (int i = 1; i <= subSum; i++) {
             final int currentIndex = i;
             btnNext[i] = ui.resources.getImage("avg_button2.png");
-            btn_next[i] = UIFactory.makeButton(ButtonConst.Simple_Button,
+            btn_next[i] = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                     80, 70 * i + 10, 222, 50,
                     ui.resources.getHelpText("Info" + scene.FirstInfoNum() + "-" + i + ".txt"), btnNext[i]);
             btn_next[i].setHorizontalTextPosition(SwingConstants.CENTER);

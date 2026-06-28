@@ -14,9 +14,9 @@ class VoteInfoRenderer {
     ImageIcon boardIcon;
 
     void render(UI ui) {
-        JLabel data = UIFactory.makeLabel(LabelConst.Simple_Label, 880, 10,
+        JLabel data = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 880, 10,
                 ui.resources.getImage("hiduke.png"));
-        JTextArea dataText = UIFactory.createBoldTitleTextArea(Color.WHITE, 20,
+        JTextArea dataText = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 20,
                 "    " + ui.ctx.getGameDay() + "日目\n 生存者:" + ui.ctx.getAliveCounter()
                         + "\n 死亡者:" + ui.ctx.getDeathCounter()
                         + "\n 吊り縄:" + (ui.ctx.getAliveCounter() - 1) / 2);
@@ -118,9 +118,9 @@ class VoteInfoRenderer {
                 .append(GameStrings.SECTION_EXECUTION).append(chuxing)
                 .append("\n[死体]\n").append(shiti).append("\n[護衛先]\n").append(lieren);
         boardIcon = ui.resources.getImage("frame #19252.png");
-        board = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 198,
+        board = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 198,
                 200 + boardIcon.getIconWidth(), 50 + boardIcon.getIconHeight(), boardIcon);
-        infoText = UIFactory.createBoldTitleTextArea(Color.BLACK, 24, result.toString());
+        infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, result.toString());
         scrollPane = new JScrollPane(infoText);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);

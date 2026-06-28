@@ -18,19 +18,19 @@ class VoteHistoryBrowser {
         for (int i = 0; i < ui.voteRounds.size(); ++i) {
             int gameday = i + 2;
             int roundMax = ui.voteRounds.get(gameday - 2);
-            JButton backResult = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+            JButton backResult = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                     720 - 40 - 126 * 3 - 20, ui.resources.getImage("rirekiBack.png"));
             backResult.setVisible(false); ui.jPanel.add(backResult);
             ui.jPanel.setComponentZOrder(backResult, 0);
-            JButton nextResult = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+            JButton nextResult = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                     720 - 40 - 126 * 2 - 10, ui.resources.getImage("rirekiNext.png"));
             nextResult.setVisible(false); ui.jPanel.add(nextResult);
             ui.jPanel.setComponentZOrder(nextResult, 0);
-            JButton backResult1 = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+            JButton backResult1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                     720 - 40 - 126 * 3 - 20, ui.resources.getImage("rirekiBack.png"));
             backResult1.setVisible(false); ui.jPanel.add(backResult1);
             ui.jPanel.setComponentZOrder(backResult1, 0);
-            JButton nextResult1 = UIFactory.makeButton(ButtonConst.Simple_Button, 1060,
+            JButton nextResult1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                     720 - 40 - 126 * 2 - 10, ui.resources.getImage("rirekiNext.png"));
             nextResult1.setVisible(false); ui.jPanel.add(nextResult1);
             ui.jPanel.setComponentZOrder(nextResult1, 0);
@@ -55,7 +55,7 @@ class VoteHistoryBrowser {
                 backResult.setVisible(true);
             });
             ImageIcon dayIcon = ui.resources.getImage(gameday + "day.png");
-            JButton dayBtn = UIFactory.makeButton(ButtonConst.Simple_Button, dayIcon);
+            JButton dayBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, dayIcon);
             dayBtn.setSize(dayIcon.getIconWidth(), dayIcon.getIconHeight());
             dayBtn.addActionListener(e1 -> {
                 VoteResultRenderer.renderDayPiao(ui, 1, gameday, ui.voteMethods.get(gameday - 2), handler);

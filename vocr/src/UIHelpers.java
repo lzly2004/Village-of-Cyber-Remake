@@ -19,13 +19,13 @@ public class UIHelpers {
             case zjgb8:
             case gprz11p:
             case zcrh12:
-                Chara = UIFactory.makeLabel(LabelConst.Simple_Label, 300,
+                Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 300,
                         GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
                 shouldAddToLinkIcon[0] = true;
                 break;
             default:
-                Chara = UIFactory.makeLabel(LabelConst.Simple_Label,
+                Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
                         (GameConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
                         GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
@@ -37,12 +37,12 @@ public class UIHelpers {
 
     /** 连接事件角色对显示：当前事件角色(右)+linkIcon中缓存的上一事件角色(左) */
     public static void renderLinkIconPair(UI ui, ImageIcon[] CharIcon) {
-        JLabel Chara = UIFactory.makeLabel(LabelConst.Simple_Label, 650,
+        JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 650,
                 GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                 CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
         ui.diaPanel.add(Chara);
         ui.resizeComponents();
-        JLabel Chara2 = UIFactory.makeLabel(LabelConst.Simple_Label, 300,
+        JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 300,
                 GameConstants.WINDOW_HEIGHT - ui.linkIcon.get(0).getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                 ui.linkIcon.get(0).getIconWidth(), ui.linkIcon.get(0).getIconHeight(),
                 ui.linkIcon.get(0));
@@ -91,7 +91,7 @@ public class UIHelpers {
 
     public static DialogueSetup prepareDialogueEvent(UI ui, String bgImage, Event event) {
         DialogueBox.Components dc = DialogueBox.setup(ui, bgImage);
-        JLabel nameLabel = UIFactory.makeLabel(LabelConst.Text_Label, 40, 10, 1000, 30,
+        JLabel nameLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label, 40, 10, 1000, 30,
                 ui.uiComponentFactory.getCharacterFullName(event.ch1));
         dc.dialogPanel.add(nameLabel);
         return new DialogueSetup(dc, ui.resources.getEventText(event), ui.resources.getEventImage(event));

@@ -13,7 +13,7 @@ public class DialogueChuxingHandler implements SceneHandler {
         JTextArea dialogText = ds.dc().dialogText;
         JButton nextBtn = ds.dc().nextBtn;
         ImageIcon[] CharIcon = ds.charIcon();
-        JLabel Chara = UIFactory.makeLabel(LabelConst.Simple_Label,
+        JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
                 (GameConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
                 GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                 CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
@@ -58,7 +58,7 @@ public class DialogueChuxingHandler implements SceneHandler {
             ui.resources.playSound("白天处刑音效.wav");
             Chara.setVisible(false);
             if (CharIcon.length >= 2) {
-                JLabel Chara2 = UIFactory.makeLabel(LabelConst.Simple_Label,
+                JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
                         (GameConstants.WINDOW_WIDTH - CharIcon[1].getIconWidth()) / 2,
                         GameConstants.WINDOW_HEIGHT - CharIcon[1].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[1].getIconWidth(), CharIcon[1].getIconHeight(), CharIcon[1]);

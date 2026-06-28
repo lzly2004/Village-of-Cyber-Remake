@@ -12,10 +12,10 @@ public class RecordSceneHandler implements SceneHandler {
             DebugLogger.error("[RecordSceneHandler] 渲染异常: " + ex.getMessage());
             ex.printStackTrace();
             ui.jPanel.removeAll();
-            JTextArea errorMsg = UIFactory.createBoldTitleTextArea(Color.RED, 24, "战绩加载失败，请返回主菜单");
+            JTextArea errorMsg = TextareaSimpleFactory.createBoldTitleTextArea(Color.RED, 24, "战绩加载失败，请返回主菜单");
             errorMsg.setBounds(400, 300, 500, 40);
             ui.jPanel.add(errorMsg);
-            JButton fallbackBtn = UIFactory.makeButton(
+            JButton fallbackBtn = ButtonSimpleFactory.makeButton(
                     ButtonConst.Simple_Button, 530, 450, 194, 126,
                     ui.resources.getImage("PVBtitile.png")
             );
@@ -24,7 +24,7 @@ public class RecordSceneHandler implements SceneHandler {
             // 背景图片（放在最后，确保在最底层）
             ImageIcon fallbackBg = ui.resources.getImage("title_base_resized.png");
             if (fallbackBg != null) {
-                JLabel errorBg = UIFactory.makeLabel(
+                JLabel errorBg = LabelSimpleFactory.makeLabel(
                         LabelConst.Simple_Label, 0, 0,
                         GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                         fallbackBg
@@ -101,7 +101,7 @@ public class RecordSceneHandler implements SceneHandler {
         // 背景图片（放在最后，确保在最底层）
         ImageIcon bgImg = ui.resources.getImage("title_base_resized.png");
         if (bgImg != null) {
-            JLabel background = UIFactory.makeLabel(
+            JLabel background = LabelSimpleFactory.makeLabel(
                     LabelConst.Simple_Label, 0, 0,
                     GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                     bgImg
@@ -118,7 +118,7 @@ public class RecordSceneHandler implements SceneHandler {
     private void addImageLabel(UI ui, String imageName, int x, int y, int w, int h) {
         ImageIcon img = ui.resources.getImage(imageName);
         if (img != null) {
-            JLabel label = UIFactory.makeLabel(LabelConst.Simple_Label, x, y, w, h, img);
+            JLabel label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, x, y, w, h, img);
             ui.jPanel.add(label);
         }
     }
@@ -126,7 +126,7 @@ public class RecordSceneHandler implements SceneHandler {
     private void addButton(UI ui, String imageName, int x, int y, int w, int h, ActionListener listener) {
         ImageIcon img = ui.resources.getImage(imageName);
         if (img != null) {
-            JButton btn = UIFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);
+            JButton btn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);
             btn.addActionListener(listener);
             ui.jPanel.add(btn);
         }
@@ -134,7 +134,7 @@ public class RecordSceneHandler implements SceneHandler {
 
     private void renderDataRow(UI ui, int x, int labelY, int valueY, String labelImg, String valueText) {
         addImageLabel(ui, labelImg, x, labelY, 185, 38);
-        JTextArea valueArea = UIFactory.createBoldTitleTextArea(Color.WHITE, 34, valueText);
+        JTextArea valueArea = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 34, valueText);
         valueArea.setBounds(x + 8, valueY, 240, 50);
         ui.jPanel.add(valueArea);
     }
@@ -146,7 +146,7 @@ public class RecordSceneHandler implements SceneHandler {
     private void renderStreakRow(UI ui, int x, int labelY, int valueY, String labelImg, int maxStreak, int currentStreak) {
         addImageLabel(ui, labelImg, x, labelY, 185, 38);
         String text = (currentStreak >= 0) ? maxStreak + "/Now:" + currentStreak : maxStreak + "";
-        JTextArea valueArea = UIFactory.createBoldTitleTextArea(Color.WHITE, 34, text);
+        JTextArea valueArea = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 34, text);
         valueArea.setBounds(x + 8, valueY, 260, 50);
         ui.jPanel.add(valueArea);
     }
@@ -160,19 +160,19 @@ public class RecordSceneHandler implements SceneHandler {
 
         // 村人
         addImageLabel(ui, "SE_WinNumber1.png", x + 15, valueY, factionLabelW, factionLabelH);
-        JTextArea villageArea = UIFactory.createBoldTitleTextArea(Color.WHITE, 24, village + "回");
+        JTextArea villageArea = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 24, village + "回");
         villageArea.setBounds(x + 92, valueY + 2, 75, 32);
         ui.jPanel.add(villageArea);
 
         // 人狼
         addImageLabel(ui, "SE_WinNumber2.png", x + 15, valueY + factionGap, factionLabelW, factionLabelH);
-        JTextArea wolfArea = UIFactory.createBoldTitleTextArea(Color.WHITE, 24, wolf + "回");
+        JTextArea wolfArea = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 24, wolf + "回");
         wolfArea.setBounds(x + 92, valueY + factionGap + 2, 75, 32);
         ui.jPanel.add(wolfArea);
 
         // 妖狐
         addImageLabel(ui, "SE_WinNumber3.png", x + 15, valueY + factionGap * 2, factionLabelW, factionLabelH);
-        JTextArea foxArea = UIFactory.createBoldTitleTextArea(Color.WHITE, 24, fox + "回");
+        JTextArea foxArea = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 24, fox + "回");
         foxArea.setBounds(x + 92, valueY + factionGap * 2 + 2, 75, 32);
         ui.jPanel.add(foxArea);
     }
