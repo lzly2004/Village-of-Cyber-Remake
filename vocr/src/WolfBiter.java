@@ -381,3 +381,4 @@ public class WolfBiter
         }
         analysis.getWhite = getWhite;
     }
+}
