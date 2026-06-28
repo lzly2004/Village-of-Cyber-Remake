@@ -62,10 +62,10 @@ public class ZhanFabricator
             }
             int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(baip, heip)));
             target[i] += option * n;
+            int targetRole = (option == 1) ? ctx.getActualRole(target[i] - n) : 0;
             DivinationFabricationStrategy strategy = DivinationFabricationStrategy.forRole(ctx.getActualRole(num));
             if (strategy != null)
             {
-                int targetRole = ctx.getActualRole(target[i] - n);
                 target[i] = strategy.adjustTarget(option, target[i], targetRole, n);
             }
         }
