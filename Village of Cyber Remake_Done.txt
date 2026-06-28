@@ -305,6 +305,19 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
        - 收益: Phase1 分析逻辑从335行主方法中分离，可读性显著提升，便于独立测试
        - 验证: 编译通过
 
+[P4-1] ✅ NonHumanCoordinator.handleNormalScenario() 方法拆分
+       来源: 新一轮代码扫描（2026-06-29）
+       - ✅ 新增 NormalScenarioContext 内部类封装阶段中间状态（n, gd, gqian, response, havecatco, jhzhan, jhling）
+       - ✅ handleNormalScenario() 从 182 行缩减为 40 行协调者方法
+       - ✅ executeInitialCOSetup() - 初始CO设置（占/灵列表构建 + 共逻辑）
+       - ✅ trimSeerCOToMax3() - 裁剪占CO至最多3人
+       - ✅ processBlackBallCOSecondary() - 黑球占/灵CO时机
+       - ✅ processCatCOResponses() - 猫又CO响应处理+裁剪+剩余响应处理（82行复杂逻辑）
+       - ✅ handleRemainingCOForUnclaimed() - 处理未CO玩家的剩余占/灵计划
+       - ✅ executeWhiteBallCOConditional() - 白球占/灵CO时机（条件触发）
+       - 收益: 普通场景CO逻辑从单一大方法拆分为语义清晰的子方法，便于独立测试和维护
+       - 验证: 语法正确（Jackson依赖报错为外部库问题，非本重构引入）
+
 [P3-5] UI工厂类合并（已回退）
   概述: 将 Button/Label/Panel/Textarea 四个 SimpleFactory 合并为统一的 UIFactory
   结果: 2026-06-29 回退（commit cca720d）

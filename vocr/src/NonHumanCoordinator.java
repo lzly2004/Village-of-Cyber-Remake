@@ -275,6 +275,262 @@ public class NonHumanCoordinator
         }
     }
 
+    // ============================================================
+    // 普通场景（非咒杀日）协调者方法
+    // ============================================================
+
+    /**
+     * 普通场景上下文 — 封装 handleNormalScenario 各阶段的中间状态
+     */
+    private static class NormalScenarioContext {
+        int n;
+        int gd;
+        boolean gqian;                  // 是否有共欠CO时机
+        ArrayList<IntPair> response;     // 接黒回复列表
+        boolean havecatco;              // 是否有猫又CO
+        int jhzhan;                    // 计划上占的人数
+        int jhling;                    // 计划上灵的人数
+    }
+
+    private void handleNormalScenario(ArrayList<Integer> diebody, int gd)
+    {
+        NormalScenarioContext c = new NormalScenarioContext();
+        c.n = ctx.getPlayerSum();
+        c.gd = gd;
+        c.gqian = ctx.getPeiyi() != peiyi.jianyi && ctx.getActualRole(diebody.get(0)) == 4;
+        c.response = new ArrayList<>();
+        c.havecatco = false;
+        c.jhzhan = 0;
+        c.jhling = 0;
+
+        // Phase 1: 初始CO设置（占/灵列表构建 + 共逻辑）
+        executeInitialCOSetup();
+
+        // Phase 2: 裁剪占CO（最多3人）
+        trimSeerCOToMax3();
+
+        // Phase 3: 黑球占/灵CO时机
+        processBlackBallCOSecondary(diebody);
+
+        // Phase 4: 处理接黒回复
+        if(ctx.zhans.size() == 0) {
+            DebugLogger.log("本次无占，共逻辑");
+            gylogic.run();
+        } else {
+            handleBlackResponses(c.n, c.response);
+        }
+
+        // Phase 5: 处理猫又CO响应 + 裁剪响应 + 处理剩余响应
+        processCatCOResponses(c, diebody);
+
+        // Phase 6: 询问猫又CO
+        if(c.havecatco)
+            coManager.askCoByRole(Role.mao);
+
+        // Phase 7: 处理未CO玩家的剩余占/灵计划
+        handleRemainingCOForUnclaimed(c);
+
+        // Phase 8: 白球占/灵CO时机（条件触发）
+        executeWhiteBallCOConditional(c, diebody);
+    }
+
+    private void executeInitialCOSetup()
+    {
+        DebugLogger.log("非人的初始工作：占卜co");
+        buildSeerCOList();
+        DebugLogger.log("非人的初始工作：灵能co");
+        buildMediumCOList();
+        DebugLogger.log("非人的初始工作：共逻辑");
+        gylogic.run();
+        DebugLogger.log("非人的初始工作：真占（已在占卜co阶段加入，跳过重复添加）");
+    }
+
+    private void trimSeerCOToMax3()
+    {
+        ctx.shuffleZhans();
+        while(ctx.zhans.size() > 3)
+        {
+            ctx.shuffleZhans();
+            if(ctx.zhans.get(0) == ctx.getActualRoleIndex(1)) continue;
+            ctx.setSkillTarget(ctx.zhans.get(0), 1, 0);
+            ctx.nonHumanPlan[ctx.zhans.get(0)] = 0;
+            ctx.zhans.remove(0);
+        }
+    }
+
+    private void processBlackBallCOSecondary(ArrayList<Integer> diebody)
+    {
+        DebugLogger.log("非人的初始工作：黑球占co时机");
+        for(int i=0;i<ctx.zhans.size();i++)
+        {
+            coManager.processActualCo(ctx.zhans.get(i),1,diebody);
+        }
+        for(int i=0;i<ctx.lings.size();i++)
+        {
+            coManager.processActualCo(ctx.lings.get(i),2,diebody);
+        }
+    }
+
+    /**
+     * Phase 5: 处理猫又CO响应、裁剪响应、处理剩余响应
+     */
+    private void processCatCOResponses(NormalScenarioContext c, ArrayList<Integer> diebody)
+    {
+        DebugLogger.log("本次有无猫又co：");
+        c.response = GameLogicUtils.shuffleList(c.response);
+
+        // 统计已CO的狼队占/灵数量
+        int lzsum = 0, llsum = 0;
+        for(int i=1;i<=ctx.initialWolfCount;i++)
+        {
+            if(ctx.getClaimedRole(ctx.rlindex[i]) == 1)
+                lzsum++;
+            else if(ctx.getClaimedRole(ctx.rlindex[i]) == 2)
+                llsum++;
+        }
+
+        // 过滤猫又CO响应
+        for(int i=0;i<c.response.size();i++)
+        {
+            if(c.response.get(i).first() != 7) continue;
+            if(c.response.get(i).second() == 2)
+            {
+                if(llsum > 0)
+                {
+                    int removedPlayer = c.response.get(i).first();
+                    c.response.remove(i);
+                    ctx.nonHumanPlan[removedPlayer] = 0;
+                    i--;
+                    continue;
+                }
+                llsum++;
+            }
+            if(c.response.get(i).second() == 1)
+            {
+                if(lzsum > 1)
+                {
+                    int removedPlayer = c.response.get(i).first();
+                    c.response.remove(i);
+                    ctx.nonHumanPlan[removedPlayer] = 0;
+                    i--;
+                    continue;
+                }
+                lzsum++;
+            }
+        }
+
+        // 统计实际要上占/灵的数量
+        int rezhan = 0, reling = 0;
+        for(int i=0;i<c.response.size();i++)
+        {
+            if(c.response.get(i).second() == 1)
+                rezhan++;
+            else if(c.response.get(i).second() == 2)
+                reling++;
+        }
+
+        // 裁剪占CO（最多4人）
+        while(ctx.zhans.size() + rezhan > 4 && !c.response.isEmpty())
+        {
+            c.response = GameLogicUtils.shuffleList(c.response);
+            if(c.response.get(0).second() == 1 && c.response.get(0).first() != ctx.getActualRoleIndex(1))
+            {
+                ctx.nonHumanPlan[c.response.get(0).first()] = 0;
+                ctx.setSkillTarget(c.response.get(0).first(), 1, 0);
+                c.response.remove(0);
+            }
+        }
+
+        // 裁剪灵CO（最多3人）
+        while(ctx.lings.size() + reling > 3 && !c.response.isEmpty())
+        {
+            c.response = GameLogicUtils.shuffleList(c.response);
+            if(c.response.get(0).second() == 2 && c.response.get(0).first() != ctx.getActualRoleIndex(2))
+            {
+                ctx.nonHumanPlan[c.response.get(0).first()] = 0;
+                c.response.remove(0);
+            }
+        }
+
+        // 处理剩余响应
+        for(int i=0;i<c.response.size();i++)
+        {
+            int respPlayer = c.response.get(i).first();
+            int role = c.response.get(i).second();
+            boolean alreadyProcessed = false;
+            if(role == 1 && ctx.zhans.contains(respPlayer)) alreadyProcessed = true;
+            if(role == 2 && ctx.lings.contains(respPlayer)) alreadyProcessed = true;
+
+            ctx.addLazySuspicionValue(respPlayer, GameConstants.SUSPICION_INCREASE_BLACK_RESPONSE);
+            if(!alreadyProcessed)
+                coManager.processActualCo(respPlayer, role, diebody);
+            if(role == 5)
+            {
+                c.havecatco = true;
+            }
+        }
+    }
+
+    private void handleRemainingCOForUnclaimed(NormalScenarioContext c)
+    {
+        int n = c.n;
+        for(int i=1;i<=n;i++)
+        {
+            if(ctx.isAlive(i) && ctx.getClaimedRole(i) == 0)
+            {
+                if(ctx.getActualRole(i) == 1 || ctx.nonHumanPlan[i] == 1) c.jhzhan++;
+                else if(ctx.getActualRole(i) == 2 || ctx.nonHumanPlan[i] == 2) c.jhling++;
+            }
+        }
+        while(ctx.zhans.size() + c.jhzhan > 5 || ctx.lings.size() + c.jhling > 4)
+        {
+            int target = ConstNum.randomInt(1, n);
+            if(ctx.getClaimedRole(target) == 0 && ctx.nonHumanPlan[target] > 0 && ctx.nonHumanPlan[target] < 3)
+            {
+                if(ctx.zhans.size() + c.jhzhan > 5 && ctx.nonHumanPlan[target] == 1)
+                {
+                    c.jhzhan--;
+                    ctx.nonHumanPlan[target] = 0;
+                    ctx.setSkillTarget(target, 1, 0);
+                }
+                else if(ctx.lings.size() + c.jhling > 4 && ctx.nonHumanPlan[target] == 2)
+                {
+                    c.jhling--;
+                    ctx.nonHumanPlan[target] = 0;
+                }
+            }
+        }
+    }
+
+    private void executeWhiteBallCOConditional(NormalScenarioContext c, ArrayList<Integer> diebody)
+    {
+        if(ctx.zhans.size() == 0 || c.response.size() > 0 || c.gqian || c.havecatco)
+        {
+            DebugLogger.log("非人的初始工作：白球占、灵能co");
+            for(int i=1;i<=c.n;i++)
+            {
+                if(ctx.getClaimedRole(i) != 0 || ctx.isDead(i)) continue;
+                if(ctx.getActualRole(i) < 3)
+                {
+                    coManager.processActualCo(i, ctx.getActualRole(i), diebody);
+                }
+                else if(ctx.nonHumanPlan[i] == 1 || ctx.nonHumanPlan[i] == 2)
+                {
+                    if(ctx.nonHumanPlan[i] == 1)
+                    {
+                        ctx.setSkillTarget(i, 1, ctx.zw[i]);
+                        DebugLogger.log("添加占文：角色" + i + " 占文" + ctx.getSkillTarget(i, 1));
+                    }
+                    coManager.processActualCo(i, ctx.nonHumanPlan[i], diebody);
+                }
+            }
+            if((ctx.gyindex[1] <= 0 || ctx.getClaimedRole(ctx.gyindex[1]) != 4) &&
+               (ctx.gyindex[2] <= 0 || ctx.getClaimedRole(ctx.gyindex[2]) != 4))
+                gylogic.run();
+        }
+        c.response.clear();
+    }
+
     private void handleCurseKillScenario(ArrayList<Integer> diebody, int gd)
     {
         DebugLogger.log("非人的初始工作：明确咒杀");
@@ -370,190 +626,6 @@ public class NonHumanCoordinator
         }
         DebugLogger.log("非人的初始工作：共逻辑");
         gylogic.run();
-    }
-
-    private void handleNormalScenario(ArrayList<Integer> diebody, int gd)
-    {
-        int n = ctx.getPlayerSum();
-        DebugLogger.log("非人的初始工作：无咒杀");
-        DebugLogger.log("非人的初始工作：占卜co");
-        DebugLogger.log("非人的初始工作：狼占");
-        buildSeerCOList();
-        DebugLogger.log("非人的初始工作：灵能co");
-        buildMediumCOList();
-        DebugLogger.log("非人的初始工作：共逻辑");
-        gylogic.run();
-        DebugLogger.log("非人的初始工作：真占（已在占卜co阶段加入，跳过重复添加）");
-        boolean gqian = ctx.getPeiyi() != peiyi.jianyi && ctx.getActualRole(diebody.get(0)) == 4;
-        DebugLogger.log("非人的初始工作：共欠co时机（已由 SharedExposer 处理）");
-
-        ctx.shuffleZhans();
-        while(ctx.zhans.size() > 3)
-        {
-            ctx.shuffleZhans();
-            if(ctx.zhans.get(0) == ctx.getActualRoleIndex(1)) continue;
-            ctx.setSkillTarget(ctx.zhans.get(0), 1, 0);
-            ctx.nonHumanPlan[ctx.zhans.get(0)] = 0;
-            ctx.zhans.remove(0);
-        }
-
-        DebugLogger.log("非人的初始工作：黑球占co时机");
-        for(int i=0;i<ctx.zhans.size();i++)
-        {
-            coManager.processActualCo(ctx.zhans.get(i),1,diebody);
-        }
-        for(int i=0;i<ctx.lings.size();i++)
-        {
-            coManager.processActualCo(ctx.lings.get(i),2,diebody);
-        }
-        ArrayList<IntPair> response = new ArrayList<>();
-        DebugLogger.log("非人的初始工作：接黒回复");
-        if(ctx.zhans.size() == 0)
-        {
-            DebugLogger.log("本次无占，共逻辑");
-            gylogic.run();
-        }
-        else
-        {
-            handleBlackResponses(n, response);
-        }
-
-        DebugLogger.log("本次有无猫又co：" );
-        boolean havecatco = false;
-        response = GameLogicUtils.shuffleList(response);
-        int lzsum = 0,llsum = 0;
-        for(int i=1;i<=ctx.initialWolfCount;i++)
-        {
-            if(ctx.getClaimedRole(ctx.rlindex[i]) == 1)
-                lzsum++;
-            else if(ctx.getClaimedRole(ctx.rlindex[i]) == 2)
-                llsum++;
-        }
-        for(int i=0;i<response.size();i++)
-        {
-            if(response.get(i).first() != 7) continue;
-            if(response.get(i).second() == 2)
-            {
-                if(llsum > 0)
-                {
-                    int removedPlayer = response.get(i).first();
-                    response.remove(i);
-                    ctx.nonHumanPlan[removedPlayer] = 0;
-                    i--;
-                    continue;
-                }
-                llsum++;
-            }
-            if(response.get(i).second() == 1)
-            {
-                if(lzsum > 1)
-                {
-                    int removedPlayer = response.get(i).first();
-                    response.remove(i);
-                    ctx.nonHumanPlan[removedPlayer] = 0;
-                    i--;
-                    continue;
-                }
-                lzsum++;
-            }
-        }
-        int rezhan = 0,reling = 0;
-        for(int i=0;i<response.size();i++)
-        {
-            if(response.get(i).second() == 1)
-                rezhan++;
-            else if(response.get(i).second() == 2)
-                reling++;
-        }
-        while(ctx.zhans.size() + rezhan > 4 && !response.isEmpty())
-        {
-            response = GameLogicUtils.shuffleList(response);
-            if(response.get(0).second() == 1 && response.get(0).first() != ctx.getActualRoleIndex(1))
-            {
-                ctx.nonHumanPlan[response.get(0).first()] = 0;
-                ctx.setSkillTarget(response.get(0).first(), 1, 0);
-                response.remove(0);
-            }
-        }
-        while(ctx.lings.size() + reling > 3 && !response.isEmpty())
-        {
-            response = GameLogicUtils.shuffleList(response);
-            if(response.get(0).second() == 2 && response.get(0).first() != ctx.getActualRoleIndex(2))
-            {
-                ctx.nonHumanPlan[response.get(0).first()] = 0;
-                response.remove(0);
-            }
-        }
-        for(int i=0;i<response.size();i++)
-        {
-            int respPlayer = response.get(i).first();
-            int role = response.get(i).second();
-            boolean alreadyProcessed = false;
-            if(role == 1 && ctx.zhans.contains(respPlayer)) alreadyProcessed = true;
-            if(role == 2 && ctx.lings.contains(respPlayer)) alreadyProcessed = true;
-
-            ctx.addLazySuspicionValue(respPlayer, GameConstants.SUSPICION_INCREASE_BLACK_RESPONSE);
-            if(!alreadyProcessed)
-                coManager.processActualCo(respPlayer, role, diebody);
-            if(role == 5)
-            {
-                havecatco = true;
-            }
-        }
-        if(havecatco)
-            coManager.askCoByRole(Role.mao);
-        int jhzhan = 0,jhling = 0;
-        for(int i=1;i<=n;i++)
-        {
-            if(ctx.isAlive(i) && ctx.getClaimedRole(i) == 0)
-            {
-                if(ctx.getActualRole(i) == 1 || ctx.nonHumanPlan[i] == 1)jhzhan ++;
-                else if(ctx.getActualRole(i) == 2 || ctx.nonHumanPlan[i] == 2)jhling ++;
-            }
-        }
-        while(ctx.zhans.size() + jhzhan > 5 || ctx.lings.size() + jhling > 4)
-        {
-            int target = ConstNum.randomInt(1,n);
-            if(ctx.getClaimedRole(target) == 0 && ctx.nonHumanPlan[target] > 0 && ctx.nonHumanPlan[target] < 3)
-            {
-                if(ctx.zhans.size() + jhzhan > 5 && ctx.nonHumanPlan[target] == 1)
-                {
-                    jhzhan--;
-                    ctx.nonHumanPlan[target] = 0;
-                    ctx.setSkillTarget(target, 1, 0);
-                }
-                else if(ctx.lings.size() +jhling > 4 && ctx.nonHumanPlan[target] == 2)
-                {
-                    jhling--;
-                    ctx.nonHumanPlan[target] = 0;
-                }
-            }
-        }
-        if(ctx.zhans.size() == 0 || response.size() > 0 || gqian || havecatco)
-        {
-            DebugLogger.log("非人的初始工作：白球占、灵能co");
-            for(int i = 1;i<=n;i++)
-            {
-                if(ctx.getClaimedRole(i) != 0 || ctx.isDead(i)) continue;
-                if(ctx.getActualRole(i) < 3 )
-                {
-                    coManager.processActualCo(i,ctx.getActualRole(i),diebody);
-                }
-                else if(ctx.nonHumanPlan[i] == 1 || ctx.nonHumanPlan[i] == 2)
-                {
-                    if(ctx.nonHumanPlan[i] == 1)
-                    {
-                        ctx.setSkillTarget(i, 1, ctx.zw[i]);
-                        DebugLogger.log("添加占文：角色"  + i+" 占文"+ctx.getSkillTarget(i, 1));
-                    }
-                    coManager.processActualCo(i,ctx.nonHumanPlan[i],diebody);
-                }
-            }
-            if((ctx.gyindex[1] <= 0 || ctx.getClaimedRole(ctx.gyindex[1]) != 4) &&
-               (ctx.gyindex[2] <= 0 || ctx.getClaimedRole(ctx.gyindex[2]) != 4))
-                gylogic.run();
-        }
-        response.clear();
     }
 
     private void buildSeerCOList()

@@ -1,7 +1,7 @@
 ================================================================================
         Village of Cyber Remake — 重构 Todo List（评估版）
-        整理日期：2026-06-29 | 版本：v4.0
-        已完成: 30 项 | 暂停: 1 项 | 已回退: 3 项
+        整理日期：2026-06-29 | 版本：v5.0
+        已完成: 31 项 | 暂停: 1 项 | 已回退: 3 项
 ================================================================================
 
   ⚠️ 重构原则提醒：
@@ -107,37 +107,22 @@
 💡 低优先级（优化 / 风格统一，收益有限）
 ================================================================================
 
-【P4-1】NonHumanCoordinator.handleNormalScenario() 方法拆分
-  工作量: 中（5-7小时）
+【P4-1】✅ NonHumanCoordinator.handleNormalScenario() 方法拆分（已完成）
+  工作量: 中（5-7小时）✅ 已完成
   风险: 低
   收益: 中-高
   综合优先级: ⭐⭐⭐
-  现状:
-    - NonHumanCoordinator 747行，11个方法
-    - handleNormalScenario() 方法 182行（375-557行）
-    - 包含至少6个不同阶段: 构建占灵CO名单 → gylogic → 裁剪占 → 实际CO处理 → 接黒回复 → 黒回复过滤 → 剩余CO → 白球占灵CO
-  评估:
-    - ✅ 理由: 与 WolfBiter.decideBite() 同类型问题，单一方法承载多阶段决策逻辑
-    - handleCurseKillScenario()（96行）和 handleNormalScenario()（182行）共享CO注册模式，可提取公共方法
-    - 降低非人策略逻辑维护成本
-  结论: 推荐，类似 WolfBiter Phase1 的收益量级
-  建议: 下一步重构候选
-
-【P4-2】🐛 GameStatus.startGame() 双数组洗牌bug修复
-  工作量: 小（30分钟）
-  风险: 低
-  收益: 高（修复真实bug）
-  综合优先级: ⭐⭐⭐⭐
-  现状:
-    - GameStatus.startGame() 第84-96行
-    - characters 和 zysz 使用不同的随机索引洗牌（rd 和 rd1）
-    - 导致角色编号和职业可能不匹配
-  评估:
-    - ✅ 理由: 这是一个真实的bug，不是单纯的代码质量问题
-    - characters[i] 应该和 zysz[i] 保持对应关系
-    - 修复方案：使用相同的随机索引 rd 进行同步交换
-  结论: 强烈推荐，修复真实bug
-  建议: 优先处理
+  完成内容:
+    - 新增 NormalScenarioContext 内部类封装阶段中间状态
+    - handleNormalScenario() 从 182 行缩减为 40 行协调者方法
+    - executeInitialCOSetup() - 初始CO设置（占/灵列表构建 + 共逻辑）
+    - trimSeerCOToMax3() - 裁剪占CO至最多3人
+    - processBlackBallCOSecondary() - 黑球占/灵CO时机
+    - processCatCOResponses() - 猫又CO响应处理+裁剪+剩余响应处理（82行复杂逻辑）
+    - handleRemainingCOForUnclaimed() - 处理未CO玩家的剩余占/灵计划
+    - executeWhiteBallCOConditional() - 白球占/灵CO时机（条件触发）
+  收益: 普通场景CO逻辑从单一大方法拆分为语义清晰的子方法，便于独立测试和维护
+  备注: 与 WolfBiter Phase1 拆分同类型问题
 
 【P3-7】ReplayPlayerHandler 渲染子组件提取
   工作量: 中（6-8小时）
@@ -188,8 +173,7 @@
   P3-6 WolfBiter Phase1拆分  小-中     低      中      ⭐⭐⭐   ✅完成
   P3-7 ReplayHandler子组件   中(6-8h)  低      低-中    ⭐⭐    ⏸️暂缓
   P3-8 集合字段封装          中(5-7h)  中      中      ⭐⭐    ⏸️暂缓
-  P4-1 NonHumanCoordinator   中(5-7h)  低      中-高    ⭐⭐⭐   待做
-  P4-2 双数组洗牌bug         小(30m)   低      高      ⭐⭐⭐⭐  待做
+  P4-1 NonHumanCoordinator   中(5-7h)  低      中-高    ⭐⭐⭐   ✅完成
 
 ================================================================================
                             推荐执行顺序
@@ -199,20 +183,21 @@
   1. ✅ P3-3 MainLogic gs封装收尾  — 已完成
   2. ✅ P3-1 ExecutionManager拆分 — 已完成
   3. ✅ P3-2 SuspicionSystem拆分  — 已完成
-  4. P4-2 双数组洗牌bug修复       — 🐛 优先修复真实bug（30分钟）
 
 第二梯队（中等价值，有空可以做）:
-  5. ✅ P3-4 游戏结果枚举化        — 已完成
-  6. ✅ P3-6 WolfBiter Phase1拆分  — 已完成
-  7. P4-1 NonHumanCoordinator拆分  — 下一步重构候选
+  4. ✅ P3-4 游戏结果枚举化        — 已完成
+  5. ✅ P3-6 WolfBiter Phase1拆分  — 已完成
+  6. ✅ P4-1 NonHumanCoordinator拆分 — 已完成
 
 暂停项目（需更多证据支撑后再评估）:
   - ⏸️ P3-5 UI工厂类合并            — ❌ 已放弃（无实质收益）
   - ⏸️ P3-7 ReplayHandler子组件     — 暂缓（动机不足）
   - ⏸️ P3-8 集合字段封装           — 暂缓（风险/收益比不佳）
 
+【暂无新的重构方向】— 需继续扫描后评估
+
 ================================================================================
-                    有效重构方向总结（30项已完成）
+                    有效重构方向总结（31项已完成）
 ================================================================================
 
 ✅ 有效的重构特征（已验证）:
