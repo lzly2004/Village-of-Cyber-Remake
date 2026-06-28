@@ -32,7 +32,6 @@ class GameContext implements GameContextView
 
     // === 标量状态 ===
     int kyojin;
-    int exposureProgress;
     int initialWolfCount;
     int initialNonHumanCount;
     boolean rlsl;
@@ -227,7 +226,6 @@ class GameContext implements GameContextView
 
     // --- 共有者 ---
     public int getGyIndex(int n) { return gyindex[n]; }
-    public int getExposureProgress() { return exposureProgress; }
 
     // --- 人狼 ---
     public int getRlIndex(int n) { return rlindex[n]; }

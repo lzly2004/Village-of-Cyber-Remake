@@ -89,10 +89,13 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
        - 当前同时做事件生成 + 怀疑度修改 + CO状态修改 + 非人标记
        - 拆分为 ResultEffectApplicator（应用效果）和 EventGenerator（生成事件）
 
-[P1-7] SharedExposer 暴露进度归属修正
+[P1-7] ✅ SharedExposer 暴露进度归属修正
        来源: #38
-       - exposureProgress 存储在 GameContext 中但语义上属于 SharedExposer
-       - 将 SharedExposer 改为有状态的生命周期对象
+       - ✅ exposureProgress 从 GameContext 迁移到 SharedExposer
+       - ✅ SharedExposer 新增 exposureProgress 字段及 getter
+       - ✅ 从 GameContext、GameContextView 中移除相关字段和接口
+       - ✅ 所有 6 处读写引用已同步更新
+       - 验证: getExposureProgress() 无外部调用，迁移安全
 
 --- 代码质量与可读性 ---
 
@@ -266,5 +269,5 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
 ================================================================================
                             统计概览
   P0: 6 项 ✅ 全部完成 | P1: 13 项待处理 + 2 项部分完成 + 1 项已回退 + 5 项✅ | P2: 9 项 + 2 项✅ | 合计: 39 项
-  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅(含GameModule重构) P1-10 ✅ P1-4 ✅ P1-8(部分) ✅ P1-9 ✅ P1-17(部分) ✅ P1-18 ✅ P1-10.2 ✅ P1-11 ✅ | 部分完成: P1-8 ⚠️ P1-17 ⚠️ | 已回退: P1-12 ❌
+  已完成: P2-6 ✅ P1-15 ✅ P1-1 ✅ P1-2 ✅ P1-3 ✅(含GameModule重构) P1-10 ✅ P1-4 ✅ P1-8(部分) ✅ P1-9 ✅ P1-17(部分) ✅ P1-18 ✅ P1-10.2 ✅ P1-11 ✅ P1-7 ✅ | 部分完成: P1-8 ⚠️ P1-17 ⚠️ | 已回退: P1-12 ❌
 ================================================================================

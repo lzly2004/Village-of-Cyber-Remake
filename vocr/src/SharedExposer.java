@@ -2,12 +2,16 @@ public class SharedExposer
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
+    private int exposureProgress;
 
     public SharedExposer(GameContext ctx, SuspicionSystem suspicion)
     {
         this.ctx = ctx;
         this.suspicion = suspicion;
+        this.exposureProgress = 0;
     }
+
+    public int getExposureProgress() { return exposureProgress; }
 
     public void expose()
     {
@@ -63,7 +67,7 @@ public class SharedExposer
             }
             else
             {
-                ctx.exposureProgress = ConstNum.randomInt(1, 90);
+                exposureProgress = ConstNum.randomInt(1, 90);
                 if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
                 {
                     ctx.eventarray.add(new Event(EventName.gyho2,
@@ -85,14 +89,14 @@ public class SharedExposer
         }
         int qfnum = 1;
         if (ctx.getClaimedRole(ctx.gyindex[1]) == 4) qfnum = 2;
-        if (ctx.exposureProgress == 0)
-            ctx.exposureProgress = ConstNum.randomInt(1, 90);
+        if (exposureProgress == 0)
+            exposureProgress = ConstNum.randomInt(1, 90);
         else
-            ctx.exposureProgress += ConstNum.randomInt(5, 15);
+            exposureProgress += ConstNum.randomInt(5, 15);
         if (ctx.isDead(ctx.gyindex[3 - qfnum])
                 || ctx.isDead(ctx.gyindex[qfnum]))
-            ctx.exposureProgress = GameConstants.INF;
-        if (ctx.exposureProgress > 99)
+            exposureProgress = GameConstants.INF;
+        if (exposureProgress > 99)
         {
             ctx.setClaimedRole(ctx.gyindex[qfnum], 4);
             ctx.setComingOutDay(ctx.gyindex[qfnum], ctx.getGameDay());

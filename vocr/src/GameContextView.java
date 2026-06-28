@@ -66,7 +66,6 @@ interface GameContextView
 
     // === 共有者查询 ===
     int getGyIndex(int n);
-    int getExposureProgress();
 
     // === 人狼查询 ===
     int getRlIndex(int n);
