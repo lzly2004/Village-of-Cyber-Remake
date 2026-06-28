@@ -273,11 +273,29 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
        - 收益: 核心怀疑度算法可读性提升，便于独立测试和维护
        - 验证: 编译通过
 
+[P3-4] ✅ 游戏结果枚举化
+       来源: 新一轮代码扫描（2026-06-29）
+       - ✅ 新建 GameResult 枚举类（NONE=0, VILLAGE_WIN=1, WOLF_WIN=2, FOX_WIN=3）
+       - ✅ GameStatus.end 字段从 int 改为 GameResult
+       - ✅ GameContext.getEndResult() 返回类型改为 GameResult
+       - ✅ GameContextView.getEndResult() 返回类型改为 GameResult
+       - ✅ GameEndChecker.check() 返回类型改为 GameResult
+       - ✅ 所有调用点更新（9个文件）:
+         - GameSceneHandler: switch 语句使用枚举常量
+         - GameSceneVoteHandler: 条件判断使用 GameResult.NONE
+         - VoteResultRenderer: 条件判断使用 GameResult.NONE
+         - EndAnimeHandler: switch 语句和条件判断使用枚举常量
+         - ExecutionManager: presentGameEnd() 参数类型改为 GameResult
+         - MainLogic: judgeend() 返回类型改为 GameResult
+       - ✅ 保留 getEndResultValue() 兼容方法用于需要整数值的场景（GameRecord、ReplaySave）
+       - 收益: 类型安全提升，消除魔法数字，代码可读性显著改善
+       - 验证: 编译通过
+
 ================================================================================
                             完成统计
   P0: 6 项 ✅ 全部完成
   P1: 14 项 ✅ 完成（部分完成: P1-8, P1-17） | 1 项 ❌ 已回退(P1-12)
   P2: 5 项 ✅ 完成 | 2 项 ⚠️ 已回退(P2-2)
   P3: 3 项 ✅ 完成
-  合计: 28 项已完成 + 部分完成 2 项 + 已回退 2 项
+  合计: 29 项已完成 + 部分完成 2 项 + 已回退 2 项
 ================================================================================

@@ -12,7 +12,7 @@ class VoteResultRenderer {
         ui.piaoText.setVisible(true);
         ui.piaoText1.setVisible(true);
         int gameDay;
-        if (ui.ctx.getEndResult() == 0) {
+        if (ui.ctx.getEndResult() == GameResult.NONE) {
             gameDay = ui.ctx.getGameDay() - 1;
         } else {
             gameDay = ui.ctx.getGameDay();

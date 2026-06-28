@@ -45,7 +45,7 @@ interface GameContextView
     int getGameDay();
     int getAliveCounter();
     int getDeathCounter();
-    int getEndResult();
+    GameResult getEndResult();
     peiyi getPeiyi();
     boolean isDoubleDeathOccurred(int day);
 

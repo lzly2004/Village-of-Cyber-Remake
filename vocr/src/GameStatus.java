@@ -2,7 +2,7 @@ class GameStatus
 {//游戏状态封装类
     public peiyi p;//游戏配役
     public boolean isInGame;//当前是否在游戏中
-    public int end;//当前游戏是否结束 int 0未结束 1村胜 2狼胜 3狐胜
+    public GameResult end;//当前游戏是否结束 GameResult.NONE/VILLAGE_WIN/WOLF_WIN/FOX_WIN
     public int gameDay;//游戏进行到多少日目
     public int deathCounter;//游戏中当前的死亡人数计数
     public int aliveCounter;//游戏中当前的存活人数计数
@@ -13,7 +13,7 @@ class GameStatus
     {//普通的构造函数。构造时赋初值-1，表示游戏还未开始
         //初始化游戏状态的其他字段
         this.isInGame = true;
-        this.end = 0;
+        this.end = GameResult.NONE;
         this.gameDay = 1;
         this.deathCounter = 0;
     }

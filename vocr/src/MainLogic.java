@@ -198,13 +198,13 @@ public class MainLogic implements MainLogicInterface
         ctx.diebody.clear();
         ctx.diebody.addAll(dielogic(wolf[0],wolf[1],zhantarget,lietarget));
         ctx.setEndResult(judgeend());
-        if(ctx.getEndResult() != 0) //游戏结束
+        if(ctx.getEndResult() != GameResult.NONE) //游戏结束
         {
             executionManager.recordReplayDailySnapshot(ctx.getGameDay() + 1);
-            executionManager.recordReplayGameEnd(ctx.getEndResult(), ctx.getGameDay());
+            executionManager.recordReplayGameEnd(ctx.getEndResult().getValue(), ctx.getGameDay());
             executionManager.presentGameEnd(ctx.getEndResult());
             DebugLogger.info("[战绩] 游戏结束，准备更新记录: peiyi=" + ctx.getPeiyi() + "(ordinal=" + ctx.getPeiyi().ordinal() + "), end=" + ctx.getEndResult());
-            gameRecordManager.updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult());
+            gameRecordManager.updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult().getValue());
             DebugLogger.info("[战绩] 记录更新完成");
             return;//胜负已分
         }
@@ -232,7 +232,7 @@ public class MainLogic implements MainLogicInterface
     {
         return dielogicCarrier.execute(wolf, wolfbite, zhantarget, lietarget);
     }
-    private int judgeend()
+    private GameResult judgeend()
     {
         return gameEndChecker.check();
     }

@@ -227,12 +227,12 @@ public class ExecutionManager
     private boolean checkAndHandleGameEnd(int gd)
     {
         ctx.setEndResult(gameEndChecker.check());
-        if (ctx.getEndResult() != 0) {
+        if (ctx.getEndResult() != GameResult.NONE) {
             recordReplayDailySnapshot(gd + 1);
             presentGameEnd(ctx.getEndResult());
             DebugLogger.info("[战绩] 游戏结束(ExecutionManager): peiyi=" + ctx.getPeiyi() + ", end=" + ctx.getEndResult());
-            gameRecordManager.updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult());
-            recordReplayEnd(ctx.getEndResult(), gd + 1);
+            gameRecordManager.updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult().getValue());
+            recordReplayEnd(ctx.getEndResult().getValue(), gd + 1);
             return true;
         }
         nightaction.run();
@@ -282,28 +282,28 @@ public class ExecutionManager
             }
         }
     }
-    void presentGameEnd(int endResult) {
+    void presentGameEnd(GameResult endResult) {
         DebugLogger.log("游戏结束，添加结束事件");
         int[] weight = new int[ctx.getPlayerSum() + 1];
         for (int i = 1; i <= ctx.getPlayerSum(); i++) {
             if (ctx.isDead(i)) continue;
-            if (endResult == 1 && ctx.getActualRole(i) < 7) weight[i] = 1;
-            else if (endResult == 2 && ctx.getActualRole(i) == 7) weight[i] = 1;
-            else if (endResult == 3 && ctx.getActualRole(i) == 10) weight[i] = 1;
+            if (endResult == GameResult.VILLAGE_WIN && ctx.getActualRole(i) < 7) weight[i] = 1;
+            else if (endResult == GameResult.WOLF_WIN && ctx.getActualRole(i) == 7) weight[i] = 1;
+            else if (endResult == GameResult.FOX_WIN && ctx.getActualRole(i) == 10) weight[i] = 1;
             else weight[i] = -GameConstants.INF;
         }
         CharacterEnglishName player = ctx.getCharacterName(suspicion.getOne(weight));
         switch (endResult) {
-            case 1:
+            case VILLAGE_WIN:
                 ctx.eventarray.add(new Event(EventName.crsl, player, null));
                 break;
-            case 2:
+            case WOLF_WIN:
                 if ((ctx.getNonHumanLeader() > 0 && ctx.isAlive(ctx.getNonHumanLeader())))
                     ctx.eventarray.add(new Event(EventName.krsl, ctx.getCharacterName(ctx.getNonHumanLeader()), null));
                 else
                     ctx.eventarray.add(new Event(EventName.rlsl, player, null));
                 break;
-            case 3:
+            case FOX_WIN:
                 ctx.eventarray.add(new Event(EventName.yhsl, player, null));
                 break;
         }

@@ -1,7 +1,7 @@
 public class GameEndChecker
 {
     private final GameContext ctx;
-    private int cachedResult = 0;
+    private GameResult cachedResult = GameResult.NONE;
     private int lastAliveCounter = -1;
     private int lastDeathCounter = -1;
 
@@ -10,7 +10,7 @@ public class GameEndChecker
         this.ctx = ctx;
     }
 
-    public int check()
+    public GameResult check()
     {
         int currentAlive = ctx.getAliveCounter();
         int currentDeath = ctx.getDeathCounter();
@@ -35,13 +35,13 @@ public class GameEndChecker
         if (ctx.getActualRoleIndex(10) > 0 && ctx.isAlive(ctx.getActualRoleIndex(10))
                 && (wolfcnt == 0 || wolfcnt >= humancnt))
         {
-            cachedResult = 3;
-            return 3;
+            cachedResult = GameResult.FOX_WIN;
+            return GameResult.FOX_WIN;
         }
         if (wolfcnt == 0)
         {
-            cachedResult = 1;
-            return 1;
+            cachedResult = GameResult.VILLAGE_WIN;
+            return GameResult.VILLAGE_WIN;
         }
         if ((ctx.getActualRoleIndex(8) > 0 && ctx.isAlive(ctx.getActualRoleIndex(8)))
                 || (ctx.getActualRoleIndex(9) > 0 && ctx.isAlive(ctx.getActualRoleIndex(9))))
@@ -51,10 +51,10 @@ public class GameEndChecker
         }
         if ((ctx.getActualRoleIndex(10) < 1 || !ctx.isAlive(ctx.getActualRoleIndex(10)))
                 && wolfcnt >= humancnt) {
-            cachedResult = 2;
-            return 2;
+            cachedResult = GameResult.WOLF_WIN;
+            return GameResult.WOLF_WIN;
         }
-        cachedResult = 0;
-        return 0;
+        cachedResult = GameResult.NONE;
+        return GameResult.NONE;
     }
 }

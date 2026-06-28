@@ -200,8 +200,10 @@ class GameContext implements GameContextView
     public int getDeathCounter() { return gs.deathCounter; }
     public void decrementAliveCounter() { gs.aliveCounter--; }
     public void incrementDeathCounter() { gs.deathCounter++; }
-    public int getEndResult() { return gs.end; }
-    public void setEndResult(int result) { gs.end = result; }
+    public GameResult getEndResult() { return gs.end; }
+    public void setEndResult(GameResult result) { gs.end = result; }
+    /** 兼容旧接口：返回游戏结果的整数值 */
+    public int getEndResultValue() { return gs.end.getValue(); }
     public peiyi getPeiyi() { return gs.p; }
     public boolean isDoubleDeathOccurred(int day) { return isDoubleDeathOccurred[day]; }
 

@@ -30,15 +30,16 @@ public class EndAnimeHandler implements SceneHandler {
                     default: break;
                 }
             } else {
-                if (ui.ctx.getEndResult() == 1) {
+                GameResult result = ui.ctx.getEndResult();
+                if (result == GameResult.VILLAGE_WIN) {
                     infoText.append(GameStrings.END_SURVIVE);
-                } else if (ui.ctx.getEndResult() == 2) {
+                } else if (result == GameResult.WOLF_WIN) {
                     if (ui.ctx.getActualRole(i) < 7 || ui.ctx.getActualRole(i) > 9) {
                         infoText.append(GameStrings.END_DEAD);
                     } else {
                         infoText.append(GameStrings.END_WIN);
                     }
-                } else if (ui.ctx.getEndResult() == 3) {
+                } else if (result == GameResult.FOX_WIN) {
                     if (ui.ctx.getActualRole(i) < 10) {
                         infoText.append(GameStrings.END_DEAD);
                     } else {
@@ -119,9 +120,9 @@ public class EndAnimeHandler implements SceneHandler {
         String winIconText = "";
         String winText = "";
         switch (ui.ctx.getEndResult()) {
-            case 1: winIconText = "Icon1_0.png"; winText = GameStrings.WIN_VILLAGER; break;
-            case 2: winIconText = "Icon2.png";   winText = GameStrings.WIN_WOLF; break;
-            case 3: winIconText = "Icon4.png";   winText = GameStrings.WIN_FOX; break;
+            case VILLAGE_WIN: winIconText = "Icon1_0.png"; winText = GameStrings.WIN_VILLAGER; break;
+            case WOLF_WIN: winIconText = "Icon2.png";   winText = GameStrings.WIN_WOLF; break;
+            case FOX_WIN: winIconText = "Icon4.png";   winText = GameStrings.WIN_FOX; break;
         }
         JLabel winLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 50, 25, 40, 40,
                 ui.resources.getImage(winIconText));

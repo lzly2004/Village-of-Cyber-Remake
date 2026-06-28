@@ -90,10 +90,10 @@ public class GameSceneHandler implements SceneHandler {
             public void actionPerformed(ActionEvent e) {
                 if (ui.currentScene != UI.Scene.GAME_SCENE_NIGHT) return;
                 switch (ui.ctx.getEndResult()) {
-                    case 0: ui.currentScene = UI.Scene.GAME_SCENE_DAY;    break;
-                    case 1: ui.currentScene = UI.Scene.END_VILLAGE;       break;
-                    case 2: ui.currentScene = UI.Scene.END_WOLF;          break;
-                    case 3: ui.currentScene = UI.Scene.END_FOX;           break;
+                    case NONE: ui.currentScene = UI.Scene.GAME_SCENE_DAY;    break;
+                    case VILLAGE_WIN: ui.currentScene = UI.Scene.END_VILLAGE;       break;
+                    case WOLF_WIN: ui.currentScene = UI.Scene.END_WOLF;          break;
+                    case FOX_WIN: ui.currentScene = UI.Scene.END_FOX;           break;
                 }
                 ((Timer) e.getSource()).stop();
                 ui.run();
@@ -103,14 +103,15 @@ public class GameSceneHandler implements SceneHandler {
     }
 
     private void renderDay(UI ui) {
-        if (ui.ctx.getEndResult() >= 1 && ui.ctx.getEndResult() <= 3) {
+        GameResult result = ui.ctx.getEndResult();
+        if (result != GameResult.NONE) {
             ui.jPanel.removeAll();
             ui.jPanel.revalidate();
             ui.jPanel.repaint();
-            switch (ui.ctx.getEndResult()) {
-                case 1: ui.currentScene = UI.Scene.END_VILLAGE; break;
-                case 2: ui.currentScene = UI.Scene.END_WOLF;    break;
-                case 3: ui.currentScene = UI.Scene.END_FOX;     break;
+            switch (result) {
+                case VILLAGE_WIN: ui.currentScene = UI.Scene.END_VILLAGE; break;
+                case WOLF_WIN: ui.currentScene = UI.Scene.END_WOLF;    break;
+                case FOX_WIN: ui.currentScene = UI.Scene.END_FOX;     break;
             }
             ui.run();
             return;

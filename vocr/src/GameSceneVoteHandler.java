@@ -245,7 +245,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         votePanel.againBtn.addActionListener(e -> {
             ui.resources.playSound("click.wav");
             boolean[] isReVote = {false};
-            if (ui.ctx.getEndResult() == 0) {
+            if (ui.ctx.getEndResult() == GameResult.NONE) {
                 VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay() - 1), round[0], isReVote, this);
             } else {
                 VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay()), round[0], isReVote, this);
@@ -398,7 +398,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         boolean[] isReVote = {false};
         if (!greyResult.cxList.isEmpty()) DebugLogger.log("cxList不为空，且具体为" + greyResult.cxList);
         if (ui.mainLogic.shokei(1, greyResult.cxList, ui.isAvoid)) {
-            int trueDay = (ui.ctx.getEndResult() == 0) ? ui.ctx.getGameDay() - 1 : ui.ctx.getGameDay();
+            int trueDay = (ui.ctx.getEndResult() == GameResult.NONE) ? ui.ctx.getGameDay() - 1 : ui.ctx.getGameDay();
             for (int f = 0; f < greyResult.cxList.size(); ++f)
                 ui.greyCharas[f][trueDay] = greyResult.cxList.get(f);
             ui.voteMethods.add(1); greyResult.cxList.clear();
@@ -455,7 +455,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         boolean[] isReVote = {false};
         if (ui.mainLogic.shokei(0, chuxingList, ui.isAvoid)) {
             ui.voteMethods.add(0); chuxingList.clear();
-            if (ui.ctx.getEndResult() == 0) {
+            if (ui.ctx.getEndResult() == GameResult.NONE) {
                 VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay() - 1), round[0], isReVote, this);
             } else {
                 VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay()), round[0], isReVote, this);
@@ -486,7 +486,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         boolean[] isReVote = {false};
         if (ui.mainLogic.shokei(2, chuxingList, ui.isAvoid)) {
             ui.voteMethods.add(2);
-            int trueDay = (ui.ctx.getEndResult() == 0) ? ui.ctx.getGameDay() - 1 : ui.ctx.getGameDay();
+            int trueDay = (ui.ctx.getEndResult() == GameResult.NONE) ? ui.ctx.getGameDay() - 1 : ui.ctx.getGameDay();
             StringBuilder isSelectedVoteTargetText = new StringBuilder();
             for (int i = 0; i < chuxingList.size(); ++i)
                 isSelectedVoteTargetText.append(ui.getJobText(chuxingList.get(i))).append(",");
