@@ -276,7 +276,7 @@ public class ReplayBrowserHandler implements SceneHandler {
 
         JTextArea messageText = TextareaSimpleFactory.createBoldTitleTextArea(
                 Color.WHITE, 24,
-                "データ「" + slotIndex + "」に、\nオートセーブのデータを\n上書き保存します。\nよろしいですか？"
+                "要将存档保存在\n存档格 " + slotIndex + " 吗？\n（之前的存档会被覆盖）"
         );
         messageText.setBounds(50, 20, 400, 120);
         messageText.setOpaque(false);
@@ -288,7 +288,7 @@ public class ReplayBrowserHandler implements SceneHandler {
             ReplaySave save = ReplaySave.fromRecorder(slotIndex, finalRecorder);
             ui.replayManager.saveToSlot(slotIndex, save);
             finalRecorder.endGame(finalRecorder.isActive() ? 0 : 0, 0);
-            finalRecorder.active = false;
+            finalRecorder.setActive(false);
             ui.resources.playSound("click.wav");
             dialog.dispose();
             ui.run();
