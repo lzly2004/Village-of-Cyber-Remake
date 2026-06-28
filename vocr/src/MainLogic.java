@@ -4,7 +4,7 @@ import java.util.List;
 
 public class MainLogic implements MainLogicInterface
 {
-    GameStatus gs;
+    private GameStatus gs; // 仅用于初始化，运行阶段应通过 ctx 访问状态
     SuspicionSystem suspicion;//怀疑度子系统
     GameContext ctx;//游戏上下文（Phase 2: 封装 GameStatus + 核心数组）
     private ProbabilityCalculator probabilityCalculator;
@@ -128,8 +128,8 @@ public class MainLogic implements MainLogicInterface
         // 得到职业编号
         int nowrl = 1;
         int nowgy = 1;
-        DebugLogger.log("玩家数量："+gs.getPlayerSum());
-        for(int i=1;i<=gs.getPlayerSum();i++)
+        DebugLogger.log("玩家数量："+ctx.getPlayerSum());
+        for(int i=1;i<=ctx.getPlayerSum();i++)
         {
             DebugLogger.log("玩家"+i+"的职业："+ctx.getActualRole(i));
             ctx.setActualRoleIndex(ctx.getActualRole(i), i);
@@ -164,14 +164,14 @@ public class MainLogic implements MainLogicInterface
         DebugLogger.log("死体逻辑：");
         ctx.diebody.clear();
         ctx.diebody.addAll(dielogic(wolf[0],wolf[1],zhantarget,0));//死体逻辑，并且返回当天夜间死体
-        // Replay系统: 第1天在非人初始工作后录制（gs.gameDay已被+1，用-1取回正确的day编号）
-        gs.gameDay++;//增加一天时间
+        // Replay系统: 第1天在非人初始工作后录制（ctx.getGameDay()已被+1，用-1取回正确的day编号）
+        ctx.incrementGameDay();//增加一天时间
         DebugLogger.log("死体逻辑结果：");
         feirenInitial();//非人的初始工作 + 第一天的进行（占灵共co）
         DebugLogger.log("非人的初始工作结果：");
         suspicion.updateTop3SuspectedPlayers(ctx.zhans, ctx.lings, ctx.lies);//更新怀疑度
-        executionManager.recordReplayDailySnapshot(gs.gameDay);
-        DebugLogger.log("目前总人数：" + gs.getPlayerSum());
+        executionManager.recordReplayDailySnapshot(ctx.getGameDay());
+        DebugLogger.log("目前总人数：" + ctx.getPlayerSum());
     }
     private void feirenInitial()
     {
@@ -184,36 +184,36 @@ public class MainLogic implements MainLogicInterface
         //1,真占占卜逻辑
         int zhantarget = zhenzhan(ctx.getActualRoleIndex(1));
         //2,得到真灵能技能结果
-        int num = getDiePlayerNum(whyDie.chuxing,gs.gameDay);
+        int num = getDiePlayerNum(whyDie.chuxing,ctx.getGameDay());
         int mediumResult = num;
         if(ctx.getActualRole(num) == 7)
-            mediumResult += gs.getPlayerSum();//黑结果
-        ctx.setSkillTarget(ctx.getMedium(), gs.gameDay, mediumResult);
+            mediumResult += ctx.getPlayerSum();//黑结果
+        ctx.setSkillTarget(ctx.getMedium(), ctx.getGameDay(), mediumResult);
         //3,狼咬逻辑,wolf[0]:主咬狼；wolf[1]：被咬玩家
         int[] wolf = wolfwork();
         //4,猎人工作逻辑
         int lietarget = zhenlie(ctx.getHunter());
-        ctx.setSkillTarget(ctx.getHunter(), gs.gameDay, lietarget);
+        ctx.setSkillTarget(ctx.getHunter(), ctx.getGameDay(), lietarget);
         //5,死体逻辑，并且返回当天夜间死体
         ctx.diebody.clear();
         ctx.diebody.addAll(dielogic(wolf[0],wolf[1],zhantarget,lietarget));
-        gs.end = judgeend();
-        if(gs.end != 0) //游戏结束
+        ctx.setEndResult(judgeend());
+        if(ctx.getEndResult() != 0) //游戏结束
         {
-            executionManager.recordReplayDailySnapshot(gs.gameDay + 1);
-            executionManager.recordReplayGameEnd(gs.end, gs.gameDay);
-            executionManager.presentGameEnd(gs.end);
-            DebugLogger.info("[战绩] 游戏结束，准备更新记录: peiyi=" + gs.p + "(ordinal=" + gs.p.ordinal() + "), end=" + gs.end);
-            gameRecordManager.updateRecord(gs.p.ordinal(), gs.end);
+            executionManager.recordReplayDailySnapshot(ctx.getGameDay() + 1);
+            executionManager.recordReplayGameEnd(ctx.getEndResult(), ctx.getGameDay());
+            executionManager.presentGameEnd(ctx.getEndResult());
+            DebugLogger.info("[战绩] 游戏结束，准备更新记录: peiyi=" + ctx.getPeiyi() + "(ordinal=" + ctx.getPeiyi().ordinal() + "), end=" + ctx.getEndResult());
+            gameRecordManager.updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult());
             DebugLogger.info("[战绩] 记录更新完成");
             return;//胜负已分
         }
         //6,非人占灵猎编造结果逻辑
         frlying();
         // Replay系统: 记录每日快照（录制下一天的开始状态）
-        executionManager.recordReplayDailySnapshot(gs.gameDay + 1);
+        executionManager.recordReplayDailySnapshot(ctx.getGameDay() + 1);
         //7,增加一天时间
-        gs.gameDay++;
+        ctx.incrementGameDay();
         //8，白天起身逻辑
         dayaction();
         //9,更新怀疑度

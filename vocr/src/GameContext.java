@@ -194,6 +194,8 @@ class GameContext implements GameContextView
 
     // --- 游戏状态 ---
     public int getGameDay() { return gs.gameDay; }
+    /** 增加一天时间（游戏日推进） */
+    public void incrementGameDay() { gs.gameDay++; }
     public int getAliveCounter() { return gs.aliveCounter; }
     public int getDeathCounter() { return gs.deathCounter; }
     public void decrementAliveCounter() { gs.aliveCounter--; }
