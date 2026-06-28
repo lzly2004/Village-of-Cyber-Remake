@@ -155,9 +155,9 @@ public class HunterGuarder
         // Phase 3: 选择目标
         // ============================================================
 
-        ctx.setSkillTarget(num, gd, suspicion.getOne(huweiweight));
+        int result = suspicion.getOne(huweiweight);
 
-        DebugLogger.log("最终护卫对象：" + CharacterKanjiName.values()[ctx.getCharacterNumber(ctx.getSkillTarget(num, gd))]);
-        return ctx.getSkillTarget(num, gd);
+        DebugLogger.log("最终护卫对象：" + CharacterKanjiName.values()[ctx.getCharacterNumber(result)]);
+        return result;
     }
 }

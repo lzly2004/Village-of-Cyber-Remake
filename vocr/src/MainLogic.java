@@ -193,6 +193,7 @@ public class MainLogic implements MainLogicInterface
         int[] wolf = wolfwork();
         //4,猎人工作逻辑
         int lietarget = zhenlie(ctx.getHunter());
+        ctx.setSkillTarget(ctx.getHunter(), gs.gameDay, lietarget);
         //5,死体逻辑，并且返回当天夜间死体
         ctx.diebody.clear();
         ctx.diebody.addAll(dielogic(wolf[0],wolf[1],zhantarget,lietarget));
