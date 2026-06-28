@@ -1,10 +1,14 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 游戏录像/回归测试录制器 — 第0步核心基础设施。
@@ -58,16 +62,34 @@ public class GameRecorder
         records.add("# Peiyi: " + p + " (ordinal=" + p.ordinal() + ")");
         records.add("# Seed: " + seed);
         records.add("# PlayerCount: " + playerCount);
+        int peiyiVillage = -1, totalVillage = -1;
         try {
             GameRecord record = gameRecordManager.getRecord();
-            int peiyiVillage = (p.ordinal() >= 1 && p.ordinal() <= 7) ? record.playcnt[p.ordinal()] + 1 : -1;
-            int totalVillage = record.totalPlayCnt + 1;
+            peiyiVillage = (p.ordinal() >= 1 && p.ordinal() <= 7) ? record.playcnt[p.ordinal()] + 1 : -1;
+            totalVillage = record.totalPlayCnt + 1;
             records.add("# VillageCount: " + peiyiVillage + "/" + totalVillage);
         } catch (Exception e) {
             DebugLogger.warn("[GameRecorder] 获取村数信息失败: " + e.getMessage());
             records.add("# VillageCount: -1/-1");
         }
         records.add("# ==========================================");
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            Map<String, Object> meta = new LinkedHashMap<>();
+            meta.put("type", "GAME_METADATA");
+            meta.put("version", 2);
+            meta.put("peiyiName", p.name());
+            meta.put("peiyiOrdinal", p.ordinal());
+            meta.put("peiyiVillageCount", peiyiVillage);
+            meta.put("totalVillageCount", totalVillage);
+            meta.put("seed", seed);
+            meta.put("playerCount", playerCount);
+            records.add("JSON|" + mapper.writeValueAsString(meta));
+        } catch (Exception e) {
+            DebugLogger.warn("[GameRecorder] 记录结构化元数据失败: " + e.getMessage());
+        }
 
         // 录制初始角色分配
         StringBuilder sb = new StringBuilder("INIT|roles|");

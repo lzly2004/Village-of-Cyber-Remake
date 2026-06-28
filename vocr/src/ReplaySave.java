@@ -1,10 +1,15 @@
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\vocr\src\ReplaySave.java
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReplaySave {
+    public static final int CURRENT_VERSION = 2;
+
+    public int version = CURRENT_VERSION;
     public int slotIndex;
     public String saveTime;
     public String peiyiName;
@@ -32,30 +37,51 @@ public class ReplaySave {
         
         DebugLogger.info("[ReplaySave] 开始从GameRecorder构建: records=" + save.totalEvents);
 
+        boolean foundJsonMetadata = false;
+        ObjectMapper mapper = new ObjectMapper();
+
         for (String line : save.rawRecords) {
-            // 提取村数信息（格式: # VillageCount: 3/15）
-            if (line.startsWith("# VillageCount:")) {
-                String countStr = line.substring("# VillageCount:".length()).trim();
-                String[] parts = countStr.split("/");
-                if (parts.length == 2) {
-                    try { save.peiyiVillageCount = Integer.parseInt(parts[0].trim()); } catch (Exception e) {}
-                    try { save.totalVillageCount = Integer.parseInt(parts[1].trim()); } catch (Exception e) {}
+            if (line.startsWith("JSON|")) {
+                try {
+                    String jsonStr = line.substring(5);
+                    JsonNode root = mapper.readTree(jsonStr);
+                    String type = root.has("type") ? root.get("type").asText() : "";
+                    if ("GAME_METADATA".equals(type)) {
+                        save.peiyiName = root.has("peiyiName") ? root.get("peiyiName").asText() : "unknown";
+                        save.peiyiOrdinal = root.has("peiyiOrdinal") ? root.get("peiyiOrdinal").asInt(-1) : -1;
+                        save.peiyiVillageCount = root.has("peiyiVillageCount") ? root.get("peiyiVillageCount").asInt(-1) : -1;
+                        save.totalVillageCount = root.has("totalVillageCount") ? root.get("totalVillageCount").asInt(-1) : -1;
+                        foundJsonMetadata = true;
+                        DebugLogger.info("[ReplaySave] 从JSON元数据提取: peiyi=" + save.peiyiName + ", village=" + save.peiyiVillageCount + "/" + save.totalVillageCount);
+                    }
+                } catch (Exception e) {
+                    DebugLogger.warn("[ReplaySave] JSON解析失败: " + e.getMessage());
                 }
-                DebugLogger.info("[ReplaySave] 提取到村数: peiyiVillage=" + save.peiyiVillageCount + ", totalVillage=" + save.totalVillageCount);
             }
-            // 从注释行提取peiyi信息（格式: # Peiyi: jianyi (ordinal=0)）
-            if (line.startsWith("# Peiyi:")) {
-                String peiyiStr = line.substring("# Peiyi:".length()).trim();
-                int ordStart = peiyiStr.indexOf("(ordinal=");
-                if (ordStart > 0) {
-                    save.peiyiName = peiyiStr.substring(0, ordStart).trim();
-                    String ordStr = peiyiStr.substring(ordStart + "(ordinal=".length());
-                    ordStr = ordStr.replace(")", "").trim();
-                    try { save.peiyiOrdinal = Integer.parseInt(ordStr); } catch (Exception e) {}
-                } else {
-                    save.peiyiName = peiyiStr;
+
+            if (!foundJsonMetadata) {
+                if (line.startsWith("# VillageCount:")) {
+                    String countStr = line.substring("# VillageCount:".length()).trim();
+                    String[] parts = countStr.split("/");
+                    if (parts.length == 2) {
+                        try { save.peiyiVillageCount = Integer.parseInt(parts[0].trim()); } catch (Exception e) {}
+                        try { save.totalVillageCount = Integer.parseInt(parts[1].trim()); } catch (Exception e) {}
+                    }
+                    DebugLogger.info("[ReplaySave] 提取到村数: peiyiVillage=" + save.peiyiVillageCount + ", totalVillage=" + save.totalVillageCount);
                 }
-                DebugLogger.info("[ReplaySave] 提取到peiyi: name=" + save.peiyiName + ", ordinal=" + save.peiyiOrdinal);
+                if (line.startsWith("# Peiyi:")) {
+                    String peiyiStr = line.substring("# Peiyi:".length()).trim();
+                    int ordStart = peiyiStr.indexOf("(ordinal=");
+                    if (ordStart > 0) {
+                        save.peiyiName = peiyiStr.substring(0, ordStart).trim();
+                        String ordStr = peiyiStr.substring(ordStart + "(ordinal=".length());
+                        ordStr = ordStr.replace(")", "").trim();
+                        try { save.peiyiOrdinal = Integer.parseInt(ordStr); } catch (Exception e) {}
+                    } else {
+                        save.peiyiName = peiyiStr;
+                    }
+                    DebugLogger.info("[ReplaySave] 提取到peiyi: name=" + save.peiyiName + ", ordinal=" + save.peiyiOrdinal);
+                }
             }
             
             if (line.startsWith("END|")) {

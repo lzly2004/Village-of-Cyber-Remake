@@ -3,6 +3,9 @@ import java.math.RoundingMode;
 
 public class GameRecord
 {
+    public static final int CURRENT_VERSION = 2;
+    
+    public int version = CURRENT_VERSION;
     public int[] playcnt;
     public double[] winrate;
     public int[] villageWincnt;

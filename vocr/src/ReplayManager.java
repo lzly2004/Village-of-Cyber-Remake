@@ -22,9 +22,10 @@ public class ReplayManager {
                 int validCount = 0;
                 for (int i = 0; i < slots.length; i++) {
                     if (slots[i] != null && slots[i].rawRecords != null && !slots[i].rawRecords.isEmpty()) {
+                        migrateVersion(slots[i]);
                         validCount++;
                     } else {
-                        slots[i] = null; // 清理无效数据
+                        slots[i] = null;
                     }
                 }
                 
@@ -109,5 +110,21 @@ public class ReplayManager {
             if (slots[i] != null) count++;
         }
         return count;
+    }
+
+    private void migrateVersion(ReplaySave save) {
+        if (save.version == 0) {
+            save.version = 1;
+            DebugLogger.info("[ReplayManager] 迁移存档版本: v0 -> v1");
+        }
+        if (save.version == 1) {
+            save.version = 2;
+            if (save.peiyiVillageCount <= 0) save.peiyiVillageCount = -1;
+            if (save.totalVillageCount <= 0) save.totalVillageCount = -1;
+            DebugLogger.info("[ReplayManager] 迁移存档版本: v1 -> v2");
+        }
+        if (save.version < ReplaySave.CURRENT_VERSION) {
+            DebugLogger.warn("[ReplayManager] 存档版本 v" + save.version + " 无法自动迁移到 v" + ReplaySave.CURRENT_VERSION);
+        }
     }
 }
