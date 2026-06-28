@@ -1,32 +1,71 @@
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ProbabilityGenerator {
     public static void main(String[] args) {
         try {
-            PrintWriter writer = new PrintWriter(new FileWriter(PathConfig.PROBABILITY_CONFIG));
+            // 使用Jackson生成JSON
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-            writer.println("# 猫猎co概率配置文件");
-            writer.println("# 格式: zhi situation p1 p2 probability");
-            writer.println("# zhi: 0人狼 1狂人 2狂信 3妖狐 4背德");
-            writer.println("# situation: 0被指定 1接黒 2被询问co 3询问职业 4共有全死co猫 5猫村双死co猫 6平和co猎(废弃)");
-            writer.println("# p1: 0完全怂狼 1单狼上职 2双狼上职 3三狼上职");
-            writer.println("# p2: 0孤狼剩余 1双狼剩余 2三狼剩余 3四狼俱在");
-            writer.println();
+            // 构建JSON结构
+            Map<String, Object> root = new LinkedHashMap<>();
+            root.put("description", "猫猎co概率配置文件");
+            root.put("format", "zhi, situation, p1, p2 -> probability");
+            root.put("zhi_meanings", new LinkedHashMap<String, String>() {{
+                put("0", "人狼");
+                put("1", "狂人");
+                put("2", "狂信");
+                put("3", "妖狐");
+                put("4", "背德");
+            }});
+            root.put("situation_meanings", new LinkedHashMap<String, String>() {{
+                put("0", "被指定");
+                put("1", "接黒");
+                put("2", "被询问co");
+                put("3", "询问职业");
+                put("4", "共有全死co猫");
+                put("5", "猫村双死co猫");
+                put("6", "平和co猎(废弃)");
+            }});
+            root.put("p1_meanings", new LinkedHashMap<String, String>() {{
+                put("0", "完全怂狼");
+                put("1", "单狼上职");
+                put("2", "双狼上职");
+                put("3", "三狼上职");
+            }});
+            root.put("p2_meanings", new LinkedHashMap<String, String>() {{
+                put("0", "孤狼剩余");
+                put("1", "双狼剩余");
+                put("2", "三狼剩余");
+                put("3", "四狼俱在");
+            }});
 
+            // 生成概率条目
+            List<Map<String, Integer>> probabilities = new ArrayList<>();
             int totalCount = 0;
             int minProb = 100, maxProb = 0;
-            int[] probDistribution = new int[101]; // 记录概率分布
+            int[] probDistribution = new int[101];
 
-            // 遍历所有560种组合
             for (int zhi = 0; zhi <= 4; zhi++) {
                 for (int situation = 0; situation <= 6; situation++) {
                     for (int p1 = 0; p1 <= 3; p1++) {
                         for (int p2 = 0; p2 <= 3; p2++) {
                             int probability = calculateProbability(zhi, situation, p1, p2);
-                            writer.printf("%d %d %d %d %d%n", zhi, situation, p1, p2, probability);
 
-                            // 统计信息
+                            Map<String, Integer> entry = new LinkedHashMap<>();
+                            entry.put("zhi", zhi);
+                            entry.put("situation", situation);
+                            entry.put("p1", p1);
+                            entry.put("p2", p2);
+                            entry.put("probability", probability);
+                            probabilities.add(entry);
+
                             totalCount++;
                             probDistribution[probability]++;
                             if (probability < minProb) minProb = probability;
@@ -36,7 +75,11 @@ public class ProbabilityGenerator {
                 }
             }
 
-            writer.close();
+            root.put("probabilities", probabilities);
+
+            // 写入JSON文件
+            File outputFile = new File(PathConfig.PROBABILITY_CONFIG);
+            mapper.writeValue(outputFile, root);
 
             // 打印统计信息
             DebugLogger.log("配置文件已生成: " + PathConfig.PROBABILITY_CONFIG);
@@ -44,7 +87,6 @@ public class ProbabilityGenerator {
             DebugLogger.log("最小概率: " + minProb + "%");
             DebugLogger.log("最大概率: " + maxProb + "%");
 
-            // 计算平均概率
             int sum = 0;
             for (int i = 0; i <= 100; i++) {
                 sum += i * probDistribution[i];
@@ -52,7 +94,6 @@ public class ProbabilityGenerator {
             double average = (double) sum / totalCount;
             DebugLogger.log("平均概率: " + String.format("%.2f", average) + "%");
 
-            // 打印概率分布
             DebugLogger.log("\n概率分布:");
             for (int i = 0; i <= 100; i += 5) {
                 int count = 0;
@@ -72,7 +113,6 @@ public class ProbabilityGenerator {
 
     /**
      * 核心概率计算公式
-     * 目标：降低整体概率，提高狂信倾向
      */
     private static int calculateProbability(int zhi, int situation, int p1, int p2) {
         // 平和co猎(情景6)已废弃，概率为0
@@ -82,95 +122,60 @@ public class ProbabilityGenerator {
 
         int probability = 0;
 
-        // 1. 职业基础值（降低整体，提高狂信）
+        // 1. 职业基础值
         switch(zhi) {
-            case 0: // 人狼
-                probability = 18;  // 降低4
-                break;
-            case 1: // 狂人
-                probability = 14;  // 降低4
-                break;
-            case 2: // 狂信 - 改为高倾向
-                probability = 30;  // 提高2
-                break;
-            case 3: // 妖狐
-                probability = 8;   // 降低4
-                break;
-            case 4: // 背德
-                probability = 16;  // 降低4
-                break;
+            case 0: probability = 18; break;
+            case 1: probability = 14; break;
+            case 2: probability = 30; break;
+            case 3: probability = 8; break;
+            case 4: probability = 16; break;
         }
 
-        // 2. 情境修正（降低幅度）
+        // 2. 情境修正
         switch(situation) {
-            case 0: // 被指定处刑
-                probability += 25;  // 降低10
-                break;
-            case 1: // 接黒
-                probability += 10;  // 降低5
-                break;
-            case 2: // 被询问co
-                probability += 5;   // 降低3
-                break;
-            case 3: // 询问职业
-                probability += 3;   // 降低2
-                break;
-            case 4: // 共有全死co猫
-                probability += 15;  // 降低5
-                break;
-            case 5: // 猫村双死co猫
-                probability += 17;  // 降低5
-                break;
+            case 0: probability += 25; break;
+            case 1: probability += 10; break;
+            case 2: probability += 5; break;
+            case 3: probability += 3; break;
+            case 4: probability += 15; break;
+            case 5: probability += 17; break;
         }
 
-        // 3. p1修正（进一步降低修正幅度）
-        probability -= p1 * 2;  // 降低1
+        // 3. p1修正
+        probability -= p1 * 2;
 
-        // 4. p2修正（进一步降低修正幅度）
-        probability += p2 * 1;  // 降低1
+        // 4. p2修正
+        probability += p2 * 1;
 
-        // 5. 特殊交互调整（降低调整幅度）
-
-        // 妖狐在接黒/被询问时更可能跳猫猎自保
+        // 5. 特殊交互调整
         if (zhi == 3 && (situation == 1 || situation == 2)) {
-            probability += 6;  // 降低2
+            probability += 6;
         }
-
-        // 背德在接黒/被指定时更可能跳猫猎保护妖狐
         if (zhi == 4 && (situation == 1 || situation == 0)) {
-            probability += 8;  // 降低2
+            probability += 8;
         }
-
-        // 人狼在游戏前期更保守
         if (zhi == 0 && p2 == 0) {
-            probability -= 5;  // 降低3
+            probability -= 5;
         }
-
-        // 狂信知道狼队友，会积极跳猫猎保护狼队
         if (zhi == 2 && p2 == 0) {
-            probability += 3;  // 降低1
+            probability += 3;
         }
-
-        // 共有全死时，所有非人跳猫倾向略微增加
         if (situation == 4) {
-            if (zhi == 3 || zhi == 4) {  // 妖狐/背德
-                probability += 4;  // 降低2
-            } else if (zhi == 1) {  // 狂人
-                probability += 3;  // 降低1
+            if (zhi == 3 || zhi == 4) {
+                probability += 4;
+            } else if (zhi == 1) {
+                probability += 3;
             }
         }
-
-        // 猫村双死时，非人占卜师的支持者更可能跳猫
         if (situation == 5) {
-            // 如果是人狼或狂信，而且狼占多（p1值大），则更可能跳猫支撑假占
             if ((zhi == 0 || zhi == 2) && p1 >= 2) {
-                probability += 6;  // 降低2
+                probability += 6;
             }
         }
 
         // 最终概率范围限制
-        if (probability < 2) probability = 2;    // 最低2%
-        if (probability > 70) probability = 70;  // 最高70%（进一步限制）
+        if (probability < 2) probability = 2;
+        if (probability > 70) probability = 70;
 
         return probability;
     }

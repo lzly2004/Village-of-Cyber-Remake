@@ -1,14 +1,19 @@
 // ProbabilityCalculator.java - 简化的概率计算类
-import java.io.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 简化的概率计算器类
- * 使用纯文本格式存储560种组合的概率
+ * 使用JSON格式存储560种组合的概率
  */
 public class ProbabilityCalculator {
-    // 参数取值范围定义（保持不变）
+    // 参数取值范围定义
     private static final int ZHI_MIN = 0;
     private static final int ZHI_MAX = 4;
     private static final int SITUATION_MIN = 0;
@@ -39,7 +44,6 @@ public class ProbabilityCalculator {
     public ProbabilityCalculator() {
         this.configFilePath = null;
         this.probabilityMap = new HashMap<>();
-        // 初始化所有组合为默认值
         initWithDefaultValues();
     }
 
@@ -47,7 +51,6 @@ public class ProbabilityCalculator {
      * 主函数：根据四个参数获取概率
      */
     public int maolieco(int zhi, int situation, int p1, int p2) {
-        // 参数校验
         if (!isValid(zhi, situation, p1, p2)) {
             throw new IllegalArgumentException(String.format(
                     "参数超出范围: zhi=%d[%d-%d], situation=%d[%d-%d], p1=%d[%d-%d], p2=%d[%d-%d]",
@@ -58,15 +61,12 @@ public class ProbabilityCalculator {
             ));
         }
 
-        // 生成键
         String key = String.format("%d %d %d %d", zhi, situation, p1, p2);
-
-        // 从Map中获取概率，如果不存在则返回默认值
         return probabilityMap.getOrDefault(key, GameConstants.DEFAULT_PROBABILITY);
     }
 
     /**
-     * 加载配置文件
+     * 加载配置文件（JSON格式）
      */
     private void loadFromConfig() {
         if (configFilePath == null) {
@@ -79,53 +79,38 @@ public class ProbabilityCalculator {
         if (!configFile.exists()) {
             DebugLogger.log("配置文件不存在，生成默认配置文件并加载");
             saveDefaultConfig(configFilePath);
+            return;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(configFilePath))) {
-            String line;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(configFile);
+
+            JsonNode probabilities = root.get("probabilities");
+            if (probabilities == null || !probabilities.isArray()) {
+                DebugLogger.error("JSON格式错误：缺少probabilities数组");
+                initWithDefaultValues();
+                return;
+            }
+
             int loadedCount = 0;
-            int errorCount = 0;
+            for (JsonNode entry : probabilities) {
+                int zhi = entry.get("zhi").asInt();
+                int situation = entry.get("situation").asInt();
+                int p1 = entry.get("p1").asInt();
+                int p2 = entry.get("p2").asInt();
+                int probability = entry.get("probability").asInt();
 
-            while ((line = reader.readLine()) != null) {
-                // 跳过空行和注释行
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) {
-                    continue;
-                }
-
-                // 按空格或逗号分割
-                String[] parts = line.split("[ ,]+");
-                if (parts.length < 5) {
-                    errorCount++;
-                    continue;
-                }
-
-                try {
-                    int zhi = Integer.parseInt(parts[0]);
-                    int situation = Integer.parseInt(parts[1]);
-                    int p1 = Integer.parseInt(parts[2]);
-                    int p2 = Integer.parseInt(parts[3]);
-                    int probability = Integer.parseInt(parts[4]);
-
-                    // 验证范围
-                    if (isValid(zhi, situation, p1, p2)) {
-                        String key = String.format("%d %d %d %d", zhi, situation, p1, p2);
-                        probabilityMap.put(key, probability);
-                        loadedCount++;
-                    } else {
-                        errorCount++;
-                        DebugLogger.error(String.format("参数超出范围: %s", line));
-                    }
-                } catch (NumberFormatException e) {
-                    errorCount++;
-                    DebugLogger.error("解析失败: " + line);
+                if (isValid(zhi, situation, p1, p2)) {
+                    String key = String.format("%d %d %d %d", zhi, situation, p1, p2);
+                    probabilityMap.put(key, probability);
+                    loadedCount++;
                 }
             }
 
-            DebugLogger.log(String.format("概率配置加载完成，成功加载 %d 条规则，失败 %d 条", loadedCount, errorCount));
+            DebugLogger.log(String.format("概率配置加载完成，成功加载 %d 条规则", loadedCount));
 
-            // 如果加载的规则太少，用默认值填充
-            if (loadedCount < 100) { // 假设至少应该有100条有效规则
+            if (loadedCount < 100) {
                 DebugLogger.log("有效规则太少，用默认值填充缺失的规则");
                 initWithDefaultValues();
             }
@@ -141,7 +126,6 @@ public class ProbabilityCalculator {
      */
     private void initWithDefaultValues() {
         probabilityMap.clear();
-        // 生成所有560种组合并设置为默认值
         for (int zhi = ZHI_MIN; zhi <= ZHI_MAX; zhi++) {
             for (int situation = SITUATION_MIN; situation <= SITUATION_MAX; situation++) {
                 for (int p1 = P1_MIN; p1 <= P1_MAX; p1++) {
@@ -155,35 +139,37 @@ public class ProbabilityCalculator {
     }
 
     /**
-     * 生成默认配置文件
+     * 生成默认配置文件（JSON格式）
      */
     public void saveDefaultConfig(String outputPath) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputPath))) {
-            writer.println("# 概率配置文件");
-            writer.println("# 格式: zhi situation p1 p2 probability");
-            writer.println("# zhi: 0人狼 1狂人 2狂信 3妖狐 4背德");
-            writer.println("# situation: 0被指定 1接黒 2被询问co 3询问职业 4共有全死co猫 5猫村双死co猫 6平和co猎");
-            writer.println("# p1: 0完全怂狼 1单狼上职 2双狼上职 3三狼上职");
-            writer.println("# p2: 0孤狼剩余 1双狼剩余 2三狼剩余 3四狼俱在");
-            writer.println();
+            writer.println("{");
+            writer.println("  \"description\": \"猫猎co概率配置文件\",");
+            writer.println("  \"probabilities\": [");
+
+            int count = 0;
+            int total = (ZHI_MAX - ZHI_MIN + 1) * (SITUATION_MAX - SITUATION_MIN + 1)
+                    * (P1_MAX - P1_MIN + 1) * (P2_MAX - P2_MIN + 1);
 
             for (int zhi = ZHI_MIN; zhi <= ZHI_MAX; zhi++) {
                 for (int situation = SITUATION_MIN; situation <= SITUATION_MAX; situation++) {
                     for (int p1 = P1_MIN; p1 <= P1_MAX; p1++) {
                         for (int p2 = P2_MIN; p2 <= P2_MAX; p2++) {
-                            writer.printf("%d %d %d %d %d%n",
+                            writer.printf("    {\"zhi\":%d,\"situation\":%d,\"p1\":%d,\"p2\":%d,\"probability\":%d}",
                                     zhi, situation, p1, p2, GameConstants.DEFAULT_PROBABILITY);
+                            count++;
+                            if (count < total) writer.println(",");
+                            else writer.println();
                         }
                     }
                 }
             }
 
+            writer.println("  ]");
+            writer.println("}");
+
             DebugLogger.log("默认配置文件已生成: " + outputPath);
-            DebugLogger.log("总配置项数: " +
-                    ((ZHI_MAX - ZHI_MIN + 1) *
-                            (SITUATION_MAX - SITUATION_MIN + 1) *
-                            (P1_MAX - P1_MIN + 1) *
-                            (P2_MAX - P2_MIN + 1)));
+            DebugLogger.log("总配置项数: " + total);
 
         } catch (IOException e) {
             DebugLogger.error("保存配置文件失败: " + e.getMessage());

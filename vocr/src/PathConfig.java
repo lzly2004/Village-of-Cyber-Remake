@@ -14,7 +14,7 @@ public final class PathConfig {
     public static final String REPLAY_SAVES = DATA_DIR + "replay_saves.json";
 
     // ==================== 配置文件 ====================
-    public static final String PROBABILITY_CONFIG = CONFIG_DIR + "probability.txt";
+    public static final String PROBABILITY_CONFIG = CONFIG_DIR + "probability.json";
 
     // ==================== 辅助方法 ====================
 
