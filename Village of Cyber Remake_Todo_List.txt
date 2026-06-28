@@ -231,9 +231,12 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
        来源: #15
        - 1280×720 固定窗口 + setResizable(false) → 支持等比缩放或全屏模式
 
-[P2-2] 字体回退机制
+[P2-2] ✅ 字体回退机制
        来源: #22
-       - "Takao Mincho" 硬编码 → 使用 GraphicsEnvironment 检测可用字体
+       - ✅ "Takao Mincho" 硬编码 → 使用 GraphicsEnvironment 检测可用字体
+       - ✅ 新增字体回退优先级列表(12种中日文字体): Takao Mincho, Noto Sans CJK, Microsoft YaHei, SimSun, Hiragino, Yu Mincho, Meiryo
+       - ✅ detectFont() 方法自动从高优先级到低优先级检测系统可用字体
+       - ✅ 兜底使用 Font.SERIF
 
 [P2-3] BGM 状态管理统一
        来源: #34
