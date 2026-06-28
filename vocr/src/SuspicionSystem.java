@@ -156,6 +156,16 @@ class SuspicionSystem
     {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
+        
+        updateBaseSuspicion(n, gd, zhans, lings, lies);
+        applyDivinationWhiteBallBonus(n, gd, zhans);
+        resetLazySuspicion(n);
+        computeTop3SuspectedPlayers(n, gd);
+    }
+    
+    private void updateBaseSuspicion(int n, int gd, ArrayList<Integer> zhans,
+                                     ArrayList<Integer> lings, ArrayList<Integer> lies)
+    {
         for (int i = 1; i <= n; i++)
         {
             if (ctx.isDead(i)) continue;
@@ -220,6 +230,10 @@ class SuspicionSystem
                 }
             }
         }
+    }
+    
+    private void applyDivinationWhiteBallBonus(int n, int gd, ArrayList<Integer> zhans)
+    {
         for (int i = 0; i < zhans.size(); i++)
         {
             int zhan = zhans.get(i);
@@ -236,10 +250,16 @@ class SuspicionSystem
                     }
             }
         }
-
+    }
+    
+    private void resetLazySuspicion(int n)
+    {
         for (int i = 1; i <= n; i++)
             lazySuspicionValue[i] = 0;
-
+    }
+    
+    private void computeTop3SuspectedPlayers(int n, int gd)
+    {
         for (int i = 1; i <= n; i++)
         {
             if (ctx.isDead(i)) continue;
