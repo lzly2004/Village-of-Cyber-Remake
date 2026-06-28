@@ -25,7 +25,7 @@ public class GameSceneHandler implements SceneHandler {
         JButton btn1;
         for (int i = 1; i < peiyi.values().length; i++) {
             final int j = i;
-            btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
+            btn1 = UIFactory.makeButton(ButtonConst.Simple_Button,
                     x + (i / 5) * x_div, y + (i - 1) % 4 * y_div, width, height,
                     ui.resources.getImage("game" + i + ".png"));
             ui.jPanel.add(btn1);
@@ -51,13 +51,13 @@ public class GameSceneHandler implements SceneHandler {
                 ui.run();
             });
         }
-        JButton backBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
+        JButton backBtn = UIFactory.makeButton(ButtonConst.Simple_Button,
                 1050, 560,
                 GameConstants.RETURN_WIDTH * 6 / 10, GameConstants.RETURN_HEIGHT * 6 / 10,
                 ui.resources.getImage("PVBtitile.png"));
         backBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(backBtn);
-        JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        JLabel background = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("title_base_resized.png"));
         ui.jPanel.add(background);
@@ -77,7 +77,7 @@ public class GameSceneHandler implements SceneHandler {
             DebugLogger.log("事件不为空");
         }
         ui.jPanel.removeAll();
-        JLabel label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        JLabel label = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("komorebi000night01.png"));
         ui.jPanel.add(label);

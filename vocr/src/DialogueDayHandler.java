@@ -55,13 +55,13 @@ public class DialogueDayHandler implements SceneHandler {
                     }
                 }
             } else {
-                Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 650,
+                Chara = UIFactory.makeLabel(LabelConst.Simple_Label, 650,
                         GameConstants.WINDOW_HEIGHT - ui.linkIcon.get(0).getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                         ui.linkIcon.get(0).getIconWidth(), ui.linkIcon.get(0).getIconHeight(),
                         ui.linkIcon.get(0));
                 ui.diaPanel.add(Chara);
                 ui.resizeComponents();
-                JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 300,
+                JLabel Chara2 = UIFactory.makeLabel(LabelConst.Simple_Label, 300,
                         GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
                 ui.diaPanel.add(Chara2);

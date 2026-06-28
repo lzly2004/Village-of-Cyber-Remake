@@ -5,10 +5,10 @@ public class EndAnimeHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
         ui.jPanel.removeAll();
-        JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        JLabel background = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("frame #19252.png"));
-        JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
+        JButton nextBtn = UIFactory.makeButton(ButtonConst.Simple_Button,
                 1130, 720 - GameConstants.RETURN_HEIGHT,
                 GameConstants.RETURN_WIDTH * 6 / 10, GameConstants.RETURN_HEIGHT * 6 / 10,
                 ui.resources.getImage("PVBtitile.png"));
@@ -48,7 +48,7 @@ public class EndAnimeHandler implements SceneHandler {
                 }
             }
             DebugLogger.log(infoText);
-            JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 16,
+            JTextArea infoLabel = UIFactory.createBoldTitleTextArea(Color.BLACK, 16,
                     infoText.toString());
             StringBuilder xName = new StringBuilder();
             StringBuilder imageName = new StringBuilder();
@@ -79,11 +79,11 @@ public class EndAnimeHandler implements SceneHandler {
                 ImageIcon deathImage = ui.resources.getImage(xName.toString());
                 JLabel deathLabel;
                 if (i <= (ui.ctx.getPlayerSum() + 1) / 2) {
-                    deathLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                    deathLabel = UIFactory.makeLabel(LabelConst.Simple_Label,
                             22 + (characterImage.getIconWidth() + 40) * i, 110,
                             deathImage.getIconWidth(), deathImage.getIconHeight(), deathImage);
                 } else {
-                    deathLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                    deathLabel = UIFactory.makeLabel(LabelConst.Simple_Label,
                             22 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
                             260 + characterImage.getIconHeight(),
                             deathImage.getIconWidth(), deathImage.getIconHeight(), deathImage);
@@ -93,20 +93,20 @@ public class EndAnimeHandler implements SceneHandler {
             JLabel label;
             JLabel textLabel;
             if (i <= (ui.ctx.getPlayerSum() + 1) / 2) {
-                label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                label = UIFactory.makeLabel(LabelConst.Simple_Label,
                         20 + (characterImage.getIconWidth() + 40) * i, 100,
                         characterImage.getIconWidth(), characterImage.getIconHeight(), characterImage);
-                textLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label,
+                textLabel = UIFactory.makeLabel(LabelConst.Text_Label,
                         35 + (characterImage.getIconWidth() + 40) * i,
                         100 + characterImage.getIconHeight() - characterText.getIconHeight() / 2,
                         characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
                 infoLabel.setBounds(20 + (characterImage.getIconWidth() + 40) * i, 210, 100, 150);
             } else {
-                label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                label = UIFactory.makeLabel(LabelConst.Simple_Label,
                         20 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
                         250 + characterImage.getIconHeight(),
                         characterImage.getIconWidth(), characterImage.getIconHeight(), characterImage);
-                textLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label,
+                textLabel = UIFactory.makeLabel(LabelConst.Text_Label,
                         35 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
                         250 + 2 * characterImage.getIconHeight() - characterText.getIconHeight() / 2,
                         characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
@@ -124,10 +124,10 @@ public class EndAnimeHandler implements SceneHandler {
             case WOLF_WIN: winIconText = "Icon2.png";   winText = GameStrings.WIN_WOLF; break;
             case FOX_WIN: winIconText = "Icon4.png";   winText = GameStrings.WIN_FOX; break;
         }
-        JLabel winLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 50, 25, 40, 40,
+        JLabel winLabel = UIFactory.makeLabel(LabelConst.Simple_Label, 50, 25, 40, 40,
                 ui.resources.getImage(winIconText));
         ui.jPanel.add(winLabel);
-        JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, winText);
+        JTextArea infoLabel = UIFactory.createBoldTitleTextArea(Color.BLACK, 24, winText);
         infoLabel.setBounds(100, 29, 200, 100);
         ui.jPanel.add(infoLabel);
         ui.jPanel.add(background);

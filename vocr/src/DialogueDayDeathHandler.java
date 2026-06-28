@@ -38,7 +38,7 @@ public class DialogueDayDeathHandler implements SceneHandler {
             if (CharIcon.length != 0) {
                 typeTimer.stop();
                 ds.dc().dialogPanel.setVisible(false);
-                JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                JLabel Chara = UIFactory.makeLabel(LabelConst.Simple_Label,
                         (GameConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
                         GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
@@ -47,7 +47,7 @@ public class DialogueDayDeathHandler implements SceneHandler {
                     ui.resources.playSound("夜间死亡音效.wav");
                     Chara.setVisible(false);
                     if (CharIcon.length >= 2) {
-                        JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Text_Label,
+                        JLabel Chara2 = UIFactory.makeLabel(LabelConst.Text_Label,
                                 (GameConstants.WINDOW_WIDTH - CharIcon[1].getIconWidth()) / 2,
                                 GameConstants.WINDOW_HEIGHT - CharIcon[1].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
                                 CharIcon[1].getIconWidth(), CharIcon[1].getIconHeight(), CharIcon[1]);

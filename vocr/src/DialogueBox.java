@@ -24,16 +24,16 @@ public class DialogueBox
     public static Components createWithIcon(ResourcesInterface resources, ImageIcon bgIcon)
     {
         Components c = new Components();
-        c.background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        c.background = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, bgIcon);
         ImageIcon backIcon = resources.getImage("messageframe.png");
-        c.dialogPanel = PanelSimpleFactory.createSimplePanel(260, 450,
+        c.dialogPanel = UIFactory.createSimplePanel(260, 450,
                 backIcon.getIconWidth(), backIcon.getIconHeight(), false, true);
-        c.back = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        c.back = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 backIcon.getIconWidth(), backIcon.getIconHeight(), backIcon);
-        c.dialogText = TextareaSimpleFactory.createBasicTextArea(Color.WHITE);
+        c.dialogText = UIFactory.createBasicTextArea(Color.WHITE);
         c.dialogText.setBounds(20, 50, 710, 200);
-        c.nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 0, 0,
+        c.nextBtn = UIFactory.makeButton(ButtonConst.Simple_Button, 0, 0,
                 backIcon.getIconWidth(), backIcon.getIconHeight(), null, null);
         return c;
     }

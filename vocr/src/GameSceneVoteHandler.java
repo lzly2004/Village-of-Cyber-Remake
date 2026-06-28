@@ -65,7 +65,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     // ===================================================================
     private void createBackground()
     {
-        background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        background = UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("komorebi002yuu.png"));
     }
@@ -85,7 +85,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             bgmTexts = new String[]{"Death Impact.txt", "永久色五色.txt", "Emotionally Unstable.txt", "FELT LOVE.txt", "Just Complex.txt", "Peace of lost puzzle.txt", "TEEK TEEK TEEK.txt", "ダンジョン09.txt", "ライアービジネス.txt", "五月雨Vivaride.txt", "村08.txt", "真甜呢丨先来一斤吧 - ダンジョン14.txt", "西江紫堂 - 五月雨Vivaride-Samidare bibaraido-.txt"};
         }
         ImageIcon musicBtnIcon = ui.resources.getImage("musicBtn.png");
-        JButton btnMusic = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 15, 35,
+        JButton btnMusic = UIFactory.makeButton(ButtonConst.Simple_Button, 15, 35,
                 GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT, musicBtnIcon);
         btnMusic.addActionListener(e -> {
             int cur = ui.count % bgmSongs.length;
@@ -157,12 +157,12 @@ public class GameSceneVoteHandler implements SceneHandler {
             createDoubt();
         });
 
-        hisPanel = PanelSimpleFactory.createSimplePanel(0, 0, false, false);
+        hisPanel = UIFactory.createSimplePanel(0, 0, false, false);
         hisPanel.setBounds(0, 198, 200 + voteInfo.boardIcon.getIconWidth(), 50 + voteInfo.boardIcon.getIconHeight());
         ui.jPanel.add(hisPanel);
         hisPanel.setVisible(false);
         ImageIcon levelIcon = ui.resources.getImage(ui.levelName);
-        levellb = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 700, 600, levelIcon);
+        levellb = UIFactory.makeLabel(LabelConst.Simple_Label, 700, 600, levelIcon);
         levellb.setVisible(false); ui.jPanel.add(levellb);
         isVotehis = new boolean[]{false};
         votePanel.votehisBtn.addActionListener(e -> VoteHistoryBrowser.render(ui, votePanel, voteInfo, hisPanel, levellb, isVotehis, this));
@@ -227,10 +227,10 @@ public class GameSceneVoteHandler implements SceneHandler {
         });
 
         // --- 情報パネル ---
-        infoPanel = PanelSimpleFactory.createSimplePanel(0, 0, true, false);
-        infoZhanPanel = PanelSimpleFactory.createSimplePanel(0, 0, true, false);
-        infoHuPanel = PanelSimpleFactory.createSimplePanel(0, 0, true, false);
-        infoCoPanel = PanelSimpleFactory.createSimplePanel(0, 0, true, false);
+        infoPanel = UIFactory.createSimplePanel(0, 0, true, false);
+        infoZhanPanel = UIFactory.createSimplePanel(0, 0, true, false);
+        infoHuPanel = UIFactory.createSimplePanel(0, 0, true, false);
+        infoCoPanel = UIFactory.createSimplePanel(0, 0, true, false);
 
         askList = new ArrayList<>();
         isCo = new boolean[]{false};
@@ -301,7 +301,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (greyResult.cxList.isEmpty()) votePanel.greyBtn.setVisible(false);
         votePanel.returnBtn.setVisible(true); votePanel.scrollPane1.setVisible(true);
 
-        JTextArea isSelectedVoteTargetText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, "");
+        JTextArea isSelectedVoteTargetText = UIFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, "");
         StringBuilder isSelectedVoteTargetResult = new StringBuilder("-指定内容-\n");
         int playerSum = ui.ctx.getPlayerSum() + 1;
         if (ui.isVote[0]) {
@@ -508,7 +508,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     // ===================================================================
     void stylePiaoTextArea(JTextArea area, String text, int x, int y, int w, int h) {
         area.setText(text);
-        TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, text);
+        UIFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, text);
         area.setForeground(Color.black);
         area.setFont(new Font(GameConstants.FONT_FAMILY, Font.BOLD, GameConstants.FONT_SIZE_VOTE));
         area.setLineWrap(true);
@@ -524,7 +524,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     }
 
     private void createTishi(String str) {
-        JTextArea tishiText = TextareaSimpleFactory.createTranslucentTipTextArea(str);
+        JTextArea tishiText = UIFactory.createTranslucentTipTextArea(str);
         tishiText.setBounds(300, 300, 500, 200);
         this.ui.jPanel.add(tishiText);
         this.ui.jPanel.setComponentZOrder(tishiText, 0);

@@ -127,10 +127,10 @@ class CharacterSelectionPanel {
 
         panel.setBounds(GameConstants.INFO_PANEL_X, GameConstants.INFO_PANEL_Y,
                 200 + vi.boardIcon.getIconWidth(), 50 + vi.boardIcon.getIconHeight());
-        panel.add(LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+        panel.add(UIFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 200 + vi.boardIcon.getIconWidth(), 50 + vi.boardIcon.getIconHeight(), vi.boardIcon));
 
-        JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button, 250, 350,
+        JButton dragBtn = UIFactory.makeButton(ButtonConst.Draggable_Button, 250, 350,
                 ui.resources.getImage(dragAllIconName).getIconWidth() / 2,
                 ui.resources.getImage(dragAllIconName).getIconHeight() / 2,
                 ui.resources.getImage(dragAllIconName));
@@ -184,7 +184,7 @@ class CharacterSelectionPanel {
             String perIconPrefix = (type == SelectionType.DIVINATION) ? "uranai" : "goei";
             for (int r = 0; r < roleNums.size(); r++) {
                 final int cur = r;
-                JButton perBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,
+                JButton perBtn = UIFactory.makeButton(ButtonConst.Draggable_Button,
                         roleOrders.get(r) * (type == SelectionType.DIVINATION ? 100 : 150)
                                 + (type == SelectionType.DIVINATION ? 150 : 250), 350,
                         ui.resources.getImage(perIconPrefix + roleOrders.get(r) + ".png").getIconWidth() / 2,
@@ -220,7 +220,7 @@ class CharacterSelectionPanel {
             }
         }
 
-        JButton delBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,
+        JButton delBtn = UIFactory.makeButton(ButtonConst.Draggable_Button,
                 (type == SelectionType.VOTE) ? 500 : 800, 350,
                 ui.resources.getImage("delete.png").getIconWidth() / 2,
                 ui.resources.getImage("delete.png").getIconHeight() / 2,

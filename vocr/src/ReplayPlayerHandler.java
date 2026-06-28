@@ -70,7 +70,7 @@ public class ReplayPlayerHandler implements SceneHandler {
     }
 
     private void showErrorState(UI ui, String errorMessage) {
-        JTextArea errorText = TextareaSimpleFactory.createBoldTitleTextArea(Color.RED, 22, errorMessage);
+        JTextArea errorText = UIFactory.createBoldTitleTextArea(Color.RED, 22, errorMessage);
         errorText.setBounds(300, 200, 600, 350);
         errorText.setLineWrap(true);
         errorText.setWrapStyleWord(true);
@@ -92,7 +92,7 @@ public class ReplayPlayerHandler implements SceneHandler {
     private JLabel addBackground(UI ui) {
         ImageIcon bgImg = ui.resources.getImage("PVBG.png");
         if (bgImg != null) {
-            JLabel background = LabelSimpleFactory.makeLabel(
+            JLabel background = UIFactory.makeLabel(
                     LabelConst.Simple_Label, 0, 0,
                     GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                     bgImg
@@ -177,7 +177,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             fallbackBtn.setBounds(x, y, w, h);
             return fallbackBtn;
         }
-        return ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);
+        return UIFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);
     }
 
     private JButton addButton(UI ui, String text, int x, int y, int w, int h, ActionListener listener) {
@@ -186,7 +186,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             DebugLogger.warn("[ReplayPlayerHandler] 按钮背景图未找到: avg_button2.png");
             return null;
         }
-        JButton btn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, btnImg);
+        JButton btn = UIFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, btnImg);
         btn.setText(text);
         btn.setHorizontalTextPosition(SwingConstants.CENTER);
         btn.setFont(new Font("Dialog", Font.BOLD, 18));
@@ -326,7 +326,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                     label.setBounds(160 + characterImage.getIconWidth() * playerIndex, 0,
                             characterImage.getIconWidth(), characterImage.getIconHeight());
                     if (characterText != null) {
-                        textLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                        textLabel = UIFactory.makeLabel(LabelConst.Simple_Label,
                                 175 + characterImage.getIconWidth() * playerIndex,
                                 characterImage.getIconHeight() - characterText.getIconHeight() / 2,
                                 characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
@@ -336,7 +336,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                             characterImage.getIconHeight(),
                             characterImage.getIconWidth(), characterImage.getIconHeight());
                     if (characterText != null) {
-                        textLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                        textLabel = UIFactory.makeLabel(LabelConst.Simple_Label,
                                 175 + characterImage.getIconWidth() * (playerIndex - ((playerSum + 1) / 2)),
                                 2 * characterImage.getIconHeight() - characterText.getIconHeight() / 2,
                                 characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
@@ -427,7 +427,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         DebugLogger.info(String.format("[ReplayPlayerHandler] 数据面板: day=%d, alive=%d, dead=%d, rope=%d",
                 day, aliveCount, deathCount, hangCount));
 
-        JTextArea dataText = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 20,
+        JTextArea dataText = UIFactory.createBoldTitleTextArea(Color.WHITE, 20,
                 "    " + day + "日目\n 生存者:" + aliveCount +
                         "\n 死亡者:" + deathCount +
                         "\n 吊り縄:" + hangCount
@@ -441,7 +441,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         if (dataBgImg == null) {
             DebugLogger.warn("[ReplayPlayerHandler] 日历背景图未找到: hiduke.png");
         } else {
-            JLabel dataBg = LabelSimpleFactory.makeLabel(
+            JLabel dataBg = UIFactory.makeLabel(
                     LabelConst.Simple_Label, 880, 10,
                     dataBgImg
             );
@@ -457,7 +457,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
             ImageIcon boardIcon = ui.resources.getImage("frame #19252.png");
             if (boardIcon != null) {
-                JLabel board = LabelSimpleFactory.makeLabel(
+                JLabel board = UIFactory.makeLabel(
                         LabelConst.Simple_Label, 0, 198,
                         boardIcon.getIconWidth(), boardIcon.getIconHeight(),
                         boardIcon
@@ -583,7 +583,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
             DebugLogger.info("[ReplayPlayerHandler] infoArea: resultLen=" + result.length());
 
-            JTextArea infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, result.toString());
+            JTextArea infoText = UIFactory.createBoldTitleTextArea(Color.BLACK, 24, result.toString());
             JScrollPane scrollPane = new JScrollPane(infoText);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -632,7 +632,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             result.append("\n");
         }
 
-        JTextArea roleText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 22, result.toString());
+        JTextArea roleText = UIFactory.createBoldTitleTextArea(Color.BLACK, 22, result.toString());
         JScrollPane scrollPane = new JScrollPane(roleText);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -756,7 +756,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             }
         }
 
-        JTextArea piaoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 20, leftPiao.toString());
+        JTextArea piaoText = UIFactory.createBoldTitleTextArea(Color.BLACK, 20, leftPiao.toString());
         JScrollPane scrollPane = new JScrollPane(piaoText);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -769,7 +769,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         ui.jPanel.add(scrollPane);
         ui.jPanel.setComponentZOrder(scrollPane, 1);
 
-        JTextArea piaoText1 = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 20, rightPiao.toString());
+        JTextArea piaoText1 = UIFactory.createBoldTitleTextArea(Color.BLACK, 20, rightPiao.toString());
         JScrollPane scrollPane1 = new JScrollPane(piaoText1);
         scrollPane1.setBorder(BorderFactory.createEmptyBorder());
         scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -819,7 +819,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
 
     private void renderEmptyInfoPanel(UI ui) {
-        JTextArea infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 20, "\u60c5\u5831\u3042\u308a\u307e\u3059\u3093");
+        JTextArea infoText = UIFactory.createBoldTitleTextArea(Color.BLACK, 20, "\u60c5\u5831\u3042\u308a\u307e\u3059\u3093");
         infoText.setBounds(60, 228, 500, 300);
         infoText.setOpaque(false);
         ui.jPanel.add(infoText);

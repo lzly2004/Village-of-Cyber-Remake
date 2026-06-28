@@ -89,7 +89,7 @@ class PlayerStatusRenderer {
             if (i <= halfCount) {
                 label.setBounds(STATUS_START_X + charWidth * charIndex, 0,
                         charWidth, charHeight);
-                textLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                textLabel = UIFactory.makeLabel(LabelConst.Simple_Label,
                         STATUS_START_X + TEXT_OFFSET_X + charWidth * charIndex,
                         charHeight - textHeight / 2,
                         textWidth / 2, textHeight / 2, characterText);
@@ -97,7 +97,7 @@ class PlayerStatusRenderer {
                 label.setBounds(STATUS_START_X + charWidth * charIndex,
                         charHeight,
                         charWidth, charHeight);
-                textLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
+                textLabel = UIFactory.makeLabel(LabelConst.Simple_Label,
                         STATUS_START_X + TEXT_OFFSET_X + charWidth * charIndex,
                         2 * charHeight - textHeight / 2,
                         textWidth / 2, textHeight / 2, characterText);
