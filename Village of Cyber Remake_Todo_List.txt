@@ -77,12 +77,15 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
        - ✅ 所有上层协调器均通过 GameModule 获取依赖，回调不再逐层传递
        - 注: DielogicCarrier 保持原样（底层服务，存在循环依赖）
 
-[P1-5] 修复分层泄漏
+[P1-5] 修复分层泄漏（部分完成）
        来源: #31 #65 #67 #73
        - GreyListCalculator 接受 UI 而非 GameContextView
        - PlayerStatusRenderer 依赖 Handler 获取图标名
        - Fabricator 是薄委托层可消除
-       - jFrame 和 GameRecorder.active 不应 public
+       - ✅ jFrame 和 GameRecorder.active 不应 public
+         - UI.jFrame → private + getJFrame()
+         - GameRecorder.active → private + isActive()/setActive()
+         - 替换19处 ui.jFrame 引用 + 1处 recorder.active 引用
 
 [P1-6] ResultPresenter 职责拆分
        来源: #37

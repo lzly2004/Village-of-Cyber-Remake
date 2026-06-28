@@ -56,7 +56,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         ui.jPanel.add(voteInfo.scrollPane);
         ui.jPanel.add(voteInfo.board);
         ui.jPanel.add(background);
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
         ui.resizeComponents();
     }
 

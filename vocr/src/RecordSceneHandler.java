@@ -34,7 +34,7 @@ public class RecordSceneHandler implements SceneHandler {
             ui.resizeComponents();
             ui.jPanel.revalidate();
             ui.jPanel.repaint();
-            ui.jFrame.setVisible(true);
+            ui.getJFrame().setVisible(true);
         }
     }
 
@@ -112,7 +112,7 @@ public class RecordSceneHandler implements SceneHandler {
         ui.resizeComponents();
         ui.jPanel.revalidate();
         ui.jPanel.repaint();
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
     }
 
     private void addImageLabel(UI ui, String imageName, int x, int y, int w, int h) {

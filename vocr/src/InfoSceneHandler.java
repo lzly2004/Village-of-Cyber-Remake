@@ -45,7 +45,7 @@ public class InfoSceneHandler implements SceneHandler {
         ui.jPanel.add(btnMenu);
         ui.jPanel.add(backgroundLabel_2);
         ui.jPanel.add(backgroundLabel);
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
         ui.resizeComponents();
     }
 
@@ -74,7 +74,7 @@ public class InfoSceneHandler implements SceneHandler {
         ib.ui.jPanel.add(ib.back);
         ib.ui.jPanel.add(ib.bg2);
         ib.ui.jPanel.add(ib.bg);
-        ib.ui.jFrame.setVisible(true);
+        ib.ui.getJFrame().setVisible(true);
         ib.ui.resizeComponents();
     }
 

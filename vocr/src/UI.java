@@ -123,7 +123,7 @@ public class UI implements UIInterface
     int replayDay = 1; // Replay播放器当前查看日目
     ReplaySave currentReplaySave = null; // 当前正在查看的存档
 
-    JFrame jFrame;//窗口
+    private JFrame jFrame;//窗口
     JPanel jPanel;//容器
     JPanel diaPanel;//对话容器
 
@@ -138,6 +138,9 @@ public class UI implements UIInterface
 
     /** 获取玩家职业图标文本（便捷转发） */
     public String getJobText(int player) { return uiComponentFactory.getJobText(ctx.getCharacterNumber(player)); }
+
+    /** 获取主窗口 */
+    public JFrame getJFrame() { return jFrame; }
 
     private DialogueBox dialogueBox;//对话框封装逻辑
     private Map<Scene, SceneHandler> sceneHandlers = new HashMap<>();//场景处理器注册表

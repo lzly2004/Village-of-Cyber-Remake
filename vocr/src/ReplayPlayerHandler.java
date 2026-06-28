@@ -108,7 +108,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         ui.resizeComponents();
         ui.jPanel.revalidate();
         ui.jPanel.repaint();
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
     }
 
     private String getStatusIcon(int deathReason, int actualRole) {
@@ -1154,7 +1154,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                     int nextBtnH = btnH / 2;
                     JButton nextVoteBtn = createButton(ui, "PVRirekiNext.png", nextBtnX, nextBtnY, nextBtnW, nextBtnH);
                     DebugLogger.info("[ReplayPlayerHandler] [BTN-CREATE] nextVoteBtn=" + (nextVoteBtn != null ? "非null" : "NULL") + ", pos=(" + nextBtnX + "," + nextBtnY + "," + nextBtnW + "," + nextBtnH + ")");
-                    DebugLogger.info("[ReplayPlayerHandler] [BTN-CREATE] screenSize=" + ui.jFrame.getWidth() + "x" + ui.jFrame.getHeight());
+                    DebugLogger.info("[ReplayPlayerHandler] [BTN-CREATE] screenSize=" + ui.getJFrame().getWidth() + "x" + ui.getJFrame().getHeight());
                     if (nextVoteBtn != null) {
                         nextVoteBtn.addActionListener(e -> showVoteNextRound(ui));
                         ui.jPanel.add(nextVoteBtn);

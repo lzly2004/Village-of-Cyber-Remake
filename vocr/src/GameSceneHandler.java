@@ -61,7 +61,7 @@ public class GameSceneHandler implements SceneHandler {
                 GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("title_base_resized.png"));
         ui.jPanel.add(background);
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
         ui.resizeComponents();
     }
 
@@ -82,7 +82,7 @@ public class GameSceneHandler implements SceneHandler {
                 ui.resources.getImage("komorebi000night01.png"));
         ui.jPanel.add(label);
         ui.resizeComponents();
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
         ui.resources.playBgm("");
         ui.resources.playSound("入夜音效.wav");
         Timer timer = new Timer(GameConstants.NIGHT_SCREEN_DURATION_MS, new ActionListener() {
@@ -139,6 +139,6 @@ public class GameSceneHandler implements SceneHandler {
         ui.jPanel.add(dc.dialogPanel);
         ui.jPanel.add(dc.background);
         ui.resizeComponents();
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
     }
 }

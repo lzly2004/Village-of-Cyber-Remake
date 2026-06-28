@@ -140,6 +140,6 @@ public class StartSceneHandler implements SceneHandler {
         ui.resizeComponents();
         ui.jPanel.revalidate();
         ui.jPanel.repaint();
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
     }
 }

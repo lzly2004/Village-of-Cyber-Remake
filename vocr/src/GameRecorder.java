@@ -25,7 +25,7 @@ public class GameRecorder
 {
     private final String runLabel;           // 本次运行的标签
     private final List<String> records;      // 结构化记录
-    public boolean active = false;          // 是否正在录制
+    private boolean active = false;          // 是否正在录制
     private peiyi gamePeiyi = null;
     private long gameSeed = 0;
     private int playerCount = 0;
@@ -356,5 +356,6 @@ public class GameRecorder
 
     public List<String> getRecords() { return new ArrayList<>(records); }
     public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
     public String getRunLabel() { return runLabel; }
 }

@@ -104,7 +104,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         ui.resizeComponents();
         ui.jPanel.revalidate();
         ui.jPanel.repaint();
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
     }
 
     private void renderSlot(UI ui, ReplayManager manager, int slotIndex,
@@ -201,7 +201,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         
         if (mainLogic == null || mainLogic.getRecorder() == null || 
             mainLogic.getRecorder().getRecords().isEmpty()) {
-            JOptionPane.showMessageDialog(ui.jFrame, 
+            JOptionPane.showMessageDialog(ui.getJFrame(), 
                 "没有可保存的对局数据。\n请先完成一局游戏后再保存。",
                 "无法保存",
                 JOptionPane.INFORMATION_MESSAGE
@@ -211,7 +211,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         
         GameRecorder recorder = mainLogic.getRecorder();
         if (recorder.getRecords().isEmpty()) {
-            JOptionPane.showMessageDialog(ui.jFrame,
+            JOptionPane.showMessageDialog(ui.getJFrame(),
                 "当前对局数据为空，无法保存。",
                 "无法保存",
                 JOptionPane.WARNING_MESSAGE
@@ -219,7 +219,7 @@ public class ReplayBrowserHandler implements SceneHandler {
             return;
         }
         
-        int choice = JOptionPane.showConfirmDialog(ui.jFrame,
+        int choice = JOptionPane.showConfirmDialog(ui.getJFrame(),
             "是否将对局数据保存到槽位 " + slotIndex + "？",
             "保存确认",
             JOptionPane.YES_NO_OPTION
@@ -229,7 +229,7 @@ public class ReplayBrowserHandler implements SceneHandler {
             ReplaySave save = ReplaySave.fromRecorder(slotIndex, recorder);
             ui.replayManager.saveToSlot(slotIndex, save);
             recorder.endGame(recorder.isActive() ? 0 : 0, 0);
-            recorder.active = false;
+            recorder.setActive(false);
             ui.resources.playSound("click.wav");
             ui.run();
             DebugLogger.info("[ReplayBrowserHandler] 已保存到槽位: " + slotIndex);
@@ -246,7 +246,7 @@ public class ReplayBrowserHandler implements SceneHandler {
                 !mainLogic.getRecorder().getRecords().isEmpty());
 
         if (!hasNewData) {
-            JOptionPane.showMessageDialog(ui.jFrame,
+            JOptionPane.showMessageDialog(ui.getJFrame(),
                     "没有新的对局数据可供覆盖保存。",
                     "提示",
                     JOptionPane.INFORMATION_MESSAGE
@@ -256,11 +256,11 @@ public class ReplayBrowserHandler implements SceneHandler {
 
         final GameRecorder finalRecorder = mainLogic.getRecorder();
 
-        JDialog dialog = new JDialog(ui.jFrame, true);
+        JDialog dialog = new JDialog(ui.getJFrame(), true);
         dialog.setUndecorated(true);
         dialog.setLayout(null);
         dialog.setSize(500, 220);
-        dialog.setLocationRelativeTo(ui.jFrame);
+        dialog.setLocationRelativeTo(ui.getJFrame());
 
         JPanel overlay = new JPanel() {
             @Override

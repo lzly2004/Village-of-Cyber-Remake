@@ -131,6 +131,6 @@ public class EndAnimeHandler implements SceneHandler {
         ui.jPanel.add(infoLabel);
         ui.jPanel.add(background);
         ui.resizeComponents();
-        ui.jFrame.setVisible(true);
+        ui.getJFrame().setVisible(true);
     }
 }
