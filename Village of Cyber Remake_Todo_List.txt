@@ -82,8 +82,12 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
        - ✅ GreyListCalculator 接受 UI 而非 GameContextView → 已修复
          - compute(UI ui) → compute(GameContextView ctx)
          - ui.getJobText(i) → CharacterKanjiName.values()[ctx.getCharacterNumber(i)].getShortName()
-       - PlayerStatusRenderer 依赖 Handler 获取图标名
-       - Fabricator 是薄委托层可消除
+       - ✅ PlayerStatusRenderer 依赖 Handler 获取图标名 → 已修复
+         - 创建 UIComponentFactory.getClaimedRoleIconName() 方法
+         - 创建 UIComponentFactory.getCharImageName() 方法
+         - PlayerStatusRenderer.render(UI, handler) → PlayerStatusRenderer.render(UI)
+         - CoSelectionPanel 使用 ui.uiComponentFactory 替代 handler 调用
+       - Fabricator 是薄委托层可消除（保留，因包含选择逻辑）
        - ✅ jFrame 和 GameRecorder.active 不应 public
          - UI.jFrame → private + getJFrame()
          - GameRecorder.active → private + isActive()/setActive()

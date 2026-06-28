@@ -101,7 +101,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     // 阶段1提取：玩家状态渲染
     // ===================================================================
     private void renderPlayerStatuses() {
-        PlayerStatusRenderer.render(ui, this);
+        PlayerStatusRenderer.render(ui);
     }
 
     // ===================================================================

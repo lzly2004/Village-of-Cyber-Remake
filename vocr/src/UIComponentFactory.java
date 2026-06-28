@@ -100,4 +100,21 @@ public class UIComponentFactory
         String katakanaName = CharacterKatakanaName.values()[idx].name();
         return String.format("%s %s/%s", kanjiName, katakanaName, englishName.name());
     }
+
+    public String getClaimedRoleIconName(int claimedRole, int claimedRoleOrder) {
+        StringBuilder sb = new StringBuilder("yaku");
+        if (claimedRole <= 3) sb.append(claimedRole).append("_").append(claimedRoleOrder);
+        else sb.append(claimedRole);
+        sb.append(".png");
+        return sb.toString();
+    }
+
+    public String getCharImageName(int characterNumber, boolean isAlive) {
+        StringBuilder sb = new StringBuilder();
+        if (characterNumber <= 9) sb.append("0");
+        sb.append(characterNumber);
+        if (!isAlive) sb.append("g");
+        sb.append("s.png");
+        return sb.toString();
+    }
 }

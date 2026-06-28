@@ -12,7 +12,7 @@ class PlayerStatusRenderer {
     private static final int TEXT_OFFSET_X = 15;
     private static final int ROW_Y_OFFSET = 98;
 
-    static void render(UI ui, GameSceneVoteHandler handler) {
+    static void render(UI ui) {
         int playerSum = ui.ctx.getPlayerSum();
         int halfCount = (playerSum + 1) / 2;
         for (int i = 1; i <= playerSum; i++) {
@@ -29,7 +29,8 @@ class PlayerStatusRenderer {
             }
             imageName.append("s.png");
             String textName = ui.ctx.getCharacterNumber(i) + "job.png";
-            String claimedRoleIconName = handler.claimedRoleIconName(i);
+            String claimedRoleIconName = ui.uiComponentFactory.getClaimedRoleIconName(
+                    ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i));
             StringBuilder skillTargetName = new StringBuilder("result");
             if (ui.ctx.getClaimedRole(i) > 0 && ui.ctx.getClaimedRole(i) < 6) {
                 if (ui.ctx.getClaimedRole(i) <= 3) {

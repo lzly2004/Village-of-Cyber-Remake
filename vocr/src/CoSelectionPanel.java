@@ -36,9 +36,11 @@ class CoSelectionPanel {
         List<JLabel> resultLabels = new ArrayList<>();
         List<JLabel> zbLabels = new ArrayList<>();
         for (int i = 1; i <= ui.ctx.getPlayerSum(); i++) {
-            ImageIcon characterImage = ui.resources.getImage(handler.charImageName(i));
+            ImageIcon characterImage = ui.resources.getImage(ui.uiComponentFactory.getCharImageName(
+                    ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i)));
             if (ui.ctx.getClaimedRole(i) > 0 && ui.ctx.getClaimedRole(i) < 6) {
-                ImageIcon claimedRoleIcon = ui.resources.getImage(handler.claimedRoleIconName(i));
+                ImageIcon claimedRoleIcon = ui.resources.getImage(ui.uiComponentFactory.getClaimedRoleIconName(
+                        ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i)));
                 JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
                 if (i <= (ui.ctx.getPlayerSum() + 1) / 2)
                     claimedRoleLabel.setBounds(60 + 74 * i, 20, claimedRoleIcon.getIconWidth(), claimedRoleIcon.getIconHeight());
