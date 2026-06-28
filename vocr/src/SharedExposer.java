@@ -34,9 +34,9 @@ public class SharedExposer
                 ctx.addLazySuspicionValue(ctx.gyindex[2], -GameConstants.INF);
                 return;
             }
-            if (GameLogicUtils.probabilityJudge(50))
+            if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
             {
-                if (GameLogicUtils.probabilityJudge(50))
+                if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
                 {
                     ctx.eventarray.add(new Event(EventName.gyfo1,
                             ctx.getCharacterName(ctx.gyindex[1]),
@@ -64,7 +64,7 @@ public class SharedExposer
             else
             {
                 ctx.exposureProgress = ConstNum.randomInt(1, 90);
-                if (GameLogicUtils.probabilityJudge(50))
+                if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
                 {
                     ctx.eventarray.add(new Event(EventName.gyho2,
                             ctx.getCharacterName(ctx.gyindex[1])));

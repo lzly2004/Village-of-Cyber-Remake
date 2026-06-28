@@ -47,14 +47,14 @@ public class Fabricator
         int gd = ctx.getGameDay();
         DebugLogger.log("进入假猎人撒谎环节，假猎人下标：" + num);
         int[] target = new int[2];
-        ArrayList<Integer> weight = new ArrayList<>(List.of(50, 50));
+        ArrayList<Integer> weight = new ArrayList<>(List.of(GameConstants.WEIGHT_FAKE_HUNTER_WHITE, GameConstants.WEIGHT_FAKE_HUNTER_BLACK));
         for (int i = 0; i < 2; i++)
         {
             target[i] = hunterGuarder.guard(num);
             if (ctx.getActualRole(num) == 7 || ctx.getActualRole(num) == 9)
             {
                 if (ctx.getActualRole(target[i]) == 7) break;
-                if (GameLogicUtils.probabilityJudge(10))
+                if (GameLogicUtils.probabilityJudge(GameConstants.PROB_FAKE_HUNTER_REROLL))
                 {
                     target[i] = hunterGuarder.guard(num);
                     continue;

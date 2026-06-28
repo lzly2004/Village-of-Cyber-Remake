@@ -163,4 +163,14 @@ public final class GameConstants
     public static final int SUSPICION_INCREASE_CONFLICT = 5;
     /** 接黒回复时怀疑度增加 */
     public static final int SUSPICION_INCREASE_BLACK_RESPONSE = 10;
+
+    // ==================== AI 概率参数 ====================
+    /** 假猎重选概率 (%) */
+    public static final int PROB_FAKE_HUNTER_REROLL = 10;
+    /** 假猎白球权重 */
+    public static final int WEIGHT_FAKE_HUNTER_WHITE = 50;
+    /** 假猎黑球权重 */
+    public static final int WEIGHT_FAKE_HUNTER_BLACK = 50;
+    /** 共有暴露决策概率 (%) */
+    public static final int PROB_SHARED_EXPOSURE_DECISION = 50;
 }
