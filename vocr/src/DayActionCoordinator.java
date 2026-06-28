@@ -26,8 +26,23 @@ public class DayActionCoordinator
 
     public void coordinate(ArrayList<Integer> diebody)
     {
+        logDayStart();
+
+        presentDivinationResults(diebody);
+
+        handleLatentSeerMediumCO(diebody);
+
+        handleCatHunterCO(diebody);
+
+        gylogic.run();
+        deliverEvents.run();
+    }
+
+    // ==================== 子方法 ====================
+
+    private void logDayStart()
+    {
         int n = ctx.getPlayerSum();
-        int gd = ctx.getGameDay();
         DebugLogger.log("现在是白天。当前存活人数" + ctx.getAliveCounter() + ",存活名单：\n");
         String alivemans = "";
         for (int i = 1; i <= n; i++)
@@ -35,7 +50,10 @@ public class DayActionCoordinator
                 alivemans += CharacterKanjiName.values()[ctx.getCharacterNumber(i)];
         DebugLogger.log(alivemans);
         DebugLogger.log("\n");
-        // 1,占灵发球逻辑
+    }
+
+    private void presentDivinationResults(ArrayList<Integer> diebody)
+    {
         for(int i=0;i<ctx.zhans.size();i++)
         {
             resultPresenter.presentZhan(ctx.zhans.get(i), diebody);
@@ -44,7 +62,12 @@ public class DayActionCoordinator
         {
             resultPresenter.presentLing(ctx.lings.get(i));
         }
-        // 2,潜伏占灵co逻辑
+    }
+
+    private void handleLatentSeerMediumCO(ArrayList<Integer> diebody)
+    {
+        int n = ctx.getPlayerSum();
+        int gd = ctx.getGameDay();
         if(gd == 3)
             for(int i=1;i<=n;i++)
             {
@@ -63,16 +86,29 @@ public class DayActionCoordinator
                 if(ctx.claimedRoleaskday[2] == 0)
                     ctx.claimedRoleaskday[2] = 3;
             }
-        // 3,非人co猫猎逻辑,真猫猎co逻辑
-        // 4共有全灭co猫
+    }
+
+    private void handleCatHunterCO(ArrayList<Integer> diebody)
+    {
         if(ctx.getPeiyi() != peiyi.jianyi && ctx.gyindex[1] > 0 && ctx.isDead(ctx.gyindex[1]) && ctx.isDead(ctx.gyindex[2]))
             coManager.askCoByRole(Role.mao);
-        // 5猫村双死co猫
+
         if(diebody.size() == 2)
             coManager.askCoByRole(Role.mao);
-        // 1接黒
+
         ArrayList<IntPair> response = new ArrayList<>();
+        boolean havecatco = handleBlackResponses(response);
+
+        if(havecatco)
+            coManager.askCoByRole(Role.mao);
+    }
+
+    private boolean handleBlackResponses(ArrayList<IntPair> response)
+    {
+        int n = ctx.getPlayerSum();
+        int gd = ctx.getGameDay();
         boolean havecatco = false;
+
         if(ctx.claimedRoleaskday[3] == 0 || (ctx.getCat() != 0 && ctx.claimedRoleaskday[5] == 0))
         {
             for(int i=0;i<ctx.zhans.size();i++)
@@ -132,10 +168,6 @@ public class DayActionCoordinator
                 }
             }
         }
-        if(havecatco)
-            coManager.askCoByRole(Role.mao);
-        // 4,共有者相关逻辑
-        gylogic.run();
-        deliverEvents.run();
+        return havecatco;
     }
 }
