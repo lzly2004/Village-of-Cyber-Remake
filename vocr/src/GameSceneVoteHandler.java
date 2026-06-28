@@ -246,9 +246,9 @@ public class GameSceneVoteHandler implements SceneHandler {
             ui.resources.playSound("click.wav");
             boolean[] isReVote = {false};
             if (ui.ctx.getEndResult() == 0) {
-                VoteResultRenderer.renderPiao(ui, String.format(GameStrings.VOTE_TITLE_REDO, ui.ctx.getGameDay() - 1), round[0], isReVote, this);
+                VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay() - 1), round[0], isReVote, this);
             } else {
-                VoteResultRenderer.renderPiao(ui, String.format(GameStrings.VOTE_TITLE_REDO, ui.ctx.getGameDay()), round[0], isReVote, this);
+                VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay()), round[0], isReVote, this);
             }
             if (isReVote[0]) { votePanel.againBtn.setVisible(true); votePanel.nextBtn.setVisible(false); if (round[0] < 3) round[0]++; }
             else { votePanel.nextBtn.setVisible(true); votePanel.againBtn.setVisible(false); }
@@ -456,9 +456,9 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (ui.mainLogic.shokei(0, chuxingList, ui.isAvoid)) {
             ui.voteMethods.add(0); chuxingList.clear();
             if (ui.ctx.getEndResult() == 0) {
-                VoteResultRenderer.renderPiao(ui, String.format(GameStrings.VOTE_TITLE_FREE, ui.ctx.getGameDay() - 1), round[0], isReVote, this);
+                VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay() - 1), round[0], isReVote, this);
             } else {
-                VoteResultRenderer.renderPiao(ui, String.format(GameStrings.VOTE_TITLE_FREE, ui.ctx.getGameDay()), round[0], isReVote, this);
+                VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay()), round[0], isReVote, this);
             }
             if (isReVote[0]) { votePanel.againBtn.setVisible(true); votePanel.nextBtn.setVisible(false); round[0]++; }
             else { votePanel.nextBtn.setVisible(true); votePanel.againBtn.setVisible(false); }
@@ -491,7 +491,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             for (int i = 0; i < chuxingList.size(); ++i)
                 isSelectedVoteTargetText.append(ui.getJobText(chuxingList.get(i))).append(",");
             DebugLogger.log(isSelectedVoteTargetText);
-            VoteResultRenderer.renderPiao(ui, String.format(GameStrings.VOTE_TITLE_DESIGN, trueDay, isSelectedVoteTargetText.toString()), round[0], isReVote, this);
+            VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleDesign(trueDay, isSelectedVoteTargetText.toString()), round[0], isReVote, this);
             chuxingList.clear();
             if (isReVote[0]) { votePanel.againBtn.setVisible(true); votePanel.nextBtn.setVisible(false); round[0]++; }
             else { votePanel.nextBtn.setVisible(true); votePanel.againBtn.setVisible(false); }

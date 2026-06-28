@@ -95,7 +95,7 @@ class VoteResultRenderer {
                 }
                 break;
         }
-        StringBuilder leftPiao = new StringBuilder(String.format(GameStrings.VOTE_HISTORY_TITLE, gameDay, round, extraText.toString()));
+        StringBuilder leftPiao = new StringBuilder(GameStrings.getVoteHistoryTitle(gameDay, round, extraText.toString()));
         StringBuilder rightPiao = new StringBuilder("\n\n");
         int leftCnt = 0;
         for (int i = 1; i < playerSum; ++i) {

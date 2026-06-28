@@ -20,13 +20,13 @@ public class EndAnimeHandler implements SceneHandler {
                     .append(GameStrings.ACTUAL_ROLE_PREFIX).append(ui.uiComponentFactory.getZY(ui.ctx.getActualRole(i))).append("\n");
             if (!ui.ctx.isAlive(i)) {
                 switch (ui.ctx.getDeathReason(i)) {
-                    case beiyao:    infoText.append(String.format(GameStrings.DEATH_BITE_FORMAT, ui.ctx.getDeathDay(i))); break;
-                    case chuxing:   infoText.append(String.format(GameStrings.DEATH_EXECUTE_FORMAT, ui.ctx.getDeathDay(i))); break;
-                    case zhousha:   infoText.append(String.format(GameStrings.DEATH_CURSE_FORMAT, ui.ctx.getDeathDay(i))); break;
+                    case beiyao:    infoText.append(GameStrings.getDeathBite(ui.ctx.getDeathDay(i))); break;
+                    case chuxing:   infoText.append(GameStrings.getDeathExecute(ui.ctx.getDeathDay(i))); break;
+                    case zhousha:   infoText.append(GameStrings.getDeathCurse(ui.ctx.getDeathDay(i))); break;
                     case dayhouzhui:
-                    case nighthouzhui: infoText.append(String.format(GameStrings.DEATH_FOLLOW_FORMAT, ui.ctx.getDeathDay(i))); break;
+                    case nighthouzhui: infoText.append(GameStrings.getDeathFollow(ui.ctx.getDeathDay(i))); break;
                     case daymaozhou:
-                    case nightmaozhou: infoText.append(String.format(GameStrings.DEATH_CAT_FORMAT, ui.ctx.getDeathDay(i))); break;
+                    case nightmaozhou: infoText.append(GameStrings.getDeathCat(ui.ctx.getDeathDay(i))); break;
                     default: break;
                 }
             } else {

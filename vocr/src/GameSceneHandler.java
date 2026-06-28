@@ -118,7 +118,7 @@ public class GameSceneHandler implements SceneHandler {
         ui.jPanel.removeAll();
         DialogueBox.Components dc = DialogueBox.create(ui.resources, "komorebi002.png");
         ui.jPanel.add(dc.dialogPanel);
-        String dayText = String.format(GameStrings.DAY_START_FORMAT, ui.ctx.getGameDay());
+        String dayText = GameStrings.getDayStart(ui.ctx.getGameDay());
         dc.dialogPanel.setVisible(false);
         Timer typeTimer = UIHelpers.bindTypewriter(dc.dialogText, dayText, dc.nextBtn, () -> {
             ui.currentScene = UI.Scene.DIALOGUE_DEATH;

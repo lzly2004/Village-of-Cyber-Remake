@@ -708,7 +708,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             }
         }
 
-        String title = String.format(GameStrings.VOTE_HISTORY_TITLE, day, vr.round, extraText.toString());
+        String title = GameStrings.getVoteHistoryTitle(day, vr.round, extraText.toString());
         DebugLogger.info("[ReplayPlayerHandler] [VOTE-TITLE] day=" + day + ", displayRound=" + vr.round + ", dataRound=" + vr.round + ", totalRounds=" + snapshot.voteRounds.size());
         leftPiao.append(title);
 

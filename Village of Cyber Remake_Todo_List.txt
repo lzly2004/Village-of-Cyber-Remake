@@ -244,9 +244,10 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
        - 160 + 64*i 硬编码像素偏移 → 根据 playerSum 动态计算
        - GameCharacter 数组改为按配役人数动态分配
 
-[P2-5] GameStrings 添加格式化方法
+[P2-5] ✅ GameStrings 添加格式化方法
        来源: #61
-       - String.format(...) 收敛为 GameStrings.getDayStart(int day) 等语义化方法
+       - ✅ 新增10个语义化格式化方法：getDayStart/getDeathBite/getDeathExecute/getDeathCurse/getDeathFollow/getDeathCat/getVoteTitleFree/getVoteTitleGrey/getVoteTitleRedo/getVoteTitleDesign/getVoteHistoryTitle
+       - ✅ 替换6个文件中的String.format调用：EndAnimeHandler、GameSceneHandler、GameSceneVoteHandler、VoteResultRenderer、ReplayPlayerHandler
 
 [P2-6] ✅ 修复 GameRecord.winrate 浮点精度
        来源: #63

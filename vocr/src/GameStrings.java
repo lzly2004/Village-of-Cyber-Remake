@@ -134,4 +134,17 @@ public final class GameStrings
     // ==================== 投票记录格式 ====================
     /** %s：%d票  投票先→%s\n */
     public static final String VOTE_LINE_FORMAT    = "%s：%d票  投票先→%s\n";
+
+    // ==================== 格式化方法 ====================
+    public static String getDayStart(int day) { return String.format(DAY_START_FORMAT, day); }
+    public static String getDeathBite(int day) { return String.format(DEATH_BITE_FORMAT, day); }
+    public static String getDeathExecute(int day) { return String.format(DEATH_EXECUTE_FORMAT, day); }
+    public static String getDeathCurse(int day) { return String.format(DEATH_CURSE_FORMAT, day); }
+    public static String getDeathFollow(int day) { return String.format(DEATH_FOLLOW_FORMAT, day); }
+    public static String getDeathCat(int day) { return String.format(DEATH_CAT_FORMAT, day); }
+    public static String getVoteTitleFree(int day) { return String.format(VOTE_TITLE_FREE, day); }
+    public static String getVoteTitleGrey(int day) { return String.format(VOTE_TITLE_GREY, day); }
+    public static String getVoteTitleRedo(int day) { return String.format(VOTE_TITLE_REDO, day); }
+    public static String getVoteTitleDesign(int day, String targetText) { return String.format(VOTE_TITLE_DESIGN, day, targetText); }
+    public static String getVoteHistoryTitle(int day, int round, String extra) { return String.format(VOTE_HISTORY_TITLE, day, round, extra); }
 }
