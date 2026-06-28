@@ -96,8 +96,8 @@ public class LingFabricator
             }
             if (option.size() > 0)
             {
-                int p = 90;
-                if (ctx.getActualRole(num) == 9) p = 95;
+                int p = GameConstants.PROB_LING_WOLF_FACTION_DEFAULT;
+                if (ctx.getActualRole(num) == 9) p = GameConstants.PROB_LING_FANATIC_SPECIAL;
                 processLingOption(option, num, p);
                 return;
             }
@@ -116,14 +116,14 @@ public class LingFabricator
             }
             if (option.size() > 0)
             {
-                int p = 90;
+                int p = GameConstants.PROB_LING_TRUSTED_SEER_MADMAN;
                 switch (ctx.getActualRole(num))
                 {
-                    case 7: p = 95; break;
-                    case 8: p = 90; break;
-                    case 9: p = 99; break;
-                    case 10: p = 95; break;
-                    case 11: p = 80; break;
+                    case 7: p = GameConstants.PROB_LING_TRUSTED_SEER_WOLF; break;
+                    case 8: p = GameConstants.PROB_LING_TRUSTED_SEER_MADMAN; break;
+                    case 9: p = GameConstants.PROB_LING_TRUSTED_SEER_FANATIC; break;
+                    case 10: p = GameConstants.PROB_LING_TRUSTED_SEER_FOX; break;
+                    case 11: p = GameConstants.PROB_LING_TRUSTED_SEER_DEVIANT; break;
                 }
                 processLingOption(option, num, p);
                 return;
@@ -141,14 +141,14 @@ public class LingFabricator
             }
             if (option.size() > 0)
             {
-                int p = 90;
+                int p = GameConstants.PROB_LING_SUSPICIOUS_SEER_MADMAN;
                 switch (ctx.getActualRole(num))
                 {
-                    case 7: p = 85; break;
-                    case 8: p = 90; break;
-                    case 9: p = 95; break;
-                    case 10: p = 90; break;
-                    case 11: p = 80; break;
+                    case 7: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_WOLF; break;
+                    case 8: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_MADMAN; break;
+                    case 9: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_FANATIC; break;
+                    case 10: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_FOX; break;
+                    case 11: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_DEVIANT; break;
                 }
                 processLingOption(option, num, p);
                 return;

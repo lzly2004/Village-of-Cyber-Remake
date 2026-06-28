@@ -173,4 +173,32 @@ public final class GameConstants
     public static final int WEIGHT_FAKE_HUNTER_BLACK = 50;
     /** 共有暴露决策概率 (%) */
     public static final int PROB_SHARED_EXPOSURE_DECISION = 50;
+
+    // ==================== 灵能捏造概率常量 ====================
+    /** 狼/狂信灵能捏造-狼阵营默认一致概率 (%) */
+    public static final int PROB_LING_WOLF_FACTION_DEFAULT = 90;
+    /** 狼/狂信灵能捏造-狂信者一致概率 (%) */
+    public static final int PROB_LING_FANATIC_SPECIAL = 95;
+
+    /** 信赖占卜师结果一致概率-人狼 (%) */
+    public static final int PROB_LING_TRUSTED_SEER_WOLF = 95;
+    /** 信赖占卜师结果一致概率-狂人 (%) */
+    public static final int PROB_LING_TRUSTED_SEER_MADMAN = 90;
+    /** 信赖占卜师结果一致概率-狂信者 (%) */
+    public static final int PROB_LING_TRUSTED_SEER_FANATIC = 99;
+    /** 信赖占卜师结果一致概率-妖狐 (%) */
+    public static final int PROB_LING_TRUSTED_SEER_FOX = 95;
+    /** 信赖占卜师结果一致概率-背德者 (%) */
+    public static final int PROB_LING_TRUSTED_SEER_DEVIANT = 80;
+
+    /** 怀疑占卜师结果一致概率-人狼 (%) */
+    public static final int PROB_LING_SUSPICIOUS_SEER_WOLF = 85;
+    /** 怀疑占卜师结果一致概率-狂人 (%) */
+    public static final int PROB_LING_SUSPICIOUS_SEER_MADMAN = 90;
+    /** 怀疑占卜师结果一致概率-狂信者 (%) */
+    public static final int PROB_LING_SUSPICIOUS_SEER_FANATIC = 95;
+    /** 怀疑占卜师结果一致概率-妖狐 (%) */
+    public static final int PROB_LING_SUSPICIOUS_SEER_FOX = 90;
+    /** 怀疑占卜师结果一致概率-背德者 (%) */
+    public static final int PROB_LING_SUSPICIOUS_SEER_DEVIANT = 80;
 }
