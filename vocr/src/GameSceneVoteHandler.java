@@ -125,7 +125,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     // ===================================================================
     private void computeGreyList()
     {
-        greyResult = GreyListCalculator.compute(ui);
+        greyResult = GreyListCalculator.compute(ui.ctx);
     }
 
     // ===================================================================

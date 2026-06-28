@@ -79,7 +79,9 @@ P1 — 中优先级 | 架构 / 可维护性 / 代码质量（21 项）
 
 [P1-5] 修复分层泄漏（部分完成）
        来源: #31 #65 #67 #73
-       - GreyListCalculator 接受 UI 而非 GameContextView
+       - ✅ GreyListCalculator 接受 UI 而非 GameContextView → 已修复
+         - compute(UI ui) → compute(GameContextView ctx)
+         - ui.getJobText(i) → CharacterKanjiName.values()[ctx.getCharacterNumber(i)].getShortName()
        - PlayerStatusRenderer 依赖 Handler 获取图标名
        - Fabricator 是薄委托层可消除
        - ✅ jFrame 和 GameRecorder.active 不应 public

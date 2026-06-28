@@ -3,7 +3,7 @@ import java.util.List;
 
 /**
  * 灰名单计算器 —— 从 GameSceneVoteHandler 提取的纯逻辑。
- * 无UI组件依赖，可直接单元测试。
+ * 无UI组件依赖，接受 GameContextView 接口，可直接单元测试。
  */
 class GreyListCalculator {
 
@@ -17,8 +17,7 @@ class GreyListCalculator {
         }
     }
 
-    static Result compute(UI ui) {
-        GameContextView ctx = ui.ctx;
+    static Result compute(GameContextView ctx) {
         int playerSum = ctx.getPlayerSum();
         List<Integer> cxList = new ArrayList<>();
         List<Integer> beiZhan1 = new ArrayList<>();
@@ -33,15 +32,16 @@ class GreyListCalculator {
             }
         }
         for (int i = 1; i <= playerSum; ++i) {
-                DebugLogger.log("已进入灰循环" + ui.getJobText(i)
+                String charName = CharacterKanjiName.values()[ctx.getCharacterNumber(i)].getShortName();
+                DebugLogger.log("已进入灰循环" + charName
                         + " " + ctx.getDeathReason(i) + " " + ctx.getClaimedRole(i));
             if (ctx.getDeathReason(i) == whyDie.NONE
                     && (ctx.getClaimedRole(i) == 0 || ctx.getClaimedRole(i) == 6)) {
                 if (beiZhan1.contains(i)) {
-                        DebugLogger.log(ui.getJobText(i) + "被占卜过了，不是灰");
+                        DebugLogger.log(charName + "被占卜过了，不是灰");
                     continue;
                 }
-                DebugLogger.log(ui.getJobText(i) + "是灰");
+                DebugLogger.log(charName + "是灰");
                 cxList.add(i);
             }
         }
