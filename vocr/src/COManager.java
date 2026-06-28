@@ -338,7 +338,7 @@ public class COManager
             response.remove(1);
         for (int i = 0; i < response.size(); i++)
         {
-            processActualCo(response.get(i).first, response.get(i).second, ctx.diebody);
+            processActualCo(response.get(i).first(), response.get(i).second(), ctx.diebody);
         }
     }
 
@@ -422,7 +422,7 @@ public class COManager
         }
         for (int i = 0; i < response.size(); i++)
         {
-            processActualCo(response.get(i).first, response.get(i).second, ctx.diebody);
+            processActualCo(response.get(i).first(), response.get(i).second(), ctx.diebody);
         }
     }
 

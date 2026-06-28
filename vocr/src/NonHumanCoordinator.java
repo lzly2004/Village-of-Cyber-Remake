@@ -431,12 +431,12 @@ public class NonHumanCoordinator
         }
         for(int i=0;i<response.size();i++)
         {
-            if(response.get(i).first != 7) continue;
-            if(response.get(i).second == 2)
+            if(response.get(i).first() != 7) continue;
+            if(response.get(i).second() == 2)
             {
                 if(llsum > 0)
                 {
-                    int removedPlayer = response.get(i).first;
+                    int removedPlayer = response.get(i).first();
                     response.remove(i);
                     ctx.nonHumanPlan[removedPlayer] = 0;
                     i--;
@@ -444,11 +444,11 @@ public class NonHumanCoordinator
                 }
                 llsum++;
             }
-            if(response.get(i).second == 1)
+            if(response.get(i).second() == 1)
             {
                 if(lzsum > 1)
                 {
-                    int removedPlayer = response.get(i).first;
+                    int removedPlayer = response.get(i).first();
                     response.remove(i);
                     ctx.nonHumanPlan[removedPlayer] = 0;
                     i--;
@@ -460,34 +460,34 @@ public class NonHumanCoordinator
         int rezhan = 0,reling = 0;
         for(int i=0;i<response.size();i++)
         {
-            if(response.get(i).second == 1)
+            if(response.get(i).second() == 1)
                 rezhan++;
-            else if(response.get(i).second == 2)
+            else if(response.get(i).second() == 2)
                 reling++;
         }
         while(ctx.zhans.size() + rezhan > 4 && !response.isEmpty())
         {
             response = GameLogicUtils.shuffleList(response);
-            if(response.get(0).second == 1 && response.get(0).first != ctx.getActualRoleIndex(1))
+            if(response.get(0).second() == 1 && response.get(0).first() != ctx.getActualRoleIndex(1))
             {
-                ctx.nonHumanPlan[response.get(0).first] = 0;
-                ctx.setSkillTarget(response.get(0).first, 1, 0);
+                ctx.nonHumanPlan[response.get(0).first()] = 0;
+                ctx.setSkillTarget(response.get(0).first(), 1, 0);
                 response.remove(0);
             }
         }
         while(ctx.lings.size() + reling > 3 && !response.isEmpty())
         {
             response = GameLogicUtils.shuffleList(response);
-            if(response.get(0).second == 2 && response.get(0).first != ctx.getActualRoleIndex(2))
+            if(response.get(0).second() == 2 && response.get(0).first() != ctx.getActualRoleIndex(2))
             {
-                ctx.nonHumanPlan[response.get(0).first] = 0;
+                ctx.nonHumanPlan[response.get(0).first()] = 0;
                 response.remove(0);
             }
         }
         for(int i=0;i<response.size();i++)
         {
-            int respPlayer = response.get(i).first;
-            int role = response.get(i).second;
+            int respPlayer = response.get(i).first();
+            int role = response.get(i).second();
             boolean alreadyProcessed = false;
             if(role == 1 && ctx.zhans.contains(respPlayer)) alreadyProcessed = true;
             if(role == 2 && ctx.lings.contains(respPlayer)) alreadyProcessed = true;
