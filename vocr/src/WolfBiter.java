@@ -12,134 +12,38 @@ public class WolfBiter
         this.suspicion = suspicion;
     }
 
+    private static class BiteAnalysis {
+        int aliverl;
+        int y;
+        int z;
+        boolean[] isZhan;
+        boolean[] isLie;
+        boolean[] isLing;
+        int zhenZhanCnt;
+        int zhenLieCnt;
+        int zhenLingCnt;
+        int[] baiqiu;
+        double k;
+        int hiddenHunterCnt;
+        int[] getWhite;
+    }
+
     public int[] decideBite()
     {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
         int[] biteWeight = new int[n + 1];
 
-        // ============================================================
-        // Phase 1: 派生值计算（非规则，纯分析）
-        // ============================================================
+        BiteAnalysis analysis = analyzeBiteContext(n, gd);
 
-        // 1a. 末狼判定
-        int aliverl = 0;
-        for (int i = 1; i <= ctx.initialWolfCount; i++)
-            if (ctx.getDeathReason(ctx.rlindex[i]) == whyDie.NONE) aliverl++;
-
-        // 1b. 初日占被咬判定 (y=1表示初日被咬占卜师是"真占"或"咬中非狼")
-        int y = 0, z = 0;
-        int zzhb = ctx.getDiePlayerNum(whyDie.beiyao, 2);
-        if (zzhb != -1 && ctx.getClaimedRole(zzhb) == 1)
-        {
-            if (ctx.getSkillTarget(zzhb, 1) > n)
-            {
-                if (ctx.getActualRole(ctx.getSkillTarget(zzhb, 1) - n) == 7) y = 1;
-            }
-            else
-            {
-                if (ctx.getActualRole(ctx.getSkillTarget(zzhb, 1)) != 7) y = 1;
-            }
-        }
-        if (y == 0) z = 1;
-
-        // 1c. 真占/真灵/真猎识别
-        int zhenZhanCnt = 0, zhenLieCnt = 0, zhenLingCnt = 0;
-        boolean[] isZhan = new boolean[n + 1];
-        boolean[] isLie = new boolean[n + 1];
-        boolean[] isLing = new boolean[n + 1];
-        int[] baiqiu = new int[n + 1];
-
-        for (int i = 1; i <= n; i++)
-        {
-            if (ctx.getClaimedRole(i) == 2 && ctx.getActualRole(i) != 7 && !ctx.isNonHumanMarked(i))
-            {
-                boolean ok = true;
-                for (int j = 1; j <= gd; j++)
-                {
-                    if (ctx.getSkillTarget(i, j) > n)
-                    { if (ctx.getActualRole(i) != 7) { ok = false; break; } }
-                    else
-                    { if (ctx.getActualRole(i) == 7) { ok = false; break; } }
-                }
-                if (ok) { isLing[i] = true; zhenLingCnt++; }
-            }
-            if (ctx.getDeathDay(i) != 0) continue;
-            if (ctx.getClaimedRole(i) == 3 && ctx.getActualRole(i) != 7 && !ctx.isNonHumanMarked(i))
-            { isLie[i] = true; zhenLieCnt++; }
-            if (ctx.getClaimedRole(i) == 1 && ctx.getActualRole(i) != 7 && !ctx.isNonHumanMarked(i))
-            {
-                boolean ok = true;
-                for (int j = 1; j <= gd; j++)
-                {
-                    if (ctx.getSkillTarget(i, j) > n)
-                    { if (ctx.getActualRole(i) != 7) { ok = false; break; } }
-                    else
-                    { if (ctx.getActualRole(i) == 7) { ok = false; break; } }
-                }
-                if (ok) { isZhan[i] = true; zhenZhanCnt++; }
-            }
-        }
-
-        // 1d. 白球计数
-        for (int i = 1; i <= n; i++)
-        {
-            if (ctx.getClaimedRole(i) != 1) continue;
-            for (int j = 1; j < gd; j++)
-            {
-                int t = ctx.getSkillTarget(i, j);
-                if (t <= n && t > 0 && !ctx.isNonHumanMarked(t)
-                        && ctx.getClaimedRole(t) != 1
-                        && !suspicion.isAckWhite(t, ctx.maos, ctx.isDoubleDeathOccurred, ctx.claimedRoleaskday))
-                    baiqiu[i]++;
-            }
-        }
-
-        // 1e. 猎人护卫系数 k
-        double k;
-        switch (zhenLieCnt)
-        {
-            case 0: k = 0.8; break;
-            case 1: k = 0.5; break;
-            case 2: k = 0.3; break;
-            case 3: k = 0.1; break;
-            default: k = 0; break;
-        }
-        int wuco = 0, alivewuco = 0;
-        for (int i = 1; i <= n; i++)
-        {
-            if (ctx.getActualRole(i) == 7 || Math.abs(ctx.getClaimedRole(i) - 3) < 3) continue;
-            wuco++;
-            if (ctx.getDeathReason(i) == whyDie.NONE) alivewuco++;
-        }
-        k *= alivewuco;
-        k /= Math.max(wuco, 1);
-        if (ctx.claimedRoleaskday[3] > 0) k = 0;
-
-        int hiddenHunterCnt = 0;
-        for (int i = 1; i <= n; i++)
-            if (ctx.getHiddenHunterScheduledSkillTargets()[i][n]) hiddenHunterCnt++;
-
-        // 1f. 白球全局计数
-        int[] getWhite = new int[n + 1];
-        for (int i = 0; i < ctx.zhans.size(); i++)
-        {
-            int zhan = ctx.zhans.get(i);
-            for (int j = 1; j <= gd; j++)
-            {
-                int target = ctx.getSkillTarget(zhan, j);
-                if (target >= 1 && target <= n) getWhite[target]++;
-            }
-        }
-
-        final double kFinal = k;
-        final int hiddenHunterCntFinal = hiddenHunterCnt;
-        final int zhenZhanCntFinal = zhenZhanCnt;
-        final int zhenLieCntFinal = zhenLieCnt;
-        final int zhenLingCntFinal = zhenLingCnt;
-        final int yFinal = y;
-        final int zFinal = z;
-        final int aliverlFinal = aliverl;
+        final double kFinal = analysis.k;
+        final int hiddenHunterCntFinal = analysis.hiddenHunterCnt;
+        final int zhenZhanCntFinal = analysis.zhenZhanCnt;
+        final int zhenLieCntFinal = analysis.zhenLieCnt;
+        final int zhenLingCntFinal = analysis.zhenLingCnt;
+        final int yFinal = analysis.y;
+        final int zFinal = analysis.z;
+        final int aliverlFinal = analysis.aliverl;
 
         // ============================================================
         // Phase 2: 规则引擎 —— 所有权重修改
@@ -191,11 +95,11 @@ public class WolfBiter
 
         // --- 占CO/灵CO/共CO/猫CO角色修正 ---
         engine.addSimpleRule("R08_真占CO加权",
-                i -> isZhan[i],
+                i -> analysis.isZhan[i],
                 i -> 200 - zhenZhanCntFinal * 75 + 50 * yFinal - ctx.zhans.size() * 20);
 
         engine.addSimpleRule("R09_真灵CO加权",
-                i -> isLing[i],
+                i -> analysis.isLing[i],
                 i -> 175 - zhenLingCntFinal * 100 - ctx.lings.size() * 70);
 
         engine.addSimpleRule("R10_共有CO加权",
@@ -227,13 +131,13 @@ public class WolfBiter
             {
                 if (ctx.getClaimedRole(i) != 1) continue;
 
-                if (isZhan[i])  // 真占
+                if (analysis.isZhan[i])  // 真占
                 {
                     for (int j = 1; j < gd; j++)
                         if (ctx.getDeathReason(j) == whyDie.NONE
                                 && ctx.getSkillTarget(i, j) <= n
                                 && ctx.getActualRole(i) != 7)
-                            weights[ctx.getSkillTarget(i, j)] += 45 + 2 * baiqiu[i] + 10 * yFinal;
+                            weights[ctx.getSkillTarget(i, j)] += 45 + 2 * analysis.baiqiu[i] + 10 * yFinal;
                     for (int j = 1; j <= n; j++)
                         if (ctx.getDeathReason(j) == whyDie.NONE
                                 && ctx.getClaimedRoleScheduledSkillTargets(i)[j][n]
@@ -248,7 +152,7 @@ public class WolfBiter
                         if (t < 1) continue;
                         if (t <= n && ctx.getDeathReason(t) == whyDie.NONE
                                 && ctx.getActualRole(i) != 7)
-                            weights[t] += 25 + 2 * baiqiu[i];
+                            weights[t] += 25 + 2 * analysis.baiqiu[i];
                         if (t > n && ctx.getDeathReason(t - n) == whyDie.NONE)
                         {
                             if (ctx.getClaimedRole(t - n) == 6)
@@ -271,7 +175,7 @@ public class WolfBiter
                         if (t < 1 || ctx.getDeathReason(j) != whyDie.NONE) continue;
                         if (t <= n && ctx.getActualRole(i) != 7
                                 && ctx.getDeathReason(t) == whyDie.NONE)
-                            weights[t] += 15 + baiqiu[i];
+                            weights[t] += 15 + analysis.baiqiu[i];
                         if (t > n && ctx.getDeathReason(t - n) == whyDie.NONE)
                         {
                             if (ctx.getClaimedRole(t - n) == 6)
@@ -289,7 +193,7 @@ public class WolfBiter
         engine.addComplexRule("R14_猎CO护卫修正", weights -> {
             for (int i = 1; i <= n; i++)
             {
-                if (!isLie[i]) continue;
+                if (!analysis.isLie[i]) continue;
                 weights[i] += 350 - zhenLieCntFinal * 100;
                 if (ctx.claimedRoleaskday[3] > 0) weights[i] += 50;
 
@@ -308,7 +212,7 @@ public class WolfBiter
         // --- 白球全局修正 ---
         engine.addComplexRule("R15_白球全局修正", weights -> {
             for (int i = 1; i <= n; i++)
-                weights[i] += getWhite[i] * 5 + getWhite[i] * getWhite[i] * 2;
+                weights[i] += analysis.getWhite[i] * 5 + analysis.getWhite[i] * analysis.getWhite[i] * 2;
         });
 
         // ============================================================
@@ -334,5 +238,146 @@ public class WolfBiter
         return new int[] { bitewolf, biteone };
     }
 
+    private BiteAnalysis analyzeBiteContext(int n, int gd) {
+        BiteAnalysis analysis = new BiteAnalysis();
 
-}
+        analysis.aliverl = countAliveWolves();
+        analyzeFirstDaySeerBite(n, analysis);
+        analyzeRealRoles(n, gd, analysis);
+        countWhiteBalls(n, gd, analysis);
+        calculateHunterGuardFactor(n, analysis);
+        countGlobalWhiteBalls(n, gd, analysis);
+
+        return analysis;
+    }
+
+    private int countAliveWolves() {
+        int aliverl = 0;
+        for (int i = 1; i <= ctx.initialWolfCount; i++)
+            if (ctx.getDeathReason(ctx.rlindex[i]) == whyDie.NONE) aliverl++;
+        return aliverl;
+    }
+
+    private void analyzeFirstDaySeerBite(int n, BiteAnalysis analysis) {
+        int y = 0, z = 0;
+        int zzhb = ctx.getDiePlayerNum(whyDie.beiyao, 2);
+        if (zzhb != -1 && ctx.getClaimedRole(zzhb) == 1)
+        {
+            if (ctx.getSkillTarget(zzhb, 1) > n)
+            {
+                if (ctx.getActualRole(ctx.getSkillTarget(zzhb, 1) - n) == 7) y = 1;
+            }
+            else
+            {
+                if (ctx.getActualRole(ctx.getSkillTarget(zzhb, 1)) != 7) y = 1;
+            }
+        }
+        if (y == 0) z = 1;
+        analysis.y = y;
+        analysis.z = z;
+    }
+
+    private void analyzeRealRoles(int n, int gd, BiteAnalysis analysis) {
+        int zhenZhanCnt = 0, zhenLieCnt = 0, zhenLingCnt = 0;
+        boolean[] isZhan = new boolean[n + 1];
+        boolean[] isLie = new boolean[n + 1];
+        boolean[] isLing = new boolean[n + 1];
+
+        for (int i = 1; i <= n; i++)
+        {
+            if (ctx.getClaimedRole(i) == 2 && ctx.getActualRole(i) != 7 && !ctx.isNonHumanMarked(i))
+            {
+                boolean ok = true;
+                for (int j = 1; j <= gd; j++)
+                {
+                    if (ctx.getSkillTarget(i, j) > n)
+                    { if (ctx.getActualRole(i) != 7) { ok = false; break; } }
+                    else
+                    { if (ctx.getActualRole(i) == 7) { ok = false; break; } }
+                }
+                if (ok) { isLing[i] = true; zhenLingCnt++; }
+            }
+            if (ctx.getDeathDay(i) != 0) continue;
+            if (ctx.getClaimedRole(i) == 3 && ctx.getActualRole(i) != 7 && !ctx.isNonHumanMarked(i))
+            { isLie[i] = true; zhenLieCnt++; }
+            if (ctx.getClaimedRole(i) == 1 && ctx.getActualRole(i) != 7 && !ctx.isNonHumanMarked(i))
+            {
+                boolean ok = true;
+                for (int j = 1; j <= gd; j++)
+                {
+                    if (ctx.getSkillTarget(i, j) > n)
+                    { if (ctx.getActualRole(i) != 7) { ok = false; break; } }
+                    else
+                    { if (ctx.getActualRole(i) == 7) { ok = false; break; } }
+                }
+                if (ok) { isZhan[i] = true; zhenZhanCnt++; }
+            }
+        }
+
+        analysis.isZhan = isZhan;
+        analysis.isLie = isLie;
+        analysis.isLing = isLing;
+        analysis.zhenZhanCnt = zhenZhanCnt;
+        analysis.zhenLieCnt = zhenLieCnt;
+        analysis.zhenLingCnt = zhenLingCnt;
+    }
+
+    private void countWhiteBalls(int n, int gd, BiteAnalysis analysis) {
+        int[] baiqiu = new int[n + 1];
+        for (int i = 1; i <= n; i++)
+        {
+            if (ctx.getClaimedRole(i) != 1) continue;
+            for (int j = 1; j < gd; j++)
+            {
+                int t = ctx.getSkillTarget(i, j);
+                if (t <= n && t > 0 && !ctx.isNonHumanMarked(t)
+                        && ctx.getClaimedRole(t) != 1
+                        && !suspicion.isAckWhite(t, ctx.maos, ctx.isDoubleDeathOccurred, ctx.claimedRoleaskday))
+                    baiqiu[i]++;
+            }
+        }
+        analysis.baiqiu = baiqiu;
+    }
+
+    private void calculateHunterGuardFactor(int n, BiteAnalysis analysis) {
+        double k;
+        switch (analysis.zhenLieCnt)
+        {
+            case 0: k = 0.8; break;
+            case 1: k = 0.5; break;
+            case 2: k = 0.3; break;
+            case 3: k = 0.1; break;
+            default: k = 0; break;
+        }
+        int wuco = 0, alivewuco = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            if (ctx.getActualRole(i) == 7 || Math.abs(ctx.getClaimedRole(i) - 3) < 3) continue;
+            wuco++;
+            if (ctx.getDeathReason(i) == whyDie.NONE) alivewuco++;
+        }
+        k *= alivewuco;
+        k /= Math.max(wuco, 1);
+        if (ctx.claimedRoleaskday[3] > 0) k = 0;
+
+        int hiddenHunterCnt = 0;
+        for (int i = 1; i <= n; i++)
+            if (ctx.getHiddenHunterScheduledSkillTargets()[i][n]) hiddenHunterCnt++;
+
+        analysis.k = k;
+        analysis.hiddenHunterCnt = hiddenHunterCnt;
+    }
+
+    private void countGlobalWhiteBalls(int n, int gd, BiteAnalysis analysis) {
+        int[] getWhite = new int[n + 1];
+        for (int i = 0; i < ctx.zhans.size(); i++)
+        {
+            int zhan = ctx.zhans.get(i);
+            for (int j = 1; j <= gd; j++)
+            {
+                int target = ctx.getSkillTarget(zhan, j);
+                if (target >= 1 && target <= n) getWhite[target]++;
+            }
+        }
+        analysis.getWhite = getWhite;
+    }
