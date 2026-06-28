@@ -121,7 +121,13 @@ public class DayActionCoordinator
                         continue;
                     if(ctx.getActualRole(target) == 5 || ctx.nonHumanPlan[target] == 5)
                     {
-                        response.add(new IntPair(target,5));havecatco = true;continue;
+                        // 如果猫又已明确出局，非人不能CO猫
+                        if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut())
+                            ctx.nonHumanPlan[target] = 0;
+                        else
+                        {
+                            response.add(new IntPair(target,5));havecatco = true;continue;
+                        }
                     }
                     if(ctx.getActualRole(target) < 7 || ctx.nonHumanPlan[target] == 0 || ctx.nonHumanPlan[target] == 3) continue;
                     int zhi = ctx.getActualRole(target);
@@ -132,7 +138,8 @@ public class DayActionCoordinator
                             {
                                 int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
                                 if(ctx.rlsl || ctx.claimedRoleaskday[3] != 0) lweight = 0;
-                                if(ctx.rlsm || ctx.getCat() == 0 || ctx.claimedRoleaskday[5] != 0) mweight = 0;
+                                // 如果猫又已明确出局，不能CO猫
+                                if(ctx.rlsm || ctx.getCat() == 0 || ctx.isCatDefinitivelyOut() || ctx.claimedRoleaskday[5] != 0) mweight = 0;
                                 if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
                                 else
                                 {
@@ -152,7 +159,8 @@ public class DayActionCoordinator
                             {
                                 int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
                                 if(ctx.claimedRoleaskday[3] != 0) lweight = 0;
-                                if(ctx.getCat() == 0 || ctx.claimedRoleaskday[5] != 0) mweight = 0;
+                                // 如果猫又已明确出局，不能CO猫
+                                if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut() || ctx.claimedRoleaskday[5] != 0) mweight = 0;
                                 if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
                                 else
                                 {

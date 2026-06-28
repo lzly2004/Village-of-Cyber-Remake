@@ -379,7 +379,8 @@ public class COManager
                         }
                         if (ctx.rlsl)
                         {
-                            if (ctx.actualRoleindex[5] != 0)
+                            // 如果猫又已明确出局，不能CO猫
+                            if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
                                 response.add(new IntPair(num, 5));
                             else
                                 response.add(new IntPair(num, 6));
@@ -393,7 +394,8 @@ public class COManager
                             break;
                         }
                         option = 0;
-                        if (ctx.actualRoleindex[5] != 0)
+                        // 如果猫又已明确出局，不能CO猫
+                        if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
                             option = GameLogicUtils.getEventIndexByProbability(
                                     new ArrayList<>(List.of(50 + 50 * ctx.maos.size(),
                                             50 + 50 * ctx.lies.size())));
@@ -411,7 +413,8 @@ public class COManager
                             break;
                         }
                         option = 0;
-                        if (ctx.actualRoleindex[5] != 0)
+                        // 如果猫又已明确出局，不能CO猫
+                        if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
                             option = GameLogicUtils.getEventIndexByProbability(
                                     new ArrayList<>(List.of(50 + 50 * ctx.maos.size(),
                                             50 + 50 * ctx.lies.size())));
@@ -434,12 +437,14 @@ public class COManager
                     && (ctx.actualRoleindex[5] < 1 || ctx.rlsm || ctx.claimedRoleaskday[5] > 0))
                 return;
         }
-        if (ctx.actualRoleindex[3] < 1 || (isHumanWolf && ctx.rlsl) || ctx.claimedRoleaskday[3] > 0)
-            processActualCo(num, 5, diebody);
+        // 如果猫又已明确出局，不能CO猫
+        if (ctx.actualRoleindex[3] < 1 || (isHumanWolf && ctx.rlsl) || ctx.claimedRoleaskday[3] > 0
+                || ctx.isCatDefinitivelyOut())
+            processActualCo(num, 3, diebody);
         else if (ctx.actualRoleindex[5] < 1 || (isHumanWolf && ctx.rlsm) || ctx.claimedRoleaskday[5] > 0)
             processActualCo(num, 3, diebody);
         else
-            processActualCo(num, 5 - 2 * GameLogicUtils.getEventIndexByProbability(
+            processActualCo(num, 3 + 2 * GameLogicUtils.getEventIndexByProbability(
                     new ArrayList<>(List.of(50 + 50 * ctx.lies.size(), 50 + 50 * ctx.maos.size()))), diebody);
     }
 }
