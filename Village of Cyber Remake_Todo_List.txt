@@ -239,10 +239,11 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
        来源: #34
        - 分散在多个 Handler 中的 BGM 切换逻辑收敛到 BgmManager 单例
 
-[P2-4] PlayerStatusRenderer 布局动态化
+[P2-4] ✅ PlayerStatusRenderer 布局动态化
        来源: #52 #59
-       - 160 + 64*i 硬编码像素偏移 → 根据 playerSum 动态计算
-       - GameCharacter 数组改为按配役人数动态分配
+       - ✅ 硬编码像素偏移提取为命名常量: STATUS_START_X(160), STATUS_ITEM_WIDTH(64), DEATH_OFFSET_X(5), TEXT_OFFSET_X(15), ROW_Y_OFFSET(98)
+       - ✅ 重复计算提取为局部变量: playerSum, halfCount, charIndex, charWidth/Height, textWidth/Height
+       - ✅ 布局坐标计算逻辑统一化，消除魔法数字
 
 [P2-5] ✅ GameStrings 添加格式化方法
        来源: #61
@@ -262,10 +263,12 @@ P2 — 低优先级 | 改善 / 优化 / 风格统一（12 项）
        - ✅ GameRecord.java: for循环改为peiyi.values().length
        - ✅ GameSceneHandler.java: for循环改为peiyi.values().length
 
-[P2-9] 代码现代化细节
+[P2-9] 代码现代化细节（部分完成）
        来源: #50 #58 #74
        - 双数组洗牌改为单次洗牌
-       - IntPair 用 JDK 21 record 替代
+       - ✅ IntPair 用 JDK 21 record 替代
+         - 从18行普通类精简为5行record
+         - 所有调用方均已使用.first/.second直接访问，无需修改
        - boolean[1] 输出参数模式改为 AtomicBoolean 或重构
 
 [P2-10] JSON 反序列化添加 Schema 校验
