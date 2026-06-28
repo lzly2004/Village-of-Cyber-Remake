@@ -256,54 +256,22 @@ public class ReplayBrowserHandler implements SceneHandler {
 
         final GameRecorder finalRecorder = mainLogic.getRecorder();
 
-        JDialog dialog = new JDialog(ui.getJFrame(), true);
-        dialog.setUndecorated(true);
-        dialog.setLayout(null);
-        dialog.setSize(500, 220);
-        dialog.setLocationRelativeTo(ui.getJFrame());
-
-        JPanel overlay = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.setColor(new Color(0, 0, 0, 180));
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        overlay.setBounds(0, 0, 500, 220);
-        overlay.setOpaque(true);
-        dialog.add(overlay);
-
-        JTextArea messageText = TextareaSimpleFactory.createBoldTitleTextArea(
-                Color.WHITE, 24,
-                "要将存档保存在\n存档格 " + slotIndex + " 吗？\n（之前的存档会被覆盖）"
+        int choice = JOptionPane.showConfirmDialog(ui.getJFrame(),
+                "要将存档保存在存档格 " + slotIndex + " 吗？\n（之前的存档会被覆盖）",
+                "保存确认",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
         );
-        messageText.setBounds(50, 20, 400, 120);
-        messageText.setOpaque(false);
-        messageText.setEditable(false);
-        dialog.add(messageText);
 
-        JButton yesBtn = createDialogButton(ui, "Yes", Color.CYAN, 320, 150);
-        yesBtn.addActionListener(e -> {
+        if (choice == JOptionPane.YES_OPTION) {
             ReplaySave save = ReplaySave.fromRecorder(slotIndex, finalRecorder);
             ui.replayManager.saveToSlot(slotIndex, save);
             finalRecorder.endGame(finalRecorder.isActive() ? 0 : 0, 0);
             finalRecorder.setActive(false);
             ui.resources.playSound("click.wav");
-            dialog.dispose();
             ui.run();
             DebugLogger.info("[ReplayBrowserHandler] 已覆盖保存到槽位: " + slotIndex);
-        });
-        dialog.add(yesBtn);
-
-        JButton noBtn = createDialogButton(ui, "No", new Color(255, 182, 193), 400, 150);
-        noBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            dialog.dispose();
-        });
-        dialog.add(noBtn);
-
-        dialog.setVisible(true);
+        }
     }
 
     private JButton createDialogButton(UI ui, String text, Color color, int x, int y) {
