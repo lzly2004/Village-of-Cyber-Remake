@@ -221,15 +221,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 boolean isDead = ps.deathDay > 0 && ps.deathDay < day;
 
                 // 复盘模式：根据实际身份显示不同颜色头像（对齐结算界面规则）
-                switch (ps.actualRole) {
-                    case 5:  imageName.append("cs"); break;
-                    case 10: imageName.append("fs"); break;
-                    case 11: imageName.append("hs"); break;
-                    case 7:  imageName.append("ws"); break;
-                    case 8:
-                    case 9:  imageName.append("ks"); break;
-                    default: imageName.append("s");  break;
-                }
+                imageName.append(GameStrings.getRoleImageSuffix(ps.actualRole));
 
                 // 死亡图标照常显示（与生死状态无关）
                 if (isDead) {

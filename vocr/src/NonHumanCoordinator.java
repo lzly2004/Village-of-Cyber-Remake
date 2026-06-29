@@ -363,14 +363,8 @@ public class NonHumanCoordinator
     private void processBlackBallCOSecondary(ArrayList<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：黑球占co时机");
-        for(int i=0;i<ctx.zhans.size();i++)
-        {
-            coManager.processActualCo(ctx.zhans.get(i),1,diebody);
-        }
-        for(int i=0;i<ctx.lings.size();i++)
-        {
-            coManager.processActualCo(ctx.lings.get(i),2,diebody);
-        }
+        for (int zhan : ctx.zhans) coManager.processActualCo(zhan, 1, diebody);
+        for (int ling : ctx.lings) coManager.processActualCo(ling, 2, diebody);
     }
 
     /**

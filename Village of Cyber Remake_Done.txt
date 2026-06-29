@@ -1,6 +1,6 @@
 ================================================================================
         Village of Cyber Remake — 已完成重构记录
-        整理日期：2026-06-29 | 版本：v1.0.3.20
+        整理日期：2026-06-29 | 版本：v1.0.3.21
 ================================================================================
 
 ================================================================================
@@ -520,6 +520,31 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
   - 收益: 消除跨类重复代码，日志构建逻辑集中管理
   - 验证: 编译通过
 
+[P5-22] ✅ ReplayPlayerHandler/EndAnimeHandler 角色后缀消除重复
+  来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+  - ✅ 在 GameStrings 中添加 getRoleImageSuffix(int actualRole) 方法
+  - ✅ EndAnimeHandler 和 ReplayPlayerHandler 中的重复 switch case 替换为方法调用
+  - ✅ 消除两处完全相同的 switch case（各9行）
+  - 代码行数: GameStrings.java: +15行；EndAnimeHandler.java: -8行；ReplayPlayerHandler.java: -8行（净减少 1行，但消除了重复逻辑）
+  - 收益: 消除跨类重复 switch case，逻辑集中管理
+  - 验证: 编译通过
+
+[P5-23] ✅ GameSceneVoteHandler.charImageName() 使用共享方法
+  来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+  - ✅ GameSceneVoteHandler.charImageName() 6行实现替换为调用 UIComponentFactory.getCharImageName()
+  - ✅ 消除重复的图片名构建逻辑
+  - 代码行数: GameSceneVoteHandler.java: 6行 → 2行（减少4行）
+  - 收益: 消除重复逻辑，统一使用 UIComponentFactory
+  - 验证: 编译通过
+
+[P5-24] ✅ DayActionCoordinator/NonHumanCoordinator 遍历优化
+  来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+  - ✅ presentDivinationResults() 使用增强 for 循环简化
+  - ✅ processBlackBallCOSecondary() 使用增强 for 循环简化
+  - 代码行数: DayActionCoordinator.java: 9行 → 2行（减少7行）；NonHumanCoordinator.java: 11行 → 2行（减少9行）（净减少16行）
+  - 收益: 消除样板代码，代码更简洁
+  - 验证: 编译通过
+
 [P5-11] ❌ GameContext 角色语义方法添加（已放弃）
   来源: 新一轮代码扫描（2026-06-29）
   - ❌ 分析结论: 添加语义方法会增加 GameContext 约 20-25 行
@@ -534,6 +559,6 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
   P2: 5 项 ✅ 完成 | 2 项 ⚠️ 已回退(P2-2)
   P3: 4 项 ✅ 完成 | 1 项 ⚠️ 已回退(P3-5)
   P4: 3 项 ✅ 完成（P4-1, P4-3, P4-4）
-  P5: 14 项（P5-1, P5-2, P5-3, P5-4, P5-5, P5-6, P5-8, P5-9, P5-12, P5-13, P5-14, P5-15, P5-19, P5-20, P5-21 ✅；P5-7 ⏸️；P5-11, P5-16, P5-17, P5-18 ❌）
-  合计: 48 项已完成 + 部分完成 2 项 + 已放弃 4 项 + 已回退 3 项
+  P5: 17 项（P5-1, P5-2, P5-3, P5-4, P5-5, P5-6, P5-8, P5-9, P5-12, P5-13, P5-14, P5-15, P5-19, P5-20, P5-21, P5-22, P5-23, P5-24 ✅；P5-7 ⏸️；P5-11, P5-16, P5-17, P5-18 ❌）
+  合计: 51 项已完成 + 部分完成 2 项 + 已放弃 4 项 + 已回退 3 项
 ================================================================================

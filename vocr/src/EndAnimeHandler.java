@@ -56,15 +56,7 @@ public class EndAnimeHandler implements SceneHandler {
             imageName.append(ui.ctx.getCharacterNumber(i));
             switch (ui.ctx.getDeathReason(i)) {
                 case NONE:
-                    switch (ui.ctx.getActualRole(i)) {
-                        case 5:  imageName.append("cs"); break;
-                        case 10: imageName.append("fs"); break;
-                        case 11: imageName.append("hs"); break;
-                        case 7:  imageName.append("ws"); break;
-                        case 8:
-                        case 9:  imageName.append("ks"); break;
-                        default: imageName.append("s");  break;
-                    }
+                    imageName.append(GameStrings.getRoleImageSuffix(ui.ctx.getActualRole(i)));
                     break;
                 case chuxing:     imageName.append("gs"); xName.append("turi.png");   break;
                 case daymaozhou:  imageName.append("gs"); xName.append("noroi.png");  break;

@@ -639,12 +639,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     }
 
     String charImageName(int i) {
-        StringBuilder sb = new StringBuilder();
-        if (this.ui.ctx.getCharacterNumber(i) <= 9) sb.append("0");
-        sb.append(this.ui.ctx.getCharacterNumber(i));
-        if (!this.ui.ctx.isAlive(i)) sb.append("g");
-        sb.append("s.png");
-        return sb.toString();
+        return ui.uiComponentFactory.getCharImageName(ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i));
     }
 
     String claimedRoleIconName(int i) {

@@ -54,14 +54,8 @@ public class DayActionCoordinator
 
     private void presentDivinationResults(ArrayList<Integer> diebody)
     {
-        for(int i=0;i<ctx.zhans.size();i++)
-        {
-            resultPresenter.presentZhan(ctx.zhans.get(i), diebody);
-        }
-        for(int i=0;i<ctx.lings.size();i++)
-        {
-            resultPresenter.presentLing(ctx.lings.get(i));
-        }
+        for (int zhan : ctx.zhans) resultPresenter.presentZhan(zhan, diebody);
+        for (int ling : ctx.lings) resultPresenter.presentLing(ling);
     }
 
     private void handleLatentSeerMediumCO(ArrayList<Integer> diebody)
