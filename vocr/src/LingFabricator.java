@@ -12,6 +12,24 @@ public class LingFabricator
         this.suspicion = suspicion;
     }
 
+    private int getLingProbability(int actualRole, boolean isTrusted)
+    {
+        return switch (actualRole) {
+            case 7 -> isTrusted ? GameConstants.PROB_LING_TRUSTED_SEER_WOLF
+                    : GameConstants.PROB_LING_SUSPICIOUS_SEER_WOLF;
+            case 8 -> isTrusted ? GameConstants.PROB_LING_TRUSTED_SEER_MADMAN
+                    : GameConstants.PROB_LING_SUSPICIOUS_SEER_MADMAN;
+            case 9 -> isTrusted ? GameConstants.PROB_LING_TRUSTED_SEER_FANATIC
+                    : GameConstants.PROB_LING_SUSPICIOUS_SEER_FANATIC;
+            case 10 -> isTrusted ? GameConstants.PROB_LING_TRUSTED_SEER_FOX
+                    : GameConstants.PROB_LING_SUSPICIOUS_SEER_FOX;
+            case 11 -> isTrusted ? GameConstants.PROB_LING_TRUSTED_SEER_DEVIANT
+                    : GameConstants.PROB_LING_SUSPICIOUS_SEER_DEVIANT;
+            default -> isTrusted ? GameConstants.PROB_LING_TRUSTED_SEER_MADMAN
+                    : GameConstants.PROB_LING_SUSPICIOUS_SEER_MADMAN;
+        };
+    }
+
     public void fabricate(int num)
     {
         if (ctx.isNonHumanMarked(num)) return;
@@ -115,19 +133,11 @@ public class LingFabricator
                         option.add(1);
             }
             if (option.size() > 0)
-            {
-                int p = GameConstants.PROB_LING_TRUSTED_SEER_MADMAN;
-                switch (ctx.getActualRole(num))
                 {
-                    case 7: p = GameConstants.PROB_LING_TRUSTED_SEER_WOLF; break;
-                    case 8: p = GameConstants.PROB_LING_TRUSTED_SEER_MADMAN; break;
-                    case 9: p = GameConstants.PROB_LING_TRUSTED_SEER_FANATIC; break;
-                    case 10: p = GameConstants.PROB_LING_TRUSTED_SEER_FOX; break;
-                    case 11: p = GameConstants.PROB_LING_TRUSTED_SEER_DEVIANT; break;
+                    int p = getLingProbability(ctx.getActualRole(num), true);
+                    processLingOption(option, num, p);
+                    return;
                 }
-                processLingOption(option, num, p);
-                return;
-            }
         }
         for (int i = 0; i < ctx.zhans.size(); i++)
         {
@@ -141,15 +151,7 @@ public class LingFabricator
             }
             if (option.size() > 0)
             {
-                int p = GameConstants.PROB_LING_SUSPICIOUS_SEER_MADMAN;
-                switch (ctx.getActualRole(num))
-                {
-                    case 7: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_WOLF; break;
-                    case 8: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_MADMAN; break;
-                    case 9: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_FANATIC; break;
-                    case 10: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_FOX; break;
-                    case 11: p = GameConstants.PROB_LING_SUSPICIOUS_SEER_DEVIANT; break;
-                }
+                int p = getLingProbability(ctx.getActualRole(num), false);
                 processLingOption(option, num, p);
                 return;
             }

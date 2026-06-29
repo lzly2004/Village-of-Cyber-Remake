@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 class GameLogicUtils
 {
@@ -59,23 +61,13 @@ class GameLogicUtils
             return new ArrayList<>();
 
         ArrayList<T> shuffledList = new ArrayList<>(originalList);
-        int listSize = shuffledList.size();
-
-        for (int i = listSize - 1; i > 0; i--)
-        {
-            int randomIndex = ConstNum.randomInt(0, i);
-            T temp = shuffledList.get(i);
-            shuffledList.set(i, shuffledList.get(randomIndex));
-            shuffledList.set(randomIndex, temp);
-        }
-
+        Collections.shuffle(shuffledList);
         return shuffledList;
     }
 
     public static ArrayList<Integer> getPriority(int[] array, boolean maxFirst)
     {
         ArrayList<Integer> result = new ArrayList<>();
-
         if (array == null || array.length < 2)
         {
             result.add(0);
@@ -83,51 +75,20 @@ class GameLogicUtils
         }
 
         int validLen = array.length - 1;
-        int[] valArr = new int[validLen];
-        int[] idxArr = new int[validLen];
-        for (int i = 0; i < validLen; i++)
-        {
-            valArr[i] = array[i + 1];
-            idxArr[i] = i + 1;
-        }
+        ArrayList<int[]> pairs = new ArrayList<>();
+        for (int i = 1; i <= validLen; i++)
+            pairs.add(new int[]{i, array[i]});
 
-        for (int i = 0; i < validLen - 1; i++)
-        {
-            for (int j = 0; j < validLen - 1 - i; j++)
-            {
-                boolean needSwap = maxFirst ? valArr[j] < valArr[j + 1] : valArr[j] > valArr[j + 1];
-                if (needSwap)
-                {
-                    int tempVal = valArr[j];
-                    valArr[j] = valArr[j + 1];
-                    valArr[j + 1] = tempVal;
-                    int tempIdx = idxArr[j];
-                    idxArr[j] = idxArr[j + 1];
-                    idxArr[j + 1] = tempIdx;
-                }
-            }
-        }
-
-        int[] rankArr = new int[validLen];
-        int currentRank = 1;
-        int currentVal = valArr[0];
-        rankArr[0] = currentRank;
-        for (int i = 1; i < validLen; i++)
-        {
-            if (valArr[i] != currentVal)
-            {
-                currentRank = i + 1;
-                currentVal = valArr[i];
-            }
-            rankArr[i] = currentRank;
-        }
+        pairs.sort(maxFirst ? Comparator.comparingInt(a -> -a[1]) : Comparator.comparingInt(a -> a[1]));
 
         for (int i = 0; i < array.length; i++)
             result.add(0);
-        for (int i = 0; i < validLen; i++)
+
+        for (int i = 0; i < pairs.size(); i++)
         {
-            int originalIndex = idxArr[i];
-            int rank = rankArr[i];
+            int originalIndex = pairs.get(i)[0];
+            int rank = (i > 0 && pairs.get(i)[1] == pairs.get(i-1)[1])
+                    ? result.get(pairs.get(i-1)[0]) : (i + 1);
             result.set(originalIndex, rank);
         }
 
