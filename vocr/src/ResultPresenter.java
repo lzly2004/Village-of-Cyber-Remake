@@ -20,7 +20,7 @@ public class ResultPresenter
         int target = ctx.getSkillTarget(num, ctx.getGameDay() - 1);
         if (target < 1 || target == num)
         {
-            eventGenerator.addWz17(num);
+            eventGenerator.addEvent(EventName.wz17, num);
             return;
         }
         if (diebody.size() < 2)
@@ -29,18 +29,18 @@ public class ResultPresenter
             {
                 target -= n;
                 effectApplicator.applyBlackBallSuspicion(num, target);
-                eventGenerator.addZjgh8b(num, target);
+                eventGenerator.addEvent(EventName.zjgh8b, num, target);
                 presentBlackResult(num, target, false);
             }
             else if (ctx.getDeathReason(target) == whyDie.NONE)
             {
                 effectApplicator.applyWhiteBallSuspicion(num, target);
-                eventGenerator.addZjgb8(num, target);
-                eventGenerator.addJbdh8r(target, num);
+                eventGenerator.addEvent(EventName.zjgb8, num, target);
+                eventGenerator.addEvent(EventName.jbdh8r, target, num);
             }
             else
             {
-                eventGenerator.addZbdxsw10(num, target);
+                eventGenerator.addEvent(EventName.zbdxsw10, num, target);
             }
         }
         else
@@ -49,18 +49,18 @@ public class ResultPresenter
             if (ctx.getCat() > 0 && ackWhiteCat && !diebody.contains(ctx.getCat())
                     && !diebody.contains(target))
             {
-                eventGenerator.addZspz15ByName(num);
+                eventGenerator.addEvent(EventName.zspz15, num);
                 effectApplicator.applyContradictionMark(num);
             }
             else if ((ctx.getPeiyi() != peiyi.daxing && ctx.getPeiyi() != peiyi.maoyou) || diebody.size() > 2)
             {
                 if (diebody.contains(target))
                 {
-                    eventGenerator.addZs14(num, target);
+                    eventGenerator.addEvent(EventName.zs14, num, target);
                 }
                 else
                 {
-                    eventGenerator.addZspz15ByEnglish(num);
+                    eventGenerator.addEventWithEnglishName(EventName.zspz15, num);
                     effectApplicator.applyContradictionMark(num);
                 }
             }
@@ -68,21 +68,21 @@ public class ResultPresenter
             {
                 if (diebody.contains(target))
                 {
-                    eventGenerator.addSzsm16(num, target);
+                    eventGenerator.addEvent(EventName.szsm16, num, target);
                 }
                 else if (target <= n)
                 {
                     effectApplicator.applyWhiteBallSuspicion(num, target);
-                    eventGenerator.addZjgb8(num, target);
-                    eventGenerator.addJbdh8r(target, num);
+                    eventGenerator.addEvent(EventName.zjgb8, num, target);
+                    eventGenerator.addEvent(EventName.jbdh8r, target, num);
                 }
                 else
                 {
                     target -= n;
                     effectApplicator.applyDoubleDeathBlackBallSuspicion(num, target);
-                    eventGenerator.addZjgh8b(num, target);
+                    eventGenerator.addEvent(EventName.zjgh8b, num, target);
                     if (ctx.getDeathReason(target) == whyDie.NONE)
-                        eventGenerator.addJhdh8b(target, num);
+                        eventGenerator.addEvent(EventName.jhdh8b, target, num);
                 }
             }
         }
@@ -102,15 +102,15 @@ public class ResultPresenter
                     ctx.getClaimedRole(target) == 4 : ctx.getActualRole(target) == 4;
             if (!isGong)
             {
-                eventGenerator.addJhdh8b(target, num);
+                eventGenerator.addEvent(EventName.jhdh8b, target, num);
             }
             else
             {
-                eventGenerator.addGprz11r(target, num);
+                eventGenerator.addEvent(EventName.gprz11r, target, num);
                 int gy = 1;
                 if (ctx.gyindex[2] == target) gy = 2;
                 if (ctx.getDeathReason(ctx.gyindex[3 - gy]) == whyDie.NONE)
-                    eventGenerator.addGprz11p(ctx.gyindex[3 - gy], target);
+                    eventGenerator.addEvent(EventName.gprz11p, ctx.gyindex[3 - gy], target);
             }
         }
     }
@@ -129,11 +129,11 @@ public class ResultPresenter
         int diePlayer = ctx.getDiePlayerNum(whyDie.chuxing, gd - 1);
         if (ctx.isBlackResult(ctx.getSkillTarget(num, gd - 1)))
         {
-            eventGenerator.addLjgh19b(num, diePlayer);
+            eventGenerator.addEvent(EventName.ljgh19b, num, diePlayer);
         }
         else
         {
-            eventGenerator.addLjgb19(num, diePlayer);
+            eventGenerator.addEvent(EventName.ljgb19, num, diePlayer);
         }
     }
 }
