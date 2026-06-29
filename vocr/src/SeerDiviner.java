@@ -19,13 +19,7 @@ public class SeerDiviner
         int gd = ctx.getGameDay();
 
         DebugLogger.log("占卜师编号：" + znum + " 当前游戏日期：" + gd);
-        StringBuilder sb = new StringBuilder("这个占的预告：");
-        for (int i = 1; i <= n; i++)
-        {
-            if (ctx.getClaimedRoleScheduledSkillTargets(znum)[i][gd])
-                sb.append(i).append(" ");
-        }
-        DebugLogger.log(sb.toString());
+        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("这个占的预告：", n, gd, ctx.getClaimedRoleScheduledSkillTargets(znum)));
         int[] weight = new int[n + 1];
         ArrayList<Integer> target = new ArrayList<>();
         boolean[] istarget = new boolean[n + 1];

@@ -65,35 +65,26 @@ public class ExecutionManager
         for(int i=0;i<ctx.zhans.size();i++)
         {
             int zhan = ctx.zhans.get(i);
-            StringBuilder sb = new StringBuilder("占卜师候补编号：" + ctx.getClaimedRoleOrder(zhan) + "预告情况：");
-            for(int j=1;j<=n;j++)
-                if(ctx.getClaimedRoleScheduledSkillTargets(zhan)[j][gd])
-                    sb.append(CharacterKanjiName.values()[ctx.getCharacterNumber(j)]).append(" ");
-            DebugLogger.log(sb.toString());
+            DebugLogger.log(buildSkillScheduleLog("占卜师候补编号：" + ctx.getClaimedRoleOrder(zhan) + "预告情况：",
+                    n, gd, ctx.getClaimedRoleScheduledSkillTargets(zhan)));
         }
         for (int i = 0; i < ctx.lies.size(); i++)
         {
             int lie = ctx.lies.get(i);
-            StringBuilder sb = new StringBuilder("猎人候补编号：" + ctx.getClaimedRoleOrder(lie) + "指定护卫情况：");
-            for (int j = 1; j <= n; j++)
-                if (ctx.getClaimedRoleScheduledSkillTargets(lie)[j][gd])
-                    sb.append(CharacterKanjiName.values()[ctx.getCharacterNumber(j)]).append(" ");
-            DebugLogger.log(sb.toString());
+            DebugLogger.log(buildSkillScheduleLog("猎人候补编号：" + ctx.getClaimedRoleOrder(lie) + "指定护卫情况：",
+                    n, gd, ctx.getClaimedRoleScheduledSkillTargets(lie)));
         }
-        StringBuilder sb3 = new StringBuilder("潜伏占预告情况：");
+        DebugLogger.log(buildSkillScheduleLog("潜伏占预告情况：", n, gd, ctx.getHiddenSeerScheduledSkillTargets()));
+        DebugLogger.log(buildSkillScheduleLog("潜伏猎人指定护卫情况：", n, gd, ctx.getHiddenHunterScheduledSkillTargets()));
+    }
+
+    private String buildSkillScheduleLog(String title, int n, int gd, boolean[][] schedule)
+    {
+        StringBuilder sb = new StringBuilder(title);
         for(int i=1;i<=n;i++)
-        {
-            if(ctx.getHiddenSeerScheduledSkillTargets()[i][gd])
-                sb3.append(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]).append(" ");
-        }
-        DebugLogger.log(sb3.toString());
-        StringBuilder sb4 = new StringBuilder("潜伏猎人指定护卫情况：");
-        for(int i=1;i<=n;i++)
-        {
-            if(ctx.getHiddenHunterScheduledSkillTargets()[i][gd])
-                sb4.append(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]).append(" ");
-        }
-        DebugLogger.log(sb4.toString());
+            if(schedule[i][gd])
+                sb.append(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]).append(" ");
+        return sb.toString();
     }
     
     private boolean[] prepareVoting(int n, int gd, int dailyVotingRule, List<Integer> chuxingList)

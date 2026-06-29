@@ -18,20 +18,8 @@ public class HunterGuarder
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
         DebugLogger.log("猎人编号：" + num + " 当前游戏日期：" + gd);
-        StringBuilder sb = new StringBuilder("这个猎的预告：");
-        for (int i = 1; i <= n; i++)
-        {
-            if (ctx.getClaimedRoleScheduledSkillTargets(num)[i][gd])
-                sb.append(i).append(" ");
-        }
-        DebugLogger.log(sb.toString());
-        sb = new StringBuilder("潜伏猎人的预告：");
-        for (int i = 1; i <= n; i++)
-        {
-            if (ctx.getHiddenHunterScheduledSkillTargets()[i][gd])
-                sb.append(i).append(" ");
-        }
-        DebugLogger.log(sb.toString());
+        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("这个猎的预告：", n, gd, ctx.getClaimedRoleScheduledSkillTargets(num)));
+        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("潜伏猎人的预告：", n, gd, ctx.getHiddenHunterScheduledSkillTargets()));
         boolean haveTarget = false;
         boolean qf = false;
         int[] huweiweight = new int[n + 1];

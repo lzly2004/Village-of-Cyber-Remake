@@ -102,4 +102,13 @@ class GameLogicUtils
         int p0 = ConstNum.randomInt(1, 100);
         return p0 <= p;
     }
+
+    public static String buildSkillScheduleLog(String title, int n, int gd, boolean[][] schedule)
+    {
+        StringBuilder sb = new StringBuilder(title);
+        for (int i = 1; i <= n; i++)
+            if (schedule[i][gd])
+                sb.append(i).append(" ");
+        return sb.toString();
+    }
 }

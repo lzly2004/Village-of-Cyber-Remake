@@ -1,7 +1,7 @@
 ================================================================================
         Village of Cyber Remake — 重构 Todo List（评估版）
-        整理日期：2026-06-29 | 版本：v5.16
-        已完成: 45 项 | 暂停: 1 项 | 放弃: 4 项 | 已回退: 3 项
+        整理日期：2026-06-29 | 版本：v5.17
+        已完成: 48 项 | 暂停: 1 项 | 放弃: 4 项 | 已回退: 3 项
 ================================================================================
 
   ⚠️ 重构原则提醒：
@@ -503,6 +503,50 @@
   代码行数变化:
     - VoteButtonPanel.java: 101行 → 64行（减少37行）
   收益: 消除大量样板代码，逻辑集中管理
+  验证: 编译通过
+
+【P5-19】✅ LingFabricator 三段重复循环合并 — 已完成（减少20行）
+  工作量: 中（45分钟）✅ 已完成
+  风险: 低
+  收益: 中-高
+  综合优先级: ⭐⭐⭐⭐
+  完成内容:
+    - 提取 collectLingOptions() 私有方法，参数化条件判断和是否包含白球选项
+    - 三段几乎相同的 zhans 循环合并为一处
+    - 使用 Predicate<Integer> 过滤条件参数化
+  代码行数变化:
+    - LingFabricator.java: 约减少 20 行
+  收益: 消除重复循环逻辑，条件判断集中管理
+  验证: 编译通过
+
+【P5-20】✅ ExecutionManager.logSkillSchedule() 日志构建合并 — 已完成（减少15行）
+  工作量: 小（30分钟）✅ 已完成
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  完成内容:
+    - 提取 buildSkillScheduleLog() 私有方法，参数化标题和数据源
+    - 四段几乎相同的日志构建合并为一处
+    - StringBuilder + for循环 + DebugLogger.log 模式统一
+  代码行数变化:
+    - ExecutionManager.java: 约减少 15 行
+  收益: 消除重复日志构建逻辑，数据与逻辑分离
+  验证: 编译通过
+
+【P5-21】✅ SeerDiviner/HunterGuarder 预告日志共享 — 已完成（减少15行）
+  工作量: 小（30分钟）✅ 已完成
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  完成内容:
+    - 在 GameLogicUtils 中添加 buildSkillScheduleLog() 静态方法
+    - SeerDiviner 和 HunterGuarder 中的预告日志构建替换为共享方法调用
+    - 消除3处重复的 StringBuilder + for循环模式
+  代码行数变化:
+    - SeerDiviner.java: 约减少 7 行
+    - HunterGuarder.java: 约减少 12 行
+    - GameLogicUtils.java: 约增加 8 行（净减少 11 行）
+  收益: 消除跨类重复代码，日志构建逻辑集中管理
   验证: 编译通过
 
 【P5-16】❌ ResultEffectApplicator/ResultPresenter isHunter 语义方法 — 已放弃（语法糖）

@@ -101,17 +101,9 @@ public class LingFabricator
         {
             if (ctx.getActualRole(shokei) == 7)
                 option.add(0);
-            for (int i = 0; i < ctx.zhans.size(); i++)
-            {
-                if (ctx.getActualRole(ctx.zhans.get(i)) != 7
-                        || ctx.getSuspicionValue(ctx.zhans.get(i), num) > GameConstants.INFJ) continue;
-                int zhan = ctx.zhans.get(i);
-                for (int j = 1; j < gd; j++)
-                    if (ctx.getSkillTarget(zhan, j) == shokei)
-                        option.add(0);
-                    else if (ctx.getSkillTarget(zhan, j) - shokei == n)
-                        option.add(1);
-            }
+            collectLingOptions(option, num, shokei, n, gd,
+                    zhan -> ctx.getActualRole(zhan) == 7 && ctx.getSuspicionValue(zhan, num) <= GameConstants.INFJ,
+                    true);
             if (option.size() > 0)
             {
                 int p = GameConstants.PROB_LING_WOLF_FACTION_DEFAULT;
@@ -120,45 +112,45 @@ public class LingFabricator
                 return;
             }
         }
-        for (int i = 0; i < ctx.zhans.size(); i++)
+        collectLingOptions(option, num, shokei, n, gd,
+                zhan -> ctx.getSuspicionValue(zhan, num) < GameConstants.INFJ
+                        && ctx.getSuspicionValue(num, zhan) < GameConstants.INFJ && ctx.lined[zhan][num] == 1,
+                true);
+        if (option.size() > 0)
         {
-            int zhan = ctx.zhans.get(i);
-            if (ctx.getSuspicionValue(zhan, num) < GameConstants.INFJ
-                    && ctx.getSuspicionValue(num, zhan) < GameConstants.INFJ && ctx.lined[zhan][num] == 1)
-            {
-                for (int j = 1; j < gd; j++)
-                    if (ctx.getSkillTarget(zhan, j) == shokei)
-                        option.add(0);
-                    else if (ctx.getSkillTarget(zhan, j) - shokei == n)
-                        option.add(1);
-            }
-            if (option.size() > 0)
-                {
-                    int p = getLingProbability(ctx.getActualRole(num), true);
-                    processLingOption(option, num, p);
-                    return;
-                }
+            processLingOption(option, num, getLingProbability(ctx.getActualRole(num), true));
+            return;
         }
-        for (int i = 0; i < ctx.zhans.size(); i++)
+        collectLingOptions(option, num, shokei, n, gd,
+                zhan -> ctx.getSuspicionValue(zhan, num) > GameConstants.INFJ
+                        && ctx.getSuspicionValue(num, zhan) > GameConstants.INFJ,
+                false);
+        if (option.size() > 0)
         {
-            int zhan = ctx.zhans.get(i);
-            if (ctx.getSuspicionValue(zhan, num) > GameConstants.INFJ
-                    && ctx.getSuspicionValue(num, zhan) > GameConstants.INFJ)
-            {
-                for (int j = 1; j < gd; j++)
-                    if (ctx.getSkillTarget(zhan, j) - shokei == n)
-                        option.add(0);
-            }
-            if (option.size() > 0)
-            {
-                int p = getLingProbability(ctx.getActualRole(num), false);
-                processLingOption(option, num, p);
-                return;
-            }
+            processLingOption(option, num, getLingProbability(ctx.getActualRole(num), false));
+            return;
         }
         int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(baip, heip)));
         if (op == 1)
             ctx.setSkillTarget(num, gd, ctx.getSkillTarget(num, gd) + n);
+    }
+
+    private void collectLingOptions(ArrayList<Integer> option, int num, int shokei, int n, int gd,
+                                    java.util.function.Predicate<Integer> filter, boolean includeWhite)
+    {
+        for (int i = 0; i < ctx.zhans.size(); i++)
+        {
+            int zhan = ctx.zhans.get(i);
+            if (!filter.test(zhan)) continue;
+            for (int j = 1; j < gd; j++)
+            {
+                int skillTarget = ctx.getSkillTarget(zhan, j);
+                if (skillTarget == shokei)
+                    option.add(0);
+                else if (skillTarget - shokei == n)
+                    option.add(includeWhite ? 1 : 0);
+            }
+        }
     }
 
     private void processLingOption(ArrayList<Integer> option, int num, int p)
