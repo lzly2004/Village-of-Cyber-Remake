@@ -649,6 +649,31 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
   - ❌ 净效果: 代码行数增加1行，不符合"减少代码行数"目标
   - 放弃原因: 认同用户原则，该重构仅提升可读性，不减少代码行数
 
+[P5-38] ✅ CharacterSelectionPanel claimedRoleIconName 构建使用 UIComponentFactory
+  来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+  - ✅ 删除 StringBuilder 手动构建逻辑（5行）
+  - ✅ 替换为 ui.uiComponentFactory.getClaimedRoleIconName() 调用（1行）
+  - 代码行数: CharacterSelectionPanel.java: -4行
+  - 收益: 消除重复逻辑，统一使用 UIComponentFactory
+  - 验证: 编译通过
+
+[P5-39] ❌ PlayerStatusRenderer 与 ReplayPlayerHandler skillTargetName 构建重复消除（已放弃）
+  原因: 两处逻辑差异较大（PlayerStatusRenderer 有副作用设置数组），合并收益不如预期
+  - ❌ PlayerStatusRenderer 有副作用（设置 ui.claimedRolenum/skillTargetOrder/skillTargetPeople/skillTargetNames）
+  - ❌ ReplayPlayerHandler 无副作用，仅构建字符串
+  - 放弃原因: 逻辑不完全相同，强行合并会增加复杂度
+
+[P5-40] ❌ ReplayPlayerHandler 角色图像名称构建使用 GameStrings（已放弃）
+  原因: 两处逻辑不兼容
+  - ❌ ReplayPlayerHandler: 死亡时仍显示角色身份头像（roleSuffix）
+  - ❌ GameStrings.buildCharacterImageName: 死亡时显示 gs.png
+  - 放弃原因: 逻辑不一致，不能直接替换
+
+[P5-41/42/43] ❌ getJobText 调用简化（已放弃）
+  原因: 语法糖级别重构，不会减少代码行数
+  - ❌ 仅缩短每行代码长度，不减少行数
+  - 放弃原因: 不符合"减少代码量"原则
+
 [P5-11] ❌ GameContext 角色语义方法添加（已放弃）
 
 [P5-29] ❌ VoteResultRenderer isAlive/getDeathDay 检查重复（已放弃）
@@ -666,6 +691,6 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
   P2: 5 项 ✅ 完成 | 2 项 ⚠️ 已回退(P2-2)
   P3: 4 项 ✅ 完成 | 1 项 ⚠️ 已回退(P3-5)
   P4: 3 项 ✅ 完成（P4-1, P4-3, P4-4）
-  P5: 28 项（P5-1, P5-2, P5-3, P5-4, P5-5, P5-6, P5-8, P5-9, P5-12, P5-13, P5-14, P5-15, P5-19, P5-20, P5-21, P5-22, P5-23, P5-24, P5-25, P5-26, P5-27, P5-28, P5-30, P5-31, P5-32, P5-33, P5-34, P5-35, P5-36 ✅；P5-7 ⏸️；P5-11, P5-16, P5-17, P5-18, P5-29, P5-37 ❌）
-  合计: 62 项已完成 + 部分完成 2 项 + 已放弃 6 项 + 已回退 3 项
+  P5: 29 项（P5-1, P5-2, P5-3, P5-4, P5-5, P5-6, P5-8, P5-9, P5-12, P5-13, P5-14, P5-15, P5-19, P5-20, P5-21, P5-22, P5-23, P5-24, P5-25, P5-26, P5-27, P5-28, P5-30, P5-31, P5-32, P5-33, P5-34, P5-35, P5-36, P5-38 ✅；P5-7 ⏸️；P5-11, P5-16, P5-17, P5-18, P5-29, P5-37, P5-39, P5-40, P5-41, P5-42, P5-43 ❌）
+  合计: 63 项已完成 + 部分完成 2 项 + 已放弃 11 项 + 已回退 3 项
 ================================================================================

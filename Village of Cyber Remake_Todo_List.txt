@@ -1,7 +1,7 @@
 ================================================================================
         Village of Cyber Remake — 重构 Todo List（评估版）
-        整理日期：2026-06-29 | 版本：v5.24
-        已完成: 62 项 | 暂停: 1 项 | 放弃: 6 项 | 已回退: 3 项 | 待评估: 6 项
+        整理日期：2026-06-29 | 版本：v5.25
+        已完成: 63 项 | 暂停: 1 项 | 放弃: 11 项 | 已回退: 3 项 | 待评估: 0 项
 ================================================================================
 
   ⚠️ 重构原则提醒：
@@ -798,99 +798,23 @@
 【P5-37 ❌ 已放弃】GameContext.initFromPeiyi() switch 语句数组映射化
   原因: 重构后代码行数反而增加（peiyi枚举+10行 vs GameContext-9行），不符合"减少代码行数"目标
 
-【P5-38】CharacterSelectionPanel claimedRoleIconName 构建使用 UIComponentFactory
-  工作量: 小（10分钟）
-  风险: 低
-  收益: 中
-  综合优先级: ⭐⭐⭐
-  现状:
-    - CharacterSelectionPanel（行58-63）手动构建 claimedRoleIconName
-    - UIComponentFactory.getClaimedRoleIconName() 已提供相同功能
-  方案:
-    - 替换为 ui.uiComponentFactory.getClaimedRoleIconName() 调用
-  代码行数变化:
-    - CharacterSelectionPanel.java: -7行（删除StringBuilder和条件判断）
-  收益: 消除重复逻辑，统一使用 UIComponentFactory
+【P5-38 ✅ 已完成】CharacterSelectionPanel claimedRoleIconName 构建使用 UIComponentFactory
+  代码行数: CharacterSelectionPanel.java: -4行
 
-【P5-39】PlayerStatusRenderer 与 ReplayPlayerHandler skillTargetName 构建重复消除
-  工作量: 中（20分钟）
-  风险: 低
-  收益: 中-高
-  综合优先级: ⭐⭐⭐
-  现状:
-    - PlayerStatusRenderer（行25-53）构建 skillTargetName
-    - ReplayPlayerHandler（行237-255）构建 skillTargetName
-    - 逻辑高度相似：前缀"result" + 角色编号 + 结果后缀（black/white/.png）
-  方案:
-    - 在 UIComponentFactory 或 GameStrings 中添加 buildSkillTargetIconName() 方法
-    - 两处调用点替换为方法调用
-  代码行数变化:
-    - UIComponentFactory.java: +10行（方法定义）
-    - PlayerStatusRenderer.java: -25行（消除逻辑）
-    - ReplayPlayerHandler.java: -15行（消除逻辑）
-    - 净减少: ~30行
-  收益: 消除跨类重复逻辑，技能目标图标名称构建集中管理
+【P5-39 ❌ 已放弃】PlayerStatusRenderer 与 ReplayPlayerHandler skillTargetName 构建重复消除
+  原因: 两处逻辑差异较大（PlayerStatusRenderer 有副作用设置数组），合并收益不如预期
 
-【P5-40】ReplayPlayerHandler 角色图像名称构建使用 GameStrings.buildCharacterImageName()
-  工作量: 小（10分钟）
-  风险: 低
-  收益: 中
-  综合优先级: ⭐⭐⭐
-  现状:
-    - ReplayPlayerHandler（行217-230）手动构建 imageName：
-      ```java
-      if (ps.characterNumber <= 9) imageName.append("0");
-      imageName.append(ps.characterNumber);
-      imageName.append(GameStrings.getRoleImageSuffix(ps.actualRole));
-      imageName.append(".png");
-      ```
-    - GameStrings.buildCharacterImageName() 已提供相同功能
-  方案:
-    - 替换为 GameStrings.buildCharacterImageName() 调用
-  代码行数变化:
-    - ReplayPlayerHandler.java: -6行（删除手动构建逻辑）
-  收益: 消除重复逻辑，统一使用 GameStrings 共享方法
+【P5-40 ❌ 已放弃】ReplayPlayerHandler 角色图像名称构建使用 GameStrings
+  原因: 两处逻辑不兼容（ReplayPlayerHandler 死亡时仍显示角色身份头像）
 
-【P5-41】UI.java 中重复的 getJobText(ctx.getCharacterNumber()) 简化
-  工作量: 小（10分钟）
-  风险: 低
-  收益: 中
-  综合优先级: ⭐⭐⭐
-  现状:
-    - UI.java 已有便捷方法 `getJobText(int player)`（行140）
-    - 但 UI.java 内部仍多次使用冗长写法 `uiComponentFactory.getJobText(ctx.getCharacterNumber())`（行234, 238, 241）
-  方案:
-    - 将 `uiComponentFactory.getJobText(ctx.getCharacterNumber(x))` 替换为 `getJobText(x)`
-  代码行数变化:
-    - UI.java: -15~20行（缩短方法调用）
-  收益: 代码更简洁，统一使用 UI 类内部便捷方法
+【P5-41 ❌ 已放弃】UI.java 中重复的 getJobText(ctx.getCharacterNumber()) 简化
+  原因: 语法糖级别重构，不会减少代码行数
 
-【P5-42】VoteResultRenderer 多处 ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber()) 简化
-  工作量: 小（10分钟）
-  风险: 低
-  收益: 中
-  综合优先级: ⭐⭐⭐
-  现状:
-    - VoteResultRenderer.java（行29, 86, 92, 110, 112）多次使用冗长写法
-    - UI.java 已有 `getJobText(int player)` 便捷方法
-  方案:
-    - 将 `ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(x))` 替换为 `ui.getJobText(x)`
-  代码行数变化:
-    - VoteResultRenderer.java: -20~25行（缩短方法调用）
-  收益: 代码更简洁，减少重复链式调用
+【P5-42 ❌ 已放弃】VoteResultRenderer 多处 ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber()) 简化
+  原因: 语法糖级别重构，不会减少代码行数
 
-【P5-43】GameLogicUtils 中重复的 getJobText(getCharacterNumber()) 简化
-  工作量: 小（10分钟）
-  风险: 低
-  收益: 中
-  综合优先级: ⭐⭐⭐
-  现状:
-    - GameLogicUtils.java（行120, 124, 129）多次使用冗长写法
-  方案:
-    - 将 `ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(x))` 替换为 `ui.getJobText(x)`
-  代码行数变化:
-    - GameLogicUtils.java: -10~15行（缩短方法调用）
-  收益: 代码更简洁，减少重复链式调用
+【P5-43 ❌ 已放弃】GameLogicUtils 中重复的 getJobText(getCharacterNumber()) 简化
+  原因: 语法糖级别重构，不会减少代码行数
 
 ================================================================================
                             推荐执行顺序
