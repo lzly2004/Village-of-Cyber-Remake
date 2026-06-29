@@ -13,6 +13,13 @@ public class SharedExposer
 
     public int getExposureProgress() { return exposureProgress; }
 
+    private void applyGuardianCO(int player)
+    {
+        ctx.setClaimedRole(player, 4);
+        ctx.setComingOutDay(player, ctx.getGameDay());
+        ctx.addLazySuspicionValue(player, -GameConstants.INF);
+    }
+
     public void expose()
     {
         if (ctx.getPeiyi() == peiyi.jianyi) return;
@@ -30,12 +37,8 @@ public class SharedExposer
                 ctx.eventarray.add(new Event(EventName.gkgsw4,
                         ctx.getCharacterName(ctx.gyindex[gy]),
                         ctx.getCharacterName(ctx.gyindex[3 - gy])));
-                ctx.setClaimedRole(ctx.gyindex[1], 4);
-                ctx.setComingOutDay(ctx.gyindex[1], ctx.getGameDay());
-                ctx.setClaimedRole(ctx.gyindex[2], 4);
-                ctx.setComingOutDay(ctx.gyindex[2], ctx.getGameDay());
-                ctx.addLazySuspicionValue(ctx.gyindex[1], -GameConstants.INF);
-                ctx.addLazySuspicionValue(ctx.gyindex[2], -GameConstants.INF);
+                applyGuardianCO(ctx.gyindex[1]);
+                applyGuardianCO(ctx.gyindex[2]);
                 return;
             }
             if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
@@ -58,12 +61,8 @@ public class SharedExposer
                             ctx.getCharacterName(ctx.gyindex[1]),
                             ctx.getCharacterName(ctx.gyindex[2])));
                 }
-                ctx.setClaimedRole(ctx.gyindex[1], 4);
-                ctx.setComingOutDay(ctx.gyindex[1], ctx.getGameDay());
-                ctx.setClaimedRole(ctx.gyindex[2], 4);
-                ctx.setComingOutDay(ctx.gyindex[2], ctx.getGameDay());
-                ctx.addLazySuspicionValue(ctx.gyindex[1], -GameConstants.INF);
-                ctx.addLazySuspicionValue(ctx.gyindex[2], -GameConstants.INF);
+                applyGuardianCO(ctx.gyindex[1]);
+                applyGuardianCO(ctx.gyindex[2]);
             }
             else
             {
@@ -72,17 +71,13 @@ public class SharedExposer
                 {
                     ctx.eventarray.add(new Event(EventName.gyho2,
                             ctx.getCharacterName(ctx.gyindex[1])));
-                    ctx.setClaimedRole(ctx.gyindex[1], 4);
-                    ctx.setComingOutDay(ctx.gyindex[1], ctx.getGameDay());
-                    ctx.addLazySuspicionValue(ctx.gyindex[1], -GameConstants.INF);
+                    applyGuardianCO(ctx.gyindex[1]);
                 }
                 else
                 {
                     ctx.eventarray.add(new Event(EventName.gyho2,
                             ctx.getCharacterName(ctx.gyindex[2])));
-                    ctx.setClaimedRole(ctx.gyindex[2], 4);
-                    ctx.setComingOutDay(ctx.gyindex[2], ctx.getGameDay());
-                    ctx.addLazySuspicionValue(ctx.gyindex[2], -GameConstants.INF);
+                    applyGuardianCO(ctx.gyindex[2]);
                 }
             }
             return;
@@ -98,9 +93,7 @@ public class SharedExposer
             exposureProgress = GameConstants.INF;
         if (exposureProgress > 99)
         {
-            ctx.setClaimedRole(ctx.gyindex[qfnum], 4);
-            ctx.setComingOutDay(ctx.gyindex[qfnum], ctx.getGameDay());
-            ctx.addLazySuspicionValue(ctx.gyindex[qfnum], -GameConstants.INF);
+            applyGuardianCO(ctx.gyindex[qfnum]);
             if (ctx.getDeathReason(ctx.gyindex[qfnum]) == whyDie.chuxing)
                 ctx.eventarray.add(new Event(EventName.gycx6,
                         ctx.getCharacterName(ctx.gyindex[3 - qfnum]),
