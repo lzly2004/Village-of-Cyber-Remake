@@ -56,12 +56,8 @@ class CharacterSelectionPanel {
             String imageName = handler.charImageName(i);
 
             if (ui.ctx.getClaimedRole(i) > 0 && ui.ctx.getClaimedRole(i) < 6) {
-                StringBuilder crName = new StringBuilder("yaku");
-                if (ui.ctx.getClaimedRole(i) <= 3)
-                    crName.append(ui.ctx.getClaimedRole(i)).append("_").append(ui.ctx.getClaimedRoleOrder(i)).append(".png");
-                else
-                    crName.append(ui.ctx.getClaimedRole(i)).append(".png");
-                JLabel crLabel = new JLabel(ui.resources.getImage(crName.toString()));
+                String crName = ui.uiComponentFactory.getClaimedRoleIconName(ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i));
+                JLabel crLabel = new JLabel(ui.resources.getImage(crName));
                 crLabel.setBounds(handler.charGridX(i, 60, 74), handler.charGridY(i, 20, 128),
                         crLabel.getIcon().getIconWidth(), crLabel.getIcon().getIconHeight());
                 panel.add(crLabel);
