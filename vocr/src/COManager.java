@@ -7,6 +7,7 @@ public class COManager
     private final SuspicionSystem suspicion;
     private final ResultPresenter resultPresenter;
     private final ProbabilityCalculator probabilityCalculator;
+    private final ResultEventGenerator eventGenerator;
 
     public COManager(GameContext ctx, SuspicionSystem suspicion,
                      ResultPresenter resultPresenter, ProbabilityCalculator probabilityCalculator)
@@ -15,6 +16,7 @@ public class COManager
         this.suspicion = suspicion;
         this.resultPresenter = resultPresenter;
         this.probabilityCalculator = probabilityCalculator;
+        this.eventGenerator = new ResultEventGenerator(ctx);
     }
 
     /** 猫又CO概率参数p1：狼队中已CO且非默认CO（claimedRole=6）的人数 */
@@ -117,9 +119,7 @@ public class COManager
                     ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_INCREASE_BLACK_BALL_TARGET);
                     ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_BLACK_BALL_CASTER);
                     suspicion.updateTop3Aux2(num, target, GameConstants.INF, GameConstants.INF);
-                    ctx.eventarray.add(new Event(EventName.zjgh8b,
-                            ctx.getCharacterName(num),
-                            ctx.getCharacterName(target)));
+                    eventGenerator.addEvent(EventName.zjgh8b, num, target);
                     DebugLogger.log("添加事件占结果黑，占卜师编号：" + num + "黑球姓名:"
                             + ctx.getCharacterName(target).toString());
                     resultPresenter.presentBlackResult(num, target, true);
@@ -128,13 +128,9 @@ public class COManager
                 {
                     ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_DECREASE_WHITE_BALL_TARGET);
                     suspicion.updateTop3Aux2(num, target, -5, -10);
-                    ctx.eventarray.add(new Event(EventName.zjgb8,
-                            ctx.getCharacterName(num),
-                            ctx.getCharacterName(target)));
+                    eventGenerator.addEvent(EventName.zjgb8, num, target);
                     if (ctx.getDeathReason(target) == whyDie.NONE)
-                        ctx.eventarray.add(new Event(EventName.jbdh8r,
-                                ctx.getCharacterName(target),
-                                ctx.getCharacterName(num)));
+                        eventGenerator.addEvent(EventName.jbdh8r, target, num);
                 }
                 if (gd == 3)
                 {
@@ -158,8 +154,7 @@ public class COManager
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 if (gd == 2)
                 {
-                    ctx.eventarray.add(new Event(EventName.lnco18,
-                            ctx.getCharacterName(num)));
+                    eventGenerator.addEvent(EventName.lnco18, num);
                     break;
                 }
                 else
@@ -179,7 +174,7 @@ public class COManager
                 if (ctx.getClaimedRoleOrder(num) == 0)
                     ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(3));
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
-                ctx.eventarray.add(new Event(EventName.lrco, ctx.getCharacterName(num)));
+                eventGenerator.addEvent(EventName.lrco, num);
                 if (ctx.getActualRole(num) == 7)
                     ctx.rlsl = true;
                 break;
@@ -188,12 +183,8 @@ public class COManager
                 int gy = 1;
                 if (ctx.gyindex[2] == num) gy = 2;
                 ctx.addLazySuspicionValue(num, -GameConstants.INF);
-                ctx.eventarray.add(new Event(EventName.qfjc5,
-                        ctx.getCharacterName(num),
-                        ctx.getCharacterName(ctx.gyindex[3 - gy])));
-                ctx.eventarray.add(new Event(EventName.qfjcqr5r,
-                        ctx.getCharacterName(ctx.gyindex[3 - gy]),
-                        ctx.getCharacterName(num)));
+                eventGenerator.addEvent(EventName.qfjc5, num, ctx.gyindex[3 - gy]);
+                eventGenerator.addEvent(EventName.qfjcqr5r, ctx.gyindex[3 - gy], num);
                 if (ctx.getClaimedRole(ctx.gyindex[3 - gy]) != zhi)
                 {
                     ctx.setClaimedRole(ctx.gyindex[3 - gy], zhi);
@@ -211,7 +202,7 @@ public class COManager
                 if (ctx.getClaimedRoleOrder(num) == 0)
                     ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(5));
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
-                ctx.eventarray.add(new Event(EventName.mco, ctx.getCharacterName(num)));
+                eventGenerator.addEvent(EventName.mco, num);
                 if (ctx.getActualRole(num) == 7)
                     ctx.rlsm = true;
                 break;
