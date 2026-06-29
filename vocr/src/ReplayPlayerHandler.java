@@ -509,7 +509,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                     if (ps == null) continue;
                     switch (ps.claimedRole) {
                         case 1: appendSeerResults(ui, zhanbu, ps, i, playerSum, day); break;
-                        case 2: appendMediumResults(ui, lingneng, ps, i, playerSum, day); break;
+                        case 2: appendSeerResults(ui, lingneng, ps, i, playerSum, day); break;
                         case 3: appendHunterResults(ui, lieren, ps, i, playerSum, day); break;
                     }
                 }
@@ -840,34 +840,6 @@ public class ReplayPlayerHandler implements SceneHandler {
         return CharacterKanjiName.values()[charNum].getShortName();
     }
 
-    private int getCharNumByPlayerIndex(DaySnapshot snap, int targetPlayerIdx) {
-        if (snap.players == null || targetPlayerIdx < 0) return targetPlayerIdx;
-        for (DaySnapshot.PlayerStatus ps : snap.players) {
-            if (ps.playerIndex == targetPlayerIdx) {
-                return ps.characterNumber;
-            }
-        }
-        DebugLogger.warn("[CHAR-RESOLVE] Cannot find playerIndex=" + targetPlayerIdx + " in day=" + snap.dayNumber + ", fallback to original value");
-        return targetPlayerIdx;
-    }
-
-    /**
-     * 根据玩家编号(playerIndex)从快照中查找对应的角色编号(characterNumber)
-     * @param snap 当日快照
-     * @param playerIdx 玩家编号（1-N）
-     * @return 角色编号，未找到返回-1
-     */
-    private int getCharNumFromSnapshot(DaySnapshot snap, int playerIdx) {
-        if (snap == null || snap.players == null || playerIdx < 1) return -1;
-        for (DaySnapshot.PlayerStatus ps : snap.players) {
-            if (ps != null && ps.playerIndex == playerIdx) {
-                return ps.characterNumber;
-            }
-        }
-        DebugLogger.warn("[ReplayPlayerHandler] 未找到player=" + playerIdx + "的characterNumber");
-        return -1;
-    }
-
     private String findRoleInSnapshot(DaySnapshot snap, int targetRole, int playerSum) {
         if (snap == null || snap.players == null) return "";
         for (int i = 0; i < playerSum; i++) {
@@ -877,103 +849,46 @@ public class ReplayPlayerHandler implements SceneHandler {
         return "";
     }
 
-    private void appendSeerResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus basePs,
-                                   int idx, int playerSum, int currentDay) {
-        sb.append(getShortName(basePs.characterNumber)).append(" : ");
-        for (int d = 1; d < currentDay; d++) {
-            DaySnapshot snap = getSnapshot(ui, d + 1);
+    private void appendSkillResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus ps,
+                                   int idx, int playerSum, int startDay, int endDay,
+                                   boolean useSafeName, boolean showBallResult, int dayOffset) {
+        sb.append(useSafeName ? safeCharName(ps.characterNumber) : getShortName(ps.characterNumber)).append(" : ");
+        for (int d = startDay; d < endDay; d++) {
+            DaySnapshot snap = getSnapshot(ui, d + dayOffset);
             if (snap == null || snap.players == null || idx >= snap.players.length) continue;
-            DaySnapshot.PlayerStatus ps = snap.players[idx];
-            if (ps == null) continue;
-            if (ps.deathDay > 0 && d >= ps.deathDay) break;
-            if (ps.skillTarget != 0) {
-                int target = ps.skillTarget;
-                DebugLogger.info("[SEER-RAW] day=" + d + ", src=p" + (idx+1) + ", skillTarget=" + target + ", playerSum=" + playerSum);
-                if (target > playerSum) {
-                    sb.append(getShortName(getCharNumByTarget(snap, target - playerSum))).append("\u25cf\u2192");
-                } else if (target > 0) {
-                    sb.append(getShortName(getCharNumByTarget(snap, target))).append("\u25cb\u2192");
-                }
-            }
-        }
-        if (basePs.nonHumanMarked) { sb.append(GameStrings.MARKER_EXPOSED).append("\u2192"); }
-        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '\u2192') sb.setLength(sb.length() - 1);
-        sb.append("\n");
-    }
-
-    private void appendMediumResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus basePs,
-                                     int idx, int playerSum, int currentDay) {
-        appendSeerResults(ui, sb, basePs, idx, playerSum, currentDay);
-    }
-
-    private void appendHunterResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus ps,
-                                     int idx, int playerSum, int currentDay) {
-        sb.append(getShortName(ps.characterNumber)).append(" : ");
-        for (int d = 2; d < currentDay; d++) {
-            DaySnapshot s = getSnapshot(ui, d + 1);
-            if (s == null || s.players == null || idx >= s.players.length) continue;
-            DaySnapshot.PlayerStatus p = s.players[idx];
-            if (p == null) continue;
-            if (p.deathDay > 0 && d >= p.deathDay) break;
-            if (p.skillTarget != 0) {
-                String targetName = getShortName(getCharNumByTarget(s, p.skillTarget));
-                sb.append(targetName).append("\u2192");
-            }
-        }
-        if (ps.nonHumanMarked) { sb.append(GameStrings.MARKER_EXPOSED).append("\u2192"); }
-        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '\u2192') sb.setLength(sb.length() - 1);
-        sb.append("\n");
-    }
-
-    private void appendReplaySkillResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus basePs,
-                                          int idx, int playerSum, int roleType, int startDay, int currentDay) {
-        sb.append(safeCharName(basePs.characterNumber)).append(" : ");
-        for (int d = startDay; d <= currentDay; d++) {
-            DaySnapshot snap = getSnapshot(ui, d);
-            if (snap == null || snap.players == null || idx >= snap.players.length) continue;
-            DaySnapshot.PlayerStatus ps = snap.players[idx];
-            if (ps == null) continue;
-            // 死亡后不再发球
-            if (ps.deathDay > 0 && d >= ps.deathDay) break;
-            if (ps.skillTarget != 0) {
-                int target = ps.skillTarget;
-                String targetName;
-                if (target >= playerSum + 1) {
-                    targetName = safeCharName(getCharNumByTarget(snap, target - playerSum));
-                    sb.append(targetName).append("●→");
-                } else if (target > 0) {
-                    targetName = safeCharName(getCharNumByTarget(snap, target));
-                    sb.append(targetName).append("○→");
-                }
-            }
-        }
-        if (basePs.nonHumanMarked) {
-            sb.append(GameStrings.MARKER_EXPOSED).append("→");
-        }
-        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '>') sb.setLength(sb.length() - 1);
-        sb.append("\n");
-    }
-
-    private void appendReplayGuardResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus ps,
-                                           int idx, int playerSum, int startDay, int currentDay) {
-        sb.append(getShortName(ps.characterNumber)).append(" : ");
-        for (int d = startDay; d <= currentDay; d++) {
-            DaySnapshot s = getSnapshot(ui, d);
-            if (s == null || s.players == null || idx >= s.players.length) continue;
-            DaySnapshot.PlayerStatus p = s.players[idx];
+            DaySnapshot.PlayerStatus p = snap.players[idx];
             if (p == null) continue;
             if (p.deathDay > 0 && d >= p.deathDay) break;
             if (p.skillTarget != 0) {
                 int target = p.skillTarget;
-                String targetName = getShortName(getCharNumByTarget(s, target <= playerSum ? target : target - playerSum));
-                sb.append(targetName).append("\u2192");
+                int effectiveTarget = target;
+                boolean isBlack = false;
+                if (target > playerSum) {
+                    effectiveTarget = target - playerSum;
+                    isBlack = true;
+                }
+                String targetName = useSafeName ? safeCharName(getCharNumByTarget(snap, effectiveTarget))
+                        : getShortName(getCharNumByTarget(snap, effectiveTarget));
+                if (showBallResult) {
+                    sb.append(targetName).append(isBlack ? "\u25cf\u2192" : "\u25cb\u2192");
+                } else {
+                    sb.append(targetName).append("\u2192");
+                }
             }
         }
-        if (ps.nonHumanMarked) {
-            sb.append(GameStrings.MARKER_EXPOSED).append("→");
-        }
-        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '>') sb.setLength(sb.length() - 1);
+        if (ps.nonHumanMarked) sb.append(GameStrings.MARKER_EXPOSED).append("\u2192");
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '\u2192') sb.setLength(sb.length() - 1);
         sb.append("\n");
+    }
+
+    private void appendSeerResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus basePs,
+                                   int idx, int playerSum, int currentDay) {
+        appendSkillResults(ui, sb, basePs, idx, playerSum, 1, currentDay, false, true, 1);
+    }
+
+    private void appendHunterResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus ps,
+                                     int idx, int playerSum, int currentDay) {
+        appendSkillResults(ui, sb, ps, idx, playerSum, 2, currentDay, false, false, 1);
     }
 
     private int getCharNumByTarget(DaySnapshot snap, int targetPlayerIdx) {

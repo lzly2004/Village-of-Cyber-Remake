@@ -232,21 +232,12 @@ public class GameRecorder
     public void recordStateSnapshot(int day, GameStatus gs)
     {
         if (!active) return;
-        StringBuilder sb = new StringBuilder("STATE|day=" + day + "|");
-        for (int i = 1; i <= gs.getPlayerSum(); i++)
-        {
+        records.add(buildStateLine(day, gs.getPlayerSum(), i -> {
             GameCharacter gc = gs.gc[i];
-            sb.append("{").append(i).append(":")
-                    .append("n=").append(gc.number)
-                    .append(",r=").append(gc.actualRole)
-                    .append(",cr=").append(gc.claimedRole)
-                    .append(",cro=").append(gc.claimedRoleorder)
-                    .append(",dd=").append(gc.dieDay)
-                    .append(",wd=").append(gc.whyDie.ordinal())
-                    .append(",nm=").append(gc.nonHumanMarker)
-                    .append("}");
-        }
-        records.add(sb.toString());
+            return String.format("%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d",
+                    i, gc.number, gc.actualRole, gc.claimedRole, gc.claimedRoleorder,
+                    gc.dieDay, gc.whyDie.ordinal(), gc.nonHumanMarker);
+        }));
     }
 
     /**
@@ -259,37 +250,35 @@ public class GameRecorder
 
         int playerSum = ctx.getPlayerSum();
 
-        // 基础状态快照
         int aliveCount = 0;
         for (int i = 1; i <= playerSum; i++) {
             if (ctx.isAlive(i)) aliveCount++;
         }
         records.add("DAILY_SNAPSHOT|day=" + day + "|alive=" + aliveCount);
 
-        // 详细角色状态
-        StringBuilder sb = new StringBuilder("STATE|day=" + day + "|");
-        for (int i = 1; i <= playerSum; i++) {
+        String stateLine = buildStateLine(day, playerSum, i -> {
             int charNum = ctx.getCharacterNumber(i);
             if (charNum == 0) {
                 DebugLogger.warn("[GameRecorder] ⚠️ 玩家" + i + "的characterNumber=0!");
             }
-            sb.append("{").append(i).append(":")
-                    .append("n=").append(charNum)
-                    .append(",r=").append(ctx.getActualRole(i))
-                    .append(",cr=").append(ctx.getClaimedRole(i))
-                    .append(",cro=").append(ctx.getClaimedRoleOrder(i))
-                    .append(",dd=").append(ctx.getDeathDay(i))
-                    .append(",wd=").append(ctx.getDeathReason(i).ordinal())
-                    .append(",nm=").append(ctx.isNonHumanMarked(i) ? 1 : 0)
-                    .append(",cod=").append(ctx.getComingOutDay(i))
-                    .append(",st=").append(ctx.getSkillTarget(i, day - 1))
-                    .append("}");
-        }
-        String stateLine = sb.toString();
+            return String.format("%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d,cod=%d,st=%d",
+                    i, charNum, ctx.getActualRole(i), ctx.getClaimedRole(i), ctx.getClaimedRoleOrder(i),
+                    ctx.getDeathDay(i), ctx.getDeathReason(i).ordinal(), ctx.isNonHumanMarked(i) ? 1 : 0,
+                    ctx.getComingOutDay(i), ctx.getSkillTarget(i, day - 1));
+        });
         records.add(stateLine);
         DebugLogger.info("[GameRecorder] STATE行: " + stateLine);
 
         DebugLogger.info("[GameRecorder] 每日快照已记录: day=" + day + " alive=" + aliveCount);
+    }
+
+    private String buildStateLine(int day, int playerSum, java.util.function.IntFunction<String> playerDataProvider)
+    {
+        StringBuilder sb = new StringBuilder("STATE|day=" + day + "|");
+        for (int i = 1; i <= playerSum; i++) {
+            sb.append("{").append(playerDataProvider.apply(i)).append("}");
+        }
+        return sb.toString();
     }
 
     /**
