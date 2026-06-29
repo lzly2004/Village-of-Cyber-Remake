@@ -250,8 +250,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             } else {
                 VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay()), round[0], isReVote, this);
             }
-            if (isReVote[0]) { votePanel.againBtn.setVisible(true); votePanel.nextBtn.setVisible(false); if (round[0] < 3) round[0]++; }
-            else { votePanel.nextBtn.setVisible(true); votePanel.againBtn.setVisible(false); }
+            handleReVoteResultWithLimit(isReVote, round);
         });
 
         // --- 次へ ---
@@ -398,13 +397,12 @@ public class GameSceneVoteHandler implements SceneHandler {
         boolean[] isReVote = {false};
         if (!greyResult.cxList.isEmpty()) DebugLogger.log("cxList不为空，且具体为" + greyResult.cxList);
         if (ui.mainLogic.shokei(1, greyResult.cxList, ui.isAvoid)) {
-            int trueDay = (ui.ctx.getEndResult() == GameResult.NONE) ? ui.ctx.getGameDay() - 1 : ui.ctx.getGameDay();
+            int trueDay = ui.ctx.getEffectiveGameDay();
             for (int f = 0; f < greyResult.cxList.size(); ++f)
                 ui.greyCharas[f][trueDay] = greyResult.cxList.get(f);
             ui.voteMethods.add(1); greyResult.cxList.clear();
             VoteResultRenderer.renderPiao(ui, String.format(GameStrings.VOTE_TITLE_GREY, trueDay) + greyText + "\n", round[0], isReVote, this);
-            if (isReVote[0]) { votePanel.againBtn.setVisible(true); votePanel.nextBtn.setVisible(false); round[0]++; }
-            else { votePanel.nextBtn.setVisible(true); votePanel.againBtn.setVisible(false); }
+            handleReVoteResult(isReVote, round);
         } else {
             greyResult.cxList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
@@ -460,8 +458,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             } else {
                 VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay()), round[0], isReVote, this);
             }
-            if (isReVote[0]) { votePanel.againBtn.setVisible(true); votePanel.nextBtn.setVisible(false); round[0]++; }
-            else { votePanel.nextBtn.setVisible(true); votePanel.againBtn.setVisible(false); }
+            handleReVoteResult(isReVote, round);
         } else {
             chuxingList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
@@ -486,15 +483,14 @@ public class GameSceneVoteHandler implements SceneHandler {
         boolean[] isReVote = {false};
         if (ui.mainLogic.shokei(2, chuxingList, ui.isAvoid)) {
             ui.voteMethods.add(2);
-            int trueDay = (ui.ctx.getEndResult() == GameResult.NONE) ? ui.ctx.getGameDay() - 1 : ui.ctx.getGameDay();
+            int trueDay = ui.ctx.getEffectiveGameDay();
             StringBuilder isSelectedVoteTargetText = new StringBuilder();
             for (int i = 0; i < chuxingList.size(); ++i)
                 isSelectedVoteTargetText.append(ui.getJobText(chuxingList.get(i))).append(",");
             DebugLogger.log(isSelectedVoteTargetText);
             VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleDesign(trueDay, isSelectedVoteTargetText.toString()), round[0], isReVote, this);
             chuxingList.clear();
-            if (isReVote[0]) { votePanel.againBtn.setVisible(true); votePanel.nextBtn.setVisible(false); round[0]++; }
-            else { votePanel.nextBtn.setVisible(true); votePanel.againBtn.setVisible(false); }
+            handleReVoteResult(isReVote, round);
         } else {
             chuxingList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
@@ -626,6 +622,28 @@ public class GameSceneVoteHandler implements SceneHandler {
         else sb.append(cr);
         sb.append(".png");
         return sb.toString();
+    }
+
+    void handleReVoteResult(boolean[] isReVote, int[] round) {
+        if (isReVote[0]) {
+            votePanel.againBtn.setVisible(true);
+            votePanel.nextBtn.setVisible(false);
+            round[0]++;
+        } else {
+            votePanel.nextBtn.setVisible(true);
+            votePanel.againBtn.setVisible(false);
+        }
+    }
+
+    void handleReVoteResultWithLimit(boolean[] isReVote, int[] round) {
+        if (isReVote[0]) {
+            votePanel.againBtn.setVisible(true);
+            votePanel.nextBtn.setVisible(false);
+            if (round[0] < 3) round[0]++;
+        } else {
+            votePanel.nextBtn.setVisible(true);
+            votePanel.againBtn.setVisible(false);
+        }
     }
 
     void renderSkillTargets(JPanel panel, int baseX, int spacing, int yTop, int yBottom) {

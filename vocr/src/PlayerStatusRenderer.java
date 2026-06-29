@@ -17,18 +17,14 @@ class PlayerStatusRenderer {
         int halfCount = (playerSum + 1) / 2;
         for (int i = 1; i <= playerSum; i++) {
             StringBuilder xName = new StringBuilder();
-            StringBuilder imageName = new StringBuilder();
-            if (ui.ctx.getCharacterNumber(i) <= 9) imageName.append("0");
-            imageName.append(ui.ctx.getCharacterNumber(i));
+            String imageName = GameStrings.buildCharacterImageNameSimple(ui.ctx.getCharacterNumber(i), ui.ctx.getDeathReason(i));
             switch (ui.ctx.getDeathReason(i)) {
-                case NONE: break;
-                case chuxing: imageName.append("g"); xName.append("turi.png"); break;
-                case daymaozhou: imageName.append("g"); xName.append("noroi.png"); break;
-                case dayhouzhui: imageName.append("g"); xName.append("atooi.png"); break;
-                default: imageName.append("g"); xName.append("kami.png"); break;
+                case chuxing: xName.append("turi.png"); break;
+                case daymaozhou: xName.append("noroi.png"); break;
+                case dayhouzhui: xName.append("atooi.png"); break;
+                default: xName.append("kami.png"); break;
             }
-            imageName.append("s.png");
-            String textName = ui.ctx.getCharacterNumber(i) + "job.png";
+            String textName = GameStrings.buildCharacterTextName(ui.ctx.getCharacterNumber(i));
             String claimedRoleIconName = ui.uiComponentFactory.getClaimedRoleIconName(
                     ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i));
             StringBuilder skillTargetName = new StringBuilder("result");

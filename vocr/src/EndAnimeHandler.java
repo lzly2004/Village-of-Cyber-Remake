@@ -51,20 +51,14 @@ public class EndAnimeHandler implements SceneHandler {
             JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 16,
                     infoText.toString());
             StringBuilder xName = new StringBuilder();
-            StringBuilder imageName = new StringBuilder();
-            if (ui.ctx.getCharacterNumber(i) <= 9) imageName.append("0");
-            imageName.append(ui.ctx.getCharacterNumber(i));
+            String imageName = GameStrings.buildCharacterImageName(ui.ctx.getCharacterNumber(i), ui.ctx.getDeathReason(i), ui.ctx.getActualRole(i), true);
             switch (ui.ctx.getDeathReason(i)) {
-                case NONE:
-                    imageName.append(GameStrings.getRoleImageSuffix(ui.ctx.getActualRole(i)));
-                    break;
-                case chuxing:     imageName.append("gs"); xName.append("turi.png");   break;
-                case daymaozhou:  imageName.append("gs"); xName.append("noroi.png");  break;
-                case dayhouzhui:  imageName.append("gs"); xName.append("atooi.png");  break;
-                default:          imageName.append("gs"); xName.append("kami.png");   break;
+                case chuxing:     xName.append("turi.png");   break;
+                case daymaozhou:  xName.append("noroi.png");  break;
+                case dayhouzhui:  xName.append("atooi.png");  break;
+                default:          xName.append("kami.png");   break;
             }
-            imageName.append(".png");
-            String textName = ui.ctx.getCharacterNumber(i) + "job.png";
+            String textName = GameStrings.buildCharacterTextName(ui.ctx.getCharacterNumber(i));
             ImageIcon characterImage = ui.resources.getImage(imageName.toString());
             ImageIcon characterText = ui.resources.getImage(textName);
             if (!xName.isEmpty()) {

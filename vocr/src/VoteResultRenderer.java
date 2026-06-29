@@ -11,7 +11,7 @@ class VoteResultRenderer {
         DebugLogger.log("***当前gameDay等于" + ui.ctx.getGameDay() + "***");
         ui.piaoText.setVisible(true);
         ui.piaoText1.setVisible(true);
-        int gameDay = ui.ctx.getEndResult() == GameResult.NONE ? ui.ctx.getGameDay() - 1 : ui.ctx.getGameDay();
+        int gameDay = ui.ctx.getEffectiveGameDay();
         int playerSum = ui.ctx.getPlayerSum() + 1;
         int[][] voteTotal = buildVoteTotal(ui, playerSum, gameDay, round, true);
         StringBuilder leftPiao = new StringBuilder(str);

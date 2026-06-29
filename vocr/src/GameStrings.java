@@ -162,4 +162,30 @@ public final class GameStrings
             default -> "s";   // 村民
         };
     }
+
+    public static String buildCharacterImageName(int characterNumber, whyDie deathReason, int actualRole, boolean useRoleSuffix) {
+        StringBuilder imageName = new StringBuilder();
+        if (characterNumber <= 9) imageName.append("0");
+        imageName.append(characterNumber);
+        if (deathReason == whyDie.NONE) {
+            if (useRoleSuffix) imageName.append(getRoleImageSuffix(actualRole));
+        } else {
+            imageName.append("gs");
+        }
+        imageName.append(".png");
+        return imageName.toString();
+    }
+
+    public static String buildCharacterImageNameSimple(int characterNumber, whyDie deathReason) {
+        StringBuilder imageName = new StringBuilder();
+        if (characterNumber <= 9) imageName.append("0");
+        imageName.append(characterNumber);
+        if (deathReason != whyDie.NONE) imageName.append("g");
+        imageName.append("s.png");
+        return imageName.toString();
+    }
+
+    public static String buildCharacterTextName(int characterNumber) {
+        return characterNumber + "job.png";
+    }
 }

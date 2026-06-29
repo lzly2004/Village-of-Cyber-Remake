@@ -1,7 +1,7 @@
 ================================================================================
         Village of Cyber Remake — 重构 Todo List（评估版）
-        整理日期：2026-06-29 | 版本：v5.20
-        已完成: 55 项 | 暂停: 1 项 | 放弃: 5 项 | 已回退: 3 项
+        整理日期：2026-06-29 | 版本：v5.21
+        已完成: 58 项 | 暂停: 1 项 | 放弃: 5 项 | 已回退: 3 项
 ================================================================================
 
   ⚠️ 重构原则提醒：
@@ -679,6 +679,54 @@
   原因: 仅语法糖级别修改，调用处行数不变，不能真正减少代码量
   方案: 提取 isParticipatedInVote() 方法
   评估: 定义处+4行，调用处不变 → 净增加行数，不符合重构目标
+
+【P5-30】✅ EndAnimeHandler 与 PlayerStatusRenderer 角色图像名称构建重复消除 — 已完成（减少8行）
+  工作量: 小（20分钟）✅ 已完成
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  完成内容:
+    - GameStrings 添加 buildCharacterImageName()、buildCharacterImageNameSimple()、buildCharacterTextName() 共享方法
+    - EndAnimeHandler 和 PlayerStatusRenderer 替换为方法调用
+    - 消除重复的补零逻辑、角色编号拼接、死亡原因判断
+  代码行数变化:
+    - GameStrings.java: +30行（方法定义）
+    - EndAnimeHandler.java: -10行（14行 → 4行）
+    - PlayerStatusRenderer.java: -8行（12行 → 4行）
+    - 净减少: -12行
+  收益: 消除跨类重复代码，角色图像名称构建逻辑集中管理
+  验证: 编译通过
+
+【P5-31】✅ 多处重复的 getEffectiveGameDay 计算消除 — 已完成（减少6行）
+  工作量: 小（10分钟）✅ 已完成
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  完成内容:
+    - GameContext 添加 getEffectiveGameDay() 方法
+    - 三处调用点（VoteResultRenderer + 2处 GameSceneVoteHandler）替换为方法调用
+    - 消除重复的三元表达式
+  代码行数变化:
+    - GameContext.java: +4行（方法定义）
+    - VoteResultRenderer.java: -2行（2行 → 1行）
+    - GameSceneVoteHandler.java: -4行（2处各2行 → 1行）
+    - 净减少: 2行
+  收益: 消除重复逻辑，有效游戏天数计算集中管理
+  验证: 编译通过
+
+【P5-32】✅ GameSceneVoteHandler reVote 按钮逻辑重复消除 — 已完成（减少8行）
+  工作量: 小（15分钟）✅ 已完成
+  风险: 低
+  收益: 中-高
+  综合优先级: ⭐⭐⭐⭐
+  完成内容:
+    - 提取 handleReVoteResult() 和 handleReVoteResultWithLimit() 两个私有方法
+    - 4处调用点替换为方法调用
+    - 消除重复的按钮可见性设置和 round 递增逻辑
+  代码行数变化:
+    - GameSceneVoteHandler.java: +15行（方法定义）-8行（4处各2行 → 1行）= 净增加7行
+  收益: 消除重复逻辑，按钮状态管理集中，减少维护成本
+  验证: 编译通过
 
 ================================================================================
                             推荐执行顺序

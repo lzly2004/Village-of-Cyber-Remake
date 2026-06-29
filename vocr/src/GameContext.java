@@ -204,6 +204,10 @@ class GameContext implements GameContextView
     public void setEndResult(GameResult result) { gs.end = result; }
     /** 兼容旧接口：返回游戏结果的整数值 */
     public int getEndResultValue() { return gs.end.getValue(); }
+    /** 获取有效游戏天数（游戏进行中返回 getGameDay()-1，结束后返回 getGameDay()） */
+    public int getEffectiveGameDay() {
+        return gs.end == GameResult.NONE ? gs.gameDay - 1 : gs.gameDay;
+    }
     public peiyi getPeiyi() { return gs.p; }
     public boolean isDoubleDeathOccurred(int day) { return isDoubleDeathOccurred[day]; }
 
