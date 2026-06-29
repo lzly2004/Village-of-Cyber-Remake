@@ -692,7 +692,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 case 1:
                     extraText.append(GameStrings.VOTE_GREY);
                     for (int playerIdx : snapshot.greyTargetCharNums) {
-                        int charNum = getCharNumByPlayerIndex(snapshot, playerIdx);
+                        int charNum = getCharNumByTarget(snapshot, playerIdx);
                         DebugLogger.info("[VOTE-GREY] playerIdx=" + playerIdx + " -> charNum=" + charNum + " -> " + getShortName(charNum));
                         extraText.append(getShortName(charNum));
                     }
