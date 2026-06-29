@@ -111,4 +111,30 @@ class GameLogicUtils
                 sb.append(i).append(" ");
         return sb.toString();
     }
+
+    public static void appendSkillResultLog(UI ui, StringBuilder sb, int i, int startDay) {
+        appendSkillResultLog(ui, sb, i, startDay, true);
+    }
+
+    public static void appendSkillResultLog(UI ui, StringBuilder sb, int i, int startDay, boolean showBallResult) {
+        sb.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i))).append(" : ");
+        for (int j = startDay; j < ui.ctx.getGameDay(); ++j) {
+            if (ui.ctx.getDeathDay(i) != 0 && j >= ui.ctx.getDeathDay(i)) break;
+            if (ui.ctx.getSkillTarget(i, j) > ui.ctx.getPlayerSum()) {
+                sb.append(ui.uiComponentFactory.getJobText(
+                        ui.ctx.getCharacterNumber(ui.ctx.getSkillTarget(i, j) - ui.ctx.getPlayerSum())));
+                if (showBallResult) sb.append("●");
+                sb.append("→");
+            } else if (ui.ctx.getSkillTarget(i, j) > 0) {
+                sb.append(ui.uiComponentFactory.getJobText(
+                        ui.ctx.getCharacterNumber(ui.ctx.getSkillTarget(i, j))));
+                if (showBallResult) sb.append("○");
+                sb.append("→");
+            }
+        }
+        if (ui.ctx.isNonHumanMarked(i)) {
+            sb.append(GameStrings.MARKER_EXPOSED); sb.append("→");
+        }
+        sb.setLength(sb.length() - 1); sb.append("\n");
+    }
 }

@@ -576,26 +576,9 @@ public class GameSceneVoteHandler implements SceneHandler {
                     else if (temp <= 10) cmps.add(">");
                     else cmps.add("≫");
                 }
-                if (leftCnt >= 10) {
-                    for (int u = 1; u < 4; ++u) {
-                        if (this.ui.ctx.getTop3SuspectedPlayer(i, u, this.ui.ctx.getGameDay()) != 0) {
-                            if (u == 1) rightPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.ctx.getCharacterNumber(i))).append("：");
-                            rightPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.ctx.getCharacterNumber(this.ui.ctx.getTop3SuspectedPlayer(i, u, this.ui.ctx.getGameDay()))));
-                            if (!cmps.isEmpty()) { rightPiao.append(cmps.getFirst()); cmps.removeFirst(); }
-                        }
-                    }
-                    rightPiao.append("\n");
-                } else {
-                    for (int u = 1; u < 4; ++u) {
-                        if (this.ui.ctx.getTop3SuspectedPlayer(i, u, this.ui.ctx.getGameDay()) != 0) {
-                            if (u == 1) leftPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.ctx.getCharacterNumber(i))).append("：");
-                            leftPiao.append(this.ui.uiComponentFactory.getJobText(this.ui.ctx.getCharacterNumber(this.ui.ctx.getTop3SuspectedPlayer(i, u, this.ui.ctx.getGameDay()))));
-                            if (!cmps.isEmpty()) { leftPiao.append(cmps.getFirst()); cmps.removeFirst(); }
-                        }
-                    }
-                    leftPiao.append("\n");
-                    leftCnt++;
-                }
+                StringBuilder targetPiao = leftCnt >= 10 ? rightPiao : leftPiao;
+                appendVotePanel(targetPiao, i, cmps);
+                if (leftCnt < 10) leftCnt++;
             }
         }
         DebugLogger.log(leftPiao);
@@ -608,25 +591,8 @@ public class GameSceneVoteHandler implements SceneHandler {
 
 
 
-    private void appendSkillResults(StringBuilder sb, int i, int startDay)
-    {
-        sb.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i))).append(" : ");
-        for (int j = startDay; j < ui.ctx.getGameDay(); ++j) {
-            if (ui.ctx.getDeathDay(i) != 0 && j >= ui.ctx.getDeathDay(i)) break;
-            if (ui.ctx.getSkillTarget(i, j) > ui.ctx.getPlayerSum()) {
-                sb.append(ui.uiComponentFactory.getJobText(
-                        ui.ctx.getCharacterNumber(ui.ctx.getSkillTarget(i, j) - ui.ctx.getPlayerSum()))).append("●");
-                sb.append("→");
-            } else if (ui.ctx.getSkillTarget(i, j) > 0) {
-                sb.append(ui.uiComponentFactory.getJobText(
-                        ui.ctx.getCharacterNumber(ui.ctx.getSkillTarget(i, j)))).append("○");
-                sb.append("→");
-            }
-        }
-        if (ui.ctx.isNonHumanMarked(i)) {
-            sb.append(GameStrings.MARKER_EXPOSED); sb.append("→");
-        }
-        sb.setLength(sb.length() - 1); sb.append("\n");
+    private void appendSkillResults(StringBuilder sb, int i, int startDay) {
+        GameLogicUtils.appendSkillResultLog(ui, sb, i, startDay);
     }
 
     int charGridX(int i, int baseX, int spacing) {
@@ -640,6 +606,17 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     String charImageName(int i) {
         return ui.uiComponentFactory.getCharImageName(ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i));
+    }
+
+    private void appendVotePanel(StringBuilder piao, int i, java.util.LinkedList<String> cmps) {
+        for (int u = 1; u < 4; ++u) {
+            if (ui.ctx.getTop3SuspectedPlayer(i, u, ui.ctx.getGameDay()) != 0) {
+                if (u == 1) piao.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i))).append("：");
+                piao.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.ctx.getTop3SuspectedPlayer(i, u, ui.ctx.getGameDay()))));
+                if (!cmps.isEmpty()) { piao.append(cmps.getFirst()); cmps.removeFirst(); }
+            }
+        }
+        piao.append("\n");
     }
 
     String claimedRoleIconName(int i) {

@@ -1,7 +1,7 @@
 ================================================================================
         Village of Cyber Remake — 重构 Todo List（评估版）
-        整理日期：2026-06-29 | 版本：v5.18
-        已完成: 51 项 | 暂停: 1 项 | 放弃: 4 项 | 已回退: 3 项
+        整理日期：2026-06-29 | 版本：v5.19
+        已完成: 54 项 | 暂停: 1 项 | 放弃: 4 项 | 已回退: 3 项
 ================================================================================
 
   ⚠️ 重构原则提醒：
@@ -611,6 +611,52 @@
     - ❌ 仅语法包装，调用处行数不变
     - ❌ 定义处反而增加行数，净效果: +行数
     - 结论: 纯语法糖，不减少代码行数，放弃
+
+【P5-25】✅ GameSceneVoteHandler 与 VoteInfoRenderer 技能结果输出重复消除 — 已完成（减少12行）
+  工作量: 小（30分钟）✅ 已完成
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  完成内容:
+    - 在 GameLogicUtils 添加 appendSkillResultLog(UI, StringBuilder, int, int) 共享方法
+    - GameSceneVoteHandler 和 VoteInfoRenderer 的 appendSkillResults() 替换为方法调用
+    - 消除两处完全相同的7行代码
+  代码行数变化:
+    - GameLogicUtils.java: +19行（方法定义）
+    - GameSceneVoteHandler.java: -16行（18行 → 2行）
+    - VoteInfoRenderer.java: -16行（18行 → 2行）
+    - 净减少: 13行
+  收益: 消除跨类重复代码，技能结果输出逻辑集中管理
+  验证: 编译通过
+
+【P5-26】✅ GameSceneVoteHandler 左右票面板构建重复消除 — 已完成（减少6行）
+  工作量: 小（15分钟）✅ 已完成
+  风险: 低
+  收益: 低-中
+  综合优先级: ⭐⭐
+  完成内容:
+    - 提取 appendVotePanel(StringBuilder, int, LinkedList<String>) 私有方法
+    - 左右票面板构建合并为一处方法调用
+  代码行数变化:
+    - GameSceneVoteHandler.java: +9行（方法定义）-15行（两处重复逻辑）= 净减少6行
+  收益: 消除重复循环逻辑，面板构建逻辑集中管理
+  验证: 编译通过
+
+【P5-27】✅ VoteInfoRenderer case分支技能结果输出模式消除 — 已完成（减少13行）
+  工作量: 小（20分钟）✅ 已完成
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  完成内容:
+    - GameLogicUtils.appendSkillResultLog() 添加 showBallResult 参数重载
+    - VoteInfoRenderer case 3（猎人）替换为方法调用（不传球结果）
+    - 消除13行重复代码
+  代码行数变化:
+    - GameLogicUtils.java: +3行（重载方法）
+    - VoteInfoRenderer.java: -16行（18行 → 2行）
+    - 净减少: 13行
+  收益: 消除重复技能结果输出逻辑
+  验证: 编译通过
 
 ================================================================================
                             推荐执行顺序

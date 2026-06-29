@@ -40,19 +40,7 @@ class VoteInfoRenderer {
                         appendSkillResults(ui, lingneng, i, 2);
                         break;
                     case 3:
-                        lieren.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i))).append(" : ");
-                        for (int j = 2; j < ui.ctx.getGameDay(); ++j) {
-                            if (ui.ctx.getDeathDay(i) != 0 && j >= ui.ctx.getDeathDay(i)) break;
-                            if (ui.ctx.getSkillTarget(i, j) != 0) {
-                                lieren.append(ui.uiComponentFactory.getJobText(
-                                        ui.ctx.getCharacterNumber(ui.ctx.getSkillTarget(i, j))));
-                                lieren.append("→");
-                            }
-                        }
-                        if (ui.ctx.isNonHumanMarked(i)) {
-                            lieren.append(GameStrings.MARKER_EXPOSED); lieren.append("→");
-                        }
-                        lieren.setLength(lieren.length() - 1); lieren.append("\n");
+                        GameLogicUtils.appendSkillResultLog(ui, lieren, i, 2, false);
                         break;
                 }
                 switch (ui.ctx.getDeathReason(i)) {
@@ -130,24 +118,7 @@ class VoteInfoRenderer {
         scrollPane.setBounds(40, 228, 200 + boardIcon.getIconWidth() - 80, 50 + boardIcon.getIconHeight() - 60);
     }
 
-    private void appendSkillResults(UI ui, StringBuilder sb, int i, int startDay)
-    {
-        sb.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i))).append(" : ");
-        for (int j = startDay; j < ui.ctx.getGameDay(); ++j) {
-            if (ui.ctx.getDeathDay(i) != 0 && j >= ui.ctx.getDeathDay(i)) break;
-            if (ui.ctx.getSkillTarget(i, j) > ui.ctx.getPlayerSum()) {
-                sb.append(ui.uiComponentFactory.getJobText(
-                        ui.ctx.getCharacterNumber(ui.ctx.getSkillTarget(i, j) - ui.ctx.getPlayerSum()))).append("●");
-                sb.append("→");
-            } else if (ui.ctx.getSkillTarget(i, j) > 0) {
-                sb.append(ui.uiComponentFactory.getJobText(
-                        ui.ctx.getCharacterNumber(ui.ctx.getSkillTarget(i, j)))).append("○");
-                sb.append("→");
-            }
-        }
-        if (ui.ctx.isNonHumanMarked(i)) {
-            sb.append(GameStrings.MARKER_EXPOSED); sb.append("→");
-        }
-        sb.setLength(sb.length() - 1); sb.append("\n");
+    private void appendSkillResults(UI ui, StringBuilder sb, int i, int startDay) {
+        GameLogicUtils.appendSkillResultLog(ui, sb, i, startDay);
     }
 }
