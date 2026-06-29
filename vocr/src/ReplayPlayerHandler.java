@@ -501,7 +501,6 @@ public class ReplayPlayerHandler implements SceneHandler {
 
                 int shitiCnt = 0;
                 java.util.List<Integer> shitiNum = new java.util.ArrayList<>();
-                java.util.List<String> chuxingItems = new java.util.ArrayList<>();
 
                 for (int i = 0; i < playerSum; i++) {
                     DaySnapshot.PlayerStatus ps = snap.players[i];
@@ -510,16 +509,20 @@ public class ReplayPlayerHandler implements SceneHandler {
                     switch (ps.deathReason) {
                         case 1:
                             if (ps.deathDay == d)
-                                chuxingItems.add(getShortName(ps.characterNumber));
+                                chuxing.append(getShortName(ps.characterNumber)).append("\u2192");
                             break;
                         case 2:
                             if (ps.deathDay == d) {
-                                chuxingItems.add(getShortName(ps.characterNumber) + "(猫呪)");
+                                String cat = findRoleInSnapshot(snap, 5, playerSum);
+                                if (!cat.isEmpty()) chuxing.append(cat).append("+");
+                                chuxing.append(getShortName(ps.characterNumber)).append("(猫呪)\u2192");
                             }
                             break;
                         case 3:
                             if (ps.deathDay == d) {
-                                chuxingItems.add(getShortName(ps.characterNumber) + "(後追)");
+                                String fox = findRoleInSnapshot(snap, 10, playerSum);
+                                if (!fox.isEmpty()) chuxing.append(fox).append("+");
+                                chuxing.append(getShortName(ps.characterNumber)).append("(後追)\u2192");
                             }
                             break;
                         default:
@@ -533,14 +536,6 @@ public class ReplayPlayerHandler implements SceneHandler {
                     if (i == playerSum - 1 && shitiCnt == 0) {
                         shiti.append(GameStrings.PEACE_ARROW);
                     }
-                }
-
-                if (!chuxingItems.isEmpty()) {
-                    for (int l = 0; l < chuxingItems.size(); l++) {
-                        if (l > 0) chuxing.append("+");
-                        chuxing.append(chuxingItems.get(l));
-                    }
-                    chuxing.append("\u2192");
                 }
 
                 if (shitiCnt == 1) {
