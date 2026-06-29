@@ -24,6 +24,12 @@ interface GameContextView
     int getClaimedRoleOrderCount(int role);
     int getActualRoleIndex(int role);
 
+    int getMedium();
+    int getHunter();
+    int getCat();
+    int getFox();
+    int getDeviant();
+
     // === 职业候补列表（只读）===
     List<Integer> getZhans();
     List<Integer> getLings();
