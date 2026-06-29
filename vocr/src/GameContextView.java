@@ -43,6 +43,7 @@ interface GameContextView
 
     // === 游戏状态查询 ===
     int getGameDay();
+    int getEffectiveGameDay();
     int getAliveCounter();
     int getDeathCounter();
     GameResult getEndResult();

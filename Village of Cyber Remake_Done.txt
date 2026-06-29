@@ -610,6 +610,45 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
   - 收益: 消除重复逻辑，按钮状态管理集中，减少维护成本
   - 验证: 编译通过
 
+[P5-33] ✅ whyDie 死亡图标名称获取方法提取
+  来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+  - ✅ whyDie 添加 getDeathIconName() 实例方法和 getDeathIconName(int) 静态方法
+  - ✅ EndAnimeHandler、PlayerStatusRenderer、ReplayPlayerHandler 三处 switch 替换为方法调用
+  - 代码行数: whyDie.java: +12行；EndAnimeHandler.java: -5行；PlayerStatusRenderer.java: -5行；ReplayPlayerHandler.java: -5行（净减少3行）
+  - 收益: 消除跨类重复 switch case，死亡图标名称逻辑集中管理
+  - 验证: 编译通过
+
+[P5-34] ✅ GameSceneVoteHandler.claimedRoleIconName() 死代码删除
+  来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+  - ✅ 删除未使用的 claimedRoleIconName(int) 私有方法（7行）
+  - ✅ UIComponentFactory.getClaimedRoleIconName() 已提供相同功能
+  - 代码行数: GameSceneVoteHandler.java: -7行
+  - 收益: 消除死代码，避免维护负担
+  - 验证: 编译通过
+
+[P5-35] ✅ ExecutionManager.buildSkillScheduleLog() 与 GameLogicUtils 重复消除
+  来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+  - ✅ 删除 ExecutionManager 中重复的私有方法（8行）
+  - ✅ 4处调用点替换为 GameLogicUtils.buildSkillScheduleLog()
+  - 代码行数: ExecutionManager.java: -8行
+  - 收益: 消除跨类重复代码，日志构建逻辑统一
+  - 验证: 编译通过
+
+[P5-36] ✅ ReplayPlayerHandler 角色图像名称构建使用共享方法
+  来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+  - ✅ textName 构建替换为 GameStrings.buildCharacterTextName()
+  - ✅ claimedRoleIconName 构建替换为 UIComponentFactory.getClaimedRoleIconName()
+  - 代码行数: ReplayPlayerHandler.java: -9行
+  - 收益: 消除重复逻辑，使用统一的共享方法
+  - 验证: 编译通过
+
+[P5-37] ❌ GameContext.initFromPeiyi() switch 语句数组映射化（已放弃）
+  原因: 重构后代码行数反而增加
+  - ❌ peiyi 枚举添加字段和构造函数: +10行
+  - ❌ GameContext.initFromPeiyi() 简化: -9行
+  - ❌ 净效果: 代码行数增加1行，不符合"减少代码行数"目标
+  - 放弃原因: 认同用户原则，该重构仅提升可读性，不减少代码行数
+
 [P5-11] ❌ GameContext 角色语义方法添加（已放弃）
 
 [P5-29] ❌ VoteResultRenderer isAlive/getDeathDay 检查重复（已放弃）
@@ -627,6 +666,6 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
   P2: 5 项 ✅ 完成 | 2 项 ⚠️ 已回退(P2-2)
   P3: 4 项 ✅ 完成 | 1 项 ⚠️ 已回退(P3-5)
   P4: 3 项 ✅ 完成（P4-1, P4-3, P4-4）
-  P5: 24 项（P5-1, P5-2, P5-3, P5-4, P5-5, P5-6, P5-8, P5-9, P5-12, P5-13, P5-14, P5-15, P5-19, P5-20, P5-21, P5-22, P5-23, P5-24, P5-25, P5-26, P5-27, P5-28, P5-30, P5-31, P5-32 ✅；P5-7 ⏸️；P5-11, P5-16, P5-17, P5-18, P5-29 ❌）
-  合计: 58 项已完成 + 部分完成 2 项 + 已放弃 5 项 + 已回退 3 项
+  P5: 28 项（P5-1, P5-2, P5-3, P5-4, P5-5, P5-6, P5-8, P5-9, P5-12, P5-13, P5-14, P5-15, P5-19, P5-20, P5-21, P5-22, P5-23, P5-24, P5-25, P5-26, P5-27, P5-28, P5-30, P5-31, P5-32, P5-33, P5-34, P5-35, P5-36 ✅；P5-7 ⏸️；P5-11, P5-16, P5-17, P5-18, P5-29, P5-37 ❌）
+  合计: 62 项已完成 + 部分完成 2 项 + 已放弃 6 项 + 已回退 3 项
 ================================================================================
