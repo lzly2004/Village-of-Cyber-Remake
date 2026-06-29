@@ -65,24 +65,14 @@ class VoteInfoRenderer {
                         break;
                     case whyDie.daymaozhou:
                         if (ui.ctx.getDeathDay(i) == k) {
-                            for (int j = 1; j <= ui.ctx.getPlayerSum(); j++) {
-                                if (ui.ctx.getActualRole(j) == 5) {
-                                    chuxing.append(ui.getJobText(j)).append("+");
-                                    break;
-                                }
-                            }
+                            chuxing.append(ui.getJobText(ui.ctx.getCat())).append("+");
                             chuxing.append(ui.getJobText(i)).append("(猫呪)");
                             hasChuxing = true;
                         }
                         break;
                     case whyDie.dayhouzhui:
                         if (ui.ctx.getDeathDay(i) == k) {
-                            for (int j = 1; j <= ui.ctx.getPlayerSum(); j++) {
-                                if (ui.ctx.getActualRole(j) == 10) {
-                                    chuxing.append(ui.getJobText(j)).append("+");
-                                    break;
-                                }
-                            }
+                            chuxing.append(ui.getJobText(ui.ctx.getFox())).append("+");
                             chuxing.append(ui.getJobText(i)).append("(後追)");
                             hasChuxing = true;
                         }
