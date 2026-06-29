@@ -7,6 +7,7 @@ public class NonHumanCoordinator
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
     private final COManager coManager;
+    private final ResultEventGenerator eventGenerator;
     private final Runnable gylogic;
     private final Runnable deliverEvents;
 
@@ -16,6 +17,7 @@ public class NonHumanCoordinator
         this.ctx = module.getCtx();
         this.suspicion = module.getSuspicion();
         this.coManager = module.getCoManager();
+        this.eventGenerator = new ResultEventGenerator(ctx);
         this.gylogic = module.getGylogic();
         this.deliverEvents = module.getDeliverEvents();
     }
@@ -615,7 +617,7 @@ public class NonHumanCoordinator
         ctx.shuffleLings();
         for(int i=0;i<ctx.lings.size();i++)
         {
-            ctx.eventarray.add(new Event(EventName.lnco18,ctx.getCharacterName(ctx.lings.get(i))));
+            eventGenerator.addEvent(EventName.lnco18, ctx.lings.get(i));
             ctx.setClaimedRole(ctx.lings.get(i), 2);
             if(ctx.getClaimedRoleOrder(ctx.lings.get(i)) == 0)
                 ctx.setClaimedRoleOrder(ctx.lings.get(i), ctx.incrementClaimedRoleOrder(2));

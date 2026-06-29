@@ -1,6 +1,6 @@
 ================================================================================
         Village of Cyber Remake — 已完成重构记录
-        整理日期：2026-06-29 | 版本：v1.0.3.12
+        整理日期：2026-06-29 | 版本：v1.0.3.13
 ================================================================================
 
 ================================================================================
@@ -389,6 +389,31 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
        - 代码行数: COManager.java: 450 → 441 行（-9行）
        - 验证: 编译通过
 
+[P5-4] ✅ 剩余文件事件创建统一路由到 ResultEventGenerator
+       来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+       - ✅ SharedExposer.java: 添加 ResultEventGenerator，替换 10 处直接事件创建
+         - gkgsw4, gyfo1, gyfo1r, gyho2, gycx6, qfgsw3, qfjc5, qfjcqr5r
+       - ✅ DielogicCarrier.java: 添加 ResultEventGenerator，替换 4 处直接事件创建
+         - cxs, hzsw, mzsw, yjsw（wsw 为 null 参数特殊情况保留）
+       - ✅ NonHumanCoordinator.java: 添加 ResultEventGenerator，替换 1 处直接事件创建
+         - lnco18（zs14 为技能目标特殊情况保留）
+       - ✅ ExecutionManager.java: 添加 ResultEventGenerator，替换 1 处直接事件创建
+         - hbg（游戏结束事件为 null 参数特殊情况保留）
+       - 收益: 统一事件创建入口，架构一致性提升
+       - 代码行数: 合计 -11 行（SharedExposer -15, DielogicCarrier +2, NonHumanCoordinator -1, ExecutionManager +3）
+       - 验证: 编译通过
+
+[P5-5] ✅ LabelSimpleFactory 重复代码消除
+       来源: 新一轮代码扫描（2026-06-29）— 减少代码行数方向
+       - ✅ 提取私有方法 createLabel(text, icon, kind) — 无界版本通用逻辑
+       - ✅ 提取私有方法 createBoundedLabel(x, y, w, h, text, icon, kind) — 有界版本通用逻辑
+       - ✅ 提取私有方法 applyLabelStyle(label, kind) — 样式设置统一入口
+       - ✅ 6个公共 createXxxLabel 方法简化为单行调用
+       - ✅ 移除无用的 MouseAdapter / MouseEvent import
+       - 收益: 消除大量样板代码重复，样式设置集中管理，新增样式类型只需修改一处
+       - 代码行数: LabelSimpleFactory.java: 164 → 115 行（-49行）
+       - 验证: 编译通过
+
 [P3-5] UI工厂类合并（已回退）
   概述: 将 Button/Label/Panel/Textarea 四个 SimpleFactory 合并为统一的 UIFactory
   结果: 2026-06-29 回退（commit cca720d）
@@ -404,6 +429,6 @@ P3 — 新一轮扫描发现的重构项（2026-06-29）
   P2: 5 项 ✅ 完成 | 2 项 ⚠️ 已回退(P2-2)
   P3: 4 项 ✅ 完成 | 1 项 ⚠️ 已回退(P3-5)
   P4: 3 项 ✅ 完成（P4-1, P4-3, P4-4）
-  P5: 3 项 ✅ 完成（P5-1, P5-2, P5-3）
-  合计: 35 项已完成 + 部分完成 2 项 + 已回退 3 项
+  P5: 5 项 ✅ 完成（P5-1, P5-2, P5-3, P5-4, P5-5）
+  合计: 37 项已完成 + 部分完成 2 项 + 已回退 3 项
 ================================================================================

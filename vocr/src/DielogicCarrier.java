@@ -5,12 +5,14 @@ public class DielogicCarrier
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
     private final Runnable deliverEvents;
+    private final ResultEventGenerator eventGenerator;
 
     public DielogicCarrier(GameContext ctx, SuspicionSystem suspicion, Runnable deliverEvents)
     {
         this.ctx = ctx;
         this.suspicion = suspicion;
         this.deliverEvents = deliverEvents;
+        this.eventGenerator = new ResultEventGenerator(ctx);
     }
 
     public ArrayList<Integer> execute(int wolf, int wolfbite, int zhantarget, int lietarget)
@@ -115,17 +117,17 @@ public class DielogicCarrier
         ctx.setDeathDay(index, ctx.getGameDay());
         if (why == whyDie.chuxing)
         {
-            ctx.eventarray.add(new Event(EventName.cxs, ctx.getCharacterName(index)));
+            eventGenerator.addEvent(EventName.cxs, index);
             if (ctx.getClaimedRole(index) == 5 && ctx.getActualRole(index) != 5)
             {
                 ctx.markNonHuman(index);
             }
         }
         else if (why == whyDie.dayhouzhui)
-            ctx.eventarray.add(new Event(EventName.hzsw, ctx.getCharacterName(index)));
+            eventGenerator.addEvent(EventName.hzsw, index);
         else if (why == whyDie.daymaozhou)
-            ctx.eventarray.add(new Event(EventName.mzsw, ctx.getCharacterName(index)));
+            eventGenerator.addEvent(EventName.mzsw, index);
         else
-            ctx.eventarray.add(new Event(EventName.yjsw, ctx.getCharacterName(index)));
+            eventGenerator.addEvent(EventName.yjsw, index);
     }
 }

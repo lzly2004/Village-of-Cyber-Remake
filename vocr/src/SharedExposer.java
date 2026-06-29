@@ -2,12 +2,14 @@ public class SharedExposer
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
+    private final ResultEventGenerator eventGenerator;
     private int exposureProgress;
 
     public SharedExposer(GameContext ctx, SuspicionSystem suspicion)
     {
         this.ctx = ctx;
         this.suspicion = suspicion;
+        this.eventGenerator = new ResultEventGenerator(ctx);
         this.exposureProgress = 0;
     }
 
@@ -34,9 +36,7 @@ public class SharedExposer
             {
                 int gy = 1;
                 if (ctx.isDead(ctx.gyindex[1])) gy = 2;
-                ctx.eventarray.add(new Event(EventName.gkgsw4,
-                        ctx.getCharacterName(ctx.gyindex[gy]),
-                        ctx.getCharacterName(ctx.gyindex[3 - gy])));
+                eventGenerator.addEvent(EventName.gkgsw4, ctx.gyindex[gy], ctx.gyindex[3 - gy]);
                 applyGuardianCO(ctx.gyindex[1]);
                 applyGuardianCO(ctx.gyindex[2]);
                 return;
@@ -45,21 +45,13 @@ public class SharedExposer
             {
                 if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
                 {
-                    ctx.eventarray.add(new Event(EventName.gyfo1,
-                            ctx.getCharacterName(ctx.gyindex[1]),
-                            ctx.getCharacterName(ctx.gyindex[2])));
-                    ctx.eventarray.add(new Event(EventName.gyfo1r,
-                            ctx.getCharacterName(ctx.gyindex[2]),
-                            ctx.getCharacterName(ctx.gyindex[1])));
+                    eventGenerator.addEvent(EventName.gyfo1, ctx.gyindex[1], ctx.gyindex[2]);
+                    eventGenerator.addEvent(EventName.gyfo1r, ctx.gyindex[2], ctx.gyindex[1]);
                 }
                 else
                 {
-                    ctx.eventarray.add(new Event(EventName.gyfo1,
-                            ctx.getCharacterName(ctx.gyindex[2]),
-                            ctx.getCharacterName(ctx.gyindex[1])));
-                    ctx.eventarray.add(new Event(EventName.gyfo1r,
-                            ctx.getCharacterName(ctx.gyindex[1]),
-                            ctx.getCharacterName(ctx.gyindex[2])));
+                    eventGenerator.addEvent(EventName.gyfo1, ctx.gyindex[2], ctx.gyindex[1]);
+                    eventGenerator.addEvent(EventName.gyfo1r, ctx.gyindex[1], ctx.gyindex[2]);
                 }
                 applyGuardianCO(ctx.gyindex[1]);
                 applyGuardianCO(ctx.gyindex[2]);
@@ -69,14 +61,12 @@ public class SharedExposer
                 exposureProgress = ConstNum.randomInt(1, 90);
                 if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
                 {
-                    ctx.eventarray.add(new Event(EventName.gyho2,
-                            ctx.getCharacterName(ctx.gyindex[1])));
+                    eventGenerator.addEvent(EventName.gyho2, ctx.gyindex[1]);
                     applyGuardianCO(ctx.gyindex[1]);
                 }
                 else
                 {
-                    ctx.eventarray.add(new Event(EventName.gyho2,
-                            ctx.getCharacterName(ctx.gyindex[2])));
+                    eventGenerator.addEvent(EventName.gyho2, ctx.gyindex[2]);
                     applyGuardianCO(ctx.gyindex[2]);
                 }
             }
@@ -95,25 +85,15 @@ public class SharedExposer
         {
             applyGuardianCO(ctx.gyindex[qfnum]);
             if (ctx.getDeathReason(ctx.gyindex[qfnum]) == whyDie.chuxing)
-                ctx.eventarray.add(new Event(EventName.gycx6,
-                        ctx.getCharacterName(ctx.gyindex[3 - qfnum]),
-                        ctx.getCharacterName(ctx.gyindex[qfnum])));
+                eventGenerator.addEvent(EventName.gycx6, ctx.gyindex[3 - qfnum], ctx.gyindex[qfnum]);
             else if (ctx.isDead(ctx.gyindex[3 - qfnum]))
-                ctx.eventarray.add(new Event(EventName.gkgsw4,
-                        ctx.getCharacterName(ctx.gyindex[qfnum]),
-                        ctx.getCharacterName(ctx.gyindex[3 - qfnum])));
+                eventGenerator.addEvent(EventName.gkgsw4, ctx.gyindex[qfnum], ctx.gyindex[3 - qfnum]);
             else if (ctx.isDead(ctx.gyindex[qfnum]))
-                ctx.eventarray.add(new Event(EventName.qfgsw3,
-                        ctx.getCharacterName(ctx.gyindex[3 - qfnum]),
-                        ctx.getCharacterName(ctx.gyindex[qfnum])));
+                eventGenerator.addEvent(EventName.qfgsw3, ctx.gyindex[3 - qfnum], ctx.gyindex[qfnum]);
             else
             {
-                ctx.eventarray.add(new Event(EventName.qfjc5,
-                        ctx.getCharacterName(ctx.gyindex[qfnum]),
-                        ctx.getCharacterName(ctx.gyindex[3 - qfnum])));
-                ctx.eventarray.add(new Event(EventName.qfjcqr5r,
-                        ctx.getCharacterName(ctx.gyindex[3 - qfnum]),
-                        ctx.getCharacterName(ctx.gyindex[qfnum])));
+                eventGenerator.addEvent(EventName.qfjc5, ctx.gyindex[qfnum], ctx.gyindex[3 - qfnum]);
+                eventGenerator.addEvent(EventName.qfjcqr5r, ctx.gyindex[3 - qfnum], ctx.gyindex[qfnum]);
             }
         }
     }

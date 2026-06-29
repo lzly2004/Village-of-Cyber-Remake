@@ -10,6 +10,7 @@ public class ExecutionManager
     private final ProbabilityCalculator probabilityCalculator;
     private final VoteSelector voteSelector;
     private final GameEndChecker gameEndChecker;
+    private final ResultEventGenerator eventGenerator;
     private final Runnable gylogic;
     private final Runnable deliverEvents;
     private final java.util.function.BiConsumer<Integer, whyDie> dieaux;
@@ -25,6 +26,7 @@ public class ExecutionManager
         this.probabilityCalculator = module.getProbabilityCalculator();
         this.voteSelector = module.getVoteSelector();
         this.gameEndChecker = module.getGameEndChecker();
+        this.eventGenerator = new ResultEventGenerator(ctx);
         this.gylogic = module.getGylogic();
         this.deliverEvents = module.getDeliverEvents();
         this.dieaux = module.getDieaux();
@@ -246,7 +248,7 @@ public class ExecutionManager
             if(ctx.isDead(num) ) continue;
             if(ctx.getActualRole(num) == 4)
             {
-                ctx.eventarray.add(new Event(EventName.hbg,ctx.getCharacterName(num)));
+                eventGenerator.addEvent(EventName.hbg, num);
                 ctx.setClaimedRole(num, 4);
                 continue;
             }
