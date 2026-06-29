@@ -32,12 +32,13 @@ enum whyDie
             case chuxing -> "turi.png";
             case daymaozhou -> "noroi.png";
             case dayhouzhui -> "atooi.png";
-            default -> "kami.png";
+            case beiyao, nightmaozhou, nighthouzhui, zhousha -> "kami.png";
+            case NONE -> "";
         };
     }
 
     public static String getDeathIconName(int deathReason) {
-        if (deathReason < 0 || deathReason >= values().length) return "kami.png";
+        if (deathReason < 0 || deathReason >= values().length) return "";
         return values()[deathReason].getDeathIconName();
     }
 }
