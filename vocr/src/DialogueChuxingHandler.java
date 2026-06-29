@@ -24,22 +24,13 @@ public class DialogueChuxingHandler implements SceneHandler {
             Timer timer = new Timer(GameConstants.TRANSITION_MEDIUM_MS, e1 -> {
                 dialogText.setText("");
                 nextBtn.setVisible(true);
-                CharacterKanjiName[] values = CharacterKanjiName.values();
                 String resultText;
                 if (event.eventname == EventName.cxs) {
-                    resultText = String.format(GameStrings.EXECUTED_FORMAT, values[ui.ctx.getCharacterNumber(ui.chuxingWho)].name());
+                    resultText = String.format(GameStrings.EXECUTED_FORMAT, event.ch1.name());
                 } else if (event.eventname == EventName.hzsw) {
-                    int num = 0;
-                    for (int r = 1; r <= ui.ctx.getPlayerSum(); ++r) {
-                        if (ui.ctx.getDeathReason(r) == whyDie.dayhouzhui) num = ui.ctx.getCharacterNumber(r);
-                    }
-                    resultText = String.format(GameStrings.FOLLOW_DEATH_FORMAT, values[num].name());
+                    resultText = String.format(GameStrings.FOLLOW_DEATH_FORMAT, event.ch1.name());
                 } else if (event.eventname == EventName.mzsw) {
-                    int num = 0;
-                    for (int r = 1; r <= ui.ctx.getPlayerSum(); ++r) {
-                        if (ui.ctx.getDeathReason(r) == whyDie.daymaozhou) num = ui.ctx.getCharacterNumber(r);
-                    }
-                    resultText = String.format(GameStrings.CAT_CURSE_FORMAT, values[num].name());
+                    resultText = String.format(GameStrings.CAT_CURSE_FORMAT, event.ch1.name());
                 } else {
                     resultText = "";
                 }
