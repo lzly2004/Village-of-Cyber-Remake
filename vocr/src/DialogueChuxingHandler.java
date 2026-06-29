@@ -37,7 +37,7 @@ public class DialogueChuxingHandler implements SceneHandler {
                 } else if (event.eventname == EventName.mzsw) {
                     int num = 0;
                     for (int r = 1; r <= ui.ctx.getPlayerSum(); ++r) {
-                        if (ui.ctx.getDeathReason(r) == whyDie.dayhouzhui) num = ui.ctx.getCharacterNumber(r);
+                        if (ui.ctx.getDeathReason(r) == whyDie.daymaozhou) num = ui.ctx.getCharacterNumber(r);
                     }
                     resultText = String.format(GameStrings.CAT_CURSE_FORMAT, values[num].name());
                 } else {
