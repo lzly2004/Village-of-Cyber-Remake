@@ -3,87 +3,26 @@ import java.awt.*;
 
 public class UIComponentFactory
 {
+    private static final String[] ZY_NAMES = {"", "占い師", "霊能者", "狩人", "共有者", "猫又",
+            "村人", "人狼", "狂人", "狂信者", "妖狐", "背徳者"};
+    private static final String[] WHY_DIE_NAMES = {"没死", "处刑", "白天猫咒", "白天后追",
+            "被咬", "夜间猫咒", "夜间后追", "咒杀"};
+
     public String getJobText(int num)
     {
         if (num >= 1 && num <= 44)
             return CharacterKanjiName.values()[num].getShortName();
         return "";
     }
-    public String getZY(int i)//获取职业文本，需要传入角色的number
+    public String getZY(int i)
     {
-        String str = "";
-        switch(i){
-            case 1:
-                str = "占い師";
-                break;
-            case 2:
-                str = "霊能者";
-                break;
-            case 3:
-                str = "狩人";
-                break;
-            case 5:
-                str = "猫又";
-                break;
-            case 4:
-                str = "共有者";
-                break;
-            case 10:
-                str = "妖狐";
-                break;
-            case 11:
-                str = "背徳者";
-                break;
-            case 7:
-                str = "人狼";
-                break;
-            case 8:
-                str = "狂人";
-                break;
-            case 9:
-                str = "狂信者";
-                break;
-            case 6:
-                str = "村人";
-                break;
-            default:
-                str = "無し";
-                break;
-        }
-        return str;
+        if (i >= 1 && i < ZY_NAMES.length) return ZY_NAMES[i];
+        return "無し";
     }
-    public String getWhyDie(whyDie i)//获取角色死因，用于测试信息的显示
+    public String getWhyDie(whyDie i)
     {
-        String str = "";
-        switch(i){
-            case NONE :
-                str = "没死";
-                break;
-            case nightmaozhou:
-                str = "夜间猫咒";
-                break;
-            case daymaozhou:
-                str = "白天猫咒";
-                break;
-            case dayhouzhui:
-                str = "白天后追";
-                break;
-            case zhousha:
-                str = "咒杀";
-                break;
-            case nighthouzhui:
-                str = "夜间后追";
-                break;
-            case chuxing:
-                str = "处刑";
-                break;
-            case beiyao:
-                str = "被咬";
-                break;
-            default:
-                break;
-        }
-        return str;
+        if (i == null || i.ordinal() >= WHY_DIE_NAMES.length) return "";
+        return WHY_DIE_NAMES[i.ordinal()];
     }
     /**
      * 获取人物的完整名字(日文汉字 片假名/英文)。
@@ -101,7 +40,8 @@ public class UIComponentFactory
         return String.format("%s %s/%s", kanjiName, katakanaName, englishName.name());
     }
 
-    public String getClaimedRoleIconName(int claimedRole, int claimedRoleOrder) {
+    public String getClaimedRoleIconName(int claimedRole, int claimedRoleOrder)
+    {
         StringBuilder sb = new StringBuilder("yaku");
         if (claimedRole <= 3) sb.append(claimedRole).append("_").append(claimedRoleOrder);
         else sb.append(claimedRole);
@@ -109,7 +49,8 @@ public class UIComponentFactory
         return sb.toString();
     }
 
-    public String getCharImageName(int characterNumber, boolean isAlive) {
+    public String getCharImageName(int characterNumber, boolean isAlive)
+    {
         StringBuilder sb = new StringBuilder();
         if (characterNumber <= 9) sb.append("0");
         sb.append(characterNumber);
