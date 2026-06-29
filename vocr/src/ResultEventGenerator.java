@@ -9,9 +9,7 @@ public class ResultEventGenerator
 
     public void addEvent(EventName name, int... players)
     {
-        if (players.length == 0)
-            ctx.eventarray.add(new Event(name));
-        else if (players.length == 1)
+        if (players.length == 1)
             ctx.eventarray.add(new Event(name, ctx.getCharacterName(players[0])));
         else
             ctx.eventarray.add(new Event(name, ctx.getCharacterName(players[0]),
