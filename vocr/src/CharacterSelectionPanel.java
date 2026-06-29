@@ -9,6 +9,11 @@ import java.util.List;
  */
 class CharacterSelectionPanel {
 
+    private static final String[] FRAME_ICONS = {"frameSBlue.png", "frameSRed.png", "frameOrange.png"};
+    private static final String[] RESULT_ALL_ICONS = {"result2_all.png", "result1_all.png", "result3_all.png"};
+    private static final String[] DRAG_ALL_ICONS = {"touhyou.png", "uranaiAll.png", "goeiAll.png"};
+    private static final int[] ROLE_FILTERS = {0, 1, 3};
+
     static void render(UI ui, VoteButtonPanel vp, VoteInfoRenderer vi,
                        JPanel panel, List<Integer> chosenList, boolean[] flag,
                        SelectionType type, GameSceneVoteHandler handler) {
@@ -22,26 +27,11 @@ class CharacterSelectionPanel {
         ui.jPanel.setComponentZOrder(panel, 0);
         int n = ui.ctx.getPlayerSum() + 1;
 
-        String frameIconName = switch (type) {
-            case VOTE -> "frameSBlue.png";
-            case DIVINATION -> "frameSRed.png";
-            case GUARD -> "frameOrange.png";
-        };
-        String resultAllIconName = switch (type) {
-            case VOTE -> "result2_all.png";
-            case DIVINATION -> "result1_all.png";
-            case GUARD -> "result3_all.png";
-        };
-        String dragAllIconName = switch (type) {
-            case VOTE -> "touhyou.png";
-            case DIVINATION -> "uranaiAll.png";
-            case GUARD -> "goeiAll.png";
-        };
-        int claimedRoleFilter = switch (type) {
-            case VOTE -> 0;
-            case DIVINATION -> 1;
-            case GUARD -> 3;
-        };
+        int typeIdx = type.ordinal();
+        String frameIconName = FRAME_ICONS[typeIdx];
+        String resultAllIconName = RESULT_ALL_ICONS[typeIdx];
+        String dragAllIconName = DRAG_ALL_ICONS[typeIdx];
+        int claimedRoleFilter = ROLE_FILTERS[typeIdx];
 
         List<Integer> roleNums = new ArrayList<>();
         List<Integer> roleOrders = new ArrayList<>();

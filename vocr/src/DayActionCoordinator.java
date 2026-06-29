@@ -131,48 +131,26 @@ public class DayActionCoordinator
                     }
                     if(ctx.getActualRole(target) < 7 || ctx.nonHumanPlan[target] == 0 || ctx.nonHumanPlan[target] == 3) continue;
                     int zhi = ctx.getActualRole(target);
-                    switch(zhi)
+                    int maolieIdx = zhi == 7 ? 0 : zhi - 7;
+                    if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(maolieIdx,1,coManager.getp1(zhi),coManager.getp2(zhi))))
                     {
-                        case  7:
-                            if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(0,1,coManager.getp1(7),coManager.getp2(7))))
+                        int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
+                        if((zhi == 7 && ctx.rlsl) || ctx.claimedRoleaskday[3] != 0) lweight = 0;
+                        if((zhi == 7 && ctx.rlsm) || ctx.getCat() == 0 || ctx.isCatDefinitivelyOut() || ctx.claimedRoleaskday[5] != 0) mweight = 0;
+                        if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
+                        else
+                        {
+                            ctx.nonHumanPlan[target] = 3 + 2 * GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(lweight,mweight)));
+                            if(ctx.nonHumanPlan[target] == 5)
                             {
-                                int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
-                                if(ctx.rlsl || ctx.claimedRoleaskday[3] != 0) lweight = 0;
-                                // 如果猫又已明确出局，不能CO猫
-                                if(ctx.rlsm || ctx.getCat() == 0 || ctx.isCatDefinitivelyOut() || ctx.claimedRoleaskday[5] != 0) mweight = 0;
-                                if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
-                                else
-                                {
-                                    ctx.nonHumanPlan[target] = 3 + 2 * GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(lweight,mweight)));
-                                    if(ctx.nonHumanPlan[target] == 5)
-                                    {
-                                        response.add(new IntPair(target,5));havecatco = true;ctx.rlsm = true;
-                                    }
-                                    else ctx.rlsl = true;
-                                }
+                                response.add(new IntPair(target,5));havecatco = true;
+                                if(zhi == 7) ctx.rlsm = true;
                             }
-                            else
-                                ctx.nonHumanPlan[target] = 0;
-                            break;
-                        default:
-                            if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(zhi-7,1,coManager.getp1(zhi),coManager.getp2(zhi))))
-                            {
-                                int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
-                                if(ctx.claimedRoleaskday[3] != 0) lweight = 0;
-                                // 如果猫又已明确出局，不能CO猫
-                                if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut() || ctx.claimedRoleaskday[5] != 0) mweight = 0;
-                                if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
-                                else
-                                {
-                                    ctx.nonHumanPlan[target] = 3 + 2 * GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(lweight,mweight)));
-                                    if(ctx.nonHumanPlan[target] == 5)
-                                    {
-                                        response.add(new IntPair(target,5));havecatco = true;
-                                    }
-                                }
-                            }
-                            break;
+                            else if(zhi == 7) ctx.rlsl = true;
+                        }
                     }
+                    else if(zhi == 7)
+                        ctx.nonHumanPlan[target] = 0;
                 }
             }
         }
