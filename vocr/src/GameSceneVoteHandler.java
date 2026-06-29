@@ -615,15 +615,6 @@ public class GameSceneVoteHandler implements SceneHandler {
         piao.append("\n");
     }
 
-    String claimedRoleIconName(int i) {
-        StringBuilder sb = new StringBuilder("yaku");
-        int cr = this.ui.ctx.getClaimedRole(i);
-        if (cr <= 3) sb.append(cr).append("_").append(this.ui.ctx.getClaimedRoleOrder(i));
-        else sb.append(cr);
-        sb.append(".png");
-        return sb.toString();
-    }
-
     void handleReVoteResult(boolean[] isReVote, int[] round) {
         if (isReVote[0]) {
             votePanel.againBtn.setVisible(true);

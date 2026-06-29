@@ -18,12 +18,7 @@ class PlayerStatusRenderer {
         for (int i = 1; i <= playerSum; i++) {
             StringBuilder xName = new StringBuilder();
             String imageName = GameStrings.buildCharacterImageNameSimple(ui.ctx.getCharacterNumber(i), ui.ctx.getDeathReason(i));
-            switch (ui.ctx.getDeathReason(i)) {
-                case chuxing: xName.append("turi.png"); break;
-                case daymaozhou: xName.append("noroi.png"); break;
-                case dayhouzhui: xName.append("atooi.png"); break;
-                default: xName.append("kami.png"); break;
-            }
+            xName.append(ui.ctx.getDeathReason(i).getDeathIconName());
             String textName = GameStrings.buildCharacterTextName(ui.ctx.getCharacterNumber(i));
             String claimedRoleIconName = ui.uiComponentFactory.getClaimedRoleIconName(
                     ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i));

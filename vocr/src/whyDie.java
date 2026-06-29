@@ -26,4 +26,18 @@ enum whyDie
     {
         return !isDayDeath() && this != NONE;
     }
+
+    public String getDeathIconName() {
+        return switch (this) {
+            case chuxing -> "turi.png";
+            case daymaozhou -> "noroi.png";
+            case dayhouzhui -> "atooi.png";
+            default -> "kami.png";
+        };
+    }
+
+    public static String getDeathIconName(int deathReason) {
+        if (deathReason < 0 || deathReason >= values().length) return "kami.png";
+        return values()[deathReason].getDeathIconName();
+    }
 }

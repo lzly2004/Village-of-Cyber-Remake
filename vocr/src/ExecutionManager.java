@@ -65,28 +65,19 @@ public class ExecutionManager
         for(int i=0;i<ctx.zhans.size();i++)
         {
             int zhan = ctx.zhans.get(i);
-            DebugLogger.log(buildSkillScheduleLog("占卜师候补编号：" + ctx.getClaimedRoleOrder(zhan) + "预告情况：",
+            DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("占卜师候补编号：" + ctx.getClaimedRoleOrder(zhan) + "预告情况：",
                     n, gd, ctx.getClaimedRoleScheduledSkillTargets(zhan)));
         }
         for (int i = 0; i < ctx.lies.size(); i++)
         {
             int lie = ctx.lies.get(i);
-            DebugLogger.log(buildSkillScheduleLog("猎人候补编号：" + ctx.getClaimedRoleOrder(lie) + "指定护卫情况：",
+            DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("猎人候补编号：" + ctx.getClaimedRoleOrder(lie) + "指定护卫情况：",
                     n, gd, ctx.getClaimedRoleScheduledSkillTargets(lie)));
         }
-        DebugLogger.log(buildSkillScheduleLog("潜伏占预告情况：", n, gd, ctx.getHiddenSeerScheduledSkillTargets()));
-        DebugLogger.log(buildSkillScheduleLog("潜伏猎人指定护卫情况：", n, gd, ctx.getHiddenHunterScheduledSkillTargets()));
+        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("潜伏占预告情况：", n, gd, ctx.getHiddenSeerScheduledSkillTargets()));
+        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("潜伏猎人指定护卫情况：", n, gd, ctx.getHiddenHunterScheduledSkillTargets()));
     }
 
-    private String buildSkillScheduleLog(String title, int n, int gd, boolean[][] schedule)
-    {
-        StringBuilder sb = new StringBuilder(title);
-        for(int i=1;i<=n;i++)
-            if(schedule[i][gd])
-                sb.append(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]).append(" ");
-        return sb.toString();
-    }
-    
     private boolean[] prepareVoting(int n, int gd, int dailyVotingRule, List<Integer> chuxingList)
     {
         boolean[] votable = new boolean[n+1];

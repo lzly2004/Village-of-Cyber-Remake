@@ -225,25 +225,13 @@ public class ReplayPlayerHandler implements SceneHandler {
 
                 // 死亡图标照常显示（与生死状态无关）
                 if (isDead) {
-                    switch (ps.deathReason) {
-                        case 1: xName.append("turi.png"); break;
-                        case 2: xName.append("noroi.png"); break;
-                        case 3: xName.append("atooi.png"); break;
-                        default: xName.append("kami.png"); break;
-                    }
+                    xName.append(whyDie.getDeathIconName(ps.deathReason));
                 }
                 imageName.append(".png");
-                String textName = ps.characterNumber + "job.png";
+                String textName = GameStrings.buildCharacterTextName(ps.characterNumber);
                 
                 // 构建CO职业图标名称
-                StringBuilder crNameSb = new StringBuilder("yaku");
-                if (ps.claimedRole > 0 && ps.claimedRole < 6) {
-                    if (ps.claimedRole <= 3)
-                        crNameSb.append(ps.claimedRole).append("_").append(ps.claimedRoleOrder).append(".png");
-                    else
-                        crNameSb.append(ps.claimedRole).append(".png");
-                }
-                String claimedRoleIconName = crNameSb.toString();
+                String claimedRoleIconName = ui.uiComponentFactory.getClaimedRoleIconName(ps.claimedRole, ps.claimedRoleOrder);
                 
                 // 构建技能目标标记名称
                 StringBuilder skillTargetName = new StringBuilder("result");

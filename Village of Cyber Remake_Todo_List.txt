@@ -1,7 +1,7 @@
 ================================================================================
         Village of Cyber Remake — 重构 Todo List（评估版）
-        整理日期：2026-06-29 | 版本：v5.21
-        已完成: 58 项 | 暂停: 1 项 | 放弃: 5 项 | 已回退: 3 项
+        整理日期：2026-06-29 | 版本：v5.22
+        已完成: 58 项 | 暂停: 1 项 | 放弃: 5 项 | 已回退: 3 项 | 待评估: 5 项
 ================================================================================
 
   ⚠️ 重构原则提醒：
@@ -727,6 +727,88 @@
     - GameSceneVoteHandler.java: +15行（方法定义）-8行（4处各2行 → 1行）= 净增加7行
   收益: 消除重复逻辑，按钮状态管理集中，减少维护成本
   验证: 编译通过
+
+【P5-33】whyDie 死亡图标名称获取方法提取
+  工作量: 小（15分钟）
+  风险: 低
+  收益: 中-高
+  综合优先级: ⭐⭐⭐
+  现状:
+    - EndAnimeHandler（行55-60）、PlayerStatusRenderer（行21-26）、ReplayPlayerHandler（行228-233）有三处完全相同的 switch case
+    - 根据死亡原因获取死亡图标文件名：chuxing→turi.png, daymaozhou→noroi.png, dayhouzhui→atooi.png, default→kami.png
+  方案:
+    - 在 whyDie 枚举中添加 getDeathIconName() 方法
+    - 三处调用点替换为方法调用
+  代码行数变化:
+    - whyDie.java: +7行（方法定义）
+    - EndAnimeHandler.java: -5行（消除 switch）
+    - PlayerStatusRenderer.java: -5行（消除 switch）
+    - ReplayPlayerHandler.java: -5行（消除 switch）
+    - 净减少: 8行
+  收益: 消除跨类重复 switch case，逻辑集中管理
+
+【P5-34】GameSceneVoteHandler.claimedRoleIconName() 与 UIComponentFactory 重复消除
+  工作量: 小（10分钟）
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  现状:
+    - GameSceneVoteHandler（行618-625）有一个本地方法 claimedRoleIconName(int i)
+    - UIComponentFactory（行43-50）已经有 getClaimedRoleIconName(int claimedRole, int claimedRoleOrder)
+    - 两处逻辑完全相同
+  方案:
+    - 删除 GameSceneVoteHandler.claimedRoleIconName() 方法
+    - 调用点替换为 ui.uiComponentFactory.getClaimedRoleIconName()
+  代码行数变化:
+    - GameSceneVoteHandler.java: -8行（删除方法定义）+1行（替换调用）= 净减少7行
+  收益: 消除重复方法，统一使用 UIComponentFactory
+
+【P5-35】ExecutionManager.buildSkillScheduleLog() 与 GameLogicUtils 重复消除
+  工作量: 小（15分钟）
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  现状:
+    - ExecutionManager（行81-88）有 buildSkillScheduleLog(String title, int n, int gd, boolean[][] schedule)
+    - GameLogicUtils（行106-113）有 buildSkillScheduleLog(String title, int n, int gd, boolean[][] schedule)
+    - 逻辑几乎相同，唯一差异：ExecutionManager 使用 CharacterKanjiName，GameLogicUtils 使用 int
+  方案:
+    - 删除 ExecutionManager.buildSkillScheduleLog() 方法
+    - 修改 logSkillSchedule() 使用 GameLogicUtils.buildSkillScheduleLog()，或创建统一版本
+  代码行数变化:
+    - ExecutionManager.java: -9行（删除方法定义）
+    - 净减少: 9行
+  收益: 消除重复方法，日志构建逻辑集中管理
+
+【P5-36】ReplayPlayerHandler 角色图像名称构建使用 GameStrings 共享方法
+  工作量: 小（15分钟）
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  现状:
+    - ReplayPlayerHandler（行217-236）手动构建 imageName 和 textName
+    - GameStrings 已经有 buildCharacterImageNameSimple() 和 buildCharacterTextName() 方法
+  方案:
+    - 替换 ReplayPlayerHandler 中的手动构建为 GameStrings 方法调用
+    - ReplayPlayerHandler 中的死亡图标 switch（行228-233）也可以使用 whyDie.getDeathIconName()（需先完成 P5-33）
+  代码行数变化:
+    - ReplayPlayerHandler.java: 约减少 10-15 行
+  收益: 消除重复逻辑，统一使用 GameStrings
+
+【P5-37】GameContext.initFromPeiyi() switch 语句数组映射化
+  工作量: 小（15分钟）
+  风险: 低
+  收益: 中
+  综合优先级: ⭐⭐⭐
+  现状:
+    - GameContext.initFromPeiyi()（行384-396）使用 switch 语句初始化三个字段：initialWolfCount, initialNonHumanCount, kyojin
+    - 7个 case 对应7种配役类型
+  方案:
+    - 创建静态二维数组或记录类存储配役配置
+    - switch 语句替换为数组索引访问
+  代码行数变化:
+    - GameContext.java: 约减少 8-10 行
+  收益: 消除样板代码，数据与逻辑分离
 
 ================================================================================
                             推荐执行顺序
