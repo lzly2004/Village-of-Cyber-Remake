@@ -31,6 +31,7 @@ class VoteInfoRenderer {
         for (int k = 1; k < ui.ctx.getGameDay(); ++k) {
             int shitiCnt = 0;
             ArrayList<Integer> shitiNum = new ArrayList<>();
+            ArrayList<String> chuxingItems = new ArrayList<>();
             for (int i = 1; i <= ui.ctx.getPlayerSum(); i++) {
                 if (k == 1) switch (ui.ctx.getClaimedRole(i)) {
                     case 1:
@@ -49,36 +50,24 @@ class VoteInfoRenderer {
                             for (int j = 1; j <= ui.ctx.getPlayerSum(); j++) {
                                 if (ui.ctx.getActualRole(j) == 11 && !ui.ctx.isAlive(j)
                                         && ui.ctx.getDeathDay(i) == k && ui.ctx.getDeathDay(j) < ui.ctx.getDeathDay(i)) {
-                                    chuxing.append(ui.getJobText(i)).append("→");
+                                    chuxingItems.add(ui.getJobText(i));
                                     break;
                                 }
                             }
                         } else if (ui.ctx.getActualRole(i) == 5) {
                         } else {
                             if (ui.ctx.getDeathDay(i) == k)
-                                chuxing.append(ui.getJobText(i)).append("→");
+                                chuxingItems.add(ui.getJobText(i));
                         }
                         break;
                     case whyDie.daymaozhou:
                         if (ui.ctx.getDeathDay(i) == k) {
-                            for (int j = 1; j <= ui.ctx.getPlayerSum(); j++) {
-                                if (ui.ctx.getActualRole(j) == 5) {
-                                    chuxing.append(ui.getJobText(j)).append("+");
-                                    break;
-                                }
-                            }
-                            chuxing.append(ui.getJobText(i)).append("(猫呪)").append("→");
+                            chuxingItems.add(ui.getJobText(i) + "(猫呪)");
                         }
                         break;
                     case whyDie.dayhouzhui:
                         if (ui.ctx.getDeathDay(i) == k) {
-                            for (int j = 1; j <= ui.ctx.getPlayerSum(); j++) {
-                                if (ui.ctx.getActualRole(j) == 10) {
-                                    chuxing.append(ui.getJobText(j)).append("+");
-                                    break;
-                                }
-                            }
-                            chuxing.append(ui.getJobText(i)).append("(後追)").append("→");
+                            chuxingItems.add(ui.getJobText(i) + "(後追)");
                         }
                         break;
                     default:
@@ -90,6 +79,13 @@ class VoteInfoRenderer {
                 if (i == ui.ctx.getPlayerSum() && shitiCnt == 0) {
                     shiti.append(GameStrings.PEACE_ARROW);
                 }
+            }
+            if (!chuxingItems.isEmpty()) {
+                for (int l = 0; l < chuxingItems.size(); l++) {
+                    if (l > 0) chuxing.append("+");
+                    chuxing.append(chuxingItems.get(l));
+                }
+                chuxing.append("→");
             }
             if (shitiCnt == 1) shiti.append(ui.uiComponentFactory.getJobText(shitiNum.get(0))).append("→");
             else {
