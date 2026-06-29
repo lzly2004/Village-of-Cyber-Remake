@@ -4,7 +4,7 @@ class GameLogicUtils
 {
     public static boolean isDayDie(whyDie why)
     {
-        return why == whyDie.chuxing || why == whyDie.dayhouzhui || why == whyDie.daymaozhou;
+        return why != null && why.isDayDeath();
     }
 
     public static int getEventIndexByProbability(ArrayList<Integer> probabilities)

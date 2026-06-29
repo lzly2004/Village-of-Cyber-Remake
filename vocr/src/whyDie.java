@@ -1,13 +1,29 @@
 enum whyDie
-{//死亡原因枚举类型
-    NONE,//存活，暂时还未死亡
-    //白天死亡，可以辨别死因。
-    chuxing,//处刑
-    daymaozhou,//白天猫咒
-    dayhouzhui,//白天后追
-     //晚上死亡，注意无法辨别死因。
-    beiyao,//被咬
-    nightmaozhou,//夜间猫咒
-    nighthouzhui,//夜间后追
-    zhousha,//咒杀
+{
+    NONE,
+    chuxing,
+    daymaozhou,
+    dayhouzhui,
+    beiyao,
+    nightmaozhou,
+    nighthouzhui,
+    zhousha;
+
+    public static final whyDie EXECUTION = chuxing;
+    public static final whyDie DAY_CAT_CURSE = daymaozhou;
+    public static final whyDie DAY_PURSUED = dayhouzhui;
+    public static final whyDie NIGHT_BITTEN = beiyao;
+    public static final whyDie NIGHT_CAT_CURSE = nightmaozhou;
+    public static final whyDie NIGHT_PURSUED = nighthouzhui;
+    public static final whyDie CURSE_KILL = zhousha;
+
+    public boolean isDayDeath()
+    {
+        return this == chuxing || this == dayhouzhui || this == daymaozhou;
+    }
+
+    public boolean isNightDeath()
+    {
+        return !isDayDeath() && this != NONE;
+    }
 }

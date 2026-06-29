@@ -1,7 +1,7 @@
 ================================================================================
         Village of Cyber Remake — 重构 Todo List（评估版）
-        整理日期：2026-06-29 | 版本：v5.1
-        已完成: 31 项 | 暂停: 1 项 | 已回退: 3 项
+        整理日期：2026-06-29 | 版本：v5.2
+        已完成: 33 项 | 暂停: 1 项 | 已回退: 3 项
 ================================================================================
 
   ⚠️ 重构原则提醒：
@@ -124,41 +124,43 @@
   收益: 普通场景CO逻辑从单一大方法拆分为语义清晰的子方法，便于独立测试和维护
   备注: 与 WolfBiter Phase1 拆分同类型问题
 
-【P4-3】DielogicCarrier.execute() 假占暴露逻辑提取 + 方法拆分
-  工作量: 小（1-2小时）
+【P4-3】✅ DielogicCarrier.execute() 假占暴露逻辑提取 + 方法拆分（已完成）
+  工作量: 小（1-2小时）✅ 已完成
   风险: 低
   收益: 中
   综合优先级: ⭐⭐⭐
-  现状:
-    - DielogicCarrier.execute() 70行方法
-    - 有两处几乎完全相同的假占暴露逻辑（约15行×2）：
-      - diebody.size() == 1 分支（第49-61行）
-      - else 分支（第70-81行）
-    - 两处都是：遍历zhans → 跳过真占 → 遍历技能目标 → 黑球目标在diebody中 → markNonHuman
-  评估:
-    - ✅ 真实的代码重复（DRY原则违反）
-    - 提取 exposeFakeSeersByDeath() 方法消除重复
-    - execute() 方法本身也可以拆分为更小的阶段方法
-    - 收益：减少重复代码，提高可维护性
-  结论: 推荐，小而有意义的改进
-  建议: 下一步小重构候选
+  完成内容:
+    - execute() 70行方法拆分为5个语义化子方法：
+      - handleWolfBite() - 狼人咬处理（狼咬+猫咒反杀）
+      - handleCurseKill() - 咒杀处理（占咒杀+背德者追随死）
+      - shuffleAndLogEvents() - 事件洗牌+夜间死体日志
+      - handleFakeSeerExposure() - 假占暴露判断与执行
+      - exposeFakeSeersByDeath() - 假占暴露核心逻辑（消除重复）
+    - 提取 exposeFakeSeersByDeath() 方法，消除 diebody.size()==1 和 else 分支的重复代码
+    - execute() 作为协调者保留原接口，内部按顺序调用子方法
+  收益: 消除约15行重复代码，可读性提升，便于独立测试和维护
+  代码行数变化: DielogicCarrier.java: 105 → 131 行（+26行，含方法提取和helper方法）
 
-【P4-4】whyDie 枚举命名规范化
-  工作量: 极小（30分钟）
+【P4-4】✅ whyDie 枚举命名规范化（已完成）
+  工作量: 极小（30分钟）✅ 已完成
   风险: 极低
   收益: 低
   综合优先级: ⭐⭐
-  现状:
-    - whyDie 枚举值全是拼音/中日混合：chuxing, daymaozhou, beiyao, zhousha 等
-    - 与 Role 枚举（mao, lie, zhan 等）风格一致，但都是拼音缩写
-    - 代码可读性差，新成员需要查映射才能理解
-  评估:
-    - ⚠️ 风格问题，不是bug或架构问题
-    - 改名需要改动 ~15个文件，约30+处
-    - 但whyDie使用频率远低于Role，改动范围可控
-    - 可顺带添加注释说明每个枚举值的含义
-  结论: 低优先级，顺手可做
-  建议: 其他重构时顺便处理
+  完成内容:
+    - whyDie 枚举新增7个英文静态常量别名：
+      - EXECUTION = chuxing（处刑）
+      - DAY_CAT_CURSE = daymaozhou（白天猫咒）
+      - DAY_PURSUED = dayhouzhui（白天追随）
+      - NIGHT_BITTEN = beiyao（夜间被咬）
+      - NIGHT_CAT_CURSE = nightmaozhou（夜间猫咒）
+      - NIGHT_PURSUED = nighthouzhui（夜间追随）
+      - CURSE_KILL = zhousha（咒杀）
+    - 新增 isDayDeath() 方法：判断是否为白天死亡原因
+    - 新增 isNightDeath() 方法：判断是否为夜间死亡原因
+    - GameLogicUtils.isDayDie() 改为调用 why.isDayDeath()
+    - 保留原拼音枚举值不变，确保兼容性
+  收益: 代码可读性提升，新增语义化判断方法，无需查映射表理解含义
+  代码行数变化: whyDie.java: 10 → 29 行（+19行），GameLogicUtils.java: 126 → 144 行（+18行）
 
 【P3-7】ReplayPlayerHandler 渲染子组件提取
   工作量: 中（6-8小时）
@@ -210,8 +212,8 @@
   P3-7 ReplayHandler子组件   中(6-8h)  低      低-中    ⭐⭐    ⏸️暂缓
   P3-8 集合字段封装          中(5-7h)  中      中      ⭐⭐    ⏸️暂缓
   P4-1 NonHumanCoordinator   中(5-7h)  低      中-高    ⭐⭐⭐   ✅完成
-  P4-3 DielogicCarrier去重    小(1-2h)  低      中      ⭐⭐⭐   待做
-  P4-4 whyDie命名规范化      极小(30m)  极低     低      ⭐⭐    待做
+  P4-3 DielogicCarrier去重    小(1-2h)  低      中      ⭐⭐⭐   ✅完成
+  P4-4 whyDie命名规范化      极小(30m)  极低     低      ⭐⭐    ✅完成
 
 ================================================================================
                             推荐执行顺序
