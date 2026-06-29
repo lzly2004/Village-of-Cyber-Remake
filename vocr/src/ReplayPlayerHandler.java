@@ -501,6 +501,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
                 int shitiCnt = 0;
                 java.util.List<Integer> shitiNum = new java.util.ArrayList<>();
+                boolean hasChuxing = false;
 
                 for (int i = 0; i < playerSum; i++) {
                     DaySnapshot.PlayerStatus ps = snap.players[i];
@@ -508,21 +509,25 @@ public class ReplayPlayerHandler implements SceneHandler {
 
                     switch (ps.deathReason) {
                         case 1:
-                            if (ps.deathDay == d)
-                                chuxing.append(getShortName(ps.characterNumber)).append("\u2192");
+                            if (ps.deathDay == d) {
+                                chuxing.append(getShortName(ps.characterNumber));
+                                hasChuxing = true;
+                            }
                             break;
                         case 2:
                             if (ps.deathDay == d) {
                                 String cat = findRoleInSnapshot(snap, 5, playerSum);
                                 if (!cat.isEmpty()) chuxing.append(cat).append("+");
-                                chuxing.append(getShortName(ps.characterNumber)).append("(猫呪)\u2192");
+                                chuxing.append(getShortName(ps.characterNumber)).append("(猫呪)");
+                                hasChuxing = true;
                             }
                             break;
                         case 3:
                             if (ps.deathDay == d) {
                                 String fox = findRoleInSnapshot(snap, 10, playerSum);
                                 if (!fox.isEmpty()) chuxing.append(fox).append("+");
-                                chuxing.append(getShortName(ps.characterNumber)).append("(後追)\u2192");
+                                chuxing.append(getShortName(ps.characterNumber)).append("(後追)");
+                                hasChuxing = true;
                             }
                             break;
                         default:
@@ -537,6 +542,8 @@ public class ReplayPlayerHandler implements SceneHandler {
                         shiti.append(GameStrings.PEACE_ARROW);
                     }
                 }
+
+                if (hasChuxing) chuxing.append("\u2192");
 
                 if (shitiCnt == 1) {
                     shiti.append(getShortName(shitiNum.get(0))).append("\u2192");

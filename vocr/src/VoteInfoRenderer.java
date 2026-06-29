@@ -31,6 +31,7 @@ class VoteInfoRenderer {
         for (int k = 1; k < ui.ctx.getGameDay(); ++k) {
             int shitiCnt = 0;
             ArrayList<Integer> shitiNum = new ArrayList<>();
+            boolean hasChuxing = false;
             for (int i = 1; i <= ui.ctx.getPlayerSum(); i++) {
                 if (k == 1) switch (ui.ctx.getClaimedRole(i)) {
                     case 1:
@@ -49,14 +50,17 @@ class VoteInfoRenderer {
                             for (int j = 1; j <= ui.ctx.getPlayerSum(); j++) {
                                 if (ui.ctx.getActualRole(j) == 11 && !ui.ctx.isAlive(j)
                                         && ui.ctx.getDeathDay(i) == k && ui.ctx.getDeathDay(j) < ui.ctx.getDeathDay(i)) {
-                                    chuxing.append(ui.getJobText(i)).append("→");
+                                    chuxing.append(ui.getJobText(i));
+                                    hasChuxing = true;
                                     break;
                                 }
                             }
                         } else if (ui.ctx.getActualRole(i) == 5) {
                         } else {
-                            if (ui.ctx.getDeathDay(i) == k)
-                                chuxing.append(ui.getJobText(i)).append("→");
+                            if (ui.ctx.getDeathDay(i) == k) {
+                                chuxing.append(ui.getJobText(i));
+                                hasChuxing = true;
+                            }
                         }
                         break;
                     case whyDie.daymaozhou:
@@ -67,7 +71,8 @@ class VoteInfoRenderer {
                                     break;
                                 }
                             }
-                            chuxing.append(ui.getJobText(i)).append("(猫呪)").append("→");
+                            chuxing.append(ui.getJobText(i)).append("(猫呪)");
+                            hasChuxing = true;
                         }
                         break;
                     case whyDie.dayhouzhui:
@@ -78,7 +83,8 @@ class VoteInfoRenderer {
                                     break;
                                 }
                             }
-                            chuxing.append(ui.getJobText(i)).append("(後追)").append("→");
+                            chuxing.append(ui.getJobText(i)).append("(後追)");
+                            hasChuxing = true;
                         }
                         break;
                     default:
@@ -91,6 +97,7 @@ class VoteInfoRenderer {
                     shiti.append(GameStrings.PEACE_ARROW);
                 }
             }
+            if (hasChuxing) chuxing.append("→");
             if (shitiCnt == 1) shiti.append(ui.uiComponentFactory.getJobText(shitiNum.get(0))).append("→");
             else {
                 for (int l = 0; l < shitiNum.size(); ++l)
