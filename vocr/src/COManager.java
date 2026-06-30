@@ -182,7 +182,6 @@ public class COManager
                     ctx.rlsl = true;
                 if (ctx.getActualRole(num) != 3)
                 {
-                    int gd = ctx.getGameDay();
                     for (int j = 2; j < gd; j++)
                     {
                         if (ctx.getSkillTarget(num, j) == 0)
