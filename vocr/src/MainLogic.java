@@ -100,7 +100,7 @@ public class MainLogic implements MainLogicInterface
             probabilityCalculator = new ProbabilityCalculator();
         }
 
-        coManager = new COManager(ctx, suspicion, resultPresenter, probabilityCalculator);
+        coManager = new COManager(ctx, suspicion, resultPresenter, probabilityCalculator, hunterGuarder);
 
         // 构建统一的依赖容器
         GameModule gameModule = new GameModule.Builder()
