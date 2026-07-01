@@ -167,4 +167,28 @@ public class UIHelpers {
         return LabelSimpleFactory.makeLabel(isTextLabel ? LabelConst.Text_Label : LabelConst.Simple_Label, x,
                 baseY - textHeight / 2, textWidth / 2, textHeight / 2, icon);
     }
+
+    public static JLabel createIconLabel(UI ui, String imageName, int x, int y) {
+        ImageIcon icon = ui.resources.getImage(imageName);
+        if (icon == null) return null;
+        JLabel label = new JLabel(icon);
+        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
+        return label;
+    }
+
+    public static void addIconLabel(UI ui, String imageName, int x, int y) {
+        JLabel label = createIconLabel(ui, imageName, x, y);
+        if (label != null) ui.jPanel.add(label);
+    }
+
+    public static JLabel createIconLabelWithLog(UI ui, String imageName, int x, int y, String logPrefix) {
+        ImageIcon icon = ui.resources.getImage(imageName);
+        if (icon == null) {
+            DebugLogger.warn("[" + logPrefix + "] 图标未找到: " + imageName);
+            return null;
+        }
+        JLabel label = new JLabel(icon);
+        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
+        return label;
+    }
 }

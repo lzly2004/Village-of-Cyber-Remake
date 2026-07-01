@@ -48,41 +48,28 @@ class CoSelectionPanel {
                         ui.ctx.getClaimedRoleOrder(i), 60 + 74 * charIndex, baseY);
                 if (claimedRoleLabel != null) infoCoPanel.add(claimedRoleLabel);
             }
-            ImageIcon chooseIcon = ui.resources.getImage("frameSRed.png");
-            JLabel chooseLabel = new JLabel(chooseIcon);
+            JLabel chooseLabel = UIHelpers.createIconLabel(ui, "frameSRed.png", 60 + 74 * charIndex, baseY);
             frameLabels.add(chooseLabel);
-            chooseLabel.setBounds(60 + 74 * charIndex, baseY,
-                    chooseIcon.getIconWidth(), chooseIcon.getIconHeight());
             infoCoPanel.add(chooseLabel);
             chooseLabel.setVisible(false);
 
-            ImageIcon voteIcon = ui.resources.getImage("result2_all.png");
-            JLabel voteLabel = new JLabel(voteIcon);
-            voteLabel.setBounds(60 + 5 + 74 * charIndex, baseY,
-                    voteIcon.getIconWidth(), voteIcon.getIconHeight());
+            JLabel voteLabel = UIHelpers.createIconLabel(ui, "result2_all.png", 60 + 5 + 74 * charIndex, baseY);
             infoCoPanel.add(voteLabel);
             infoCoPanel.setComponentZOrder(voteLabel, 0);
             voteLabel.setVisible(false);
             if (ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay())) voteLabel.setVisible(true);
 
-            ImageIcon voteAllIcon = ui.resources.getImage("result1_all.png");
-            JLabel voteAllLabel = new JLabel(voteAllIcon);
-            voteAllLabel.setBounds(60 + 5 + 74 * charIndex, baseY + 20,
-                    voteAllIcon.getIconWidth(), voteAllIcon.getIconHeight());
+            JLabel voteAllLabel = UIHelpers.createIconLabel(ui, "result1_all.png", 60 + 5 + 74 * charIndex, baseY + 20);
             infoCoPanel.add(voteAllLabel);
             resultLabels.add(voteAllLabel);
             voteAllLabel.setVisible(false);
 
             if (i < zhanbuNum.size() + 1) {
                 for (int i2 = 1; i2 <= playerSum; ++i2) {
-                    ImageIcon zbIcon = ui.resources.getImage("result1_" + zhanbuOrder.get(i - 1) + "white.png");
-                    JLabel zbLabel = new JLabel(zbIcon);
+                    JLabel zbLabel = UIHelpers.createIconLabel(ui, "result1_" + zhanbuOrder.get(i - 1) + "white.png",
+                            60 + 5 + 74 * UIHelpers.calculateRowIndex(i2, playerSum),
+                            (UIHelpers.isFirstRow(i2, playerSum) ? 20 : 128) + 16 * zhanbuOrder.get(i - 1));
                     zbLabels.add(zbLabel);
-                    int zbCharIndex = UIHelpers.calculateRowIndex(i2, playerSum);
-                    int zbBaseY = UIHelpers.isFirstRow(i2, playerSum) ? 20 : 128;
-                    zbLabel.setBounds(60 + 5 + zbIcon.getIconWidth() + 74 * zbCharIndex,
-                            zbBaseY + zbIcon.getIconHeight() * zhanbuOrder.get(i - 1),
-                            zbIcon.getIconWidth(), zbIcon.getIconHeight());
                     infoCoPanel.add(zbLabel);
                     zbLabel.setVisible(false);
                 }
