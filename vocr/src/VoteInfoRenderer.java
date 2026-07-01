@@ -47,13 +47,11 @@ class VoteInfoRenderer {
                 switch (ui.ctx.getDeathReason(i)) {
                     case whyDie.chuxing:
                         if (ui.ctx.getActualRole(i) == 10) {
-                            for (int j = 1; j <= ui.ctx.getPlayerSum(); j++) {
-                                if (ui.ctx.getActualRole(j) == 11 && !ui.ctx.isAlive(j)
-                                        && ui.ctx.getDeathDay(i) == k && ui.ctx.getDeathDay(j) < ui.ctx.getDeathDay(i)) {
-                                    chuxing.append(ui.getJobText(i));
-                                    hasChuxing = true;
-                                    break;
-                                }
+                            int deviant = ui.ctx.getDeviant();
+                            if (deviant > 0 && !ui.ctx.isAlive(deviant)
+                                    && ui.ctx.getDeathDay(i) == k && ui.ctx.getDeathDay(deviant) < ui.ctx.getDeathDay(i)) {
+                                chuxing.append(ui.getJobText(i));
+                                hasChuxing = true;
                             }
                         } else if (ui.ctx.getActualRole(i) == 5) {
                         } else {

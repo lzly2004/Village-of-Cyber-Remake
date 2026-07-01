@@ -93,4 +93,7 @@ interface GameContextView
 
     // === 便捷查询 ===
     List<Integer> getClaimedRole(int role, boolean mustAlive);
+    default List<Integer> getAliveClaimedRole(int role) {
+        return getClaimedRole(role, true);
+    }
 }
