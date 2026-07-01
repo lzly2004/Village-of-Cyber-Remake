@@ -290,17 +290,17 @@ public class ReplayPlayerHandler implements SceneHandler {
                 int charHeight = characterImage.getIconHeight();
                 int charIndex = UIHelpers.calculateRowIndex(playerIndex, playerSum);
                 
+                JLabel textLabel = UIHelpers.createCharacterText(ui, ps.characterNumber,
+                        175 + charWidth * charIndex,
+                        isFirstRow ? charHeight : 2 * charHeight, false);
+                if (textLabel != null) ui.jPanel.add(textLabel);
+                
                 if (isFirstRow) {
                     label.setBounds(160 + charWidth * charIndex, 0, charWidth, charHeight);
                 } else {
                     label.setBounds(160 + charWidth * charIndex, charHeight, charWidth, charHeight);
                 }
                 ui.jPanel.add(label);
-                
-                JLabel textLabel = UIHelpers.createCharacterText(ui, ps.characterNumber,
-                        175 + charWidth * charIndex,
-                        isFirstRow ? (charHeight - 15) : (2 * charHeight - 15), false);
-                if (textLabel != null) ui.jPanel.add(textLabel);
                 
             } catch (Exception e) {
                 DebugLogger.warn("[ReplayPlayerHandler] 渲染玩家" + (i+1) + "时出错: " + e.getMessage());

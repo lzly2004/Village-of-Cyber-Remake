@@ -61,13 +61,13 @@ class PlayerStatusRenderer {
                     ui.ctx.getActualRole(i), false, STATUS_START_X + 64 * charIndex,
                     isFirstRow ? 0 : 98);
             if (label != null) {
-                ui.jPanel.add(label);
                 int charWidth = ((ImageIcon) label.getIcon()).getIconWidth();
                 int charHeight = ((ImageIcon) label.getIcon()).getIconHeight();
                 int textX = STATUS_START_X + TEXT_OFFSET_X + charWidth * charIndex;
-                int textY = isFirstRow ? (charHeight - 15) : (2 * charHeight - 15);
-                JLabel textLabel = UIHelpers.createCharacterText(ui, charNumber, textX, textY, false);
+                JLabel textLabel = UIHelpers.createCharacterText(ui, charNumber, textX,
+                        isFirstRow ? charHeight : 2 * charHeight, false);
                 if (textLabel != null) ui.jPanel.add(textLabel);
+                ui.jPanel.add(label);
             }
         }
     }
