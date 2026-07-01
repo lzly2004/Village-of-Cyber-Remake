@@ -196,7 +196,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         ui.jPanel.add(slotPanel);
     }
 
-    private void handleEmptySlotRightClick(UI ui, int slotIndex) {
+    private boolean checkReplayDataAvailable(UI ui) {
         MainLogic mainLogic = null;
         try {
             mainLogic = (MainLogic) Game.getInstance().getMainLogic();
@@ -209,18 +209,31 @@ public class ReplayBrowserHandler implements SceneHandler {
                 "无法保存",
                 JOptionPane.INFORMATION_MESSAGE
             );
-            return;
+            return false;
         }
+        return true;
+    }
+
+    private void saveReplayToSlot(UI ui, int slotIndex) {
+        MainLogic mainLogic = null;
+        try {
+            mainLogic = (MainLogic) Game.getInstance().getMainLogic();
+        } catch (Exception e) {}
+        
+        if (mainLogic == null) return;
         
         GameRecorder recorder = mainLogic.getRecorder();
-        if (recorder.getRecords().isEmpty()) {
-            JOptionPane.showMessageDialog(ui.getJFrame(),
-                "当前对局数据为空，无法保存。",
-                "无法保存",
-                JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
+        ReplaySave save = ReplaySave.fromRecorder(slotIndex, recorder);
+        ui.replayManager.saveToSlot(slotIndex, save);
+        recorder.endGame(recorder.isActive() ? 0 : 0, 0);
+        recorder.setActive(false);
+        ui.resources.playSound("click.wav");
+        ui.run();
+        DebugLogger.info("[ReplayBrowserHandler] 已保存到槽位: " + slotIndex);
+    }
+
+    private void handleEmptySlotRightClick(UI ui, int slotIndex) {
+        if (!checkReplayDataAvailable(ui)) return;
         
         int choice = JOptionPane.showConfirmDialog(ui.getJFrame(),
             "是否将对局数据保存到槽位 " + slotIndex + "？",
@@ -229,36 +242,13 @@ public class ReplayBrowserHandler implements SceneHandler {
         );
         
         if (choice == JOptionPane.YES_OPTION) {
-            ReplaySave save = ReplaySave.fromRecorder(slotIndex, recorder);
-            ui.replayManager.saveToSlot(slotIndex, save);
-            recorder.endGame(recorder.isActive() ? 0 : 0, 0);
-            recorder.setActive(false);
-            ui.resources.playSound("click.wav");
-            ui.run();
-            DebugLogger.info("[ReplayBrowserHandler] 已保存到槽位: " + slotIndex);
+            saveReplayToSlot(ui, slotIndex);
         }
     }
 
     private void showConfirmDialog(UI ui, int slotIndex, ReplaySave existingSave) {
-        MainLogic mainLogic = null;
-        try {
-            mainLogic = (MainLogic) Game.getInstance().getMainLogic();
-        } catch (Exception e) {}
-
-        boolean hasNewData = (mainLogic != null && mainLogic.getRecorder() != null &&
-                !mainLogic.getRecorder().getRecords().isEmpty());
-
-        if (!hasNewData) {
-            JOptionPane.showMessageDialog(ui.getJFrame(),
-                    "没有新的对局数据可供覆盖保存。",
-                    "提示",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-            return;
-        }
-
-        final GameRecorder finalRecorder = mainLogic.getRecorder();
-
+        if (!checkReplayDataAvailable(ui)) return;
+        
         int choice = JOptionPane.showConfirmDialog(ui.getJFrame(),
                 "要将存档保存在存档格 " + slotIndex + " 吗？\n（之前的存档会被覆盖）",
                 "保存确认",
@@ -267,13 +257,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         );
 
         if (choice == JOptionPane.YES_OPTION) {
-            ReplaySave save = ReplaySave.fromRecorder(slotIndex, finalRecorder);
-            ui.replayManager.saveToSlot(slotIndex, save);
-            finalRecorder.endGame(finalRecorder.isActive() ? 0 : 0, 0);
-            finalRecorder.setActive(false);
-            ui.resources.playSound("click.wav");
-            ui.run();
-            DebugLogger.info("[ReplayBrowserHandler] 已覆盖保存到槽位: " + slotIndex);
+            saveReplayToSlot(ui, slotIndex);
         }
     }
 
