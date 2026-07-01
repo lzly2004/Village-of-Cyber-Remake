@@ -53,49 +53,40 @@ public class EndAnimeHandler implements SceneHandler {
             StringBuilder xName = new StringBuilder();
             String imageName = GameStrings.buildCharacterImageName(ui.ctx.getCharacterNumber(i), ui.ctx.getDeathReason(i), ui.ctx.getActualRole(i), true);
             xName.append(ui.ctx.getDeathReason(i).getDeathIconName());
-            String textName = GameStrings.buildCharacterTextName(ui.ctx.getCharacterNumber(i));
+            int charNumber = ui.ctx.getCharacterNumber(i);
             ImageIcon characterImage = ui.resources.getImage(imageName.toString());
-            ImageIcon characterText = ui.resources.getImage(textName);
+            if (characterImage == null) continue;
+            int charWidth = characterImage.getIconWidth();
+            int charHeight = characterImage.getIconHeight();
+            int playerSum = ui.ctx.getPlayerSum();
+            int charIndex = UIHelpers.calculateRowIndex(i, playerSum);
+            boolean isFirstRow = UIHelpers.isFirstRow(i, playerSum);
+            int spacing = charWidth + 40;
+
             if (!xName.isEmpty()) {
-                ImageIcon deathImage = ui.resources.getImage(xName.toString());
-                JLabel deathLabel;
-                if (i <= (ui.ctx.getPlayerSum() + 1) / 2) {
-                    deathLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                            22 + (characterImage.getIconWidth() + 40) * i, 110,
-                            deathImage.getIconWidth(), deathImage.getIconHeight(), deathImage);
-                } else {
-                    deathLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                            22 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
-                            260 + characterImage.getIconHeight(),
-                            deathImage.getIconWidth(), deathImage.getIconHeight(), deathImage);
-                }
-                ui.jPanel.add(deathLabel);
+                int deathX = 22 + spacing * charIndex;
+                int deathY = isFirstRow ? 110 : (260 + charHeight);
+                JLabel deathLabel = UIHelpers.createDeathMarker(ui, ui.ctx.getDeathReason(i), deathX, deathY);
+                if (deathLabel != null) ui.jPanel.add(deathLabel);
             }
+
             JLabel label;
             JLabel textLabel;
-            if (i <= (ui.ctx.getPlayerSum() + 1) / 2) {
+            if (isFirstRow) {
                 label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        20 + (characterImage.getIconWidth() + 40) * i, 100,
-                        characterImage.getIconWidth(), characterImage.getIconHeight(), characterImage);
-                textLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label,
-                        35 + (characterImage.getIconWidth() + 40) * i,
-                        100 + characterImage.getIconHeight() - characterText.getIconHeight() / 2,
-                        characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
-                infoLabel.setBounds(20 + (characterImage.getIconWidth() + 40) * i, 210, 100, 150);
+                        20 + spacing * charIndex, 100, charWidth, charHeight, characterImage);
+                textLabel = UIHelpers.createCharacterText(ui, charNumber,
+                        35 + spacing * charIndex, 100 + charHeight - 20);
+                infoLabel.setBounds(20 + spacing * charIndex, 210, 100, 150);
             } else {
                 label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        20 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
-                        250 + characterImage.getIconHeight(),
-                        characterImage.getIconWidth(), characterImage.getIconHeight(), characterImage);
-                textLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label,
-                        35 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
-                        250 + 2 * characterImage.getIconHeight() - characterText.getIconHeight() / 2,
-                        characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
-                infoLabel.setBounds(20 + (characterImage.getIconWidth() + 40) * (i - ((ui.ctx.getPlayerSum() + 1) / 2)),
-                        460, 100, 150);
+                        20 + spacing * charIndex, 250 + charHeight, charWidth, charHeight, characterImage);
+                textLabel = UIHelpers.createCharacterText(ui, charNumber,
+                        35 + spacing * charIndex, 250 + 2 * charHeight - 20);
+                infoLabel.setBounds(20 + spacing * charIndex, 460, 100, 150);
             }
             ui.jPanel.add(infoLabel);
-            ui.jPanel.add(textLabel);
+            if (textLabel != null) ui.jPanel.add(textLabel);
             ui.jPanel.add(label);
         }
         String winIconText = "";

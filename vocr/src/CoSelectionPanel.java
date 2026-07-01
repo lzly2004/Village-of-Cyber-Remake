@@ -35,38 +35,31 @@ class CoSelectionPanel {
         List<JLabel> frameLabels = new ArrayList<>();
         List<JLabel> resultLabels = new ArrayList<>();
         List<JLabel> zbLabels = new ArrayList<>();
-        for (int i = 1; i <= ui.ctx.getPlayerSum(); i++) {
+        int playerSum = ui.ctx.getPlayerSum();
+        for (int i = 1; i <= playerSum; i++) {
             ImageIcon characterImage = ui.resources.getImage(ui.uiComponentFactory.getCharImageName(
                     ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i)));
+            int charIndex = UIHelpers.calculateRowIndex(i, playerSum);
+            boolean isFirstRow = UIHelpers.isFirstRow(i, playerSum);
+            int baseY = isFirstRow ? 20 : 128;
+
             if (ui.ctx.getClaimedRole(i) > 0 && ui.ctx.getClaimedRole(i) < 6) {
-                ImageIcon claimedRoleIcon = ui.resources.getImage(ui.uiComponentFactory.getClaimedRoleIconName(
-                        ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i)));
-                JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
-                if (i <= (ui.ctx.getPlayerSum() + 1) / 2)
-                    claimedRoleLabel.setBounds(60 + 74 * i, 20, claimedRoleIcon.getIconWidth(), claimedRoleIcon.getIconHeight());
-                else
-                    claimedRoleLabel.setBounds(60 + 74 * (i - ((ui.ctx.getPlayerSum() + 1) / 2)), 128,
-                            claimedRoleIcon.getIconWidth(), claimedRoleIcon.getIconHeight());
-                infoCoPanel.add(claimedRoleLabel);
+                JLabel claimedRoleLabel = UIHelpers.createClaimedRoleIcon(ui, ui.ctx.getClaimedRole(i),
+                        ui.ctx.getClaimedRoleOrder(i), 60 + 74 * charIndex, baseY);
+                if (claimedRoleLabel != null) infoCoPanel.add(claimedRoleLabel);
             }
             ImageIcon chooseIcon = ui.resources.getImage("frameSRed.png");
             JLabel chooseLabel = new JLabel(chooseIcon);
             frameLabels.add(chooseLabel);
-            if (i <= (ui.ctx.getPlayerSum() + 1) / 2)
-                chooseLabel.setBounds(60 + 74 * i, 20, chooseIcon.getIconWidth(), chooseIcon.getIconHeight());
-            else
-                chooseLabel.setBounds(60 + 74 * (i - ((ui.ctx.getPlayerSum() + 1) / 2)), 128,
-                        chooseIcon.getIconWidth(), chooseIcon.getIconHeight());
+            chooseLabel.setBounds(60 + 74 * charIndex, baseY,
+                    chooseIcon.getIconWidth(), chooseIcon.getIconHeight());
             infoCoPanel.add(chooseLabel);
             chooseLabel.setVisible(false);
 
             ImageIcon voteIcon = ui.resources.getImage("result2_all.png");
             JLabel voteLabel = new JLabel(voteIcon);
-            if (i <= (ui.ctx.getPlayerSum() + 1) / 2)
-                voteLabel.setBounds(60 + 5 + 74 * i, 20, voteIcon.getIconWidth(), voteIcon.getIconHeight());
-            else
-                voteLabel.setBounds(60 + 5 + 74 * (i - (ui.ctx.getPlayerSum() + 1) / 2), 128,
-                        voteIcon.getIconWidth(), voteIcon.getIconHeight());
+            voteLabel.setBounds(60 + 5 + 74 * charIndex, baseY,
+                    voteIcon.getIconWidth(), voteIcon.getIconHeight());
             infoCoPanel.add(voteLabel);
             infoCoPanel.setComponentZOrder(voteLabel, 0);
             voteLabel.setVisible(false);
@@ -74,40 +67,32 @@ class CoSelectionPanel {
 
             ImageIcon voteAllIcon = ui.resources.getImage("result1_all.png");
             JLabel voteAllLabel = new JLabel(voteAllIcon);
-            if (i <= (ui.ctx.getPlayerSum() + 1) / 2)
-                voteAllLabel.setBounds(60 + 5 + 74 * i, 40, voteAllIcon.getIconWidth(), voteAllIcon.getIconHeight());
-            else
-                voteAllLabel.setBounds(60 + 5 + 74 * (i - (ui.ctx.getPlayerSum() + 1) / 2), 148,
-                        voteAllIcon.getIconWidth(), voteAllIcon.getIconHeight());
+            voteAllLabel.setBounds(60 + 5 + 74 * charIndex, baseY + 20,
+                    voteAllIcon.getIconWidth(), voteAllIcon.getIconHeight());
             infoCoPanel.add(voteAllLabel);
             resultLabels.add(voteAllLabel);
             voteAllLabel.setVisible(false);
 
             if (i < zhanbuNum.size() + 1) {
-                for (int i2 = 1; i2 <= ui.ctx.getPlayerSum(); ++i2) {
+                for (int i2 = 1; i2 <= playerSum; ++i2) {
                     ImageIcon zbIcon = ui.resources.getImage("result1_" + zhanbuOrder.get(i - 1) + "white.png");
                     JLabel zbLabel = new JLabel(zbIcon);
                     zbLabels.add(zbLabel);
-                    if (i2 <= (ui.ctx.getPlayerSum() + 1) / 2)
-                        zbLabel.setBounds(60 + 5 + zbIcon.getIconWidth() + 74 * i2,
-                                20 + zbIcon.getIconHeight() * zhanbuOrder.get(i - 1),
-                                zbIcon.getIconWidth(), zbIcon.getIconHeight());
-                    else
-                        zbLabel.setBounds(60 + 5 + zbIcon.getIconWidth() + 74 * (i2 - (ui.ctx.getPlayerSum() + 1) / 2),
-                                128 + zbIcon.getIconHeight() * zhanbuOrder.get(i - 1),
-                                zbIcon.getIconWidth(), zbIcon.getIconHeight());
+                    int zbCharIndex = UIHelpers.calculateRowIndex(i2, playerSum);
+                    int zbBaseY = UIHelpers.isFirstRow(i2, playerSum) ? 20 : 128;
+                    zbLabel.setBounds(60 + 5 + zbIcon.getIconWidth() + 74 * zbCharIndex,
+                            zbBaseY + zbIcon.getIconHeight() * zhanbuOrder.get(i - 1),
+                            zbIcon.getIconWidth(), zbIcon.getIconHeight());
                     infoCoPanel.add(zbLabel);
                     zbLabel.setVisible(false);
                 }
             }
             JLabel label = new JLabel(characterImage);
             targetLabels.add(label);
-            if (i <= (ui.ctx.getPlayerSum() + 1) / 2)
-                label.setBounds(60 + (characterImage.getIconWidth() + 10) * i, 20,
-                        characterImage.getIconWidth(), characterImage.getIconHeight());
-            else
-                label.setBounds((60 + (characterImage.getIconWidth() + 10) * (i - (ui.ctx.getPlayerSum() + 1) / 2)),
-                        30 + characterImage.getIconHeight(), characterImage.getIconWidth(), characterImage.getIconHeight());
+            int charWidth = characterImage.getIconWidth();
+            int charHeight = characterImage.getIconHeight();
+            label.setBounds(60 + (charWidth + 10) * charIndex, baseY + 10,
+                    charWidth, charHeight);
             infoCoPanel.add(label);
         }
         handler.renderSkillTargets(infoCoPanel, 50, 74, 20, 128);

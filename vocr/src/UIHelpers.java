@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.awt.*;
 
 public class UIHelpers {
 
@@ -111,5 +112,57 @@ public class UIHelpers {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
+    }
+
+    public static int calculateRowIndex(int playerIndex, int playerSum) {
+        return playerIndex <= (playerSum + 1) / 2 ? playerIndex : (playerIndex - (playerSum + 1) / 2);
+    }
+
+    public static boolean isFirstRow(int playerIndex, int playerSum) {
+        return playerIndex <= (playerSum + 1) / 2;
+    }
+
+    public static JLabel createClaimedRoleIcon(UI ui, int claimedRole, int claimedRoleOrder, int x, int y) {
+        if (claimedRole <= 0 || claimedRole >= 6) return null;
+        String iconName = ui.uiComponentFactory.getClaimedRoleIconName(claimedRole, claimedRoleOrder);
+        ImageIcon icon = ui.resources.getImage(iconName);
+        if (icon == null) return null;
+        JLabel label = new JLabel(icon);
+        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
+        return label;
+    }
+
+    public static JLabel createDeathMarker(UI ui, whyDie deathReason, int x, int y) {
+        String iconName = deathReason.getDeathIconName();
+        if (iconName.isEmpty()) return null;
+        ImageIcon icon = ui.resources.getImage(iconName);
+        if (icon == null) return null;
+        JLabel label = new JLabel(icon);
+        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
+        return label;
+    }
+
+    public static JLabel createDeathMarker(UI ui, int deathReason, int x, int y) {
+        return createDeathMarker(ui, whyDie.values()[deathReason], x, y);
+    }
+
+    public static JLabel createPlayerAvatar(UI ui, int charNumber, whyDie deathReason,
+            int actualRole, boolean showActualRole, int x, int y) {
+        String imageName = showActualRole
+                ? GameStrings.buildCharacterImageName(charNumber, deathReason, actualRole, true)
+                : GameStrings.buildCharacterImageNameSimple(charNumber, deathReason);
+        ImageIcon icon = ui.resources.getImage(imageName);
+        if (icon == null) return null;
+        JLabel label = new JLabel(icon);
+        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
+        return label;
+    }
+
+    public static JLabel createCharacterText(UI ui, int charNumber, int x, int y) {
+        String textName = GameStrings.buildCharacterTextName(charNumber);
+        ImageIcon icon = ui.resources.getImage(textName);
+        if (icon == null) return null;
+        return LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, x, y,
+                icon.getIconWidth() / 2, icon.getIconHeight() / 2, icon);
     }
 }

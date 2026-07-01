@@ -260,35 +260,22 @@ public class ReplayPlayerHandler implements SceneHandler {
                         DebugLogger.info(String.format(
                                 "[ReplayPlayerHandler] 显示CO图标: player=%d, role=%d, comingOutDay=%d, currentDay=%d",
                                 i+1, ps.claimedRole, ps.comingOutDay, day));
-                        ImageIcon claimedRoleIcon = ui.resources.getImage(claimedRoleIconName);
-                        if (claimedRoleIcon != null) {
-                            JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
-                            if (isFirstRow) {
-                                claimedRoleLabel.setBounds(160 + 64 * playerIndex, 0,
-                                        claimedRoleIcon.getIconWidth(), claimedRoleIcon.getIconHeight());
-                            } else {
-                                claimedRoleLabel.setBounds(160 + 64 * (playerIndex - ((playerSum + 1) / 2)), 98,
-                                        claimedRoleIcon.getIconWidth(), claimedRoleIcon.getIconHeight());
-                            }
-                            ui.jPanel.add(claimedRoleLabel);
-                        }
+                        int charIndex = UIHelpers.calculateRowIndex(playerIndex, playerSum);
+                        int roleX = 160 + 64 * charIndex;
+                        int roleY = isFirstRow ? 0 : 98;
+                        JLabel claimedRoleLabel = UIHelpers.createClaimedRoleIcon(ui, ps.claimedRole,
+                                ps.claimedRoleOrder, roleX, roleY);
+                        if (claimedRoleLabel != null) ui.jPanel.add(claimedRoleLabel);
                     }
                 }
                 
                 // === 2.添加死亡标记 ===
-                if (!xName.isEmpty()) {
-                    ImageIcon deathImage = ui.resources.getImage(xName.toString());
-                    if (deathImage != null) {
-                        JLabel deathLabel = new JLabel(deathImage);
-                        if (isFirstRow) {
-                            deathLabel.setBounds(165 + 64 * playerIndex, 10,
-                                    deathImage.getIconWidth(), deathImage.getIconHeight());
-                        } else {
-                            deathLabel.setBounds(165 + 64 * (playerIndex - ((playerSum + 1) / 2)), 108,
-                                    deathImage.getIconWidth(), deathImage.getIconHeight());
-                        }
-                        ui.jPanel.add(deathLabel);
-                    }
+                if (isDead) {
+                    int charIndex = UIHelpers.calculateRowIndex(playerIndex, playerSum);
+                    int deathX = 165 + 64 * charIndex;
+                    int deathY = isFirstRow ? 10 : 108;
+                    JLabel deathLabel = UIHelpers.createDeathMarker(ui, ps.deathReason, deathX, deathY);
+                    if (deathLabel != null) ui.jPanel.add(deathLabel);
                 }
                 
                 // === 3. 添加头像和角色名 ===
@@ -298,33 +285,22 @@ public class ReplayPlayerHandler implements SceneHandler {
                     continue;
                 }
                 
-                ImageIcon characterText = ui.resources.getImage(textName);
                 JLabel label = new JLabel(characterImage);
-                JLabel textLabel = null;
+                int charWidth = characterImage.getIconWidth();
+                int charHeight = characterImage.getIconHeight();
+                int charIndex = UIHelpers.calculateRowIndex(playerIndex, playerSum);
                 
                 if (isFirstRow) {
-                    label.setBounds(160 + characterImage.getIconWidth() * playerIndex, 0,
-                            characterImage.getIconWidth(), characterImage.getIconHeight());
-                    if (characterText != null) {
-                        textLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                                175 + characterImage.getIconWidth() * playerIndex,
-                                characterImage.getIconHeight() - characterText.getIconHeight() / 2,
-                                characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
-                    }
+                    label.setBounds(160 + charWidth * charIndex, 0, charWidth, charHeight);
                 } else {
-                    label.setBounds(160 + characterImage.getIconWidth() * (playerIndex - ((playerSum + 1) / 2)),
-                            characterImage.getIconHeight(),
-                            characterImage.getIconWidth(), characterImage.getIconHeight());
-                    if (characterText != null) {
-                        textLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                                175 + characterImage.getIconWidth() * (playerIndex - ((playerSum + 1) / 2)),
-                                2 * characterImage.getIconHeight() - characterText.getIconHeight() / 2,
-                                characterText.getIconWidth() / 2, characterText.getIconHeight() / 2, characterText);
-                    }
+                    label.setBounds(160 + charWidth * charIndex, charHeight, charWidth, charHeight);
                 }
-                
-                if (textLabel != null) ui.jPanel.add(textLabel);
                 ui.jPanel.add(label);
+                
+                JLabel textLabel = UIHelpers.createCharacterText(ui, ps.characterNumber,
+                        175 + charWidth * charIndex,
+                        isFirstRow ? (charHeight - 20) : (2 * charHeight - 20));
+                if (textLabel != null) ui.jPanel.add(textLabel);
                 
             } catch (Exception e) {
                 DebugLogger.warn("[ReplayPlayerHandler] 渲染玩家" + (i+1) + "时出错: " + e.getMessage());

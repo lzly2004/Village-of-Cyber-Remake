@@ -1,5 +1,3 @@
-import javax.swing.*;
-
 /**
  * 玩家状态渲染器 —— 从 GameSceneVoteHandler.renderPlayerStatuses() 提取。
  * 负责渲染角色头像、死亡标记、CO役职图标、技能目标标记。
@@ -14,14 +12,12 @@ class PlayerStatusRenderer {
 
     static void render(UI ui) {
         int playerSum = ui.ctx.getPlayerSum();
-        int halfCount = (playerSum + 1) / 2;
         for (int i = 1; i <= playerSum; i++) {
-            StringBuilder xName = new StringBuilder();
-            String imageName = GameStrings.buildCharacterImageNameSimple(ui.ctx.getCharacterNumber(i), ui.ctx.getDeathReason(i));
-            xName.append(ui.ctx.getDeathReason(i).getDeathIconName());
-            String textName = GameStrings.buildCharacterTextName(ui.ctx.getCharacterNumber(i));
-            String claimedRoleIconName = ui.uiComponentFactory.getClaimedRoleIconName(
-                    ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i));
+            int charIndex = UIHelpers.calculateRowIndex(i, playerSum);
+            boolean isFirstRow = UIHelpers.isFirstRow(i, playerSum);
+            int charNumber = ui.ctx.getCharacterNumber(i);
+            whyDie deathReason = ui.ctx.getDeathReason(i);
+
             StringBuilder skillTargetName = new StringBuilder("result");
             if (ui.ctx.getClaimedRole(i) > 0 && ui.ctx.getClaimedRole(i) < 6) {
                 if (ui.ctx.getClaimedRole(i) <= 3) {
@@ -40,61 +36,37 @@ class PlayerStatusRenderer {
                                 ui.skillTargetPeople[i][ui.ctx.getGameDay()] = (lastSkillTarget);
                             }
                         } else {
-                            if (lastSkillTarget >= playerSum + 1) {
-                                skillTargetName.append(".png");
-                                ui.skillTargetPeople[i][ui.ctx.getGameDay()] = (lastSkillTarget - playerSum);
-                            } else {
-                                skillTargetName.append(".png");
-                                ui.skillTargetPeople[i][ui.ctx.getGameDay()] = (lastSkillTarget);
-                            }
+                            skillTargetName.append(".png");
+                            ui.skillTargetPeople[i][ui.ctx.getGameDay()] = (lastSkillTarget >= playerSum + 1)
+                                    ? (lastSkillTarget - playerSum) : lastSkillTarget;
                         }
-                        ui.skillTargetNames[i][ui.ctx.getGameDay()] = (skillTargetName.toString());
+                        ui.skillTargetNames[i][ui.ctx.getGameDay()] = skillTargetName.toString();
                     }
                 }
-                ImageIcon claimedRoleIcon = ui.resources.getImage(claimedRoleIconName);
-                JLabel claimedRoleLabel = new JLabel(claimedRoleIcon);
-                int roleX = STATUS_START_X + STATUS_ITEM_WIDTH * (i <= halfCount ? i : (i - halfCount));
-                int roleY = i <= halfCount ? 0 : ROW_Y_OFFSET;
-                claimedRoleLabel.setBounds(roleX, roleY,
-                        claimedRoleIcon.getIconWidth(), claimedRoleIcon.getIconHeight());
-                ui.jPanel.add(claimedRoleLabel);
+                int roleX = STATUS_START_X + STATUS_ITEM_WIDTH * charIndex;
+                int roleY = isFirstRow ? 0 : ROW_Y_OFFSET;
+                JLabel claimedRoleLabel = UIHelpers.createClaimedRoleIcon(ui, ui.ctx.getClaimedRole(i),
+                        ui.ctx.getClaimedRoleOrder(i), roleX, roleY);
+                if (claimedRoleLabel != null) ui.jPanel.add(claimedRoleLabel);
             }
-            if (!xName.isEmpty()) {
-                ImageIcon deathImage = ui.resources.getImage(xName.toString());
-                JLabel deathLabel = new JLabel(deathImage);
-                int deathX = STATUS_START_X + DEATH_OFFSET_X + STATUS_ITEM_WIDTH * (i <= halfCount ? i : (i - halfCount));
-                int deathY = i <= halfCount ? 10 : (10 + ROW_Y_OFFSET);
-                deathLabel.setBounds(deathX, deathY,
-                        deathImage.getIconWidth(), deathImage.getIconHeight());
-                ui.jPanel.add(deathLabel);
+
+            int deathX = STATUS_START_X + DEATH_OFFSET_X + STATUS_ITEM_WIDTH * charIndex;
+            int deathY = isFirstRow ? 10 : (10 + ROW_Y_OFFSET);
+            JLabel deathLabel = UIHelpers.createDeathMarker(ui, deathReason, deathX, deathY);
+            if (deathLabel != null) ui.jPanel.add(deathLabel);
+
+            JLabel label = UIHelpers.createPlayerAvatar(ui, charNumber, deathReason,
+                    ui.ctx.getActualRole(i), false, STATUS_START_X + 64 * charIndex,
+                    isFirstRow ? 0 : 98);
+            if (label != null) {
+                ui.jPanel.add(label);
+                int charWidth = ((ImageIcon) label.getIcon()).getIconWidth();
+                int charHeight = ((ImageIcon) label.getIcon()).getIconHeight();
+                int textX = STATUS_START_X + TEXT_OFFSET_X + charWidth * charIndex;
+                int textY = isFirstRow ? (charHeight - 20) : (2 * charHeight - 20);
+                JLabel textLabel = UIHelpers.createCharacterText(ui, charNumber, textX, textY);
+                if (textLabel != null) ui.jPanel.add(textLabel);
             }
-            ImageIcon characterImage = ui.resources.getImage(imageName.toString());
-            ImageIcon characterText = ui.resources.getImage(textName);
-            JLabel label = new JLabel(characterImage);
-            JLabel textLabel;
-            int charWidth = characterImage.getIconWidth();
-            int charHeight = characterImage.getIconHeight();
-            int textWidth = characterText.getIconWidth();
-            int textHeight = characterText.getIconHeight();
-            int charIndex = i <= halfCount ? i : (i - halfCount);
-            if (i <= halfCount) {
-                label.setBounds(STATUS_START_X + charWidth * charIndex, 0,
-                        charWidth, charHeight);
-                textLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        STATUS_START_X + TEXT_OFFSET_X + charWidth * charIndex,
-                        charHeight - textHeight / 2,
-                        textWidth / 2, textHeight / 2, characterText);
-            } else {
-                label.setBounds(STATUS_START_X + charWidth * charIndex,
-                        charHeight,
-                        charWidth, charHeight);
-                textLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        STATUS_START_X + TEXT_OFFSET_X + charWidth * charIndex,
-                        2 * charHeight - textHeight / 2,
-                        textWidth / 2, textHeight / 2, characterText);
-            }
-            ui.jPanel.add(textLabel);
-            ui.jPanel.add(label);
         }
     }
 }
