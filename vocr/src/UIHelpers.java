@@ -158,11 +158,13 @@ public class UIHelpers {
         return label;
     }
 
-    public static JLabel createCharacterText(UI ui, int charNumber, int x, int y, boolean isTextLabel) {
+    public static JLabel createCharacterText(UI ui, int charNumber, int x, int baseY, boolean isTextLabel) {
         String textName = GameStrings.buildCharacterTextName(charNumber);
         ImageIcon icon = ui.resources.getImage(textName);
         if (icon == null) return null;
-        return LabelSimpleFactory.makeLabel(isTextLabel ? LabelConst.Text_Label : LabelConst.Simple_Label, x, y,
-                icon.getIconWidth() / 2, icon.getIconHeight() / 2, icon);
+        int textWidth = icon.getIconWidth();
+        int textHeight = icon.getIconHeight();
+        return LabelSimpleFactory.makeLabel(isTextLabel ? LabelConst.Text_Label : LabelConst.Simple_Label, x,
+                baseY - textHeight / 2, textWidth / 2, textHeight / 2, icon);
     }
 }

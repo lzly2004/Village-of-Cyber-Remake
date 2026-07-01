@@ -76,13 +76,13 @@ public class EndAnimeHandler implements SceneHandler {
                 label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
                         20 + spacing * charIndex, 100, charWidth, charHeight, characterImage);
                 textLabel = UIHelpers.createCharacterText(ui, charNumber,
-                        35 + spacing * charIndex, 100 + charHeight - 10, true);
+                        35 + spacing * charIndex, 100 + charHeight, true);
                 infoLabel.setBounds(20 + spacing * charIndex, 210, 100, 150);
             } else {
                 label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
                         20 + spacing * charIndex, 250 + charHeight, charWidth, charHeight, characterImage);
                 textLabel = UIHelpers.createCharacterText(ui, charNumber,
-                        35 + spacing * charIndex, 250 + 2 * charHeight - 10, true);
+                        35 + spacing * charIndex, 250 + 2 * charHeight, true);
                 infoLabel.setBounds(20 + spacing * charIndex, 460, 100, 150);
             }
             ui.jPanel.add(infoLabel);
