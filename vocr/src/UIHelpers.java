@@ -1,8 +1,36 @@
-import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.awt.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.Timer;
 
 public class UIHelpers {
+
+    public static void setButtonListener(JButton button, UI ui, Runnable action) {
+        button.addActionListener(e -> {
+            ui.resources.playSound("click.wav");
+            action.run();
+        });
+    }
+
+    public static void setButtonListenerNoSound(JButton button, Runnable action) {
+        button.addActionListener(e -> action.run());
+    }
+
+    public static void setButtonSceneTransition(JButton button, UI ui, UI.Scene scene) {
+        button.addActionListener(e -> {
+            ui.resources.playSound("click.wav");
+            ui.transitionTo(scene);
+        });
+    }
+
+    public static void setButtonSceneTransitionNoSound(JButton button, UI ui, UI.Scene scene) {
+        button.addActionListener(e -> ui.transitionTo(scene));
+    }
 
     /** 批量隐藏按钮 */
     public static void hideButtons(JButton... buttons) {

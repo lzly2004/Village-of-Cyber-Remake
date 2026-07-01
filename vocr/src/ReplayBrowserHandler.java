@@ -1,7 +1,8 @@
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\vocr\src\ReplayBrowserHandler.java
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ReplayBrowserHandler implements SceneHandler {
     private static final int SLOTS_PER_PAGE = 3;
@@ -62,20 +63,18 @@ public class ReplayBrowserHandler implements SceneHandler {
 
         JButton btnNext = createButton(ui, "PVBnext.png", BTN_X, 250, BTN_W, BTN_H);
         if (page < 2) {
-            btnNext.addActionListener(e -> {
-                ui.resources.playSound("click.wav");
+            UIHelpers.setButtonListener(btnNext, ui, () -> {
                 ui.replayPage++;
                 ui.run();
             });
         } else {
-            btnNext.addActionListener(e -> ui.resources.playSound("click.wav"));
+            UIHelpers.setButtonListener(btnNext, ui, () -> {});
         }
         ui.jPanel.add(btnNext);
 
         if (page > 0) {
             JButton btnBack = createButton(ui, "PVBreturn.png", BTN_X, 400, BTN_W, BTN_H);
-            btnBack.addActionListener(e -> {
-                ui.resources.playSound("click.wav");
+            UIHelpers.setButtonListener(btnBack, ui, () -> {
                 ui.replayPage--;
                 ui.run();
             });
@@ -83,8 +82,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         }
 
         JButton btnTitle = createButton(ui, "PVBtitile.png", BTN_X, 550, BTN_W, BTN_H);
-        btnTitle.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+        UIHelpers.setButtonListener(btnTitle, ui, () -> {
             browserBgmSwitched = false;
             ui.resources.playBgm("start_menu.wav");
             ui.transitionTo(UI.Scene.START_SCENE);

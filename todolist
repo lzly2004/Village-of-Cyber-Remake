@@ -1,0 +1,10 @@
+# Todo 列表 - 重构任务
+# 格式：ID | 状态 | 优先级 | 内容
+
+P5-60 | completed | high | 按钮事件监听器重构：在UIHelpers中添加通用事件监听器工厂方法
+P5-61 | pending | high | finishRender逻辑重构：在UIHelpers中添加finishRender方法
+P5-62 | pending | high | handleEmptySlotRightClick与showConfirmDialog逻辑合并
+P5-63 | pending | medium | 背景添加重构：在UIHelpers中添加addBackground方法
+P5-64 | pending | medium | JTextArea配置重构：在TextareaSimpleFactory中添加bounds方法
+P5-65 | pending | medium | findRoleIndexInSnapshot重复逻辑重构
+P5-66 | pending | low | AbstractSceneHandler抽象基类重构
