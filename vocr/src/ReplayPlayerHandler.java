@@ -54,7 +54,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         }
 
         addBackground(ui);
-        finishRender(ui);
+        UIHelpers.finishRender(ui);
     }
 
     private void renderEmptyState(UI ui) {
@@ -86,7 +86,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         ui.jPanel.add(backBtn);
 
         addBackground(ui);
-        finishRender(ui);
+        UIHelpers.finishRender(ui);
     }
 
     private JLabel addBackground(UI ui) {
@@ -104,12 +104,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         return null;
     }
 
-    private void finishRender(UI ui) {
-        ui.resizeComponents();
-        ui.jPanel.revalidate();
-        ui.jPanel.repaint();
-        ui.getJFrame().setVisible(true);
-    }
+    
 
     private String getStatusIcon(int deathReason, int actualRole) {
         switch (deathReason) {
@@ -485,9 +480,20 @@ public class ReplayPlayerHandler implements SceneHandler {
 
                     switch (ps.deathReason) {
                         case 1:
-                            if (ps.deathDay == d) {
-                                chuxing.append(getShortName(ps.characterNumber));
-                                hasChuxing = true;
+                            if (ps.actualRole == 10) {
+                                int deviantIdx = findRoleIndexInSnapshot(snap, 11, playerSum);
+                                if (deviantIdx >= 0 && snap.players[deviantIdx] != null 
+                                        && snap.players[deviantIdx].deathDay > 0 
+                                        && ps.deathDay == d && snap.players[deviantIdx].deathDay < ps.deathDay) {
+                                    chuxing.append(getShortName(ps.characterNumber));
+                                    hasChuxing = true;
+                                }
+                            } else if (ps.actualRole == 5) {
+                            } else {
+                                if (ps.deathDay == d) {
+                                    chuxing.append(getShortName(ps.characterNumber));
+                                    hasChuxing = true;
+                                }
                             }
                             break;
                         case 2:
@@ -796,10 +802,20 @@ public class ReplayPlayerHandler implements SceneHandler {
         return "";
     }
 
+    private int findRoleIndexInSnapshot(DaySnapshot snap, int targetRole, int playerSum) {
+        if (snap == null || snap.players == null) return -1;
+        for (int i = 0; i < playerSum; i++) {
+            DaySnapshot.PlayerStatus ps = snap.players[i];
+            if (ps != null && ps.actualRole == targetRole) return i;
+        }
+        return -1;
+    }
+
     private void appendSkillResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus ps,
                                    int idx, int playerSum, int startDay, int endDay,
                                    boolean useSafeName, boolean showBallResult, int dayOffset) {
         sb.append(useSafeName ? safeCharName(ps.characterNumber) : getShortName(ps.characterNumber)).append(" : ");
+        boolean markedExposed = false;
         for (int d = startDay; d < endDay; d++) {
             DaySnapshot snap = getSnapshot(ui, d + dayOffset);
             if (snap == null || snap.players == null || idx >= snap.players.length) continue;
@@ -822,8 +838,25 @@ public class ReplayPlayerHandler implements SceneHandler {
                     sb.append(targetName).append("\u2192");
                 }
             }
+            DaySnapshot currentSnap = getSnapshot(ui, d);
+            if (!markedExposed && currentSnap != null && currentSnap.players != null 
+                    && idx < currentSnap.players.length) {
+                DaySnapshot.PlayerStatus currentPs = currentSnap.players[idx];
+                if (currentPs != null && currentPs.nonHumanMarked) {
+                    markedExposed = true;
+                }
+            }
         }
-        if (ps.nonHumanMarked) sb.append(GameStrings.MARKER_EXPOSED).append("\u2192");
+        if (!markedExposed) {
+            DaySnapshot endSnap = getSnapshot(ui, endDay);
+            if (endSnap != null && endSnap.players != null && idx < endSnap.players.length) {
+                DaySnapshot.PlayerStatus endPs = endSnap.players[idx];
+                if (endPs != null && endPs.nonHumanMarked) {
+                    markedExposed = true;
+                }
+            }
+        }
+        if (markedExposed) sb.append(GameStrings.MARKER_EXPOSED).append("\u2192");
         if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '\u2192') sb.setLength(sb.length() - 1);
         sb.append("\n");
     }

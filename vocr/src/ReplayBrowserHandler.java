@@ -1,8 +1,16 @@
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\vocr\src\ReplayBrowserHandler.java
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 public class ReplayBrowserHandler implements SceneHandler {
     private static final int SLOTS_PER_PAGE = 3;
@@ -99,10 +107,7 @@ public class ReplayBrowserHandler implements SceneHandler {
             ui.jPanel.add(background);
         }
 
-        ui.resizeComponents();
-        ui.jPanel.revalidate();
-        ui.jPanel.repaint();
-        ui.getJFrame().setVisible(true);
+        UIHelpers.finishRender(ui);
     }
 
     private void renderSlot(UI ui, ReplayManager manager, int slotIndex,

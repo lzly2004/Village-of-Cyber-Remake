@@ -32,6 +32,13 @@ public class UIHelpers {
         button.addActionListener(e -> ui.transitionTo(scene));
     }
 
+    public static void finishRender(UI ui) {
+        ui.resizeComponents();
+        ui.jPanel.revalidate();
+        ui.jPanel.repaint();
+        ui.getJFrame().setVisible(true);
+    }
+
     /** 批量隐藏按钮 */
     public static void hideButtons(JButton... buttons) {
         for (JButton b : buttons) b.setVisible(false);
