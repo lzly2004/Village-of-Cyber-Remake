@@ -299,7 +299,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 
                 JLabel textLabel = UIHelpers.createCharacterText(ui, ps.characterNumber,
                         175 + charWidth * charIndex,
-                        isFirstRow ? (charHeight - 20) : (2 * charHeight - 20));
+                        isFirstRow ? (charHeight - 15) : (2 * charHeight - 15), false);
                 if (textLabel != null) ui.jPanel.add(textLabel);
                 
             } catch (Exception e) {

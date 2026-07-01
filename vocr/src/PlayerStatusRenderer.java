@@ -65,8 +65,8 @@ class PlayerStatusRenderer {
                 int charWidth = ((ImageIcon) label.getIcon()).getIconWidth();
                 int charHeight = ((ImageIcon) label.getIcon()).getIconHeight();
                 int textX = STATUS_START_X + TEXT_OFFSET_X + charWidth * charIndex;
-                int textY = isFirstRow ? (charHeight - 20) : (2 * charHeight - 20);
-                JLabel textLabel = UIHelpers.createCharacterText(ui, charNumber, textX, textY);
+                int textY = isFirstRow ? (charHeight - 15) : (2 * charHeight - 15);
+                JLabel textLabel = UIHelpers.createCharacterText(ui, charNumber, textX, textY, false);
                 if (textLabel != null) ui.jPanel.add(textLabel);
             }
         }
