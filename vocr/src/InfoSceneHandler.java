@@ -84,11 +84,7 @@ public class InfoSceneHandler implements SceneHandler {
                 ui.resources.getHelpText(scene.toString()));
         JScrollPane scrollPane = new JScrollPane(dialogText);
         scrollPane.setBounds(50, 50, 880, 630);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
+        UIHelpers.configureScrollPane(scrollPane);
         ui.jPanel.add(scrollPane);
         finishInfoRender(ib);
     }

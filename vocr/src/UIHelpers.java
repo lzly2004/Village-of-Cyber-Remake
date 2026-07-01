@@ -104,4 +104,12 @@ public class UIHelpers {
         ui.diaPanel.add(Chara);
         ui.resizeComponents();
     }
+
+    public static void configureScrollPane(JScrollPane scrollPane) {
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+    }
 }

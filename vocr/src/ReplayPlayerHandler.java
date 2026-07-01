@@ -572,11 +572,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
             JTextArea infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, result.toString());
             JScrollPane scrollPane = new JScrollPane(infoText);
-            scrollPane.setBorder(BorderFactory.createEmptyBorder());
-            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            scrollPane.setOpaque(false);
-            scrollPane.getViewport().setOpaque(false);
+            UIHelpers.configureScrollPane(scrollPane);
             int panelW = boardIcon != null ? 200 + boardIcon.getIconWidth() - 80 : 500;
             int panelH = boardIcon != null ? 50 + boardIcon.getIconHeight() - 60 : 300;
             scrollPane.setBounds(40, 228, panelW, panelH);
@@ -621,11 +617,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
         JTextArea roleText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 22, result.toString());
         JScrollPane scrollPane = new JScrollPane(roleText);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
+        UIHelpers.configureScrollPane(scrollPane);
         int panelW = boardIcon != null ? 200 + boardIcon.getIconWidth() - 80 : 500;
         int panelH = boardIcon != null ? 50 + boardIcon.getIconHeight() - 60 : 300;
         scrollPane.setBounds(40, 228, panelW, panelH);
@@ -745,11 +737,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
         JTextArea piaoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 20, leftPiao.toString());
         JScrollPane scrollPane = new JScrollPane(piaoText);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
+        UIHelpers.configureScrollPane(scrollPane);
         int panelW = boardIcon != null ? 200 + boardIcon.getIconWidth() - 80 : 500;
         int panelH = boardIcon != null ? 50 + boardIcon.getIconHeight() - 60 : 300;
         scrollPane.setBounds(40, 228, panelW * 2 / 3, panelH);
@@ -758,11 +746,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
         JTextArea piaoText1 = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 20, rightPiao.toString());
         JScrollPane scrollPane1 = new JScrollPane(piaoText1);
-        scrollPane1.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane1.setOpaque(false);
-        scrollPane1.getViewport().setOpaque(false);
+        UIHelpers.configureScrollPane(scrollPane1);
         scrollPane1.setBounds(40 + panelW * 2 / 3, 228, panelW / 3, panelH);
         ui.jPanel.add(scrollPane1);
         ui.jPanel.setComponentZOrder(scrollPane1, 1);

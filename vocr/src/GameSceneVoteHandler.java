@@ -365,11 +365,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         }
         isSelectedVoteTargetText.setText(isSelectedVoteTargetResult.toString());
         votePanel.scrollPane1.getViewport().setView(isSelectedVoteTargetText);
-        votePanel.scrollPane1.setBorder(BorderFactory.createEmptyBorder());
-        votePanel.scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        votePanel.scrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        votePanel.scrollPane1.setOpaque(false);
-        votePanel.scrollPane1.getViewport().setOpaque(false);
+        UIHelpers.configureScrollPane(votePanel.scrollPane1);
         votePanel.scrollPane1.setBounds(40, 228, 200 + voteInfo.boardIcon.getIconWidth() - 80,
                 50 + voteInfo.boardIcon.getIconHeight() - 60);
         isSelectedVoteTargetText.setVisible(true);

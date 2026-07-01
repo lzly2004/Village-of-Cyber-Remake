@@ -105,11 +105,7 @@ class VoteInfoRenderer {
                 200 + boardIcon.getIconWidth(), 50 + boardIcon.getIconHeight(), boardIcon);
         infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, result.toString());
         scrollPane = new JScrollPane(infoText);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
+        UIHelpers.configureScrollPane(scrollPane);
         scrollPane.setBounds(40, 228, 200 + boardIcon.getIconWidth() - 80, 50 + boardIcon.getIconHeight() - 60);
     }
 
