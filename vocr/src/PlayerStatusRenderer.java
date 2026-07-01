@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 /**
  * 玩家状态渲染器 —— 从 GameSceneVoteHandler.renderPlayerStatuses() 提取。
  * 负责渲染角色头像、死亡标记、CO役职图标、技能目标标记。
