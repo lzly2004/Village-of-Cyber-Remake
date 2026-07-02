@@ -213,7 +213,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 
                 if (ps.characterNumber <= 9) imageName.append("0");
                 imageName.append(ps.characterNumber);
-                boolean isDead = ps.deathDay > 0 && ps.deathDay < day;
+                boolean isDead = !ps.isAlive(day);
 
                 // 复盘模式：根据实际身份显示不同颜色头像（对齐结算界面规则）
                 imageName.append(GameStrings.getRoleImageSuffix(ps.actualRole));
@@ -322,7 +322,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 if (displayRole != 1 && displayRole != 2) continue;
 
                 // 死亡检查：已死亡的占卜/灵能师不再发球（与对局中GameSceneVoteHandler一致）
-                if (ps.deathDay > 0 && ps.deathDay < d) continue;
+                if (!ps.isAlive(d)) continue;
 
                 if (ps.skillTarget == 0) continue;
 
