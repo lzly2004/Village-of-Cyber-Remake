@@ -26,7 +26,7 @@ class VoteResultRenderer {
             if (voteTotal[i][round] == max) { maxCnt++; maxPos.add(i); }
         for (int i1 = 0; i1 < 10 - leftCnt; ++i1) leftPiao.append("\n");
         if (maxCnt == 1) {
-            leftPiao.append(String.format(GameStrings.VOTE_RESULT_FORMAT, max, ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(maxPos.get(0)))));
+            leftPiao.append(String.format(GameStrings.VOTE_RESULT_FORMAT, max, ui.getJobText(maxPos.get(0))));
             isReVote[0] = false;
             ui.chuxingWho = maxPos.get(0);
         } else {
@@ -83,13 +83,13 @@ class VoteResultRenderer {
                 extraText.append(GameStrings.VOTE_GREY);
                 for (int i = 0; i < playerSum; ++i)
                     if (ui.greyCharas[i][gameDay] != 0)
-                        extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.greyCharas[i][gameDay])));
+                        extraText.append(ui.getJobText(ui.greyCharas[i][gameDay]));
                 break;
             case 2:
                 extraText.append(GameStrings.VOTE_DESIGNATED);
                 for (int i = 0; i < playerSum; ++i)
                     if (ui.isSelectedVoteTargetCharas[i][gameDay] != 0)
-                        extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.isSelectedVoteTargetCharas[i][gameDay]))).append(",");
+                        extraText.append(ui.getJobText(ui.isSelectedVoteTargetCharas[i][gameDay])).append(",");
                 break;
         }
         return extraText;
@@ -107,8 +107,8 @@ class VoteResultRenderer {
 
     private static String formatVoteLine(UI ui, int i, int round, int gameDay, int[][] voteTotal) {
         return String.format(GameStrings.VOTE_LINE_FORMAT,
-                ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i)),
+                ui.getJobText(i),
                 voteTotal[i][round],
-                ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.ctx.getVoteTarget(i, gameDay, round))));
+                ui.getJobText(ui.ctx.getVoteTarget(i, gameDay, round)));
     }
 }
