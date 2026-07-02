@@ -44,39 +44,40 @@ class VoteInfoRenderer {
                         GameLogicUtils.appendSkillResultLog(ui, lieren, i, 2, false);
                         break;
                 }
+                boolean isDeathDayMatch = ui.ctx.getDeathDay(i) == k;
                 switch (ui.ctx.getDeathReason(i)) {
                     case whyDie.chuxing:
                         if (ui.ctx.getActualRole(i) == 10) {
                             int deviant = ui.ctx.getDeviant();
                             if (deviant > 0 && !ui.ctx.isAlive(deviant)
-                                    && ui.ctx.getDeathDay(i) == k && ui.ctx.getDeathDay(deviant) < ui.ctx.getDeathDay(i)) {
+                                    && isDeathDayMatch && ui.ctx.getDeathDay(deviant) < ui.ctx.getDeathDay(i)) {
                                 chuxing.append(ui.getJobText(i));
                                 hasChuxing = true;
                             }
                         } else if (ui.ctx.getActualRole(i) == 5) {
                         } else {
-                            if (ui.ctx.getDeathDay(i) == k) {
+                            if (isDeathDayMatch) {
                                 chuxing.append(ui.getJobText(i));
                                 hasChuxing = true;
                             }
                         }
                         break;
                     case whyDie.daymaozhou:
-                        if (ui.ctx.getDeathDay(i) == k) {
+                        if (isDeathDayMatch) {
                             chuxing.append(ui.getJobText(ui.ctx.getCat())).append("+");
                             chuxing.append(ui.getJobText(i)).append("(猫呪)");
                             hasChuxing = true;
                         }
                         break;
                     case whyDie.dayhouzhui:
-                        if (ui.ctx.getDeathDay(i) == k) {
+                        if (isDeathDayMatch) {
                             chuxing.append(ui.getJobText(ui.ctx.getFox())).append("+");
                             chuxing.append(ui.getJobText(i)).append("(後追)");
                             hasChuxing = true;
                         }
                         break;
                     default:
-                        if (ui.ctx.getDeathDay(i) == k) {
+                        if (isDeathDayMatch) {
                             shitiCnt++; shitiNum.add(i);
                         }
                         break;

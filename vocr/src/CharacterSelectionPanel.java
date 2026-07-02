@@ -53,7 +53,7 @@ class CharacterSelectionPanel {
         List<JLabel> zbLabels = new ArrayList<>();
 
         for (int i = 1; i <= n - 1; i++) {
-            String imageName = handler.charImageName(i);
+            String imageName = ui.uiComponentFactory.getCharImageName(ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i));
 
             if (ui.ctx.getClaimedRole(i) > 0 && ui.ctx.getClaimedRole(i) < 6) {
                 String crName = ui.uiComponentFactory.getClaimedRoleIconName(ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i));
