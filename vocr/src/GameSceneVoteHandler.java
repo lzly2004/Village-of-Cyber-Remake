@@ -581,10 +581,6 @@ public class GameSceneVoteHandler implements SceneHandler {
 
 
 
-    private void appendSkillResults(StringBuilder sb, int i, int startDay) {
-        GameLogicUtils.appendSkillResultLog(ui, sb, i, startDay);
-    }
-
     int charGridX(int i, int baseX, int spacing) {
         int half = (this.ui.ctx.getPlayerSum() + 1) / 2;
         return baseX + spacing * (i <= half ? i : i - this.ui.ctx.getPlayerSum() / 2);

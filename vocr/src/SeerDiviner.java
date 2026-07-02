@@ -50,7 +50,7 @@ public class SeerDiviner
             boolean ackW = ctx.isAckWhite(i);
             if (ackW) suspicion.markAckWhite(i);
             if ((ctx.getDeathReason(i) != whyDie.NONE &&
-                    (ctx.getDeathDay(i) != gd || GameLogicUtils.isDayDie(ctx.getDeathReason(i))))
+                    (ctx.getDeathDay(i) != gd || ctx.getDeathReason(i) != null && ctx.getDeathReason(i).isDayDeath()))
                     || i == znum || ackW)
             {
                 DebugLogger.log("排除玩家：" + CharacterKanjiName.values()[i]);
@@ -70,7 +70,7 @@ public class SeerDiviner
             {
                 boolean ackW3 = ctx.isAckWhite(i);
                 if (ackW3) suspicion.markAckWhite(i);
-                if ((ctx.getDeathReason(i) != whyDie.NONE && (ctx.getDeathDay(i) != gd || GameLogicUtils.isDayDie(ctx.getDeathReason(i)))) || i == znum || ackW3)
+                if ((ctx.getDeathReason(i) != whyDie.NONE && (ctx.getDeathDay(i) != gd || ctx.getDeathReason(i) != null && ctx.getDeathReason(i).isDayDeath())) || i == znum || ackW3)
                 {
                     istarget[i] = false;
                     continue;

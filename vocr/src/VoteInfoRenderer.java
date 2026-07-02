@@ -35,10 +35,10 @@ class VoteInfoRenderer {
             for (int i = 1; i <= ui.ctx.getPlayerSum(); i++) {
                 if (k == 1) switch (ui.ctx.getClaimedRole(i)) {
                     case 1:
-                        appendSkillResults(ui, zhanbu, i, 1);
+                        GameLogicUtils.appendSkillResultLog(ui, zhanbu, i, 1);
                         break;
                     case 2:
-                        appendSkillResults(ui, lingneng, i, 2);
+                        GameLogicUtils.appendSkillResultLog(ui, lingneng, i, 2);
                         break;
                     case 3:
                         GameLogicUtils.appendSkillResultLog(ui, lieren, i, 2, false);
@@ -109,7 +109,4 @@ class VoteInfoRenderer {
         scrollPane.setBounds(40, 228, 200 + boardIcon.getIconWidth() - 80, 50 + boardIcon.getIconHeight() - 60);
     }
 
-    private void appendSkillResults(UI ui, StringBuilder sb, int i, int startDay) {
-        GameLogicUtils.appendSkillResultLog(ui, sb, i, startDay);
-    }
 }

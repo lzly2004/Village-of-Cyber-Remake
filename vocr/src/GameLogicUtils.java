@@ -4,11 +4,6 @@ import java.util.Comparator;
 
 class GameLogicUtils
 {
-    public static boolean isDayDie(whyDie why)
-    {
-        return why != null && why.isDayDeath();
-    }
-
     public static int getEventIndexByProbability(ArrayList<Integer> probabilities)
     {
         if (probabilities == null || probabilities.isEmpty())
