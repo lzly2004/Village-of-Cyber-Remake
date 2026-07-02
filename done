@@ -4,4 +4,5 @@
 P5-60 | 2026-07-02 | 按钮事件监听器重构：在UIHelpers中添加通用事件监听器工厂方法 | +54/-66 (净-12) | e4f27b3
 P5-61 | 2026-07-02 | finishRender逻辑重构：在UIHelpers中添加finishRender方法 | +4/-10 (净-6) | d31ddc7
 P5-62 | 2026-07-02 | handleEmptySlotRightClick与showConfirmDialog逻辑合并 | +18/-25 (净-7) | 89c37d8
-P5-63 | 2026-07-02 | 背景添加重构：在UIHelpers中添加addBackground和createBackgroundLabel方法 | +22/-34 (净-12) |
+P5-63 | 2026-07-02 | 背景添加重构：在UIHelpers中添加addBackground和createBackgroundLabel方法 | +22/-34 (净-12) | 3b99eb3
+P5-65 | 2026-07-02 | findRoleIndexInSnapshot重复逻辑重构：让findRoleInSnapshot调用findRoleIndexInSnapshot | +0/-6 (净-6) | 

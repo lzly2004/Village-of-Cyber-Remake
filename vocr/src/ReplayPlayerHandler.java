@@ -794,12 +794,9 @@ public class ReplayPlayerHandler implements SceneHandler {
     }
 
     private String findRoleInSnapshot(DaySnapshot snap, int targetRole, int playerSum) {
-        if (snap == null || snap.players == null) return "";
-        for (int i = 0; i < playerSum; i++) {
-            DaySnapshot.PlayerStatus ps = snap.players[i];
-            if (ps != null && ps.actualRole == targetRole) return getShortName(ps.characterNumber);
-        }
-        return "";
+        int idx = findRoleIndexInSnapshot(snap, targetRole, playerSum);
+        if (idx == -1) return "";
+        return getShortName(snap.players[idx].characterNumber);
     }
 
     private int findRoleIndexInSnapshot(DaySnapshot snap, int targetRole, int playerSum) {
