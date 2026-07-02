@@ -871,23 +871,8 @@ public class ReplayPlayerHandler implements SceneHandler {
     private int getCharNumByTarget(DaySnapshot snap, int targetPlayerIdx) {
         if (snap != null && snap.players != null && targetPlayerIdx >= 1 && targetPlayerIdx <= snap.players.length) {
             DaySnapshot.PlayerStatus ps = snap.players[targetPlayerIdx - 1];
-            if (ps != null && ps.characterNumber != 0) {
-                if (ps.characterNumber == targetPlayerIdx) {
-                    DebugLogger.warn("[ReplayPlayerHandler] [CHAR-SUSPECT] p" + targetPlayerIdx
-                            + ".charNum=" + ps.characterNumber + " == 座位号! name=" + getShortName(ps.characterNumber)
-                            + " | 可能是存档记录错误或角色分配巧合");
-                }
-                DebugLogger.info("[CHAR-RESOLVE] tgtP" + targetPlayerIdx + " -> charNum=" + ps.characterNumber
-                        + "(" + getShortName(ps.characterNumber) + ") | caller=" 
-                        + Thread.currentThread().getStackTrace()[2].getMethodName());
-                return ps.characterNumber;
-            }
+            if (ps != null && ps.characterNumber != 0) return ps.characterNumber;
         }
-        DebugLogger.warn("[ReplayPlayerHandler] [CHAR-FALLBACK] tgtP" + targetPlayerIdx
-                + " -> 返回座位号(无映射)! snap=" + (snap != null ? "非null" : "null")
-                + ", players=" + (snap != null && snap.players != null ? snap.players.length : "null")
-                + ", ps=" + ((snap != null && snap.players != null && targetPlayerIdx >= 1 && targetPlayerIdx < snap.players.length)
-                ? (snap.players[targetPlayerIdx - 1] != null ? "charNum=" + snap.players[targetPlayerIdx - 1].characterNumber : "null") : "越界"));
         return targetPlayerIdx;
     }
     
