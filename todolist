@@ -43,3 +43,4 @@ P5-88 | completed | high | GameSceneVoteHandler.charImageName方法内联删除 
 P5-89 | abandoned | medium | 提取重复的claimedRole范围判断 | -
 P5-90 | completed | medium | VoteInfoRenderer提取死亡天数匹配变量 | +1/-4 (净-3行)
 P5-91 | abandoned | medium | EndAnimeHandler统一职业名获取方式 | -
+P5-92 | completed | high | SuspicionSystem.updateBaseSuspicion逻辑简化 | -8行
