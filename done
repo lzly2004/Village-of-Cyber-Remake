@@ -19,3 +19,5 @@ P5-84 | 2026-07-02 | VoteResultRenderer使用ui.getJobText替代完整调用 | +
 P5-85 | 2026-07-02 | VoteInfoRenderer统一使用ui.getJobText | +3/-5 (净-2) | 48318e2
 P5-86 | 2026-07-02 | GameSceneVoteHandler统一使用ui.getJobText | +2/-4 (净-2) | 48318e2
 P5-87 | 2026-07-02 | 删除VoteResultRenderer调试日志 | +0/-3 (净-3) | 48318e2
+P5-88 | 2026-07-02 | GameSceneVoteHandler.charImageName方法内联删除 | +1/-5 (净-4) | 87a5d1b
+P5-90 | 2026-07-02 | VoteInfoRenderer提取死亡天数匹配变量 | +1/-4 (净-3) | 87a5d1b
