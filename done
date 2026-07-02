@@ -13,7 +13,7 @@ P5-78 | 2026-07-02 | VoteInfoRenderer.appendSkillResults方法删除：直接替
 P5-79 | 2026-07-02 | GameSceneVoteHandler.appendSkillResults方法删除：死代码，从未被调用 | +0/-4 (净-4) | bf7a0e9
 P5-80 | 2026-07-02 | GameLogicUtils.isDayDie方法内联删除：逻辑简单，内联到SeerDiviner的2处调用点 | +2/-7 (净-5) | bf7a0e9
 P5-81 | 2026-07-02 | 删除DaySnapshot.java中的调试日志DebugLogger.info | +0/-1 (净-1) | 81f857f
-P5-82 | 2026-07-02 | ReplayPlayerHandler使用isAlive方法替代手动死亡判断 | +2/-2 (净0) | 9365c21
+P5-82 | 2026-07-02 | ReplayPlayerHandler使用isAlive方法替代手动死亡判断（已修复逻辑bug，改回原始判断） | +2/-2 (净0) | 02b63e2
 P5-83 | 2026-07-02 | GameLogicUtils提取重复的getJobText调用，改用ui.getJobText | +3/-5 (净-2) | e786120
 P5-84 | 2026-07-02 | VoteResultRenderer使用ui.getJobText替代完整调用 | +5/-5 (净0) | 73510aa
 P5-85 | 2026-07-02 | VoteInfoRenderer统一使用ui.getJobText | +3/-5 (净-2) | 48318e2
