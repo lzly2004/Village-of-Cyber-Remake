@@ -8,7 +8,6 @@ import java.util.List;
 class VoteResultRenderer {
 
     static void renderPiao(UI ui, String str, int round, boolean[] isReVote, GameSceneVoteHandler handler) {
-        DebugLogger.log("***当前gameDay等于" + ui.ctx.getGameDay() + "***");
         ui.piaoText.setVisible(true);
         ui.piaoText1.setVisible(true);
         int gameDay = ui.ctx.getEffectiveGameDay();
@@ -98,8 +97,6 @@ class VoteResultRenderer {
     private static void renderVoteResult(UI ui, GameSceneVoteHandler handler, 
                                          StringBuilder leftPiao, StringBuilder rightPiao,
                                          int leftWidth, int rightX) {
-        DebugLogger.log(leftPiao);
-        DebugLogger.log(rightPiao);
         handler.stylePiaoTextArea(ui.piaoText, leftPiao.toString(), 40, 228, leftWidth, 430);
         handler.stylePiaoTextArea(ui.piaoText1, rightPiao.toString(), rightX, 228, 450, 430);
         ui.resizeComponents();

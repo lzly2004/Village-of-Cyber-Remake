@@ -77,7 +77,7 @@ class VoteInfoRenderer {
                         break;
                     default:
                         if (ui.ctx.getDeathDay(i) == k) {
-                            shitiCnt++; shitiNum.add(ui.ctx.getCharacterNumber(i));
+                            shitiCnt++; shitiNum.add(i);
                         }
                         break;
                 }
@@ -86,10 +86,10 @@ class VoteInfoRenderer {
                 }
             }
             if (hasChuxing) chuxing.append("→");
-            if (shitiCnt == 1) shiti.append(ui.uiComponentFactory.getJobText(shitiNum.get(0))).append("→");
+            if (shitiCnt == 1) shiti.append(ui.getJobText(shitiNum.get(0))).append("→");
             else {
                 for (int l = 0; l < shitiNum.size(); ++l)
-                    shiti.append(ui.uiComponentFactory.getJobText(shitiNum.get(l))).append("+");
+                    shiti.append(ui.getJobText(shitiNum.get(l))).append("+");
                 shiti.setLength(shiti.length() - 1); shiti.append("→");
             }
         }
