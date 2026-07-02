@@ -194,29 +194,15 @@ class SuspicionSystem
                     {
                         int fr = GameLogicUtils.feiren(ctx.getActualRole(j));
                         if (fr == 0)
-                        {
-                            if (p0 <= 10) ctx.addSuspicionValue(i, j, -15);
-                            else if (p0 <= 12) ctx.addSuspicionValue(i, j, 15);
-                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-3, 2));
-                        }
+                            ctx.addSuspicionValue(i, j, getSuspicionAdjustment(p0, 10, 12, -3, 2));
                         else if (fr == -1)
-                        {
-                            if (p0 <= 5) ctx.addSuspicionValue(i, j, -15);
-                            else if (p0 <= 10) ctx.addSuspicionValue(i, j, 15);
-                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 2));
-                        }
+                            ctx.addSuspicionValue(i, j, getSuspicionAdjustment(p0, 5, 10, -2, 2));
                         else
-                        {
-                            if (p0 <= 2) ctx.addSuspicionValue(i, j, -15);
-                            else if (p0 <= 12) ctx.addSuspicionValue(i, j, 15);
-                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 3));
-                        }
+                            ctx.addSuspicionValue(i, j, getSuspicionAdjustment(p0, 2, 12, -2, 3));
                     }
                     else
                     {
-                        if (p0 <= 5) ctx.addSuspicionValue(i, j, -15);
-                        else if (p0 <= 10) ctx.addSuspicionValue(i, j, 15);
-                        else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 2));
+                        ctx.addSuspicionValue(i, j, getSuspicionAdjustment(p0, 5, 10, -2, 2));
                     }
                     int sv = ctx.getSuspicionValue(i, j);
                     if (sv > GameConstants.INFJ)
@@ -258,6 +244,12 @@ class SuspicionSystem
             lazySuspicionValue[i] = 0;
     }
     
+    private int getSuspicionAdjustment(int p0, int threshold1, int threshold2, int randMin, int randMax) {
+        if (p0 <= threshold1) return -15;
+        if (p0 <= threshold2) return 15;
+        return ConstNum.randomInt(randMin, randMax);
+    }
+
     private void computeTop3SuspectedPlayers(int n, int gd)
     {
         for (int i = 1; i <= n; i++)
