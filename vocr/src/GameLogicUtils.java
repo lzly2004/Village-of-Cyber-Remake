@@ -115,13 +115,12 @@ class GameLogicUtils
         sb.append(ui.getJobText(i)).append(" : ");
         for (int j = startDay; j < ui.ctx.getGameDay(); ++j) {
             if (ui.ctx.getDeathDay(i) != 0 && j >= ui.ctx.getDeathDay(i)) break;
-            if (ui.ctx.getSkillTarget(i, j) > ui.ctx.getPlayerSum()) {
-                sb.append(ui.getJobText(ui.ctx.getSkillTarget(i, j) - ui.ctx.getPlayerSum()));
-                if (showBallResult) sb.append("●");
-                sb.append("→");
-            } else if (ui.ctx.getSkillTarget(i, j) > 0) {
-                sb.append(ui.getJobText(ui.ctx.getSkillTarget(i, j)));
-                if (showBallResult) sb.append("○");
+            int target = ui.ctx.getSkillTarget(i, j);
+            if (target > 0) {
+                boolean isBlack = target > ui.ctx.getPlayerSum();
+                if (isBlack) target -= ui.ctx.getPlayerSum();
+                sb.append(ui.getJobText(target));
+                if (showBallResult) sb.append(isBlack ? "●" : "○");
                 sb.append("→");
             }
         }
