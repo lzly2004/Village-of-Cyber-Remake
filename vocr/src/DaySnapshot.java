@@ -95,7 +95,7 @@ public class DaySnapshot {
         public static PlayerStatus parseFromString(String str) {
             try {
                 PlayerStatus ps = new PlayerStatus();
-                DebugLogger.info("[DaySnapshot] 开始解析PlayerStatus: " + str);  // 新增：输入日志
+
                 str = str.trim().substring(1, str.length() - 1);
                 
                 // 提取玩家位置: {1:n=42,...} → playerIndex = 1
