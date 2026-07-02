@@ -1,0 +1,17 @@
+# Git提交记录
+# 格式：ID | Git Hash | 提交信息
+
+P5-60 | e4f27b3 | 按钮事件监听器重构：在UIHelpers中添加通用事件监听器工厂方法 (-12行)
+P5-61 | d31ddc7 | finishRender逻辑重构：在UIHelpers中添加finishRender方法 (-6行)
+P5-62 | 89c37d8 | handleEmptySlotRightClick与showConfirmDialog逻辑合并 (-7行)
+P5-63 | 3b99eb3 | 背景添加重构：在UIHelpers中添加addBackground和createBackgroundLabel方法 (-12行)
+P5-65 | 3228ae2 | findRoleIndexInSnapshot重复逻辑重构：让findRoleInSnapshot调用findRoleIndexInSnapshot (-6行)
+P5-73 | 67dedf2 | getCharNumByTarget方法简化：移除17行debug日志，仅保留必要的边界检查和返回逻辑 (-17行)
+P5-76 | 1077ea3 | UIHelpers.createIconLabel与createIconLabelWithLog重复逻辑合并：让createIconLabelWithLog调用createIconLabel (-9行)
+P5-78 | bf7a0e9 | VoteInfoRenderer.appendSkillResults方法删除：直接替换为GameLogicUtils.appendSkillResultLog调用 (-5行)
+P5-79 | bf7a0e9 | GameSceneVoteHandler.appendSkillResults方法删除：死代码，从未被调用 (-4行)
+P5-80 | bf7a0e9 | GameLogicUtils.isDayDie方法内联删除：逻辑简单，内联到SeerDiviner的2处调用点 (-5行)
+P5-81 | 81f857f | 删除DaySnapshot调试日志 (-1行)
+P5-82 | 9365c21 | ReplayPlayerHandler使用isAlive方法替代手动死亡判断 (净0行)
+P5-83 | e786120 | GameLogicUtils改用ui.getJobText简化代码 (-2行)
+P5-84 | 73510aa | VoteResultRenderer使用ui.getJobText简化代码 (净0行)

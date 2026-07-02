@@ -6,5 +6,33 @@ P5-61 | completed | high | finishRender逻辑重构：在UIHelpers中添加finis
 P5-62 | completed | high | handleEmptySlotRightClick与showConfirmDialog逻辑合并
 P5-63 | completed | medium | 背景添加重构：在UIHelpers中添加addBackground方法
 P5-64 | abandoned | medium | JTextArea配置重构：收益有限，放弃
-P5-65 | completed | medium | findRoleIndexInSnapshot重复逻辑重构
+P5-65 | completed | medium | findRoleIndexInSnapshot重复逻辑重构（已包含P5-74的优化）
 P5-66 | abandoned | low | AbstractSceneHandler抽象基类重构：风险高收益低，放弃
+
+# 新发现的重构点（重新评估）
+P5-67 | abandoned | low | safeCharName和getShortName边界检查合并：实际+11行净增加，不符合要求，放弃
+P5-68 | abandoned | high | playSound工具方法：每个调用点仍是一行，无法减少行数，放弃
+P5-69 | abandoned | medium | getJobText与getShortName统一：边界处理不同，强行统一需加条件，放弃
+P5-70 | abandoned | medium | UIComponentFactory改静态类：调用方行数不变，无法减少行数，放弃
+
+# 最新发现的重构点（全面代码审查）
+P5-71 | abandoned | high | renderNormalInfoPanel死亡原因处理提取：用户放弃
+P5-72 | abandoned | high | PlayerStatus添加死亡原因辅助方法：用户放弃
+P5-73 | completed | high | ReplayPlayerHandler.getCharNumByTarget方法简化：移除约15-18行debug日志，仅保留必要的边界检查和返回逻辑
+P5-74 | completed | medium | findRoleInSnapshot和findRoleIndexInSnapshot进一步优化：已在P5-65中完成
+
+# 跨文件重复逻辑重构（新发现）
+P5-75 | abandoned | high | GameLogicUtils.appendSkillResultLog与ReplayPlayerHandler.appendSkillResults重复逻辑统一：评估后发现需要引入接口+适配器，净增约10行，不符合要求，放弃
+
+# 工具类内部重复逻辑（新发现）
+P5-76 | completed | medium | UIHelpers.createIconLabel与createIconLabelWithLog重复逻辑合并：让createIconLabelWithLog调用createIconLabel，减少约6-7行
+P5-77 | abandoned | low | UIHelpers.calculateRowIndex与isFirstRow重复逻辑合并：用户放弃
+
+# 死代码与内联优化（新发现）
+P5-78 | completed | high | VoteInfoRenderer.appendSkillResults方法删除：直接替换为GameLogicUtils.appendSkillResultLog调用 | -5行
+P5-79 | completed | high | GameSceneVoteHandler.appendSkillResults方法删除：死代码，从未被调用 | -4行
+P5-80 | completed | medium | GameLogicUtils.isDayDie方法内联删除：逻辑简单，内联到SeerDiviner的2处调用点 | -5行
+P5-81 | completed | high | 删除DaySnapshot.java中的调试日志DebugLogger.info | -1行
+P5-82 | completed | medium | ReplayPlayerHandler使用isAlive方法替代手动死亡判断 | 0行（可读性提升）
+P5-83 | completed | medium | GameLogicUtils提取重复的getJobText调用，改用ui.getJobText | -2行
+P5-84 | completed | medium | VoteResultRenderer使用ui.getJobText替代完整调用 | 0行（可读性提升）
