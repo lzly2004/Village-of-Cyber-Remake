@@ -97,15 +97,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         });
         ui.jPanel.add(btnTitle);
 
-        ImageIcon bgImg = ui.resources.getImage("PVBG.png");
-        if (bgImg != null) {
-            JLabel background = LabelSimpleFactory.makeLabel(
-                    LabelConst.Simple_Label, 0, 0,
-                    GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                    bgImg
-            );
-            ui.jPanel.add(background);
-        }
+        UIHelpers.addBackground(ui, "PVBG.png");
 
         UIHelpers.finishRender(ui);
     }

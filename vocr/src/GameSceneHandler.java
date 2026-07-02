@@ -57,10 +57,7 @@ public class GameSceneHandler implements SceneHandler {
                 ui.resources.getImage("PVBtitile.png"));
         backBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(backBtn);
-        JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("title_base_resized.png"));
-        ui.jPanel.add(background);
+        UIHelpers.addBackground(ui, "title_base_resized.png");
         ui.getJFrame().setVisible(true);
         ui.resizeComponents();
     }

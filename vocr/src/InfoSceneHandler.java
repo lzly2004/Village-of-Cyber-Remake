@@ -33,9 +33,7 @@ public class InfoSceneHandler implements SceneHandler {
             btn_next[i].addActionListener(e -> ui.transitionTo(UI.Scene.valueOf("INFO_SCENE_" + j)));
             ui.jPanel.add(btn_next[i]);
         }
-        JLabel backgroundLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("PVBG.png"));
+        JLabel backgroundLabel = UIHelpers.createBackgroundLabel(ui, "PVBG.png");
         JLabel backgroundLabel_2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage("avg1_resized(3).png"));
         JButton btnMenu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
@@ -44,7 +42,7 @@ public class InfoSceneHandler implements SceneHandler {
         btnMenu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(btnMenu);
         ui.jPanel.add(backgroundLabel_2);
-        ui.jPanel.add(backgroundLabel);
+        if (backgroundLabel != null) ui.jPanel.add(backgroundLabel);
         ui.getJFrame().setVisible(true);
         ui.resizeComponents();
     }
@@ -53,9 +51,7 @@ public class InfoSceneHandler implements SceneHandler {
 
     private InfoBackground createInfoBackground(UI ui, UI.Scene backTarget) {
         ui.jPanel.removeAll();
-        JLabel bg = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("PVBG.png"));
+        JLabel bg = UIHelpers.createBackgroundLabel(ui, "PVBG.png");
         JLabel bg2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage("avg1_resized(3).png"));
         JButton menu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
@@ -73,7 +69,7 @@ public class InfoSceneHandler implements SceneHandler {
         ib.ui.jPanel.add(ib.menu);
         ib.ui.jPanel.add(ib.back);
         ib.ui.jPanel.add(ib.bg2);
-        ib.ui.jPanel.add(ib.bg);
+        if (ib.bg != null) ib.ui.jPanel.add(ib.bg);
         ib.ui.getJFrame().setVisible(true);
         ib.ui.resizeComponents();
     }

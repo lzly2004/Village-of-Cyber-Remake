@@ -5,9 +5,6 @@ public class EndAnimeHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
         ui.jPanel.removeAll();
-        JLabel background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("frame #19252.png"));
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                 1130, 720 - GameConstants.RETURN_HEIGHT,
                 GameConstants.RETURN_WIDTH * 6 / 10, GameConstants.RETURN_HEIGHT * 6 / 10,
@@ -102,7 +99,7 @@ public class EndAnimeHandler implements SceneHandler {
         JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, winText);
         infoLabel.setBounds(100, 29, 200, 100);
         ui.jPanel.add(infoLabel);
-        ui.jPanel.add(background);
+        UIHelpers.addBackground(ui, "frame #19252.png");
         ui.resizeComponents();
         ui.getJFrame().setVisible(true);
     }

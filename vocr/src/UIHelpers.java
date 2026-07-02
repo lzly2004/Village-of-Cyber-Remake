@@ -39,6 +39,20 @@ public class UIHelpers {
         ui.getJFrame().setVisible(true);
     }
 
+    /** 创建窗口全屏背景标签，若图片不存在返回null */
+    public static JLabel createBackgroundLabel(UI ui, String imageName) {
+        ImageIcon img = ui.resources.getImage(imageName);
+        if (img == null) return null;
+        return LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
+                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, img);
+    }
+
+    /** 创建并添加窗口全屏背景到ui.jPanel，若图片不存在则不添加 */
+    public static void addBackground(UI ui, String imageName) {
+        JLabel bg = createBackgroundLabel(ui, imageName);
+        if (bg != null) ui.jPanel.add(bg);
+    }
+
     /** 批量隐藏按钮 */
     public static void hideButtons(JButton... buttons) {
         for (JButton b : buttons) b.setVisible(false);

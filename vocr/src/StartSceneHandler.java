@@ -93,12 +93,7 @@ public class StartSceneHandler implements SceneHandler {
         UIHelpers.setButtonListener(btnCollections, ui, () -> {});
         ui.jPanel.add(btnCollections);
 
-        JLabel background = LabelSimpleFactory.makeLabel(
-                LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("title_base_resized.png")
-        );
-        ui.jPanel.add(background);
+        UIHelpers.addBackground(ui, "title_base_resized.png");
 
         UIHelpers.finishRender(ui);
     }

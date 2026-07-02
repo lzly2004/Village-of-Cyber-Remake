@@ -65,9 +65,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     // ===================================================================
     private void createBackground()
     {
-        background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("komorebi002yuu.png"));
+        background = UIHelpers.createBackgroundLabel(ui, "komorebi002yuu.png");
     }
 
     // ===================================================================
