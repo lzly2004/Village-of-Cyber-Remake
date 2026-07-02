@@ -213,7 +213,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 
                 if (ps.characterNumber <= 9) imageName.append("0");
                 imageName.append(ps.characterNumber);
-                boolean isDead = !ps.isAlive(day);
+                boolean isDead = ps.deathDay > 0 && ps.deathDay < day;
 
                 // 复盘模式：根据实际身份显示不同颜色头像（对齐结算界面规则）
                 imageName.append(GameStrings.getRoleImageSuffix(ps.actualRole));
