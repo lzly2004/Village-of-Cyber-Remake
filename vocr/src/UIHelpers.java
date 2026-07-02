@@ -231,13 +231,8 @@ public class UIHelpers {
     }
 
     public static JLabel createIconLabelWithLog(UI ui, String imageName, int x, int y, String logPrefix) {
-        ImageIcon icon = ui.resources.getImage(imageName);
-        if (icon == null) {
-            DebugLogger.warn("[" + logPrefix + "] 图标未找到: " + imageName);
-            return null;
-        }
-        JLabel label = new JLabel(icon);
-        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
+        JLabel label = createIconLabel(ui, imageName, x, y);
+        if (label == null) DebugLogger.warn("[" + logPrefix + "] 图标未找到: " + imageName);
         return label;
     }
 }
