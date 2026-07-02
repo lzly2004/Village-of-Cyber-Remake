@@ -36,3 +36,6 @@ P5-81 | completed | high | 删除DaySnapshot.java中的调试日志DebugLogger.i
 P5-82 | completed | medium | ReplayPlayerHandler使用isAlive方法替代手动死亡判断 | 0行（可读性提升）
 P5-83 | completed | medium | GameLogicUtils提取重复的getJobText调用，改用ui.getJobText | -2行
 P5-84 | completed | medium | VoteResultRenderer使用ui.getJobText替代完整调用 | 0行（可读性提升）
+P5-85 | completed | medium | VoteInfoRenderer统一使用ui.getJobText | -2行
+P5-86 | completed | medium | GameSceneVoteHandler统一使用ui.getJobText | -2行
+P5-87 | completed | high | 删除VoteResultRenderer调试日志 | -3行
