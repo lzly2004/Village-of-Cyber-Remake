@@ -8,6 +8,7 @@ import java.util.List;
 class VoteResultRenderer {
 
     static void renderPiao(UI ui, String str, int round, boolean[] isReVote, GameSceneVoteHandler handler) {
+        DebugLogger.log("***当前gameDay等于" + ui.ctx.getGameDay() + "***");
         ui.piaoText.setVisible(true);
         ui.piaoText1.setVisible(true);
         int gameDay = ui.ctx.getEffectiveGameDay();
@@ -25,7 +26,7 @@ class VoteResultRenderer {
             if (voteTotal[i][round] == max) { maxCnt++; maxPos.add(i); }
         for (int i1 = 0; i1 < 10 - leftCnt; ++i1) leftPiao.append("\n");
         if (maxCnt == 1) {
-            leftPiao.append(String.format(GameStrings.VOTE_RESULT_FORMAT, max, ui.getJobText(maxPos.get(0))));
+            leftPiao.append(String.format(GameStrings.VOTE_RESULT_FORMAT, max, ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(maxPos.get(0)))));
             isReVote[0] = false;
             ui.chuxingWho = maxPos.get(0);
         } else {
@@ -82,13 +83,13 @@ class VoteResultRenderer {
                 extraText.append(GameStrings.VOTE_GREY);
                 for (int i = 0; i < playerSum; ++i)
                     if (ui.greyCharas[i][gameDay] != 0)
-                        extraText.append(ui.getJobText(ui.greyCharas[i][gameDay]));
+                        extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.greyCharas[i][gameDay])));
                 break;
             case 2:
                 extraText.append(GameStrings.VOTE_DESIGNATED);
                 for (int i = 0; i < playerSum; ++i)
                     if (ui.isSelectedVoteTargetCharas[i][gameDay] != 0)
-                        extraText.append(ui.getJobText(ui.isSelectedVoteTargetCharas[i][gameDay])).append(",");
+                        extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.isSelectedVoteTargetCharas[i][gameDay]))).append(",");
                 break;
         }
         return extraText;
@@ -97,6 +98,8 @@ class VoteResultRenderer {
     private static void renderVoteResult(UI ui, GameSceneVoteHandler handler, 
                                          StringBuilder leftPiao, StringBuilder rightPiao,
                                          int leftWidth, int rightX) {
+        DebugLogger.log(leftPiao);
+        DebugLogger.log(rightPiao);
         handler.stylePiaoTextArea(ui.piaoText, leftPiao.toString(), 40, 228, leftWidth, 430);
         handler.stylePiaoTextArea(ui.piaoText1, rightPiao.toString(), rightX, 228, 450, 430);
         ui.resizeComponents();
@@ -104,8 +107,8 @@ class VoteResultRenderer {
 
     private static String formatVoteLine(UI ui, int i, int round, int gameDay, int[][] voteTotal) {
         return String.format(GameStrings.VOTE_LINE_FORMAT,
-                ui.getJobText(i),
+                ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i)),
                 voteTotal[i][round],
-                ui.getJobText(ui.ctx.getVoteTarget(i, gameDay, round)));
+                ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.ctx.getVoteTarget(i, gameDay, round))));
     }
 }

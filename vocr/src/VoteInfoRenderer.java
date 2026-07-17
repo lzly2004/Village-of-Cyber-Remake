@@ -44,41 +44,40 @@ class VoteInfoRenderer {
                         GameLogicUtils.appendSkillResultLog(ui, lieren, i, 2, false);
                         break;
                 }
-                boolean isDeathDayMatch = ui.ctx.getDeathDay(i) == k;
                 switch (ui.ctx.getDeathReason(i)) {
                     case whyDie.chuxing:
                         if (ui.ctx.getActualRole(i) == 10) {
                             int deviant = ui.ctx.getDeviant();
                             if (deviant > 0 && !ui.ctx.isAlive(deviant)
-                                    && isDeathDayMatch && ui.ctx.getDeathDay(deviant) < ui.ctx.getDeathDay(i)) {
+                                    && ui.ctx.getDeathDay(i) == k && ui.ctx.getDeathDay(deviant) < ui.ctx.getDeathDay(i)) {
                                 chuxing.append(ui.getJobText(i));
                                 hasChuxing = true;
                             }
                         } else if (ui.ctx.getActualRole(i) == 5) {
                         } else {
-                            if (isDeathDayMatch) {
+                            if (ui.ctx.getDeathDay(i) == k) {
                                 chuxing.append(ui.getJobText(i));
                                 hasChuxing = true;
                             }
                         }
                         break;
                     case whyDie.daymaozhou:
-                        if (isDeathDayMatch) {
+                        if (ui.ctx.getDeathDay(i) == k) {
                             chuxing.append(ui.getJobText(ui.ctx.getCat())).append("+");
                             chuxing.append(ui.getJobText(i)).append("(猫呪)");
                             hasChuxing = true;
                         }
                         break;
                     case whyDie.dayhouzhui:
-                        if (isDeathDayMatch) {
+                        if (ui.ctx.getDeathDay(i) == k) {
                             chuxing.append(ui.getJobText(ui.ctx.getFox())).append("+");
                             chuxing.append(ui.getJobText(i)).append("(後追)");
                             hasChuxing = true;
                         }
                         break;
                     default:
-                        if (isDeathDayMatch) {
-                            shitiCnt++; shitiNum.add(i);
+                        if (ui.ctx.getDeathDay(i) == k) {
+                            shitiCnt++; shitiNum.add(ui.ctx.getCharacterNumber(i));
                         }
                         break;
                 }
@@ -87,10 +86,10 @@ class VoteInfoRenderer {
                 }
             }
             if (hasChuxing) chuxing.append("→");
-            if (shitiCnt == 1) shiti.append(ui.getJobText(shitiNum.get(0))).append("→");
+            if (shitiCnt == 1) shiti.append(ui.uiComponentFactory.getJobText(shitiNum.get(0))).append("→");
             else {
                 for (int l = 0; l < shitiNum.size(); ++l)
-                    shiti.append(ui.getJobText(shitiNum.get(l))).append("+");
+                    shiti.append(ui.uiComponentFactory.getJobText(shitiNum.get(l))).append("+");
                 shiti.setLength(shiti.length() - 1); shiti.append("→");
             }
         }

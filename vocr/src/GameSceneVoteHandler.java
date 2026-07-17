@@ -590,11 +590,15 @@ public class GameSceneVoteHandler implements SceneHandler {
         return i <= (this.ui.ctx.getPlayerSum() + 1) / 2 ? yTop : yBottom;
     }
 
+    String charImageName(int i) {
+        return ui.uiComponentFactory.getCharImageName(ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i));
+    }
+
     private void appendVotePanel(StringBuilder piao, int i, java.util.List<String> cmps) {
         for (int u = 1; u < 4; ++u) {
             if (ui.ctx.getTop3SuspectedPlayer(i, u, ui.ctx.getGameDay()) != 0) {
-                if (u == 1) piao.append(ui.getJobText(i)).append("：");
-                piao.append(ui.getJobText(ui.ctx.getTop3SuspectedPlayer(i, u, ui.ctx.getGameDay())));
+                if (u == 1) piao.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i))).append("：");
+                piao.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.ctx.getTop3SuspectedPlayer(i, u, ui.ctx.getGameDay()))));
                 if (!cmps.isEmpty()) { piao.append(cmps.get(0)); cmps.remove(0); }
             }
         }
