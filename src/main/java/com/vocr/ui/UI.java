@@ -300,11 +300,6 @@ public class UI implements UIInterface
     JTextArea piaoText1 = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, "");
 
     int chuxingWho = 0;//记录到底处刑的是谁，用于处刑人名显示
-    List<Integer> voteRounds = new ArrayList<>();//记录每天投票是第几轮的票
-    List<Integer> voteMethods = new ArrayList<>();//记录每天投票是什么方式
-    int[][] greyCharas;//存储每天的灰角色[角色+1][天数]
-    int[][] isSelectedVoteTargetCharas;//存储每天的指定角色[角色+1][天数]
-
     //信息场景
     //InfoScene_A_B 其实就是指从最初的info主界面开始 点击第A个按钮进入的场景中，点击第B个按钮后进入的场景。
 }

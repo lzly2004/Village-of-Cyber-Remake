@@ -34,6 +34,7 @@ class GameContext implements GameContextView
     private final int[] claimedRoleOrderCounts;
     final int[] nonHumanPlan;
     private final SkillState skillState;
+    private final VoteState voteState;
     final int[][] lined;
     private final ArrayList<Integer> seerCandidates;
     private final ArrayList<Integer> mediumCandidates;
@@ -64,6 +65,7 @@ class GameContext implements GameContextView
         this.claimedRoleOrderCounts = new int[12];
         this.nonHumanPlan = new int[n + 1];
         this.skillState = new SkillState(n);
+        this.voteState = new VoteState(n);
         this.lined = new int[n + 1][n + 1];
 
         this.seerCandidates = new ArrayList<>();
@@ -152,23 +154,20 @@ class GameContext implements GameContextView
     }
     public int getVoteTarget(int player, int day, int round)
     {
-        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
-        assert isValidDayIndex(day) : "天数索引越界: " + day;
-        return gs.gc[player].voteTarget[day][round];
+        return voteState.getVoteTarget(player, day, round);
     }
-    void setVoteTarget(int player, int day, int round, int target)
+    void recordVoteRound(int day, int round, int[] targets)
     {
-        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
-        assert isValidDayIndex(day) : "天数索引越界: " + day;
-        gs.gc[player].voteTarget[day][round] = target;
+        voteState.recordVoteRound(day, round, targets);
     }
 
     public boolean isSelectedVoteTarget(int player, int day)
     {
-        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
-        assert isValidDayIndex(day) : "天数索引越界: " + day;
-        return gs.gc[player].isSelectedVoteTarget[day];
+        return voteState.isSelectedVoteTarget(player, day);
     }
+    public int getVoteRoundCount(int day) { return voteState.getCompletedRoundCount(day); }
+    public int getVotingRule(int day) { return voteState.getVotingRule(day); }
+    public List<Integer> getVotingCandidates(int day) { return voteState.getVotingCandidates(day); }
 
     // --- 怀疑度 ---
     public int getSuspicionValue(int subject, int target)
@@ -291,8 +290,16 @@ class GameContext implements GameContextView
     /** 标记玩家为非人破绽 */
     void markNonHuman(int player) { gs.gc[player].nonHumanMarker = true; }
 
-    /** 设置指定投票目标 */
-    public void setIsSelectedVoteTarget(int player, int day, boolean value) { gs.gc[player].isSelectedVoteTarget[day] = value; }
+    /** 设置当天的指定投票候补。 */
+    public void setSelectedVoteTarget(int player, int day, boolean value)
+    {
+        voteState.setSelectedVoteTarget(player, day, value);
+    }
+
+    void completeVoting(int day, int votingRule, List<Integer> candidates, int roundCount)
+    {
+        voteState.completeVoting(day, votingRule, candidates, roundCount);
+    }
 
     /** 记录技能目标或带颜色编码的技能结果；0 表示清空。 */
     void recordSkillTarget(int player, int day, int target)
@@ -471,6 +478,12 @@ class GameContext implements GameContextView
     boolean[][] getHiddenHunterScheduledSkillTargetsSnapshot()
     {
         return skillState.getHiddenHunterScheduleSnapshot();
+    }
+
+    int[][] getVoteTargetsSnapshot(int player) { return voteState.getVoteTargetsSnapshot(player); }
+    boolean[] getSelectedVoteTargetsSnapshot(int player)
+    {
+        return voteState.getSelectedVoteTargetsSnapshot(player);
     }
 
     /**

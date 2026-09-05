@@ -42,6 +42,9 @@ public interface GameContextView
     int getSkillTarget(int player, int day);
     int getVoteTarget(int player, int day, int round);
     boolean isSelectedVoteTarget(int player, int day);
+    int getVoteRoundCount(int day);
+    int getVotingRule(int day);
+    List<Integer> getVotingCandidates(int day);
 
     // === 怀疑度查询 ===
     int getSuspicionValue(int subject, int target);
@@ -67,7 +70,7 @@ public interface GameContextView
     boolean isHiddenHunterScheduled(int target, int day);
 
     // === UI层写操作（投票/技能预约）===
-    void setIsSelectedVoteTarget(int player, int day, boolean value);
+    void setSelectedVoteTarget(int player, int day, boolean value);
     void setClaimedRoleScheduled(int player, int target, int day, boolean value);
     void setHiddenSeerScheduled(int target, int day, boolean value);
     void setHiddenHunterScheduled(int target, int day, boolean value);

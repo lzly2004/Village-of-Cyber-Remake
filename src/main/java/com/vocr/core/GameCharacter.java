@@ -16,8 +16,6 @@ class GameCharacter
     //怀疑相关
     int[][] top3SuspectedPlayers;//怀疑前三的角色在gc数组中是第几个,int [3+1][N+1]
     int[] suspicionValue;//对其他角色的怀疑度 int [配役人数+1]
-    int[][] voteTarget;//每天的的票型 int[N+1][4] N:最大游戏天数 最大可以取50 最多可以投3轮票 voteTarget[4][2] = 3: 第四天产生平票，第二轮投票中该玩家投给了玩家编号3的玩家
-    boolean[] isSelectedVoteTarget;//角色是否当天被指定 boolean [N+1]
     boolean nonHumanMarker;//角色是否已经明确破绽了
     //生死相关
     private whyDie whyDie;//死亡原因枚举类型
@@ -34,8 +32,6 @@ class GameCharacter
         this.claimedRoleOrder = 0;
         this.top3SuspectedPlayers = new int[GameConstants.TOP3_ARRAY_SIZE][GameConstants.MAX_GAME_DAYS+1];
         this.suspicionValue = new int[GameConstants.CHARACTER_SUM+1];
-        this.voteTarget = new int[GameConstants.MAX_GAME_DAYS+1][4];
-        this.isSelectedVoteTarget = new boolean[GameConstants.MAX_GAME_DAYS+1];
         this.nonHumanMarker = false;
         this.whyDie = whyDie.NONE;
         this.comingOutDay = -1;

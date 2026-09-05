@@ -19,10 +19,6 @@ public class StartSceneHandler implements SceneHandler {
         ui.isVote[0] = false;
         ui.isZhan[0] = false;
         ui.isHu[0] = false;
-        ui.voteRounds.clear();
-        ui.voteMethods.clear();
-        ui.greyCharas = new int[21][50];
-        ui.isSelectedVoteTargetCharas = new int[21][50];
         ui.voteChosen.clear();
         ui.zhanChosen.clear();
         ui.huChosen.clear();

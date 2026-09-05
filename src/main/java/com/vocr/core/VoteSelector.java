@@ -18,7 +18,8 @@ public class VoteSelector
     public int select(int shokeinum, boolean[] votable)
     {
         int[] voteTargets = computeVoteTargets(shokeinum, votable);
-        applyVoteTargets(shokeinum, voteTargets);
+        ctx.recordVoteRound(ctx.getGameDay(), shokeinum, voteTargets);
+        applyVoteEffects(voteTargets);
         return computeVoteResult(shokeinum, votable);
     }
 
@@ -59,15 +60,13 @@ public class VoteSelector
         return voteTargets;
     }
 
-    private void applyVoteTargets(int shokeinum, int[] voteTargets)
+    private void applyVoteEffects(int[] voteTargets)
     {
         int n = ctx.getPlayerSum();
-        int gd = ctx.getGameDay();
         for (int i = 1; i <= n; i++)
         {
             if (ctx.isDead(i)) continue;
             int shokeitaregt = voteTargets[i];
-            ctx.setVoteTarget(i, gd, shokeinum, shokeitaregt);
             suspicion.updateTop3Aux2(i, shokeitaregt, 1, 1);
             if (voteTargets[shokeitaregt] == i)
                 suspicion.updateTop3Aux2(i, shokeitaregt, 1, 1);

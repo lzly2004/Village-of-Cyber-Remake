@@ -160,9 +160,10 @@ public class ExecutionManager
         {
             topnum = voteSelector.select(shokeicnt,votable);
             if(topnum != 0) break;
-            if(shokeicnt < 3)
+            if(shokeicnt < GameConstants.MAX_VOTE_ROUNDS)
                 shokeicnt++;
         }
+        ctx.completeVoting(gd, dailyVotingRule, chuxingList, shokeicnt);
         DebugLogger.log("投票结束，一共投票了" + shokeicnt + "轮" + "\n票型：\n" );
         for(int k=1;k<=shokeicnt;k++)
         {
@@ -182,7 +183,7 @@ public class ExecutionManager
         
         try {
             if (recorder != null) {
-                recorder.recordVoteData(gd, ctx, dailyVotingRule, chuxingList);
+                recorder.recordVoteData(gd, ctx);
                 DebugLogger.info("[Replay] 投票数据已记录: day=" + gd + ", rounds=" + shokeicnt);
             }
         } catch (Exception e) {

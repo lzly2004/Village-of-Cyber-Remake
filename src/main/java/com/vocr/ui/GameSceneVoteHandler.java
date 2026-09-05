@@ -265,7 +265,6 @@ public class GameSceneVoteHandler implements SceneHandler {
         // --- 次へ ---
         votePanel.nextBtn.addActionListener(e -> {
             ui.resources.playSound("click.wav");
-            ui.voteRounds.add(round[0]);
             ui.currentScene = UI.Scene.DIALOGUE_CHUXING;
             ui.run();
         });
@@ -402,9 +401,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (!greyResult.cxList.isEmpty()) DebugLogger.log("cxList不为空，且具体为" + greyResult.cxList);
         if (ui.mainLogic.shokei(1, greyResult.cxList, ui.isAvoid)) {
             int trueDay = ui.ctx.getEffectiveGameDay();
-            for (int f = 0; f < greyResult.cxList.size(); ++f)
-                ui.greyCharas[f][trueDay] = greyResult.cxList.get(f);
-            ui.voteMethods.add(1); greyResult.cxList.clear();
+            greyResult.cxList.clear();
             VoteResultRenderer.renderPiao(ui, String.format(GameStrings.VOTE_TITLE_GREY, trueDay) + greyText + "\n", round[0], isReVote, this);
             handleReVoteResult(isReVote, round);
         } else {
@@ -456,7 +453,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         DebugLogger.log("自由投票" + chuxingList);
         boolean[] isReVote = {false};
         if (ui.mainLogic.shokei(0, chuxingList, ui.isAvoid)) {
-            ui.voteMethods.add(0); chuxingList.clear();
+            chuxingList.clear();
             if (ui.ctx.getEndResult() == GameResult.NONE) {
                 VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay() - 1), round[0], isReVote, this);
             } else {
@@ -475,18 +472,15 @@ public class GameSceneVoteHandler implements SceneHandler {
     {
         votePanel.readyVoteBtn.setVisible(false); votePanel.returnBtn.setVisible(false); votePanel.scrollPane1.setVisible(false);
         List<Integer> chuxingList = new ArrayList<>();
-        int p = 0;
         for (int i = 1; i <= ui.ctx.getPlayerSum(); ++i) {
             if (ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay()) && ui.ctx.isAlive(i)) {
                 chuxingList.add(i);
-                ui.isSelectedVoteTargetCharas[p++][ui.ctx.getGameDay()] = i;
                 DebugLogger.log("指定了" + i);
             }
         }
         DebugLogger.log("指定投票" + chuxingList);
         boolean[] isReVote = {false};
         if (ui.mainLogic.shokei(2, chuxingList, ui.isAvoid)) {
-            ui.voteMethods.add(2);
             int trueDay = ui.ctx.getEffectiveGameDay();
             StringBuilder isSelectedVoteTargetText = new StringBuilder();
             for (int i = 0; i < chuxingList.size(); ++i)
@@ -623,7 +617,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (isReVote[0]) {
             votePanel.againBtn.setVisible(true);
             votePanel.nextBtn.setVisible(false);
-            if (round[0] < 3) round[0]++;
+            if (round[0] < GameConstants.MAX_VOTE_ROUNDS) round[0]++;
         } else {
             votePanel.nextBtn.setVisible(true);
             votePanel.againBtn.setVisible(false);

@@ -142,7 +142,7 @@ class CharacterSelectionPanel {
                     ui.resources.playSound("click.wav");
                     switch (type) {
                         case VOTE:
-                            ui.ctx.setIsSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), true);
+                            ui.ctx.setSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), true);
                             if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
                             handler.updateFlagFromVoteTargets(flag);
                             break;
@@ -234,7 +234,7 @@ class CharacterSelectionPanel {
                     chosenList.remove(Integer.valueOf(idx + 1));
                     switch (type) {
                         case VOTE:
-                            ui.ctx.setIsSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), false);
+                            ui.ctx.setSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), false);
                             handler.updateFlagFromVoteTargets(flag);
                             break;
                         case DIVINATION:

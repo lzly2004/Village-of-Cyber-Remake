@@ -6,6 +6,7 @@ import com.vocr.domain.EventName;
 import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;
 
+import com.vocr.config.GameConstants;
 import com.vocr.config.PathConfig;
 import com.vocr.history.GameRecord;
 import com.vocr.history.GameRecordManager;
@@ -295,16 +296,18 @@ public class GameRecorder
 
     /**
      * 在投票完成后单独记录投票明细数据
-     * 必须在 VoteSelector.select() 执行后调用，此时 voteTarget 已被填充
+     * 必须在 VoteSelector.select() 执行后调用，此时对应轮次票型已被完整记录
      */
-    public void recordVoteData(int day, GameContext ctx, int dailyVotingRule, List<Integer> greyTargets) {
+    public void recordVoteData(int day, GameContext ctx) {
         if (!active) return;
 
         // 记录投票方式额外信息
+        int dailyVotingRule = ctx.getVotingRule(day);
+        List<Integer> votingCandidates = ctx.getVotingCandidates(day);
         StringBuilder methodSb = new StringBuilder("VOTE_METHOD|day=" + day + "|rule=" + dailyVotingRule);
-        if (greyTargets != null && !greyTargets.isEmpty()) {
+        if (!votingCandidates.isEmpty()) {
             methodSb.append("|grey=");
-            for (int g : greyTargets) methodSb.append(g).append(",");
+            for (int candidate : votingCandidates) methodSb.append(candidate).append(",");
             methodSb.setLength(methodSb.length() - 1);
         }
         // 指定投票対象从ctx读取
@@ -324,7 +327,7 @@ public class GameRecorder
         int playerSum = ctx.getPlayerSum();
 
         // 投票明细（多轮）- 从ctx读取实际的voteTarget数据
-        for (int round = 1; round <= 3; round++) {
+        for (int round = 1; round <= GameConstants.MAX_VOTE_ROUNDS; round++) {
             boolean hasVote = false;
             int validVoteCnt = 0;
             StringBuilder voteSb = new StringBuilder("VOTE_DETAIL|day=" + day + "|round=" + round + "|");

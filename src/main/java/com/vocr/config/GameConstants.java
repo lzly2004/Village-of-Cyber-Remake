@@ -137,6 +137,7 @@ public final class GameConstants
     public static final int RETURN_WIDTH     = 194;
     public static final int RETURN_HEIGHT    = 127;
     public static final int MAX_GAME_DAYS    = 50;
+    public static final int MAX_VOTE_ROUNDS  = 3;
     public static final int CHARACTER_SUM    = 44;
 
     // ==================== 游戏逻辑常量 ====================

@@ -2,7 +2,7 @@ package com.vocr.ui;
 
 import com.vocr.core.DebugLogger;
 
-import com.vocr.domain.GameContextView;
+import com.vocr.config.GameConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +42,11 @@ class VoteResultRenderer {
         renderVoteResult(ui, handler, leftPiao, rightPiao, 900, 530);
     }
 
-    static void renderDayPiao(UI ui, int round, int gameDay, int dailyVotingRule, GameSceneVoteHandler handler) {
+    static void renderDayPiao(UI ui, int round, int gameDay, GameSceneVoteHandler handler) {
         ui.piaoText.setVisible(true);
         ui.piaoText1.setVisible(true);
         int playerSum = ui.ctx.getPlayerSum() + 1;
-        StringBuilder extraText = buildDailyVotingRuleText(ui, playerSum, gameDay, dailyVotingRule);
+        StringBuilder extraText = buildDailyVotingRuleText(ui, gameDay);
         int[][] voteTotal = buildVoteTotal(ui, playerSum, gameDay, round, false);
         StringBuilder leftPiao = new StringBuilder(GameStrings.getVoteHistoryTitle(gameDay, round, extraText.toString()));
         StringBuilder rightPiao = new StringBuilder("\n\n");
@@ -55,7 +55,7 @@ class VoteResultRenderer {
     }
 
     private static int[][] buildVoteTotal(UI ui, int playerSum, int gameDay, int round, boolean exactDayMatch) {
-        int[][] voteTotal = new int[playerSum][4];
+        int[][] voteTotal = new int[playerSum][GameConstants.MAX_VOTE_ROUNDS + 1];
         for (int i = 1; i < playerSum; ++i) {
             boolean isParticipated = ui.ctx.isAlive(i) || 
                     (exactDayMatch ? ui.ctx.getDeathDay(i) == gameDay : ui.ctx.getDeathDay(i) >= gameDay);
@@ -81,21 +81,19 @@ class VoteResultRenderer {
         return leftCnt;
     }
 
-    private static StringBuilder buildDailyVotingRuleText(UI ui, int playerSum, int gameDay, int dailyVotingRule) {
+    private static StringBuilder buildDailyVotingRuleText(UI ui, int gameDay) {
         StringBuilder extraText = new StringBuilder();
-        switch (dailyVotingRule) {
+        switch (ui.ctx.getVotingRule(gameDay)) {
             case 0: extraText.append(GameStrings.VOTE_FREE); break;
             case 1:
                 extraText.append(GameStrings.VOTE_GREY);
-                for (int i = 0; i < playerSum; ++i)
-                    if (ui.greyCharas[i][gameDay] != 0)
-                        extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.greyCharas[i][gameDay])));
+                for (int candidate : ui.ctx.getVotingCandidates(gameDay))
+                    extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(candidate)));
                 break;
             case 2:
                 extraText.append(GameStrings.VOTE_DESIGNATED);
-                for (int i = 0; i < playerSum; ++i)
-                    if (ui.isSelectedVoteTargetCharas[i][gameDay] != 0)
-                        extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.isSelectedVoteTargetCharas[i][gameDay]))).append(",");
+                for (int candidate : ui.ctx.getVotingCandidates(gameDay))
+                    extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(candidate))).append(",");
                 break;
         }
         return extraText;
