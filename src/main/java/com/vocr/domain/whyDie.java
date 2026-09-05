@@ -1,6 +1,6 @@
-package com.vocr;
+package com.vocr.domain;
 
-enum whyDie
+public enum whyDie
 {
     NONE,
     chuxing,

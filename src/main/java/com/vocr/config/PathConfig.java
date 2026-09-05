@@ -1,4 +1,4 @@
-package com.vocr;
+package com.vocr.config;
 
 // PathConfig.java
 // 集中管理所有文件路径配置

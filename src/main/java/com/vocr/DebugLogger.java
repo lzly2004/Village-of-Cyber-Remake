@@ -1,5 +1,8 @@
 package com.vocr;
 
+import com.vocr.domain.GameResult;
+import com.vocr.domain.whyDie;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;

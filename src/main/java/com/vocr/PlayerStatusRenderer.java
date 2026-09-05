@@ -1,5 +1,8 @@
 package com.vocr;
 
+import com.vocr.domain.GameContextView;
+import com.vocr.domain.whyDie;
+
 import javax.swing.*;
 
 /**

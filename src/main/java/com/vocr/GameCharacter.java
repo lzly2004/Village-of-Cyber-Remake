@@ -1,5 +1,9 @@
 package com.vocr;
 
+import com.vocr.domain.whyDie;
+
+import com.vocr.config.GameConstants;
+
 class GameCharacter
 {//游戏角色封装类
     //角色编号

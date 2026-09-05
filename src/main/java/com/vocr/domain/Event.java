@@ -1,6 +1,6 @@
-package com.vocr;
+package com.vocr.domain;
 
-class Event
+public class Event
 {//事件类型
     public CharacterEnglishName ch1,ch2,ch3;
     public EventName eventname;

@@ -1,5 +1,9 @@
 package com.vocr;
 
+import com.vocr.domain.EventName;
+import com.vocr.domain.peiyi;
+import com.vocr.domain.whyDie;
+
 import java.util.ArrayList;
 
 public class ResultPresenter

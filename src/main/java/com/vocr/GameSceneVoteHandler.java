@@ -1,5 +1,12 @@
 package com.vocr;
 
+import com.vocr.domain.GameContextView;
+import com.vocr.domain.GameResult;
+import com.vocr.domain.Role;
+import com.vocr.domain.SelectionType;
+
+import com.vocr.config.GameConstants;
+
 // GameSceneVoteHandler.java - 投票主界面场景处理器
 import javax.swing.*;
 import java.awt.*;

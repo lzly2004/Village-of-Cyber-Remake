@@ -1,5 +1,9 @@
 package com.vocr;
 
+import com.vocr.domain.GameContextView;
+import com.vocr.domain.peiyi;
+import com.vocr.domain.Role;
+
 import java.util.List;
 public interface MainLogicInterface
 {

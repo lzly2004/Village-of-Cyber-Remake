@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.domain.whyDie;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
 import static org.junit.jupiter.api.Assertions.*;

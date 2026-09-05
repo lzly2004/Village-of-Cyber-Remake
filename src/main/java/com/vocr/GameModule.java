@@ -1,5 +1,10 @@
 package com.vocr;
 
+import com.vocr.domain.whyDie;
+
+import com.vocr.config.ProbabilityCalculator;
+import com.vocr.history.GameRecordManager;
+
 import java.util.function.BiConsumer;
 
 public class GameModule {

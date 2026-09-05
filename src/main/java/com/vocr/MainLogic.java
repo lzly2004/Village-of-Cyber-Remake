@@ -1,5 +1,18 @@
 package com.vocr;
 
+import com.vocr.domain.Event;
+import com.vocr.domain.GameContextView;
+import com.vocr.domain.GameResult;
+import com.vocr.domain.peiyi;
+import com.vocr.domain.Role;
+import com.vocr.domain.whyDie;
+
+import com.vocr.app.Game;
+import com.vocr.config.GameConstants;
+import com.vocr.config.PathConfig;
+import com.vocr.config.ProbabilityCalculator;
+import com.vocr.history.GameRecordManager;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +56,7 @@ public class MainLogic implements MainLogicInterface
     //GameConstants.MAXN:不涉及机制的最大值。
     //GameConstants.INFJ-GameConstants.INF:均被判定为设计机制的最大值
     //若涉及到游戏结束，则夜间事件都不会显示。在判断游戏不结束之后，将其中的事件依次添加到UI类当中。
-    MainLogic()
+    public MainLogic()
     {
         this(event -> Game.getInstance().getUI().addEvent(event));
     }

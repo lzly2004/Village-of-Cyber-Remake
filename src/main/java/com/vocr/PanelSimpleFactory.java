@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.config.GameConstants;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;

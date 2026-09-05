@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.domain.GameResult;
+
 public class GameEndChecker
 {
     private final GameContext ctx;

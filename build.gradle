@@ -27,7 +27,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'com.vocr.Game'
+    mainClass = 'com.vocr.app.Game'
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -1,4 +1,15 @@
-package com.vocr;
+package com.vocr.app;
+
+import com.vocr.DebugLogger;
+import com.vocr.GameRecorder;
+import com.vocr.history.GameRecordManager;
+import com.vocr.MainLogic;
+import com.vocr.MainLogicInterface;
+import com.vocr.replay.ReplayManager;
+import com.vocr.Resources;
+import com.vocr.ResourcesInterface;
+import com.vocr.UI;
+import com.vocr.UIInterface;
 
 public class Game
 {   //单例模式

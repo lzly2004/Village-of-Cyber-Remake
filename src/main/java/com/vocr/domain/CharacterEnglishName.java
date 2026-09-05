@@ -1,6 +1,6 @@
-package com.vocr;
+package com.vocr.domain;
 
-enum CharacterEnglishName {
+public enum CharacterEnglishName {
     NONE, // 角色信息：无，日文名：无，编号：0
     Abel, // 角色信息：青年，日文名：アーベル，编号：1
     Erich, // 角色信息：研究，日文名：エーリッヒ，编号：2

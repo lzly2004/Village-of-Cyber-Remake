@@ -1,4 +1,6 @@
-package com.vocr;
+package com.vocr.rules;
+
+import com.vocr.config.GameConstants;
 
 import java.util.ArrayList;
 import java.util.List;

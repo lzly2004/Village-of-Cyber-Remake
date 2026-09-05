@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.config.GameConstants;
+
 import java.util.ArrayList;
 
 class SuspicionSystem

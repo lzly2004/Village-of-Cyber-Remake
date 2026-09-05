@@ -1,5 +1,14 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterEnglishName;
+import com.vocr.domain.Event;
+import com.vocr.domain.EventName;
+import com.vocr.domain.GameContextView;
+import com.vocr.domain.GameResult;
+import com.vocr.domain.peiyi;
+
+import com.vocr.config.GameConstants;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;

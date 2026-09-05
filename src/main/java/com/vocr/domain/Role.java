@@ -1,6 +1,6 @@
-package com.vocr;
+package com.vocr.domain;
 
-enum Role
+public enum Role
 {//职业声称情况
     NONE,
     zhan,//1占卜师

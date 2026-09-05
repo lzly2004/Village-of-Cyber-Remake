@@ -1,5 +1,9 @@
 package com.vocr;
 
+import com.vocr.app.Game;
+import com.vocr.replay.ReplayManager;
+import com.vocr.replay.ReplaySave;
+
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\ReplayBrowserHandler.java
 import java.awt.Color;
 import java.awt.Font;

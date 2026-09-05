@@ -1,5 +1,15 @@
 package com.vocr;
 
+import com.vocr.domain.Event;
+import com.vocr.domain.GameContextView;
+import com.vocr.domain.whyDie;
+
+import com.vocr.app.Game;
+import com.vocr.config.GameConstants;
+import com.vocr.history.GameRecordManager;
+import com.vocr.replay.ReplayManager;
+import com.vocr.replay.ReplaySave;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -130,7 +140,7 @@ public class UI implements UIInterface
     JPanel diaPanel;//对话容器
 
     //定义当前待处理的事件
-    UI() {}
+    public UI() {}
     GameContextView ctx;//封装后的游戏状态只读访问
     ResourcesInterface resources;//资源接口
     MainLogicInterface mainLogic;//主逻辑接口

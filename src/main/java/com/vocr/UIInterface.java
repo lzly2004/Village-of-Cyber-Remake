@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.domain.Event;
+
 import java.util.LinkedList;
 
 public interface UIInterface

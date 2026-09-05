@@ -1,5 +1,10 @@
 package com.vocr;
 
+import com.vocr.domain.GameResult;
+import com.vocr.domain.peiyi;
+
+import com.vocr.config.GameConstants;
+
 class GameStatus
 {//游戏状态封装类
     public peiyi p;//游戏配役

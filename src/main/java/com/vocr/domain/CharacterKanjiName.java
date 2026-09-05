@@ -1,6 +1,6 @@
-package com.vocr;
+package com.vocr.domain;
 
-enum CharacterKanjiName
+public enum CharacterKanjiName
 {
     NONE(""),
     青年("青年"),          // 青年

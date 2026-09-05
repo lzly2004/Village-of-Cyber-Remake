@@ -1,5 +1,15 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterEnglishName;
+import com.vocr.domain.Event;
+import com.vocr.domain.EventName;
+import com.vocr.domain.peiyi;
+import com.vocr.domain.whyDie;
+
+import com.vocr.config.PathConfig;
+import com.vocr.history.GameRecord;
+import com.vocr.history.GameRecordManager;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.FileWriter;

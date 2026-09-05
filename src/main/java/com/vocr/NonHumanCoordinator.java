@@ -1,5 +1,14 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterEnglishName;
+import com.vocr.domain.Event;
+import com.vocr.domain.EventName;
+import com.vocr.domain.IntPair;
+import com.vocr.domain.peiyi;
+import com.vocr.domain.Role;
+
+import com.vocr.config.GameConstants;
+
 import java.util.ArrayList;
 import java.util.List;
 

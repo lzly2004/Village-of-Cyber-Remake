@@ -1,4 +1,4 @@
-package com.vocr;
+package com.vocr.domain;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import java.util.List;
  * 以只读查询为主，仅保留投票/CO预约两个必要的写操作。
  * 由 GameContext（Phase 2创建）实现。
  */
-interface GameContextView
+public interface GameContextView
 {
     // === 玩家状态查询 ===
     int getPlayerSum();

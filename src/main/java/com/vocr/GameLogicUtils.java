@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.domain.GameContextView;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

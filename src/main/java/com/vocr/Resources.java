@@ -1,5 +1,12 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterEnglishName;
+import com.vocr.domain.CharacterKatakanaName;
+import com.vocr.domain.Event;
+import com.vocr.domain.EventName;
+
+import com.vocr.history.GameRecord;
+
 import javax.swing.*;
 import javax.sound.sampled.*;
 import java.io.IOException;

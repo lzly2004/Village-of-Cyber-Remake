@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.domain.whyDie;
+
 /**
  * 游戏UI字符串常量 — 第1步重构核心。
  * 集中管理 UI.java 中散布的日语提示文本、格式模板、面板标题等。

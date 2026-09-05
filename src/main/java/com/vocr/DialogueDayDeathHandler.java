@@ -1,5 +1,10 @@
 package com.vocr;
 
+import com.vocr.domain.Event;
+import com.vocr.domain.EventName;
+
+import com.vocr.config.GameConstants;
+
 import javax.swing.*;
 import java.awt.*;
 

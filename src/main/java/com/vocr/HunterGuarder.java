@@ -1,5 +1,11 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterKanjiName;
+import com.vocr.domain.whyDie;
+
+import com.vocr.config.GameConstants;
+import com.vocr.rules.RuleEngine;
+
 import java.util.ArrayList;
 
 public class HunterGuarder

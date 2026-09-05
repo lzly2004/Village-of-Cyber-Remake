@@ -1,6 +1,6 @@
-package com.vocr;
+package com.vocr.domain;
 
-enum peiyi
+public enum peiyi
 {//开村配役
     NONE,
     jianyi,//简易

@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.config.GameConstants;
+
 // InfoSceneHandler.java - 信息界面场景处理器
 import javax.swing.*;
 import java.awt.*;

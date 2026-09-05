@@ -1,4 +1,6 @@
-package com.vocr;
+package com.vocr.config;
+
+import com.vocr.DebugLogger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

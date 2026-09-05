@@ -1,4 +1,4 @@
-package com.vocr;
+package com.vocr.config;
 
 import java.awt.*;
 

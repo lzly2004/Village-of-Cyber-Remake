@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.domain.Event;
+
 // DialogueAfternoonHandler.java - 下午对话场景处理器（用于回避CO）
 import javax.swing.*;
 import java.awt.*;

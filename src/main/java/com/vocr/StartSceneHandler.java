@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.config.GameConstants;
+
 // StartSceneHandler.java - 新建文件
 import javax.swing.JButton;
 import javax.swing.JLabel;

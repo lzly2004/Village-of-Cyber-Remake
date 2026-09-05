@@ -1,5 +1,9 @@
 package com.vocr;
 
+import com.vocr.domain.Event;
+
+import com.vocr.history.GameRecord;
+
 import javax.swing.*;
 
 public interface ResourcesInterface

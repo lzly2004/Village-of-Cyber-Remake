@@ -317,9 +317,9 @@ P5-XX: 简要描述重构内容
 
 ### 核心参考
 - [VoteInfoRenderer.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/VoteInfoRenderer.java) - 局内处刑显示逻辑
-- [DaySnapshot.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/DaySnapshot.java) - 快照数据结构
-- [Role.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/Role.java) - 角色定义
-- [whyDie.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/whyDie.java) - 死亡原因枚举
+- [DaySnapshot.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/replay/DaySnapshot.java) - 快照数据结构
+- [Role.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/domain/Role.java) - 角色定义
+- [whyDie.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/domain/whyDie.java) - 死亡原因枚举
 
 ### UI 工具
 - [UIHelpers.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/UIHelpers.java) - UI 工具方法

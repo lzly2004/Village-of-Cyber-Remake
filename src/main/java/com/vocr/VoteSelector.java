@@ -1,5 +1,9 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterKanjiName;
+
+import com.vocr.config.GameConstants;
+
 public class VoteSelector
 {
     private final GameContext ctx;

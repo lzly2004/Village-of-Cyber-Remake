@@ -1,5 +1,11 @@
 package com.vocr;
 
+import com.vocr.domain.GameContextView;
+import com.vocr.domain.GameResult;
+import com.vocr.domain.whyDie;
+
+import com.vocr.config.GameConstants;
+
 import javax.swing.*;
 import java.awt.*;
 

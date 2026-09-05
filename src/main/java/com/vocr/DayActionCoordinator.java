@@ -1,5 +1,12 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterKanjiName;
+import com.vocr.domain.IntPair;
+import com.vocr.domain.peiyi;
+import com.vocr.domain.Role;
+
+import com.vocr.config.ProbabilityCalculator;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,5 +1,9 @@
 package com.vocr;
 
+import com.vocr.domain.whyDie;
+
+import com.vocr.config.GameConstants;
+
 public class ResultEffectApplicator
 {
     private final GameContext ctx;

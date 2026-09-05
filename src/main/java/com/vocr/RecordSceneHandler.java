@@ -1,5 +1,8 @@
 package com.vocr;
 
+import com.vocr.config.GameConstants;
+import com.vocr.history.GameRecord;
+
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\RecordSceneHandler.java
 import javax.swing.*;
 import java.awt.*;

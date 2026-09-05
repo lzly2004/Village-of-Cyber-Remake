@@ -1,6 +1,6 @@
-package com.vocr;
+package com.vocr.domain;
 
-record IntPair(int first, int second)
+public record IntPair(int first, int second)
 {
     @Override
     public String toString() { return "(" + first + ", " + second + ")"; }

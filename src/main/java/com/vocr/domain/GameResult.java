@@ -1,4 +1,4 @@
-package com.vocr;
+package com.vocr.domain;
 
 public enum GameResult {
     NONE(0),

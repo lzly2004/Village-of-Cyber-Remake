@@ -1,6 +1,6 @@
-package com.vocr;
+package com.vocr.domain;
 
-enum EventName
+public enum EventName
 {
     NONE(""),
     gyfo1r("1r共有FO"),

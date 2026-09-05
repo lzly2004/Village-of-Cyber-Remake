@@ -1,5 +1,7 @@
 package com.vocr;
 
+import com.vocr.domain.GameContextView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;

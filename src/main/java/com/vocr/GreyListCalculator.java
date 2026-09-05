@@ -1,5 +1,9 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterKanjiName;
+import com.vocr.domain.GameContextView;
+import com.vocr.domain.whyDie;
+
 import java.util.ArrayList;
 import java.util.List;
 

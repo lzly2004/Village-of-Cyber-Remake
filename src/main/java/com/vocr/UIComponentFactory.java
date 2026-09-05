@@ -1,5 +1,10 @@
 package com.vocr;
 
+import com.vocr.domain.CharacterEnglishName;
+import com.vocr.domain.CharacterKanjiName;
+import com.vocr.domain.CharacterKatakanaName;
+import com.vocr.domain.whyDie;
+
 import javax.swing.*;
 import java.awt.*;
 
