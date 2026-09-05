@@ -167,7 +167,7 @@ public class DebugLogger
         StringBuilder sb = new StringBuilder();
         sb.append("SNAPSHOT|").append(label).append("|");
         sb.append("day=").append(gs.gameDay).append("|");
-        sb.append("alive=").append(gs.aliveCounter).append("|");
+        sb.append("alive=").append(gs.getAliveCounter()).append("|");
         sb.append("end=").append(gs.end).append("|");
         for (int i = 1; i <= gs.getPlayerSum(); i++)
         {
@@ -176,8 +176,8 @@ public class DebugLogger
                     .append(gc.number).append(":")
                     .append("role=").append(gc.actualRole).append(",")
                     .append("claimed=").append(gc.claimedRole).append(",")
-                    .append("dieDay=").append(gc.dieDay).append(",")
-                    .append("whyDie=").append(gc.whyDie).append(",")
+                    .append("dieDay=").append(gc.getDeathDay()).append(",")
+                    .append("whyDie=").append(gc.getDeathReason()).append(",")
                     .append("nonHumanMarker=").append(gc.nonHumanMarker)
                     .append("]");
         }

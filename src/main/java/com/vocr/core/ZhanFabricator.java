@@ -16,7 +16,7 @@ public class ZhanFabricator
         this.seerDiviner = seerDiviner;
     }
 
-    public void fabricate(ArrayList<Integer> diebody, int num)
+    public void fabricate(List<Integer> diebody, int num)
     {
         if (ctx.isNonHumanMarked(num)) return;
 
@@ -32,7 +32,7 @@ public class ZhanFabricator
         int heip = ctx.initialWolfCount, baip = n - ctx.initialWolfCount;
         baip -= ctx.computeNightDeathDecrement();
         for (int i = 1; i <= n; i++)
-            if (suspicion.isAckWhite(i, ctx.maos, ctx.isDoubleDeathOccurred, ctx.claimedRoleaskday) && ctx.isAlive(i))
+            if (ctx.isAckWhite(i) && ctx.isAlive(i))
             {
                 suspicion.markAckWhite(i);
                 baip--;

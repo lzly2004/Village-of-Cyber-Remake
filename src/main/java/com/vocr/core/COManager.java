@@ -67,7 +67,7 @@ public class COManager
         return 3;
     }
 
-    public void processActualCo(int num, int zhi, ArrayList<Integer> diebody)
+    public void processActualCo(int num, int zhi, List<Integer> diebody)
     {
         int gd = ctx.getGameDay();
         if (ctx.getDeathReason(num) != whyDie.NONE) return;
@@ -259,12 +259,12 @@ public class COManager
             int counter = 0;
             for (int i = 1; i <= gd; i++)
             {
-                if (ctx.isDoubleDeathOccurred[i])
+                if (ctx.isDoubleDeathOccurred(i))
                     counter++;
             }
             if (counter == 2 && ctx.getDeathReason(ctx.actualRoleindex[5]) != whyDie.NONE)
                 return;
-            if (ctx.isDoubleDeathOccurred[gd - 1] && ctx.getDeathReason(ctx.actualRoleindex[5]) != whyDie.NONE)
+            if (ctx.isDoubleDeathOccurred(gd - 1) && ctx.getDeathReason(ctx.actualRoleindex[5]) != whyDie.NONE)
             {
                 boolean canclaim = false;
                 if (gd == 3 && ctx.claimedRoleaskday[1] != 2)
@@ -275,7 +275,7 @@ public class COManager
                         if (ctx.getHiddenSeerScheduledSkillTargets()[i][gd - 1])
                         {
                             have_yugao = true;
-                            if (ctx.diebody.contains(i))
+                            if (ctx.getDiebody().contains(i))
                                 canclaim = true;
                         }
                     }
@@ -286,7 +286,7 @@ public class COManager
                     if (ctx.isNonHumanMarked(zhan)) continue;
                     if (ctx.isAlive(zhan))
                     {
-                        if (ctx.diebody.contains(ctx.getSkillTarget(zhan, gd - 1)))
+                        if (ctx.getDiebody().contains(ctx.getSkillTarget(zhan, gd - 1)))
                             canclaim = true;
                     }
                     else
@@ -297,7 +297,7 @@ public class COManager
                             if (ctx.getClaimedRoleScheduledSkillTargets(zhan)[j][gd - 1])
                             {
                                 have_yugao = true;
-                                if (ctx.diebody.contains(j))
+                                if (ctx.getDiebody().contains(j))
                                     canclaim = true;
                             }
                         }
@@ -355,7 +355,7 @@ public class COManager
             response.remove(1);
         for (int i = 0; i < response.size(); i++)
         {
-            processActualCo(response.get(i).first(), response.get(i).second(), ctx.diebody);
+            processActualCo(response.get(i).first(), response.get(i).second(), ctx.getDiebody());
         }
     }
 
@@ -442,11 +442,11 @@ public class COManager
         }
         for (int i = 0; i < response.size(); i++)
         {
-            processActualCo(response.get(i).first(), response.get(i).second(), ctx.diebody);
+            processActualCo(response.get(i).first(), response.get(i).second(), ctx.getDiebody());
         }
     }
 
-    public void processMaoLieCo(int num, boolean isHumanWolf, ArrayList<Integer> diebody)
+    public void processMaoLieCo(int num, boolean isHumanWolf, List<Integer> diebody)
     {
         if (isHumanWolf)
         {

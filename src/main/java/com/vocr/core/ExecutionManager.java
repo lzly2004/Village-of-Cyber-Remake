@@ -254,13 +254,13 @@ public class ExecutionManager
             {
                 if(ctx.getActualRole(num) < 7)
                 {
-                    coManager.processActualCo(num,ctx.getActualRole(num),ctx.diebody);
+                    coManager.processActualCo(num,ctx.getActualRole(num),ctx.getDiebody());
                     continue;
                 }
                 if(ctx.nonHumanPlan[num] != 0 && ctx.nonHumanPlan[num] != 4 && ctx.claimedRoleaskday[ctx.nonHumanPlan[num]] == 0)
                 {
                     if(ctx.claimedRoleaskday[ctx.nonHumanPlan[num]] == 0)
-                        coManager.processActualCo(num,ctx.nonHumanPlan[num],ctx.diebody);
+                        coManager.processActualCo(num,ctx.nonHumanPlan[num],ctx.getDiebody());
                     else
                         ctx.nonHumanPlan[num] = 0;
                     continue;
@@ -270,12 +270,12 @@ public class ExecutionManager
                     {
                         case 7:
                             if (GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(0, 0, coManager.getp1(7), coManager.getp2(7))))
-                                coManager.processMaoLieCo(num, true, ctx.diebody);
+                                coManager.processMaoLieCo(num, true, ctx.getDiebody());
                             break;
                         default:
                             if (GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco
                                     (ctx.getActualRole(num) - 7, 0, coManager.getp1(ctx.getActualRole(num)), coManager.getp2(ctx.getActualRole(num)))))
-                                coManager.processMaoLieCo(num, false, ctx.diebody);
+                                coManager.processMaoLieCo(num, false, ctx.getDiebody());
                             break;
                     }
             }

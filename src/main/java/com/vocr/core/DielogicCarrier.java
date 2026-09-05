@@ -23,19 +23,18 @@ public class DielogicCarrier
         this.eventGenerator = new ResultEventGenerator(ctx);
     }
 
-    public ArrayList<Integer> execute(int wolf, int wolfbite, int zhantarget, int lietarget)
+    public void execute(int wolf, int wolfbite, int zhantarget, int lietarget)
     {
         ArrayList<Integer> diebody = new ArrayList<>();
         ctx.eventarray.clear();
 
         handleWolfBite(wolf, wolfbite, lietarget, diebody);
         handleCurseKill(zhantarget, diebody);
+        ctx.recordNightDeaths(diebody);
         shuffleAndLogEvents(diebody);
         handleFakeSeerExposure(diebody);
 
         deliverEvents.run();
-        ctx.setNightDeathCount(ctx.getGameDay(), diebody.size());
-        return diebody;
     }
 
     private void handleWolfBite(int wolf, int wolfbite, int lietarget, ArrayList<Integer> diebody)
@@ -89,9 +88,7 @@ public class DielogicCarrier
         }
         else
         {
-            ctx.isDoubleDeathOccurred[ctx.getGameDay()] = true;
-            boolean ackWhite = suspicion.isAckWhite(ctx.getActualRoleIndex(5), ctx.maos,
-                    ctx.isDoubleDeathOccurred, ctx.claimedRoleaskday);
+            boolean ackWhite = ctx.isAckWhite(ctx.getActualRoleIndex(5));
             if (ackWhite) suspicion.markAckWhite(ctx.getActualRoleIndex(5));
             if (ctx.getActualRoleIndex(5) > 0 && ctx.isAlive(ctx.getActualRoleIndex(5)) && ackWhite
                     && !diebody.contains(ctx.getActualRoleIndex(5)))
@@ -119,10 +116,7 @@ public class DielogicCarrier
 
     void dieaux(int index, whyDie why)
     {
-        ctx.setDeathReason(index, why);
-        ctx.decrementAliveCounter();
-        ctx.incrementDeathCounter();
-        ctx.setDeathDay(index, ctx.getGameDay());
+        ctx.recordDeath(index, why);
         if (why == whyDie.chuxing)
         {
             eventGenerator.addEvent(EventName.cxs, index);

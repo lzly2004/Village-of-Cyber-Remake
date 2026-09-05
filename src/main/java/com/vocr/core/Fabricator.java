@@ -25,7 +25,7 @@ public class Fabricator
         this.hunterGuarder = hunterGuarder;
     }
 
-    public void fabricate(ArrayList<Integer> diebody)
+    public void fabricate(List<Integer> diebody)
     {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
@@ -47,7 +47,7 @@ public class Fabricator
         }
     }
 
-    private void frlyingLie(ArrayList<Integer> diebody, int num)
+    private void frlyingLie(List<Integer> diebody, int num)
     {
         if (ctx.isNonHumanMarked(num)) return;
         int gd = ctx.getGameDay();

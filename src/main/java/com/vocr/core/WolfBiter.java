@@ -339,7 +339,7 @@ public class WolfBiter
                 int t = ctx.getSkillTarget(i, j);
                 if (t <= n && t > 0 && !ctx.isNonHumanMarked(t)
                         && ctx.getClaimedRole(t) != 1
-                        && !suspicion.isAckWhite(t, ctx.maos, ctx.isDoubleDeathOccurred, ctx.claimedRoleaskday))
+                        && !ctx.isAckWhite(t))
                     baiqiu[i]++;
             }
         }

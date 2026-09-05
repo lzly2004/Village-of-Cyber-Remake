@@ -33,7 +33,7 @@ public class DayActionCoordinator
         this.deliverEvents = module.getDeliverEvents();
     }
 
-    public void coordinate(ArrayList<Integer> diebody)
+    public void coordinate(List<Integer> diebody)
     {
         logDayStart();
 
@@ -61,13 +61,13 @@ public class DayActionCoordinator
         DebugLogger.log("\n");
     }
 
-    private void presentDivinationResults(ArrayList<Integer> diebody)
+    private void presentDivinationResults(List<Integer> diebody)
     {
         for (int zhan : ctx.zhans) resultPresenter.presentZhan(zhan, diebody);
         for (int ling : ctx.lings) resultPresenter.presentLing(ling);
     }
 
-    private void handleLatentSeerMediumCO(ArrayList<Integer> diebody)
+    private void handleLatentSeerMediumCO(List<Integer> diebody)
     {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
@@ -91,7 +91,7 @@ public class DayActionCoordinator
             }
     }
 
-    private void handleCatHunterCO(ArrayList<Integer> diebody)
+    private void handleCatHunterCO(List<Integer> diebody)
     {
         if(ctx.getPeiyi() != peiyi.jianyi && ctx.gyindex[1] > 0 && ctx.isDead(ctx.gyindex[1]) && ctx.isDead(ctx.gyindex[2]))
             coManager.askCoByRole(Role.mao);

@@ -47,14 +47,13 @@ class SuspicionSystem
         ctx.addSuspicionValue(num2, num1, w2);
     }
 
-    public boolean isAckWhite(int num, ArrayList<Integer> maos,
-                              boolean[] isDoubleDeathOccurred, int[] claimedRoleaskday)
+    public boolean isAckWhite(int num)
     {
         if (num < 1) return false;
         if (ctx.getClaimedRole(num) == 4) return true;
-        if (ctx.getActualRole(num) != 5 || claimedRoleaskday[5] < 1) return false;
+        if (ctx.getActualRole(num) != 5 || ctx.getClaimedRoleAskDay(5) < 1) return false;
 
-        ArrayList<Integer> mao = new ArrayList<>(maos);
+        ArrayList<Integer> mao = new ArrayList<>(ctx.getMaos());
         for (int i = mao.size() - 1; i >= 0; i--)
         {
             if (ctx.isNonHumanMarked(mao.get(i)))
@@ -65,13 +64,13 @@ class SuspicionSystem
         int firsttimemoredie = -1;
         for (int i = 1; i <= ctx.getGameDay(); i++)
         {
-            if (isDoubleDeathOccurred[i])
+            if (ctx.isDoubleDeathOccurred(i))
             {
                 firsttimemoredie = i;
                 break;
             }
         }
-        if (firsttimemoredie != -1 && firsttimemoredie < claimedRoleaskday[5]) return false;
+        if (firsttimemoredie != -1 && firsttimemoredie < ctx.getClaimedRoleAskDay(5)) return false;
 
         return true;
     }

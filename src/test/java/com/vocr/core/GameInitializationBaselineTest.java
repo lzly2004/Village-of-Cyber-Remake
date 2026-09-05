@@ -106,7 +106,7 @@ class GameInitializationBaselineTest {
             assertTrue(character.number >= 1 && character.number <= GameConstants.CHARACTER_SUM,
                     "角色编号必须处于合法范围: " + player);
             assertTrue(characterNumbers.add(character.number), "同局角色编号不得重复: " + character.number);
-            assertEquals(character.whyDie == whyDie.NONE, context.isAlive(player));
+            assertEquals(character.isAlive(), context.isAlive(player));
         }
 
         String actualDigest = sha256(snapshot(result));
@@ -159,13 +159,13 @@ class GameInitializationBaselineTest {
         GameContext context = (GameContext) result.logic.getGameContext();
         StringBuilder value = new StringBuilder(32_768);
         value.append("game=").append(status.p).append('|').append(status.gameDay).append('|')
-                .append(status.aliveCounter).append('|').append(status.deathCounter).append('|')
+                .append(status.getAliveCounter()).append('|').append(status.getDeathCounter()).append('|')
                 .append(status.end).append('\n');
         value.append("ctx=").append(context.initialWolfCount).append('|')
                 .append(context.initialNonHumanCount).append('|').append(context.kyojin).append('|')
                 .append(context.kz).append('|').append(context.zhans).append('|').append(context.lings)
                 .append('|').append(context.lies).append('|').append(context.maos).append('|')
-                .append(context.diebody).append('\n');
+                .append(context.getDiebody()).append('\n');
         appendArray(value, "actualRoleindex", context.actualRoleindex);
         appendArray(value, "gyindex", context.gyindex);
         appendArray(value, "rlindex", context.rlindex);
@@ -174,15 +174,15 @@ class GameInitializationBaselineTest {
         appendArray(value, "nonHumanPlan", context.nonHumanPlan);
         appendArray(value, "ybzw", context.ybzw);
         appendArray(value, "zw", context.zw);
-        appendArray(value, "nightDeathCount", context.nightDeathCount);
-        value.append("doubleDeath=").append(Arrays.toString(context.isDoubleDeathOccurred)).append('\n');
+        appendArray(value, "nightDeathCount", context.getNightDeathCountsSnapshot());
+        value.append("doubleDeath=").append(Arrays.toString(context.getDoubleDeathOccurredSnapshot())).append('\n');
 
         for (int player = 1; player <= status.getPlayerSum(); player++) {
             GameCharacter character = status.gc[player];
             value.append("player=").append(player).append('|').append(character.number).append('|')
                     .append(character.actualRole).append('|').append(character.claimedRole).append('|')
                     .append(character.claimedRoleorder).append('|').append(character.comingOutDay).append('|')
-                    .append(character.whyDie).append('|').append(character.dieDay).append('|')
+                    .append(character.getDeathReason()).append('|').append(character.getDeathDay()).append('|')
                     .append(character.nonHumanMarker).append('|')
                     .append(Arrays.toString(character.skillTarget)).append('|')
                     .append(Arrays.toString(character.suspicionValue)).append('|')

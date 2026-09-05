@@ -13,7 +13,6 @@ import com.vocr.config.ProbabilityCalculator;
 import com.vocr.history.GameRecordManager;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -192,8 +191,7 @@ public class MainLogic implements MainLogicInterface
         while(ctx.getActualRole(wolf[1]) %5 == 0)
             wolf = wolfwork();//重新选择狼咬逻辑
         DebugLogger.log("死体逻辑：");
-        ctx.diebody.clear();
-        ctx.diebody.addAll(dielogic(wolf[0],wolf[1],zhantarget,0));//死体逻辑，并且返回当天夜间死体
+        dielogic(wolf[0],wolf[1],zhantarget,0);//死体逻辑，并记录当天夜间死体
         // Replay系统: 第1天在非人初始工作后录制（ctx.getGameDay()已被+1，用-1取回正确的day编号）
         ctx.incrementGameDay();//增加一天时间
         DebugLogger.log("死体逻辑结果：");
@@ -205,7 +203,7 @@ public class MainLogic implements MainLogicInterface
     }
     private void feirenInitial()
     {
-        nonHumanCoordinator.coordinate(ctx.diebody);
+        nonHumanCoordinator.coordinate(ctx.getDiebody());
         deliverEvents();
     }
 
@@ -225,8 +223,7 @@ public class MainLogic implements MainLogicInterface
         int lietarget = zhenlie(ctx.getHunter());
         ctx.setSkillTarget(ctx.getHunter(), ctx.getGameDay(), lietarget);
         //5,死体逻辑，并且返回当天夜间死体
-        ctx.diebody.clear();
-        ctx.diebody.addAll(dielogic(wolf[0],wolf[1],zhantarget,lietarget));
+        dielogic(wolf[0],wolf[1],zhantarget,lietarget);
         ctx.setEndResult(judgeend());
         if(ctx.getEndResult() != GameResult.NONE) //游戏结束
         {
@@ -252,15 +249,15 @@ public class MainLogic implements MainLogicInterface
 
     private void frlying()
     {
-        fabricator.fabricate(ctx.diebody);
+        fabricator.fabricate(ctx.getDiebody());
     }
     private void dayaction()
     {
-        dayActionCoordinator.coordinate(ctx.diebody);
+        dayActionCoordinator.coordinate(ctx.getDiebody());
     }
-    private ArrayList<Integer> dielogic(int wolf, int wolfbite, int zhantarget, int lietarget)
+    private void dielogic(int wolf, int wolfbite, int zhantarget, int lietarget)
     {
-        return dielogicCarrier.execute(wolf, wolfbite, zhantarget, lietarget);
+        dielogicCarrier.execute(wolf, wolfbite, zhantarget, lietarget);
     }
     private GameResult judgeend()
     {

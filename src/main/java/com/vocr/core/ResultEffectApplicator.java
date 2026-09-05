@@ -36,8 +36,7 @@ public class ResultEffectApplicator
 
     public boolean checkAndMarkAckWhiteCat()
     {
-        boolean ackWhiteCat = suspicion.isAckWhite(ctx.getCat(), ctx.maos,
-                ctx.isDoubleDeathOccurred, ctx.claimedRoleaskday);
+        boolean ackWhiteCat = ctx.isAckWhite(ctx.getCat());
         if (ackWhiteCat)
             suspicion.markAckWhite(ctx.getCat());
         return ackWhiteCat;

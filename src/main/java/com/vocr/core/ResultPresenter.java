@@ -4,7 +4,7 @@ import com.vocr.domain.EventName;
 import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ResultPresenter
 {
@@ -19,7 +19,7 @@ public class ResultPresenter
         this.effectApplicator = new ResultEffectApplicator(ctx, suspicion);
     }
 
-    public void presentZhan(int num, ArrayList<Integer> diebody)
+    public void presentZhan(int num, List<Integer> diebody)
     {
         if (ctx.getDeathReason(num) != whyDie.NONE || ctx.isNonHumanMarked(num)) return;
         int n = ctx.getPlayerSum();

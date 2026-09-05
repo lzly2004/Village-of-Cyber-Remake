@@ -25,8 +25,8 @@ class GameContext implements GameContextView
     private final SuspicionSystem suspicion;
 
     // === 核心状态数组 ===
-    final boolean[] isDoubleDeathOccurred;
-    final int[] nightDeathCount;
+    private final boolean[] isDoubleDeathOccurred;
+    private final int[] nightDeathCount;
     final int[] actualRoleindex;
     final int[] gyindex;
     final int[] rlindex;
@@ -40,7 +40,7 @@ class GameContext implements GameContextView
     final ArrayList<Integer> lings;
     final ArrayList<Integer> lies;
     final ArrayList<Integer> maos;
-    final ArrayList<Integer> diebody;
+    private final ArrayList<Integer> diebody;
     final ArrayList<Event> eventarray;
 
     // === 标量状态 ===
@@ -102,10 +102,10 @@ class GameContext implements GameContextView
 
     // --- 玩家状态 ---
     public int getPlayerSum() { return gs.getPlayerSum(); }
-    public boolean isAlive(int player) { return player >= 1 && player <= gs.getPlayerSum() && gs.gc[player].whyDie == whyDie.NONE; }
-    public boolean isDead(int player) { return player >= 1 && player <= gs.getPlayerSum() && gs.gc[player].whyDie != whyDie.NONE; }
-    public whyDie getDeathReason(int player) { return gs.gc[player].whyDie; }
-    public int getDeathDay(int player) { return gs.gc[player].dieDay; }
+    public boolean isAlive(int player) { return player >= 1 && player <= gs.getPlayerSum() && gs.gc[player].isAlive(); }
+    public boolean isDead(int player) { return player >= 1 && player <= gs.getPlayerSum() && !gs.gc[player].isAlive(); }
+    public whyDie getDeathReason(int player) { return gs.gc[player].getDeathReason(); }
+    public int getDeathDay(int player) { return gs.gc[player].getDeathDay(); }
     public boolean isNonHumanMarked(int player) { return gs.gc[player].nonHumanMarker; }
 
     // --- 角色 ---
@@ -200,7 +200,7 @@ class GameContext implements GameContextView
     public void addLazySuspicionValue(int player, int delta) { suspicion.addLazySuspicionValue(player, delta); }
     public void setLazySuspicionValue(int player, int value) { suspicion.setLazySuspicionValue(player, value); }
     public int[] getTop3SuspectedPlayers(int player, int day) { return gs.gc[player].top3SuspectedPlayers[day]; }
-    public boolean isAckWhite(int player) { return suspicion.isAckWhite(player, maos, isDoubleDeathOccurred, claimedRoleaskday); }
+    public boolean isAckWhite(int player) { return suspicion.isAckWhite(player); }
 
     public SuspicionSystem getSuspicion() { return suspicion; }
 
@@ -208,10 +208,8 @@ class GameContext implements GameContextView
     public int getGameDay() { return gs.gameDay; }
     /** 增加一天时间（游戏日推进） */
     public void incrementGameDay() { gs.gameDay++; }
-    public int getAliveCounter() { return gs.aliveCounter; }
-    public int getDeathCounter() { return gs.deathCounter; }
-    public void decrementAliveCounter() { gs.aliveCounter--; }
-    public void incrementDeathCounter() { gs.deathCounter++; }
+    public int getAliveCounter() { return gs.getAliveCounter(); }
+    public int getDeathCounter() { return gs.getDeathCounter(); }
     public GameResult getEndResult() { return gs.end; }
     public void setEndResult(GameResult result) { gs.end = result; }
     /** 兼容旧接口：返回游戏结果的整数值 */
@@ -263,7 +261,7 @@ class GameContext implements GameContextView
     public int getLined(int zhan, int ling) { return lined[zhan][ling]; }
 
     // --- 死体 ---
-    public List<Integer> getDiebody() { return Collections.unmodifiableList(diebody); }
+    public List<Integer> getDiebody() { return List.copyOf(diebody); }
 
     /** 计算夜间死亡对白牌数量的扣除（占灵共用逻辑） */
     public int computeNightDeathDecrement() {
@@ -286,7 +284,7 @@ class GameContext implements GameContextView
     {
         List<Integer> result = new ArrayList<>();
         for (int i = 1; i <= gs.getPlayerSum(); i++)
-            if (gs.gc[i].claimedRole == role && (!mustAlive || gs.gc[i].whyDie == whyDie.NONE))
+            if (gs.gc[i].claimedRole == role && (!mustAlive || gs.gc[i].isAlive()))
                 result.add(i);
         return result;
     }
@@ -307,11 +305,20 @@ class GameContext implements GameContextView
     /** 设置CO日 */
     void setComingOutDay(int player, int day) { gs.gc[player].comingOutDay = day; }
 
-    /** 设置死亡日 */
-    void setDeathDay(int player, int day) { gs.gc[player].dieDay = day; }
+    /**
+     * 原子记录玩家死亡：死因、死亡日和生死计数必须在同一次调用中完成。
+     */
+    void recordDeath(int player, whyDie reason)
+    {
+        if (!isValidPlayerIndex(player))
+            throw new IllegalArgumentException("玩家索引越界: " + player);
+        if (reason == null || reason == whyDie.NONE)
+            throw new IllegalArgumentException("死亡原因必须是有效的非 NONE 值");
+        if (!isValidDayIndex(getGameDay()))
+            throw new IllegalStateException("当前游戏天数越界: " + getGameDay());
 
-    /** 设置死因 */
-    void setDeathReason(int player, whyDie reason) { gs.gc[player].whyDie = reason; }
+        gs.recordDeath(player, reason, getGameDay());
+    }
 
     /** 设置共有者下标 */
     void setGyIndex(int n, int player) { gyindex[n] = player; }
@@ -331,11 +338,39 @@ class GameContext implements GameContextView
     /** 设置CO技能预定目标 */
     public void setClaimedRoleScheduled(int player, int target, int day, boolean value) { gs.gc[player].claimedRoleScheduledSkillTargets[target][day] = value; }
 
-    /** 设置双死标记 */
-    void setDoubleDeathOccurred(int day) { isDoubleDeathOccurred[day] = true; }
+    /**
+     * 原子替换本夜尸体快照，并同步夜间死亡数和双死标记。
+     */
+    void recordNightDeaths(List<Integer> deaths)
+    {
+        if (deaths == null)
+            throw new IllegalArgumentException("夜间死亡列表不能为空");
 
-    /** 设置夜间死亡人数 */
-    void setNightDeathCount(int day, int count) { nightDeathCount[day] = count; }
+        int day = getGameDay();
+        if (!isValidDayIndex(day))
+            throw new IllegalStateException("当前游戏天数越界: " + day);
+
+        ArrayList<Integer> snapshot = new ArrayList<>(deaths.size());
+        for (Integer player : deaths)
+        {
+            if (player == null || !isValidPlayerIndex(player))
+                throw new IllegalArgumentException("夜间死亡玩家索引无效: " + player);
+            if (snapshot.contains(player))
+                throw new IllegalArgumentException("夜间死亡列表包含重复玩家: " + player);
+            if (isAlive(player) || getDeathDay(player) != day || !getDeathReason(player).isNightDeath())
+                throw new IllegalStateException("玩家没有在本夜以夜间原因死亡: " + player);
+            snapshot.add(player);
+        }
+
+        diebody.clear();
+        diebody.addAll(snapshot);
+        nightDeathCount[day] = snapshot.size();
+        isDoubleDeathOccurred[day] = snapshot.size() > 1;
+    }
+
+    int getNightDeathCount(int day) { return nightDeathCount[day]; }
+    int[] getNightDeathCountsSnapshot() { return nightDeathCount.clone(); }
+    boolean[] getDoubleDeathOccurredSnapshot() { return isDoubleDeathOccurred.clone(); }
 
     /** 判断猫又是否明确出局 */
     public boolean isCatDefinitivelyOut()

@@ -24,8 +24,8 @@ class GameCharacter
     //可以代表潜伏非人的预定编造结果（猎人日记）
     boolean[][] claimedRoleScheduledSkillTargets;//若为职业co者，被安排的技能使用对象 boolean[配役人数+1][N+1]
     //生死相关
-    whyDie whyDie;//死亡原因枚举类型
-    int dieDay;//死亡日
+    private whyDie whyDie;//死亡原因枚举类型
+    private int dieDay;//死亡日
     //日期的定义：
     //游戏开始时，日期为1日
     //1日夜->2日昼->2日夜->3日昼->3日夜->4日昼->4日夜->...
@@ -45,5 +45,15 @@ class GameCharacter
         this.claimedRoleScheduledSkillTargets = new boolean[GameConstants.CHARACTER_SUM+1][GameConstants.MAX_GAME_DAYS+1];
         this.whyDie = whyDie.NONE;
         this.comingOutDay = -1;
+    }
+
+    boolean isAlive() { return whyDie == whyDie.NONE; }
+    whyDie getDeathReason() { return whyDie; }
+    int getDeathDay() { return dieDay; }
+
+    void recordDeath(whyDie reason, int day)
+    {
+        this.whyDie = reason;
+        this.dieDay = day;
     }
 }

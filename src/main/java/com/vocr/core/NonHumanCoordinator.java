@@ -33,7 +33,7 @@ public class NonHumanCoordinator
         this.deliverEvents = module.getDeliverEvents();
     }
 
-    public void coordinate(ArrayList<Integer> diebody)
+    public void coordinate(List<Integer> diebody)
     {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
@@ -87,7 +87,7 @@ public class NonHumanCoordinator
         }
     }
 
-    private int assignWolfSeerTargets(int n, ArrayList<Integer> diebody)
+    private int assignWolfSeerTargets(int n, List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：人狼上占");
         int rlzhan = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(10-ctx.kz, (11-ctx.initialWolfCount)*15, ctx.kz + (ctx.initialWolfCount-2)*3)));
@@ -157,7 +157,7 @@ public class NonHumanCoordinator
         }
     }
 
-    private void assignMadmanFanaticStrategy(int n, ArrayList<Integer> diebody)
+    private void assignMadmanFanaticStrategy(int n, List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：狂人狂信策略");
         if(ctx.getPeiyi() == peiyi.kuangxin || ctx.getPeiyi() == peiyi.daxing) ctx.kyojin = 0;
@@ -206,7 +206,7 @@ public class NonHumanCoordinator
         }
     }
 
-    private void assignFoxStrategy(int n, ArrayList<Integer> diebody)
+    private void assignFoxStrategy(int n, List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：妖狐策略");
         if(ctx.getFox() > 0 && ctx.isAlive(ctx.getFox()))
@@ -236,7 +236,7 @@ public class NonHumanCoordinator
         }
     }
 
-    private void assignDeviantStrategy(int n, ArrayList<Integer> diebody)
+    private void assignDeviantStrategy(int n, List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：背德策略");
         if(ctx.getDeviant() > 0 && ctx.isAlive(ctx.getDeviant()))
@@ -275,7 +275,7 @@ public class NonHumanCoordinator
         }
     }
 
-    private void handleDaytimeCO(ArrayList<Integer> diebody, int gd)
+    private void handleDaytimeCO(List<Integer> diebody, int gd)
     {
         DebugLogger.log("白天临时改变策略,以及占灵共的行动");
         if(diebody.size() > 1)
@@ -305,7 +305,7 @@ public class NonHumanCoordinator
         int jhling;                    // 计划上灵的人数
     }
 
-    private void handleNormalScenario(ArrayList<Integer> diebody, int gd)
+    private void handleNormalScenario(List<Integer> diebody, int gd)
     {
         NormalScenarioContext c = new NormalScenarioContext();
         c.n = ctx.getPlayerSum();
@@ -371,7 +371,7 @@ public class NonHumanCoordinator
         }
     }
 
-    private void processBlackBallCOSecondary(ArrayList<Integer> diebody)
+    private void processBlackBallCOSecondary(List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：黑球占co时机");
         for (int zhan : ctx.zhans) coManager.processActualCo(zhan, 1, diebody);
@@ -381,7 +381,7 @@ public class NonHumanCoordinator
     /**
      * Phase 5: 处理猫又CO响应、裁剪响应、处理剩余响应
      */
-    private void processCatCOResponses(NormalScenarioContext c, ArrayList<Integer> diebody)
+    private void processCatCOResponses(NormalScenarioContext c, List<Integer> diebody)
     {
         DebugLogger.log("本次有无猫又co：");
         c.response = GameLogicUtils.shuffleList(c.response);
@@ -509,7 +509,7 @@ public class NonHumanCoordinator
         }
     }
 
-    private void executeWhiteBallCOConditional(NormalScenarioContext c, ArrayList<Integer> diebody)
+    private void executeWhiteBallCOConditional(NormalScenarioContext c, List<Integer> diebody)
     {
         if(ctx.zhans.size() == 0 || c.response.size() > 0 || c.gqian || c.havecatco)
         {
@@ -538,7 +538,7 @@ public class NonHumanCoordinator
         c.response.clear();
     }
 
-    private void handleCurseKillScenario(ArrayList<Integer> diebody, int gd)
+    private void handleCurseKillScenario(List<Integer> diebody, int gd)
     {
         DebugLogger.log("非人的初始工作：明确咒杀");
         DebugLogger.log("非人的初始工作：人狼上占");

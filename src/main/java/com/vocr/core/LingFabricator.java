@@ -79,7 +79,7 @@ public class LingFabricator
         }
         baip -= ctx.computeNightDeathDecrement();
         for (int i = 1; i <= n; i++)
-            if (suspicion.isAckWhite(i, ctx.maos, ctx.isDoubleDeathOccurred, ctx.claimedRoleaskday) && ctx.isAlive(i))
+            if (ctx.isAckWhite(i) && ctx.isAlive(i))
             {
                 suspicion.markAckWhite(i);
                 baip--;

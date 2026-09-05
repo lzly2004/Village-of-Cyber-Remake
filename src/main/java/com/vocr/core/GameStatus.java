@@ -2,6 +2,7 @@ package com.vocr.core;
 
 import com.vocr.domain.GameResult;
 import com.vocr.domain.peiyi;
+import com.vocr.domain.whyDie;
 
 import com.vocr.config.GameConstants;
 
@@ -11,8 +12,8 @@ public class GameStatus
     public boolean isInGame;//当前是否在游戏中
     public GameResult end;//当前游戏是否结束 GameResult.NONE/VILLAGE_WIN/WOLF_WIN/FOX_WIN
     public int gameDay;//游戏进行到多少日目
-    public int deathCounter;//游戏中当前的死亡人数计数
-    public int aliveCounter;//游戏中当前的存活人数计数
+    private int deathCounter;//游戏中当前的死亡人数计数
+    private int aliveCounter;//游戏中当前的存活人数计数
     GameCharacter[] gc;//游戏角色数组 int[CharecterSum+1]
     boolean[][] hiddenSeerScheduledSkillTargets;//潜伏占卜师的预告 int[getPlayerSum()+1][N+1]N:最大游戏天数 最大可以取50
     boolean[][] hiddenHunterScheduledSkillTargets;//潜伏猎人的预告 int[getPlayerSum()+1][N+1]  N:最大游戏天数 最大可以取50
@@ -123,6 +124,21 @@ public class GameStatus
     public int getPlayerSum()
     {//得到本局游戏的玩家数
         return deathCounter + aliveCounter;//死亡人数+存活人数=总人数
+    }
+
+    public int getAliveCounter() { return aliveCounter; }
+    public int getDeathCounter() { return deathCounter; }
+
+    void recordDeath(int player, whyDie reason, int day)
+    {
+        if (!gc[player].isAlive())
+            throw new IllegalStateException("玩家已经死亡: " + player);
+        if (aliveCounter <= 0)
+            throw new IllegalStateException("存活人数不能继续减少");
+
+        gc[player].recordDeath(reason, day);
+        aliveCounter--;
+        deathCounter++;
     }
     private static int[] generateRandomCharacterArray()  //得到一个合法的大型村玩家编号数组
     {
