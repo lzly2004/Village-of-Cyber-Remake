@@ -25,8 +25,7 @@ public class SharedExposer
 
     private void applyGuardianCO(int player)
     {
-        ctx.setClaimedRole(player, 4);
-        ctx.setComingOutDay(player, ctx.getGameDay());
+        ctx.revealClaim(player, 4, ctx.getGameDay());
         ctx.addLazySuspicionValue(player, -GameConstants.INF);
     }
 

@@ -175,7 +175,7 @@ public class DebugLogger
             sb.append("[")
                     .append(gc.number).append(":")
                     .append("role=").append(gc.actualRole).append(",")
-                    .append("claimed=").append(gc.claimedRole).append(",")
+                    .append("claimed=").append(gc.getClaimedRole()).append(",")
                     .append("dieDay=").append(gc.getDeathDay()).append(",")
                     .append("whyDie=").append(gc.getDeathReason()).append(",")
                     .append("nonHumanMarker=").append(gc.nonHumanMarker)

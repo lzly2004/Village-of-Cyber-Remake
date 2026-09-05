@@ -163,14 +163,14 @@ class GameInitializationBaselineTest {
                 .append(status.end).append('\n');
         value.append("ctx=").append(context.initialWolfCount).append('|')
                 .append(context.initialNonHumanCount).append('|').append(context.kyojin).append('|')
-                .append(context.kz).append('|').append(context.zhans).append('|').append(context.lings)
-                .append('|').append(context.lies).append('|').append(context.maos).append('|')
+                .append(context.kz).append('|').append(context.getZhans()).append('|').append(context.getLings())
+                .append('|').append(context.getLies()).append('|').append(context.getMaos()).append('|')
                 .append(context.getDiebody()).append('\n');
         appendArray(value, "actualRoleindex", context.actualRoleindex);
         appendArray(value, "gyindex", context.gyindex);
         appendArray(value, "rlindex", context.rlindex);
-        appendArray(value, "claimedRoleaskday", context.claimedRoleaskday);
-        appendArray(value, "claimedRoleorder", context.claimedRoleorder);
+        appendArray(value, "claimedRoleaskday", context.getClaimedRoleAskDaysSnapshot());
+        appendArray(value, "claimedRoleorder", context.getClaimedRoleOrderCountsSnapshot());
         appendArray(value, "nonHumanPlan", context.nonHumanPlan);
         appendArray(value, "ybzw", context.ybzw);
         appendArray(value, "zw", context.zw);
@@ -180,8 +180,8 @@ class GameInitializationBaselineTest {
         for (int player = 1; player <= status.getPlayerSum(); player++) {
             GameCharacter character = status.gc[player];
             value.append("player=").append(player).append('|').append(character.number).append('|')
-                    .append(character.actualRole).append('|').append(character.claimedRole).append('|')
-                    .append(character.claimedRoleorder).append('|').append(character.comingOutDay).append('|')
+                    .append(character.actualRole).append('|').append(character.getClaimedRole()).append('|')
+                    .append(character.getClaimedRoleOrder()).append('|').append(character.getComingOutDay()).append('|')
                     .append(character.getDeathReason()).append('|').append(character.getDeathDay()).append('|')
                     .append(character.nonHumanMarker).append('|')
                     .append(Arrays.toString(character.skillTarget)).append('|')

@@ -30,16 +30,16 @@ class GameContext implements GameContextView
     final int[] actualRoleindex;
     final int[] gyindex;
     final int[] rlindex;
-    final int[] claimedRoleaskday;
-    final int[] claimedRoleorder;
+    private final int[] claimedRoleAskDays;
+    private final int[] claimedRoleOrderCounts;
     final int[] nonHumanPlan;
     final int[] ybzw;
     final int[] zw;
     final int[][] lined;
-    final ArrayList<Integer> zhans;
-    final ArrayList<Integer> lings;
-    final ArrayList<Integer> lies;
-    final ArrayList<Integer> maos;
+    private final ArrayList<Integer> seerCandidates;
+    private final ArrayList<Integer> mediumCandidates;
+    private final ArrayList<Integer> hunterCandidates;
+    private final ArrayList<Integer> catCandidates;
     private final ArrayList<Integer> diebody;
     final ArrayList<Event> eventarray;
 
@@ -47,8 +47,8 @@ class GameContext implements GameContextView
     int kyojin;
     int initialWolfCount;
     int initialNonHumanCount;
-    boolean rlsl;
-    boolean rlsm;
+    private boolean wolfClaimedHunter;
+    private boolean wolfClaimedCat;
     int kz;
 
     GameContext(GameStatus gs)
@@ -61,17 +61,17 @@ class GameContext implements GameContextView
         this.actualRoleindex = new int[Role.values().length + 1];
         this.gyindex = new int[3];
         this.rlindex = new int[n + 1];
-        this.claimedRoleaskday = new int[12];
-        this.claimedRoleorder = new int[12];
+        this.claimedRoleAskDays = new int[12];
+        this.claimedRoleOrderCounts = new int[12];
         this.nonHumanPlan = new int[n + 1];
         this.ybzw = new int[n + 1];
         this.zw = new int[n * 2 + 1];
         this.lined = new int[n + 1][n + 1];
 
-        this.zhans = new ArrayList<>();
-        this.lings = new ArrayList<>();
-        this.lies = new ArrayList<>();
-        this.maos = new ArrayList<>();
+        this.seerCandidates = new ArrayList<>();
+        this.mediumCandidates = new ArrayList<>();
+        this.hunterCandidates = new ArrayList<>();
+        this.catCandidates = new ArrayList<>();
         this.diebody = new ArrayList<>();
         this.eventarray = new ArrayList<>();
 
@@ -124,10 +124,10 @@ class GameContext implements GameContextView
     /** 背德者（役职11） */
     public int getDeviant() { return actualRoleindex[11]; }
 
-    public int getClaimedRole(int player) { return gs.gc[player].claimedRole; }
-    public int getComingOutDay(int player) { return gs.gc[player].comingOutDay; }
-    public int getClaimedRoleOrder(int player) { return gs.gc[player].claimedRoleorder; }
-    public int getClaimedRoleOrderCount(int role) { return claimedRoleorder[role]; }
+    public int getClaimedRole(int player) { return gs.gc[player].getClaimedRole(); }
+    public int getComingOutDay(int player) { return gs.gc[player].getComingOutDay(); }
+    public int getClaimedRoleOrder(int player) { return gs.gc[player].getClaimedRoleOrder(); }
+    public int getClaimedRoleOrderCount(int role) { return claimedRoleOrderCounts[role]; }
     public int getActualRoleIndex(int role) { return actualRoleindex[role]; }
     public int getDiePlayerNum(whyDie why, int day)
     {
@@ -142,10 +142,10 @@ class GameContext implements GameContextView
     }
 
     // --- 职业候补 ---
-    public List<Integer> getZhans() { return Collections.unmodifiableList(zhans); }
-    public List<Integer> getLings() { return Collections.unmodifiableList(lings); }
-    public List<Integer> getLies() { return Collections.unmodifiableList(lies); }
-    public List<Integer> getMaos() { return Collections.unmodifiableList(maos); }
+    public List<Integer> getZhans() { return Collections.unmodifiableList(seerCandidates); }
+    public List<Integer> getLings() { return Collections.unmodifiableList(mediumCandidates); }
+    public List<Integer> getLies() { return Collections.unmodifiableList(hunterCandidates); }
+    public List<Integer> getMaos() { return Collections.unmodifiableList(catCandidates); }
 
     // --- 技能 ---
     public int getSkillTarget(int player, int day)
@@ -250,12 +250,14 @@ class GameContext implements GameContextView
     // --- 人狼 ---
     public int getRlIndex(int n) { return rlindex[n]; }
     public int getInitialWolfCount() { return initialWolfCount; }
-    public boolean isWolfClaimedHunter() { return rlsl; }
-    public boolean isWolfClaimedCat() { return rlsm; }
+    public boolean isWolfClaimedHunter() { return wolfClaimedHunter; }
+    public boolean isWolfClaimedCat() { return wolfClaimedCat; }
     public int getKyojin() { return kyojin; }
 
     // --- CO询问 ---
-    public int getClaimedRoleAskDay(int role) { return claimedRoleaskday[role]; }
+    public int getClaimedRoleAskDay(int role) { return claimedRoleAskDays[role]; }
+    int[] getClaimedRoleAskDaysSnapshot() { return claimedRoleAskDays.clone(); }
+    int[] getClaimedRoleOrderCountsSnapshot() { return claimedRoleOrderCounts.clone(); }
 
     // --- 占灵连线 ---
     public int getLined(int zhan, int ling) { return lined[zhan][ling]; }
@@ -275,8 +277,8 @@ class GameContext implements GameContextView
 
     /** 计算职业候补对非人阵营的计数（占灵共用逻辑） */
     public int computeFeisum() {
-        return Math.max(0, zhans.size() - 1) + Math.max(0, lings.size() - 1)
-             + Math.max(0, lies.size() - 1) + Math.max(0, maos.size() - 1);
+        return Math.max(0, seerCandidates.size() - 1) + Math.max(0, mediumCandidates.size() - 1)
+             + Math.max(0, hunterCandidates.size() - 1) + Math.max(0, catCandidates.size() - 1);
     }
 
     // --- 便捷查询 ---
@@ -284,7 +286,7 @@ class GameContext implements GameContextView
     {
         List<Integer> result = new ArrayList<>();
         for (int i = 1; i <= gs.getPlayerSum(); i++)
-            if (gs.gc[i].claimedRole == role && (!mustAlive || gs.gc[i].isAlive()))
+            if (gs.gc[i].getClaimedRole() == role && (!mustAlive || gs.gc[i].isAlive()))
                 result.add(i);
         return result;
     }
@@ -299,11 +301,108 @@ class GameContext implements GameContextView
     /** 设置技能目标 */
     void setSkillTarget(int player, int day, int target) { gs.gc[player].skillTarget[day] = target; }
 
-    /** 设置声称职业 */
-    void setClaimedRole(int player, int role) { gs.gc[player].claimedRole = role; }
+    /**
+     * 原子登记一次主动 CO：职业、首次 CO 日、同职业顺位和候补列表一起更新。
+     */
+    void registerClaim(int player, int role)
+    {
+        validateClaim(player, role, getGameDay());
+        GameCharacter character = gs.gc[player];
+        character.recordClaimIdentity(role, getGameDay());
 
-    /** 设置CO日 */
-    void setComingOutDay(int player, int day) { gs.gc[player].comingOutDay = day; }
+        ArrayList<Integer> candidates = mutableClaimCandidates(role);
+        if (candidates != null)
+        {
+            if (character.getClaimedRoleOrder() == 0)
+                character.assignClaimOrder(++claimedRoleOrderCounts[role]);
+            if (!candidates.contains(player))
+                candidates.add(player);
+        }
+
+        if (character.actualRole == 7 && (role == 3 || role == 5))
+            markWolfClaimedRole(role);
+    }
+
+    /** 强制公开职业身份，不把玩家登记为主动 CO 候补。 */
+    void revealClaim(int player, int role, int day)
+    {
+        validateClaim(player, role, day);
+        gs.gc[player].recordClaimIdentity(role, day);
+    }
+
+    /** 首次记录某职业被询问 CO；已经记录时保持原日期并返回 false。 */
+    boolean tryRecordClaimRequest(int role, int day)
+    {
+        if (!isValidClaimRole(role))
+            throw new IllegalArgumentException("可声明职业越界: " + role);
+        if (!isValidDayIndex(day))
+            throw new IllegalArgumentException("CO 询问日期越界: " + day);
+        if (claimedRoleAskDays[role] != 0)
+            return false;
+        claimedRoleAskDays[role] = day;
+        return true;
+    }
+
+    /** 添加一个尚未正式 CO 的职业候补。 */
+    void addClaimCandidate(int role, int player)
+    {
+        if (!isValidPlayerIndex(player))
+            throw new IllegalArgumentException("玩家索引越界: " + player);
+        ArrayList<Integer> candidates = requiredMutableClaimCandidates(role);
+        if (!candidates.contains(player))
+            candidates.add(player);
+    }
+
+    /** 移除一个尚未正式 CO 的职业候补。 */
+    void removeClaimCandidate(int role, int player)
+    {
+        if (!isValidPlayerIndex(player))
+            throw new IllegalArgumentException("玩家索引越界: " + player);
+        requiredMutableClaimCandidates(role).remove(Integer.valueOf(player));
+    }
+
+    /** 记录非人阵营已经规划或完成猎人/猫又 CO。 */
+    void markWolfClaimedRole(int role)
+    {
+        if (role == 3) wolfClaimedHunter = true;
+        else if (role == 5) wolfClaimedCat = true;
+        else throw new IllegalArgumentException("狼方标记只支持猎人或猫又 CO: " + role);
+    }
+
+    private void validateClaim(int player, int role, int day)
+    {
+        if (!isValidPlayerIndex(player))
+            throw new IllegalArgumentException("玩家索引越界: " + player);
+        if (!isValidClaimRole(role))
+            throw new IllegalArgumentException("可声明职业越界: " + role);
+        if (!isValidDayIndex(day))
+            throw new IllegalArgumentException("CO 日期越界: " + day);
+    }
+
+    private boolean isValidClaimRole(int role)
+    {
+        return role >= 1 && role <= 6;
+    }
+
+    private ArrayList<Integer> mutableClaimCandidates(int role)
+    {
+        return switch (role)
+        {
+            case 1 -> seerCandidates;
+            case 2 -> mediumCandidates;
+            case 3 -> hunterCandidates;
+            case 5 -> catCandidates;
+            default -> null;
+        };
+    }
+
+    private ArrayList<Integer> requiredMutableClaimCandidates(int role)
+    {
+        ArrayList<Integer> candidates = mutableClaimCandidates(role);
+        if (candidates == null)
+            throw new IllegalArgumentException("该职业没有 CO 候补列表: " + role);
+        return candidates;
+    }
 
     /**
      * 原子记录玩家死亡：死因、死亡日和生死计数必须在同一次调用中完成。
@@ -328,12 +427,6 @@ class GameContext implements GameContextView
 
     /** 设置单人职业下标 */
     void setActualRoleIndex(int role, int player) { actualRoleindex[role] = player; }
-
-    /** 递增职业位次 */
-    int incrementClaimedRoleOrder(int role) { return ++claimedRoleorder[role]; }
-
-    /** 设置玩家职业位次 */
-    void setClaimedRoleOrder(int player, int order) { gs.gc[player].claimedRoleorder = order; }
 
     /** 设置CO技能预定目标 */
     public void setClaimedRoleScheduled(int player, int target, int day, boolean value) { gs.gc[player].claimedRoleScheduledSkillTargets[target][day] = value; }
@@ -404,16 +497,8 @@ class GameContext implements GameContextView
         return false;
     }
 
-    /** 添加占候补 */
-    void addZhan(int player) { if (!zhans.contains(player)) zhans.add(player); }
-    /** 添加灵候补 */
-    void addLing(int player) { if (!lings.contains(player)) lings.add(player); }
-    /** 添加猎候补 */
-    void addLie(int player) { if (!lies.contains(player)) lies.add(player); }
-    /** 添加猫候补 */
-    void addMao(int player) { if (!maos.contains(player)) maos.add(player); }
-    void shuffleZhans() { ConstNum.shuffle(zhans); }
-    void shuffleLings() { ConstNum.shuffle(lings); }
+    void shuffleZhans() { ConstNum.shuffle(seerCandidates); }
+    void shuffleLings() { ConstNum.shuffle(mediumCandidates); }
 
     /** 获取指定日期夜间死亡玩家列表 */
     public ArrayList<Integer> dieAtNight(int day)

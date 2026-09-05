@@ -280,7 +280,7 @@ public class NonHumanCoordinator
         DebugLogger.log("白天临时改变策略,以及占灵共的行动");
         if(diebody.size() > 1)
         {
-            handleCurseKillScenario(diebody, gd);
+            handleCurseKillScenario(diebody);
         }
         else
         {
@@ -326,7 +326,7 @@ public class NonHumanCoordinator
         processBlackBallCOSecondary(diebody);
 
         // Phase 4: 处理接黒回复
-        if(ctx.zhans.size() == 0) {
+        if(ctx.getZhans().isEmpty()) {
             DebugLogger.log("本次无占，共逻辑");
             gylogic.run();
         } else {
@@ -361,21 +361,22 @@ public class NonHumanCoordinator
     private void trimSeerCOToMax3()
     {
         ctx.shuffleZhans();
-        while(ctx.zhans.size() > 3)
+        while(ctx.getZhans().size() > 3)
         {
             ctx.shuffleZhans();
-            if(ctx.zhans.get(0) == ctx.getActualRoleIndex(1)) continue;
-            ctx.setSkillTarget(ctx.zhans.get(0), 1, 0);
-            ctx.nonHumanPlan[ctx.zhans.get(0)] = 0;
-            ctx.zhans.remove(0);
+            int removed = ctx.getZhans().get(0);
+            if(removed == ctx.getActualRoleIndex(1)) continue;
+            ctx.setSkillTarget(removed, 1, 0);
+            ctx.nonHumanPlan[removed] = 0;
+            ctx.removeClaimCandidate(1, removed);
         }
     }
 
     private void processBlackBallCOSecondary(List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：黑球占co时机");
-        for (int zhan : ctx.zhans) coManager.processActualCo(zhan, 1, diebody);
-        for (int ling : ctx.lings) coManager.processActualCo(ling, 2, diebody);
+        for (int zhan : ctx.getZhans()) coManager.processActualCo(zhan, 1, diebody);
+        for (int ling : ctx.getLings()) coManager.processActualCo(ling, 2, diebody);
     }
 
     /**
@@ -437,7 +438,7 @@ public class NonHumanCoordinator
         }
 
         // 裁剪占CO（最多4人）
-        while(ctx.zhans.size() + rezhan > 4 && !c.response.isEmpty())
+        while(ctx.getZhans().size() + rezhan > 4 && !c.response.isEmpty())
         {
             c.response = GameLogicUtils.shuffleList(c.response);
             if(c.response.get(0).second() == 1 && c.response.get(0).first() != ctx.getActualRoleIndex(1))
@@ -449,7 +450,7 @@ public class NonHumanCoordinator
         }
 
         // 裁剪灵CO（最多3人）
-        while(ctx.lings.size() + reling > 3 && !c.response.isEmpty())
+        while(ctx.getLings().size() + reling > 3 && !c.response.isEmpty())
         {
             c.response = GameLogicUtils.shuffleList(c.response);
             if(c.response.get(0).second() == 2 && c.response.get(0).first() != ctx.getActualRoleIndex(2))
@@ -465,8 +466,8 @@ public class NonHumanCoordinator
             int respPlayer = c.response.get(i).first();
             int role = c.response.get(i).second();
             boolean alreadyProcessed = false;
-            if(role == 1 && ctx.zhans.contains(respPlayer)) alreadyProcessed = true;
-            if(role == 2 && ctx.lings.contains(respPlayer)) alreadyProcessed = true;
+            if(role == 1 && ctx.getZhans().contains(respPlayer)) alreadyProcessed = true;
+            if(role == 2 && ctx.getLings().contains(respPlayer)) alreadyProcessed = true;
 
             ctx.addLazySuspicionValue(respPlayer, GameConstants.SUSPICION_INCREASE_BLACK_RESPONSE);
             if(!alreadyProcessed)
@@ -489,18 +490,18 @@ public class NonHumanCoordinator
                 else if(ctx.getActualRole(i) == 2 || ctx.nonHumanPlan[i] == 2) c.jhling++;
             }
         }
-        while(ctx.zhans.size() + c.jhzhan > 5 || ctx.lings.size() + c.jhling > 4)
+        while(ctx.getZhans().size() + c.jhzhan > 5 || ctx.getLings().size() + c.jhling > 4)
         {
             int target = ConstNum.randomInt(1, n);
             if(ctx.getClaimedRole(target) == 0 && ctx.nonHumanPlan[target] > 0 && ctx.nonHumanPlan[target] < 3)
             {
-                if(ctx.zhans.size() + c.jhzhan > 5 && ctx.nonHumanPlan[target] == 1)
+                if(ctx.getZhans().size() + c.jhzhan > 5 && ctx.nonHumanPlan[target] == 1)
                 {
                     c.jhzhan--;
                     ctx.nonHumanPlan[target] = 0;
                     ctx.setSkillTarget(target, 1, 0);
                 }
-                else if(ctx.lings.size() + c.jhling > 4 && ctx.nonHumanPlan[target] == 2)
+                else if(ctx.getLings().size() + c.jhling > 4 && ctx.nonHumanPlan[target] == 2)
                 {
                     c.jhling--;
                     ctx.nonHumanPlan[target] = 0;
@@ -511,7 +512,7 @@ public class NonHumanCoordinator
 
     private void executeWhiteBallCOConditional(NormalScenarioContext c, List<Integer> diebody)
     {
-        if(ctx.zhans.size() == 0 || c.response.size() > 0 || c.gqian || c.havecatco)
+        if(ctx.getZhans().isEmpty() || c.response.size() > 0 || c.gqian || c.havecatco)
         {
             DebugLogger.log("非人的初始工作：白球占、灵能co");
             for(int i=1;i<=c.n;i++)
@@ -538,7 +539,7 @@ public class NonHumanCoordinator
         c.response.clear();
     }
 
-    private void handleCurseKillScenario(List<Integer> diebody, int gd)
+    private void handleCurseKillScenario(List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：明确咒杀");
         DebugLogger.log("非人的初始工作：人狼上占");
@@ -549,14 +550,14 @@ public class NonHumanCoordinator
             if(diebody.contains(ctx.zw[ctx.rlindex[i]]))
             {
                 haverl = true;
-                ctx.zhans.add(ctx.rlindex[i]);
+                ctx.addClaimCandidate(1, ctx.rlindex[i]);
                 ctx.setSkillTarget(ctx.rlindex[i], 1, ctx.zw[ctx.rlindex[i]]);
                 continue;
             }
             if(diebody.contains(ctx.getYBZW(ctx.rlindex[i])))
             {
                 haverl = true;
-                ctx.zhans.add(ctx.rlindex[i]);
+                ctx.addClaimCandidate(1, ctx.rlindex[i]);
                 ctx.setSkillTarget(ctx.rlindex[i], 1, ctx.getYBZW(ctx.rlindex[i]));
                 continue;
             }
@@ -570,7 +571,7 @@ public class NonHumanCoordinator
                 if(diebody.contains(ctx.getYBZW(ctx.rlindex[i])))
                 {
                     haverl = true;
-                    ctx.zhans.add(ctx.rlindex[i]);
+                    ctx.addClaimCandidate(1, ctx.rlindex[i]);
                     ctx.setSkillTarget(ctx.rlindex[i], 1, ctx.getYBZW(ctx.rlindex[i]));
                     ctx.nonHumanPlan[ctx.rlindex[i]] = 1;
                 }
@@ -583,53 +584,49 @@ public class NonHumanCoordinator
         {
             ctx.nonHumanPlan[leader] = 1;
             ctx.setSkillTarget(leader, 1, ctx.getYBZW(leader));
-            ctx.zhans.add(leader);
+            ctx.addClaimCandidate(1, leader);
         }
         else if(ctx.nonHumanPlan[leader] == 1)
             ctx.nonHumanPlan[leader] = 0;
         DebugLogger.log("非人的初始工作：真占co");
         if(ctx.isAlive(ctx.getActualRoleIndex(1)))
-            ctx.zhans.add(ctx.getActualRoleIndex(1));
+            ctx.addClaimCandidate(1, ctx.getActualRoleIndex(1));
         DebugLogger.log("非人的初始工作：占文随机排序");
         ctx.shuffleZhans();
-        for(int i=0;i<ctx.zhans.size();i++)
+        for(int i=0;i<ctx.getZhans().size();i++)
         {
-            ctx.eventarray.add(new Event(EventName.zs14,ctx.getCharacterName(ctx.zhans.get(i)),
-                    ctx.getCharacterName(ctx.getSkillTarget(ctx.zhans.get(i), 1))));
-            ctx.setClaimedRole(ctx.zhans.get(i), 1);
-            if(ctx.getClaimedRoleOrder(ctx.zhans.get(i)) == 0)
-                ctx.setClaimedRoleOrder(ctx.zhans.get(i), ctx.incrementClaimedRoleOrder(1));
-            ctx.setComingOutDay(ctx.zhans.get(i), gd);
-            ctx.addLazySuspicionValue(ctx.zhans.get(i), GameConstants.SUSPICION_DECREASE_SEER_CO);
+            int zhan = ctx.getZhans().get(i);
+            ctx.eventarray.add(new Event(EventName.zs14,ctx.getCharacterName(zhan),
+                    ctx.getCharacterName(ctx.getSkillTarget(zhan, 1))));
+            ctx.registerClaim(zhan, 1);
+            ctx.addLazySuspicionValue(zhan, GameConstants.SUSPICION_DECREASE_SEER_CO);
             for(int j=0;j<i;j++)
-                suspicion.updateTop3Aux2(ctx.zhans.get(i),ctx.zhans.get(j),GameConstants.INF,GameConstants.INF);
+                suspicion.updateTop3Aux2(zhan,ctx.getZhans().get(j),GameConstants.INF,GameConstants.INF);
         }
         DebugLogger.log("非人的初始工作：灵能co");
         DebugLogger.log("非人的初始工作：遍历每个人狼，判断是否有计划上灵的人狼");
         for(int i=1;i<=ctx.initialWolfCount;i++)
         {
             if(ctx.nonHumanPlan[ctx.rlindex[i]] != 2) continue;
-            ctx.lings.add(ctx.rlindex[i]);
+            ctx.addClaimCandidate(2, ctx.rlindex[i]);
             break;
         }
         DebugLogger.log("非人的初始工作：狂灵信灵");
         if(ctx.getNonHumanLeader() > 0 && ctx.isAlive(ctx.getNonHumanLeader()) && ctx.nonHumanPlan[ctx.getNonHumanLeader()] == 2)
-            ctx.lings.add(ctx.getNonHumanLeader());
+            ctx.addClaimCandidate(2, ctx.getNonHumanLeader());
         DebugLogger.log("非人的初始工作：真灵");
         if(ctx.isAlive(ctx.getActualRoleIndex(2)))
-            ctx.lings.add(ctx.getActualRoleIndex(2));
+            ctx.addClaimCandidate(2, ctx.getActualRoleIndex(2));
         DebugLogger.log("非人的初始工作：灵能随机排序");
         ctx.shuffleLings();
-        for(int i=0;i<ctx.lings.size();i++)
+        for(int i=0;i<ctx.getLings().size();i++)
         {
-            eventGenerator.addEvent(EventName.lnco18, ctx.lings.get(i));
-            ctx.setClaimedRole(ctx.lings.get(i), 2);
-            if(ctx.getClaimedRoleOrder(ctx.lings.get(i)) == 0)
-                ctx.setClaimedRoleOrder(ctx.lings.get(i), ctx.incrementClaimedRoleOrder(2));
-            ctx.setComingOutDay(ctx.lings.get(i), gd);
-            ctx.addLazySuspicionValue(ctx.lings.get(i), GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
+            int ling = ctx.getLings().get(i);
+            eventGenerator.addEvent(EventName.lnco18, ling);
+            ctx.registerClaim(ling, 2);
+            ctx.addLazySuspicionValue(ling, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
             for(int j=0;j<i;j++)
-                suspicion.updateTop3Aux2(ctx.lings.get(i),ctx.lings.get(j),GameConstants.INF,GameConstants.INF);
+                suspicion.updateTop3Aux2(ling,ctx.getLings().get(j),GameConstants.INF,GameConstants.INF);
         }
         DebugLogger.log("非人的初始工作：共逻辑");
         gylogic.run();
@@ -643,32 +640,32 @@ public class NonHumanCoordinator
             if(ctx.isDead(ctx.rlindex[i])) continue;
             if(ctx.nonHumanPlan[ctx.rlindex[i]] == 1)
             {
-                ctx.zhans.add(ctx.rlindex[i]);
+                ctx.addClaimCandidate(1, ctx.rlindex[i]);
                 ctx.setSkillTarget(ctx.rlindex[i], 1, ctx.zw[ctx.rlindex[i]]);
             }
         }
         DebugLogger.log("非人的初始工作：狂占信占");
         if(ctx.getNonHumanLeader() > 0 && ctx.nonHumanPlan[ctx.getNonHumanLeader()] == 1)
         {
-            ctx.zhans.add(ctx.getNonHumanLeader());
+            ctx.addClaimCandidate(1, ctx.getNonHumanLeader());
             ctx.setSkillTarget(ctx.getNonHumanLeader(), 1, ctx.zw[ctx.getNonHumanLeader()]);
         }
         DebugLogger.log("非人的初始工作：狐占");
         if(ctx.getFox() > 0 && ctx.nonHumanPlan[ctx.getFox()] == 1)
         {
-            ctx.zhans.add(ctx.getFox());
+            ctx.addClaimCandidate(1, ctx.getFox());
             ctx.setSkillTarget(ctx.getFox(), 1, ctx.zw[ctx.getFox()]);
         }
         DebugLogger.log("非人的初始工作：背占");
         if(ctx.getDeviant() > 0 && ctx.nonHumanPlan[ctx.getDeviant()] == 1)
         {
-            ctx.zhans.add(ctx.getDeviant());
+            ctx.addClaimCandidate(1, ctx.getDeviant());
             ctx.setSkillTarget(ctx.getDeviant(), 1, ctx.zw[ctx.getDeviant()]);
         }
         DebugLogger.log("非人的初始工作：真占");
         if(ctx.isAlive(ctx.getActualRoleIndex(1)))
         {
-            ctx.zhans.add(ctx.getActualRoleIndex(1));
+            ctx.addClaimCandidate(1, ctx.getActualRoleIndex(1));
         }
     }
 
@@ -680,29 +677,29 @@ public class NonHumanCoordinator
             if(ctx.isDead(ctx.rlindex[i])) continue;
             if(ctx.nonHumanPlan[ctx.rlindex[i]] == 2)
             {
-                ctx.lings.add(ctx.rlindex[i]);
+                ctx.addClaimCandidate(2, ctx.rlindex[i]);
                 break;
             }
         }
         DebugLogger.log("非人的初始工作：狂灵信灵");
         if(ctx.getNonHumanLeader() > 0 && ctx.isAlive(ctx.getNonHumanLeader()) && ctx.nonHumanPlan[ctx.getNonHumanLeader()] == 2)
         {
-            ctx.lings.add(ctx.getNonHumanLeader());
+            ctx.addClaimCandidate(2, ctx.getNonHumanLeader());
         }
         DebugLogger.log("非人的初始工作：狐灵");
         if(ctx.getFox() > 0 && ctx.nonHumanPlan[ctx.getFox()] == 2)
         {
-            ctx.lings.add(ctx.getFox());
+            ctx.addClaimCandidate(2, ctx.getFox());
         }
         DebugLogger.log("非人的初始工作：背灵");
         if(ctx.getDeviant() > 0 && ctx.nonHumanPlan[ctx.getDeviant()] == 2)
         {
-            ctx.lings.add(ctx.getDeviant());
+            ctx.addClaimCandidate(2, ctx.getDeviant());
         }
         DebugLogger.log("非人的初始工作：真灵");
         if(ctx.isAlive(ctx.getActualRoleIndex(2)))
         {
-            ctx.lings.add(ctx.getActualRoleIndex(2));
+            ctx.addClaimCandidate(2, ctx.getActualRoleIndex(2));
         }
     }
 
@@ -710,9 +707,9 @@ public class NonHumanCoordinator
     {
         boolean morelzll = false,morelmll = false;
         ArrayList<Integer> bplayers = new ArrayList<>();
-        for(int i=0;i<ctx.zhans.size();i++)
+        for(int i=0;i<ctx.getZhans().size();i++)
         {
-            int zhan = ctx.zhans.get(i);
+            int zhan = ctx.getZhans().get(i);
             if(ctx.getSkillTarget(zhan,1) <= n) continue;
             int bplayer = ctx.getSkillTarget(zhan,1) - n;
             if(!bplayers.contains(bplayer))
@@ -752,7 +749,7 @@ public class NonHumanCoordinator
                     {
                         lmlweight = 0;
                     }
-                    if(ctx.getPeiyi() == peiyi.jianyi && (ctx.zhans.contains(ctx.rlindex[1]) || ctx.zhans.contains(ctx.rlindex[2])))
+                    if(ctx.getPeiyi() == peiyi.jianyi && (ctx.getZhans().contains(ctx.rlindex[1]) || ctx.getZhans().contains(ctx.rlindex[2])))
                     {
                         lzweight = 0;
                         llweight = 0;
@@ -776,7 +773,7 @@ public class NonHumanCoordinator
                             }
                             break;
                         case 2:
-                            ctx.nonHumanPlan[bplayer] = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50 + 50 * ctx.lies.size(),50+50 * ctx.maos.size()))) * 2;
+                            ctx.nonHumanPlan[bplayer] = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50 + 50 * ctx.getLies().size(),50+50 * ctx.getMaos().size()))) * 2;
                         if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut())
                             ctx.nonHumanPlan[bplayer] = 3;
                         if(ctx.nonHumanPlan[bplayer] == 5)
@@ -810,7 +807,7 @@ public class NonHumanCoordinator
                         response.add(new IntPair(bplayer,2));
                         break;
                     case 2:
-                        ctx.nonHumanPlan[bplayer] = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50 + 50 * ctx.lies.size(),50+50 * ctx.maos.size()))) * 2;
+                        ctx.nonHumanPlan[bplayer] = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50 + 50 * ctx.getLies().size(),50+50 * ctx.getMaos().size()))) * 2;
                         if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut())
                             ctx.nonHumanPlan[bplayer] = 3;
                         if(ctx.nonHumanPlan[bplayer] == 5)

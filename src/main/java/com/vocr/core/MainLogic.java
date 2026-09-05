@@ -197,7 +197,7 @@ public class MainLogic implements MainLogicInterface
         DebugLogger.log("死体逻辑结果：");
         feirenInitial();//非人的初始工作 + 第一天的进行（占灵共co）
         DebugLogger.log("非人的初始工作结果：");
-        suspicion.updateTop3SuspectedPlayers(ctx.zhans, ctx.lings, ctx.lies);//更新怀疑度
+        suspicion.updateTop3SuspectedPlayers(ctx.getZhans(), ctx.getLings(), ctx.getLies());//更新怀疑度
         executionManager.recordReplayDailySnapshot(ctx.getGameDay());
         DebugLogger.log("目前总人数：" + ctx.getPlayerSum());
     }
@@ -244,7 +244,7 @@ public class MainLogic implements MainLogicInterface
         //8，白天起身逻辑
         dayaction();
         //9,更新怀疑度
-        suspicion.updateTop3SuspectedPlayers(ctx.zhans, ctx.lings, ctx.lies);
+        suspicion.updateTop3SuspectedPlayers(ctx.getZhans(), ctx.getLings(), ctx.getLies());
     }
 
     private void frlying()

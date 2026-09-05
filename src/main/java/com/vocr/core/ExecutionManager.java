@@ -78,15 +78,15 @@ public class ExecutionManager
     
     private void logSkillSchedule(int n, int gd)
     {
-        for(int i=0;i<ctx.zhans.size();i++)
+        for(int i=0;i<ctx.getZhans().size();i++)
         {
-            int zhan = ctx.zhans.get(i);
+            int zhan = ctx.getZhans().get(i);
             DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("占卜师候补编号：" + ctx.getClaimedRoleOrder(zhan) + "预告情况：",
                     n, gd, ctx.getClaimedRoleScheduledSkillTargets(zhan)));
         }
-        for (int i = 0; i < ctx.lies.size(); i++)
+        for (int i = 0; i < ctx.getLies().size(); i++)
         {
-            int lie = ctx.lies.get(i);
+            int lie = ctx.getLies().get(i);
             DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("猎人候补编号：" + ctx.getClaimedRoleOrder(lie) + "指定护卫情况：",
                     n, gd, ctx.getClaimedRoleScheduledSkillTargets(lie)));
         }
@@ -107,9 +107,9 @@ public class ExecutionManager
                     votable[i] = true;
                 }
             }
-            for(int i=0;i<ctx.zhans.size();i++)
+            for(int i=0;i<ctx.getZhans().size();i++)
             {
-                int zhan = ctx.zhans.get(i);
+                int zhan = ctx.getZhans().get(i);
                 for(int j=1;j<gd;j++)
                 {
                     int target = ctx.getSkillTarget(zhan, j);
@@ -197,8 +197,7 @@ public class ExecutionManager
         {
             if(ctx.getClaimedRole(topnum) != 5)
             {
-                ctx.setClaimedRole(topnum, 5);
-                ctx.setComingOutDay(topnum, gd + 1);
+                ctx.revealClaim(topnum, 5, gd + 1);
             }
             int[] mztarget = new int[n + 1];
             for(int i=1;i<=n;i++)
@@ -246,7 +245,7 @@ public class ExecutionManager
             if(ctx.getActualRole(num) == 4)
             {
                 eventGenerator.addEvent(EventName.hbg, num);
-                ctx.setClaimedRole(num, 4);
+                ctx.revealClaim(num, 4, ctx.getGameDay());
                 continue;
             }
             if(ctx.getClaimedRole(num) != 0) continue;
@@ -257,15 +256,15 @@ public class ExecutionManager
                     coManager.processActualCo(num,ctx.getActualRole(num),ctx.getDiebody());
                     continue;
                 }
-                if(ctx.nonHumanPlan[num] != 0 && ctx.nonHumanPlan[num] != 4 && ctx.claimedRoleaskday[ctx.nonHumanPlan[num]] == 0)
+                if(ctx.nonHumanPlan[num] != 0 && ctx.nonHumanPlan[num] != 4 && ctx.getClaimedRoleAskDay(ctx.nonHumanPlan[num]) == 0)
                 {
-                    if(ctx.claimedRoleaskday[ctx.nonHumanPlan[num]] == 0)
+                    if(ctx.getClaimedRoleAskDay(ctx.nonHumanPlan[num]) == 0)
                         coManager.processActualCo(num,ctx.nonHumanPlan[num],ctx.getDiebody());
                     else
                         ctx.nonHumanPlan[num] = 0;
                     continue;
                 }
-                if(ctx.claimedRoleaskday[3] == 0  || ctx.claimedRoleaskday[5] == 0)
+                if(ctx.getClaimedRoleAskDay(3) == 0  || ctx.getClaimedRoleAskDay(5) == 0)
                     switch (ctx.getActualRole(num))
                     {
                         case 7:

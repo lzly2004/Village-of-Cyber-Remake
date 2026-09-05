@@ -100,9 +100,9 @@ public class DielogicCarrier
 
     private void exposeFakeSeersByDeath(ArrayList<Integer> diebody)
     {
-        for (int i = 0; i < ctx.zhans.size(); i++)
+        for (int i = 0; i < ctx.getZhans().size(); i++)
         {
-            int zhan = ctx.zhans.get(i);
+            int zhan = ctx.getZhans().get(i);
             if (zhan == ctx.getActualRoleIndex(1)) continue;
             for (int j = 1; j <= ctx.getGameDay(); j++)
             {

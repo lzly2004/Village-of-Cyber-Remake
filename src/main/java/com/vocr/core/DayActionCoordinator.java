@@ -63,8 +63,8 @@ public class DayActionCoordinator
 
     private void presentDivinationResults(List<Integer> diebody)
     {
-        for (int zhan : ctx.zhans) resultPresenter.presentZhan(zhan, diebody);
-        for (int ling : ctx.lings) resultPresenter.presentLing(ling);
+        for (int zhan : ctx.getZhans()) resultPresenter.presentZhan(zhan, diebody);
+        for (int ling : ctx.getLings()) resultPresenter.presentLing(ling);
     }
 
     private void handleLatentSeerMediumCO(List<Integer> diebody)
@@ -84,10 +84,8 @@ public class DayActionCoordinator
                 {
                     coManager.processActualCo(i,1,diebody);
                 }
-                if(ctx.claimedRoleaskday[1] == 0)
-                    ctx.claimedRoleaskday[1] = 3;
-                if(ctx.claimedRoleaskday[2] == 0)
-                    ctx.claimedRoleaskday[2] = 3;
+                ctx.tryRecordClaimRequest(1, 3);
+                ctx.tryRecordClaimRequest(2, 3);
             }
     }
 
@@ -112,11 +110,11 @@ public class DayActionCoordinator
         int gd = ctx.getGameDay();
         boolean havecatco = false;
 
-        if(ctx.claimedRoleaskday[3] == 0 || (ctx.getCat() != 0 && ctx.claimedRoleaskday[5] == 0))
+        if(ctx.getClaimedRoleAskDay(3) == 0 || (ctx.getCat() != 0 && ctx.getClaimedRoleAskDay(5) == 0))
         {
-            for(int i=0;i<ctx.zhans.size();i++)
+            for(int i=0;i<ctx.getZhans().size();i++)
             {
-                int zhan = ctx.zhans.get(i);
+                int zhan = ctx.getZhans().get(i);
                 if(ctx.isBlackResult(ctx.getSkillTarget(zhan, gd - 1)))
                 {
                     int target = ctx.getSkillTarget(zhan, gd - 1) - n;
@@ -137,9 +135,9 @@ public class DayActionCoordinator
                     int maolieIdx = zhi == 7 ? 0 : zhi - 7;
                     if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(maolieIdx,1,coManager.getp1(zhi),coManager.getp2(zhi))))
                     {
-                        int lweight = 50+50*ctx.maos.size(),mweight = 50 + 50*ctx.lies.size();
-                        if((zhi == 7 && ctx.rlsl) || ctx.claimedRoleaskday[3] != 0) lweight = 0;
-                        if((zhi == 7 && ctx.rlsm) || ctx.getCat() == 0 || ctx.isCatDefinitivelyOut() || ctx.claimedRoleaskday[5] != 0) mweight = 0;
+                        int lweight = 50+50*ctx.getMaos().size(),mweight = 50 + 50*ctx.getLies().size();
+                        if((zhi == 7 && ctx.isWolfClaimedHunter()) || ctx.getClaimedRoleAskDay(3) != 0) lweight = 0;
+                        if((zhi == 7 && ctx.isWolfClaimedCat()) || ctx.getCat() == 0 || ctx.isCatDefinitivelyOut() || ctx.getClaimedRoleAskDay(5) != 0) mweight = 0;
                         if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
                         else
                         {
@@ -147,9 +145,9 @@ public class DayActionCoordinator
                             if(ctx.nonHumanPlan[target] == 5)
                             {
                                 response.add(new IntPair(target,5));havecatco = true;
-                                if(zhi == 7) ctx.rlsm = true;
+                                if(zhi == 7) ctx.markWolfClaimedRole(5);
                             }
-                            else if(zhi == 7) ctx.rlsl = true;
+                            else if(zhi == 7) ctx.markWolfClaimedRole(3);
                         }
                     }
                     else if(zhi == 7)

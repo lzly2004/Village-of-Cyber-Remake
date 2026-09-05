@@ -74,18 +74,13 @@ public class COManager
 
         DebugLogger.log("进入役职co:num,zhi:" + num + "," + zhi + ",初日技能情况：" + ctx.getSkillTarget(num, 1));
         if (ctx.getPeiyi() != peiyi.daxing && ctx.getPeiyi() != peiyi.maoyou && zhi == 5) return;
-        if (ctx.getClaimedRole(num) != zhi)
-        {
-            ctx.setClaimedRole(num, zhi);
-            ctx.setComingOutDay(num, gd);
-        }
         switch (zhi)
         {
             case 1:
             {
-                for (int i = 0; i < ctx.zhans.size(); i++)
+                for (int i = 0; i < ctx.getZhans().size(); i++)
                 {
-                    suspicion.updateTop3Aux2(num, ctx.zhans.get(i), GameConstants.INF, GameConstants.INF);
+                    suspicion.updateTop3Aux2(num, ctx.getZhans().get(i), GameConstants.INF, GameConstants.INF);
                 }
                 if (gd == 3 && ctx.getActualRole(num) > 6 && ctx.isBlackResult(ctx.getSkillTarget(num, 1))
                         && ctx.getDiePlayerNum(whyDie.beiyao, 2) == ctx.getSkillTarget(num, 1) - ctx.getPlayerSum())
@@ -95,35 +90,30 @@ public class COManager
                     else if (ctx.getYBZW(num) == ctx.getSkillTarget(num, 1) && ctx.zw[num] > 0)
                         ctx.setSkillTarget(num, 1, ctx.zw[num]);
                 }
-                for (int i = 0; i < ctx.lings.size(); i++)
+                for (int i = 0; i < ctx.getLings().size(); i++)
                 {
                     for (int j = 1; j <= gd; j++)
                         for (int k = 2; k <= gd; k++)
                         {
-                            if (ctx.getSuspicionValue(num, ctx.lings.get(i)) <= GameConstants.INFJ
-                                    && Math.abs(ctx.getSkillTarget(ctx.lings.get(i), k)
+                            if (ctx.getSuspicionValue(num, ctx.getLings().get(i)) <= GameConstants.INFJ
+                                    && Math.abs(ctx.getSkillTarget(ctx.getLings().get(i), k)
                                     - ctx.getSkillTarget(num, j)) == gd)
                             {
                                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_CONFLICT);
-                                ctx.addLazySuspicionValue(ctx.lings.get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
-                                suspicion.updateTop3Aux2(num, ctx.lings.get(i), GameConstants.INF, GameConstants.INF);
-                                ctx.lined[num][ctx.lings.get(i)] = 0;
+                                ctx.addLazySuspicionValue(ctx.getLings().get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
+                                suspicion.updateTop3Aux2(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
+                                ctx.lined[num][ctx.getLings().get(i)] = 0;
                             }
-                            else if (ctx.getSuspicionValue(num, ctx.lings.get(i)) <= GameConstants.INFJ
-                                    && ctx.getSkillTarget(ctx.lings.get(i), k) == ctx.getSkillTarget(num, j)
+                            else if (ctx.getSuspicionValue(num, ctx.getLings().get(i)) <= GameConstants.INFJ
+                                    && ctx.getSkillTarget(ctx.getLings().get(i), k) == ctx.getSkillTarget(num, j)
                                     && ctx.isBlackResult(ctx.getSkillTarget(num, j)))
                             {
-                                suspicion.updateTop3Aux2(num, ctx.lings.get(i), -10, -10);
-                                ctx.lined[num][ctx.lings.get(i)] = 1;
+                                suspicion.updateTop3Aux2(num, ctx.getLings().get(i), -10, -10);
+                                ctx.lined[num][ctx.getLings().get(i)] = 1;
                             }
                         }
                 }
-                if (ctx.getClaimedRoleOrder(num) == 0)
-                {
-                    ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(1));
-                }
-                if (!ctx.zhans.contains(num))
-                    ctx.zhans.add(num);
+                ctx.registerClaim(num, 1);
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_SEER_CO);
                 if (gd > 2)
                     ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_LATE_CO);
@@ -156,16 +146,11 @@ public class COManager
             }
             case 2:
             {
-                for (int i = 0; i < ctx.lings.size(); i++)
+                for (int i = 0; i < ctx.getLings().size(); i++)
                 {
-                    suspicion.updateTop3Aux2(num, ctx.lings.get(i), GameConstants.INF, GameConstants.INF);
+                    suspicion.updateTop3Aux2(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
                 }
-                if (!ctx.lings.contains(num))
-                {
-                    ctx.lings.add(num);
-                }
-                if (ctx.getClaimedRoleOrder(num) == 0)
-                    ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(2));
+                ctx.registerClaim(num, 2);
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 if (gd == 2)
                 {
@@ -180,18 +165,11 @@ public class COManager
                 break;
             }
             case 3:
-                for (int i = 0; i < ctx.lies.size(); i++)
-                    suspicion.updateTop3Aux2(ctx.lies.get(i), num, GameConstants.INF, GameConstants.INF);
-                if (!ctx.lies.contains(num))
-                {
-                    ctx.lies.add(num);
-                }
-                if (ctx.getClaimedRoleOrder(num) == 0)
-                    ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(3));
+                for (int i = 0; i < ctx.getLies().size(); i++)
+                    suspicion.updateTop3Aux2(ctx.getLies().get(i), num, GameConstants.INF, GameConstants.INF);
+                ctx.registerClaim(num, 3);
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 eventGenerator.addEvent(EventName.lrco, num);
-                if (ctx.getActualRole(num) == 7)
-                    ctx.rlsl = true;
                 if (ctx.getActualRole(num) != 3)
                 {
                     for (int j = 2; j < gd; j++)
@@ -206,33 +184,25 @@ public class COManager
                 break;
             case 4:
             {
+                ctx.registerClaim(num, 4);
                 int gy = 1;
                 if (ctx.gyindex[2] == num) gy = 2;
                 ctx.addLazySuspicionValue(num, -GameConstants.INF);
                 eventGenerator.addEvent(EventName.qfjc5, num, ctx.gyindex[3 - gy]);
                 eventGenerator.addEvent(EventName.qfjcqr5r, ctx.gyindex[3 - gy], num);
                 if (ctx.getClaimedRole(ctx.gyindex[3 - gy]) != zhi)
-                {
-                    ctx.setClaimedRole(ctx.gyindex[3 - gy], zhi);
-                    ctx.setComingOutDay(ctx.gyindex[3 - gy], gd);
-                }
+                    ctx.revealClaim(ctx.gyindex[3 - gy], zhi, gd);
                 break;
             }
             case 5:
-                for (int i = 0; i < ctx.maos.size(); i++)
-                    suspicion.updateTop3Aux2(ctx.maos.get(i), num, GameConstants.INF, GameConstants.INF);
-                if (!ctx.maos.contains(num))
-                {
-                    ctx.maos.add(num);
-                }
-                if (ctx.getClaimedRoleOrder(num) == 0)
-                    ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(5));
+                for (int i = 0; i < ctx.getMaos().size(); i++)
+                    suspicion.updateTop3Aux2(ctx.getMaos().get(i), num, GameConstants.INF, GameConstants.INF);
+                ctx.registerClaim(num, 5);
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 eventGenerator.addEvent(EventName.mco, num);
-                if (ctx.getActualRole(num) == 7)
-                    ctx.rlsm = true;
                 break;
             case 6:
+                ctx.registerClaim(num, 6);
                 break;
         }
         DebugLogger.log("退出役职co");
@@ -244,11 +214,8 @@ public class COManager
         int gd = ctx.getGameDay();
         DebugLogger.log("询问职业：" + aclaimedRole);
         int zhi = aclaimedRole.ordinal();
-        if (ctx.claimedRoleaskday[zhi] != 0)
-        {
+        if (!ctx.tryRecordClaimRequest(zhi, gd))
             return;
-        }
-        ctx.claimedRoleaskday[zhi] = gd;
         if (zhi > 3 && zhi < 6)
         {
             if (ctx.getPeiyi() == peiyi.jianyi) return;
@@ -267,7 +234,7 @@ public class COManager
             if (ctx.isDoubleDeathOccurred(gd - 1) && ctx.getDeathReason(ctx.actualRoleindex[5]) != whyDie.NONE)
             {
                 boolean canclaim = false;
-                if (gd == 3 && ctx.claimedRoleaskday[1] != 2)
+                if (gd == 3 && ctx.getClaimedRoleAskDay(1) != 2)
                 {
                     boolean have_yugao = false;
                     for (int i = 1; i <= n; i++)
@@ -280,9 +247,9 @@ public class COManager
                         }
                     }
                 }
-                for (int i = 0; i < ctx.zhans.size(); i++)
+                for (int i = 0; i < ctx.getZhans().size(); i++)
                 {
-                    int zhan = ctx.zhans.get(i);
+                    int zhan = ctx.getZhans().get(i);
                     if (ctx.isNonHumanMarked(zhan)) continue;
                     if (ctx.isAlive(zhan))
                     {
@@ -329,16 +296,13 @@ public class COManager
             switch (ctx.getActualRole(i))
             {
                 case 7:
-                    if (zhi == 3 && ctx.rlsl) break;
-                    if (zhi == 5 && ctx.rlsm) break;
+                    if (zhi == 3 && ctx.isWolfClaimedHunter()) break;
+                    if (zhi == 5 && ctx.isWolfClaimedCat()) break;
                     int probability = probabilityCalculator.maolieco(0, 3, getp1(7), getp2(7));
                     if (GameLogicUtils.probabilityJudge(probability))
                     {
                         response.add(new IntPair(i, zhi));
-                        if (zhi == 3)
-                            ctx.rlsl = true;
-                        else
-                            ctx.rlsm = true;
+                        ctx.markWolfClaimedRole(zhi);
                     }
                     break;
                 default:
@@ -383,7 +347,7 @@ public class COManager
                 switch (ctx.getActualRole(num))
                 {
                     case 7:
-                        if (ctx.rlsl && ctx.rlsm)
+                        if (ctx.isWolfClaimedHunter() && ctx.isWolfClaimedCat())
                         {
                             response.add(new IntPair(num, 6));
                             break;
@@ -394,28 +358,28 @@ public class COManager
                             response.add(new IntPair(num, 6));
                             break;
                         }
-                        if (ctx.rlsl)
+                        if (ctx.isWolfClaimedHunter())
                         {
                             // 如果猫又已明确出局，不能CO猫
                             if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
                                 response.add(new IntPair(num, 5));
                             else
                                 response.add(new IntPair(num, 6));
-                            ctx.rlsm = true;
+                            ctx.markWolfClaimedRole(5);
                             break;
                         }
-                        if (ctx.rlsm)
+                        if (ctx.isWolfClaimedCat())
                         {
                             response.add(new IntPair(num, 3));
-                            ctx.rlsl = true;
+                            ctx.markWolfClaimedRole(3);
                             break;
                         }
                         option = 0;
                         // 如果猫又已明确出局，不能CO猫
                         if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
                             option = GameLogicUtils.getEventIndexByProbability(
-                                    new ArrayList<>(List.of(50 + 50 * ctx.maos.size(),
-                                            50 + 50 * ctx.lies.size())));
+                                    new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
+                                            50 + 50 * ctx.getLies().size())));
                         response.add(new IntPair(num, 3 + 2 * option));
                         break;
                     case 8:
@@ -433,8 +397,8 @@ public class COManager
                         // 如果猫又已明确出局，不能CO猫
                         if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
                             option = GameLogicUtils.getEventIndexByProbability(
-                                    new ArrayList<>(List.of(50 + 50 * ctx.maos.size(),
-                                            50 + 50 * ctx.lies.size())));
+                                    new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
+                                            50 + 50 * ctx.getLies().size())));
                         response.add(new IntPair(num, 3 + 2 * option));
                         break;
                 }
@@ -450,18 +414,18 @@ public class COManager
     {
         if (isHumanWolf)
         {
-            if ((ctx.actualRoleindex[3] < 1 || ctx.rlsl || ctx.claimedRoleaskday[3] > 0)
-                    && (ctx.actualRoleindex[5] < 1 || ctx.rlsm || ctx.claimedRoleaskday[5] > 0))
+            if ((ctx.actualRoleindex[3] < 1 || ctx.isWolfClaimedHunter() || ctx.getClaimedRoleAskDay(3) > 0)
+                    && (ctx.actualRoleindex[5] < 1 || ctx.isWolfClaimedCat() || ctx.getClaimedRoleAskDay(5) > 0))
                 return;
         }
         // 如果猫又已明确出局，不能CO猫
-        if (ctx.actualRoleindex[3] < 1 || (isHumanWolf && ctx.rlsl) || ctx.claimedRoleaskday[3] > 0
+        if (ctx.actualRoleindex[3] < 1 || (isHumanWolf && ctx.isWolfClaimedHunter()) || ctx.getClaimedRoleAskDay(3) > 0
                 || ctx.isCatDefinitivelyOut())
             processActualCo(num, 3, diebody);
-        else if (ctx.actualRoleindex[5] < 1 || (isHumanWolf && ctx.rlsm) || ctx.claimedRoleaskday[5] > 0)
+        else if (ctx.actualRoleindex[5] < 1 || (isHumanWolf && ctx.isWolfClaimedCat()) || ctx.getClaimedRoleAskDay(5) > 0)
             processActualCo(num, 3, diebody);
         else
             processActualCo(num, 3 + 2 * GameLogicUtils.getEventIndexByProbability(
-                    new ArrayList<>(List.of(50 + 50 * ctx.lies.size(), 50 + 50 * ctx.maos.size()))), diebody);
+                    new ArrayList<>(List.of(50 + 50 * ctx.getLies().size(), 50 + 50 * ctx.getMaos().size()))), diebody);
     }
 }

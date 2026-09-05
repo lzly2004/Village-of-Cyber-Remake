@@ -247,7 +247,7 @@ public class GameRecorder
         records.add(buildStateLine(day, gs.getPlayerSum(), i -> {
             GameCharacter gc = gs.gc[i];
             return String.format("%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d",
-                    i, gc.number, gc.actualRole, gc.claimedRole, gc.claimedRoleorder,
+                    i, gc.number, gc.actualRole, gc.getClaimedRole(), gc.getClaimedRoleOrder(),
                     gc.getDeathDay(), gc.getDeathReason().ordinal(), gc.nonHumanMarker);
         }));
     }

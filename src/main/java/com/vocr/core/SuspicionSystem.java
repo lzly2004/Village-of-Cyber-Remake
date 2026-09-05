@@ -3,6 +3,7 @@ package com.vocr.core;
 import com.vocr.config.GameConstants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 class SuspicionSystem
 {
@@ -153,9 +154,9 @@ class SuspicionSystem
         return maxIdx;
     }
 
-    public void updateTop3SuspectedPlayers(ArrayList<Integer> zhans,
-                                            ArrayList<Integer> lings,
-                                            ArrayList<Integer> lies)
+    public void updateTop3SuspectedPlayers(List<Integer> zhans,
+                                            List<Integer> lings,
+                                            List<Integer> lies)
     {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
@@ -166,8 +167,8 @@ class SuspicionSystem
         computeTop3SuspectedPlayers(n, gd);
     }
     
-    private void updateBaseSuspicion(int n, int gd, ArrayList<Integer> zhans,
-                                     ArrayList<Integer> lings, ArrayList<Integer> lies)
+    private void updateBaseSuspicion(int n, int gd, List<Integer> zhans,
+                                     List<Integer> lings, List<Integer> lies)
     {
         for (int i = 1; i <= n; i++)
         {
@@ -235,7 +236,7 @@ class SuspicionSystem
         }
     }
     
-    private void applyDivinationWhiteBallBonus(int n, int gd, ArrayList<Integer> zhans)
+    private void applyDivinationWhiteBallBonus(int n, int gd, List<Integer> zhans)
     {
         for (int i = 0; i < zhans.size(); i++)
         {

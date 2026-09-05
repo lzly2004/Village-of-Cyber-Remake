@@ -144,9 +144,9 @@ public class LingFabricator
     private void collectLingOptions(ArrayList<Integer> option, int num, int shokei, int n, int gd,
                                     java.util.function.Predicate<Integer> filter, boolean includeWhite)
     {
-        for (int i = 0; i < ctx.zhans.size(); i++)
+        for (int i = 0; i < ctx.getZhans().size(); i++)
         {
-            int zhan = ctx.zhans.get(i);
+            int zhan = ctx.getZhans().get(i);
             if (!filter.test(zhan)) continue;
             for (int j = 1; j < gd; j++)
             {

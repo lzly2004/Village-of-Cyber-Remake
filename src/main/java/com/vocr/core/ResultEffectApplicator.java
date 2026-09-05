@@ -53,16 +53,12 @@ public class ResultEffectApplicator
             {
                 ctx.addLazySuspicionValue(num, GameConstants.INF);
                 ctx.addLazySuspicionValue(target, -GameConstants.INF);
-                ctx.setClaimedRole(target, 4);
-                ctx.setComingOutDay(target, gd);
+                ctx.revealClaim(target, 4, gd);
                 ctx.markNonHuman(num);
                 int gy = 1;
                 if (ctx.gyindex[2] == target) gy = 2;
                 if (ctx.getClaimedRole(ctx.gyindex[3 - gy]) != 4)
-                {
-                    ctx.setClaimedRole(ctx.gyindex[3 - gy], 4);
-                    ctx.setComingOutDay(ctx.gyindex[3 - gy], gd);
-                }
+                    ctx.revealClaim(ctx.gyindex[3 - gy], 4, gd);
             }
         }
     }
@@ -72,16 +68,11 @@ public class ResultEffectApplicator
         int gd = ctx.getGameDay();
         if (ctx.getClaimedRole(num) != 2)
         {
-            ctx.setClaimedRole(num, 2);
-            ctx.setComingOutDay(num, gd);
-            if (ctx.getClaimedRoleOrder(num) == 0)
-                ctx.setClaimedRoleOrder(num, ctx.incrementClaimedRoleOrder(2));
-            for (int i = 0; i < ctx.lings.size(); i++)
+            for (int i = 0; i < ctx.getLings().size(); i++)
             {
-                suspicion.updateTop3Aux2(num, ctx.lings.get(i), GameConstants.INF, GameConstants.INF);
+                suspicion.updateTop3Aux2(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
             }
-            if (!ctx.lings.contains(num))
-                ctx.lings.add(num);
+            ctx.registerClaim(num, 2);
             ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
             if (gd > 2)
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_LATE_CO);
@@ -91,24 +82,24 @@ public class ResultEffectApplicator
     public void applyLingConflictDetection(int num)
     {
         int gd = ctx.getGameDay();
-        for (int i = 0; i < ctx.zhans.size(); i++)
+        for (int i = 0; i < ctx.getZhans().size(); i++)
         {
             for (int j = 1; j <= gd; j++)
             {
-                if (ctx.getSuspicionValue(num, ctx.zhans.get(i)) <= GameConstants.INFJ
+                if (ctx.getSuspicionValue(num, ctx.getZhans().get(i)) <= GameConstants.INFJ
                         && Math.abs(ctx.getSkillTarget(num, gd - 1)
-                        - ctx.getSkillTarget(ctx.zhans.get(i), j)) == gd)
+                        - ctx.getSkillTarget(ctx.getZhans().get(i), j)) == gd)
                 {
                     ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_CONFLICT);
-                    ctx.addLazySuspicionValue(ctx.zhans.get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
-                    suspicion.updateTop3Aux2(num, ctx.zhans.get(i), GameConstants.INF, GameConstants.INF);
+                    ctx.addLazySuspicionValue(ctx.getZhans().get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
+                    suspicion.updateTop3Aux2(num, ctx.getZhans().get(i), GameConstants.INF, GameConstants.INF);
                 }
-                if (ctx.getSuspicionValue(num, ctx.zhans.get(i)) <= GameConstants.INFJ
-                        && ctx.getSkillTarget(num, gd - 1) == ctx.getSkillTarget(ctx.zhans.get(i), j)
-                        && ctx.isBlackResult(ctx.getSkillTarget(ctx.zhans.get(i), j)))
+                if (ctx.getSuspicionValue(num, ctx.getZhans().get(i)) <= GameConstants.INFJ
+                        && ctx.getSkillTarget(num, gd - 1) == ctx.getSkillTarget(ctx.getZhans().get(i), j)
+                        && ctx.isBlackResult(ctx.getSkillTarget(ctx.getZhans().get(i), j)))
                 {
-                    suspicion.updateTop3Aux2(num, ctx.zhans.get(i), -10, -10);
-                    ctx.lined[ctx.zhans.get(i)][num] = 1;
+                    suspicion.updateTop3Aux2(num, ctx.getZhans().get(i), -10, -10);
+                    ctx.lined[ctx.getZhans().get(i)][num] = 1;
                 }
             }
         }

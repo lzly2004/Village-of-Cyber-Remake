@@ -78,7 +78,7 @@ public class WolfBiter
         // --- 末狼猫嫌 ---
         if (aliverlFinal == 1)
         {
-            List<Integer> maoSnapshot = new ArrayList<>(ctx.maos);
+            List<Integer> maoSnapshot = new ArrayList<>(ctx.getMaos());
             engine.addSimpleRule("R05_末狼猫嫌",
                     i -> maoSnapshot.contains(i),
                     i -> -50);
@@ -103,11 +103,11 @@ public class WolfBiter
         // --- 占CO/灵CO/共CO/猫CO角色修正 ---
         engine.addSimpleRule("R08_真占CO加权",
                 i -> analysis.isZhan[i],
-                i -> 200 - zhenZhanCntFinal * 75 + 50 * yFinal - ctx.zhans.size() * 20);
+                i -> 200 - zhenZhanCntFinal * 75 + 50 * yFinal - ctx.getZhans().size() * 20);
 
         engine.addSimpleRule("R09_真灵CO加权",
                 i -> analysis.isLing[i],
-                i -> 175 - zhenLingCntFinal * 100 - ctx.lings.size() * 70);
+                i -> 175 - zhenLingCntFinal * 100 - ctx.getLings().size() * 70);
 
         engine.addSimpleRule("R10_共有CO加权",
                 i -> ctx.getActualRole(i) == 4 && ctx.getClaimedRole(i) == 4,
@@ -202,7 +202,7 @@ public class WolfBiter
             {
                 if (!analysis.isLie[i]) continue;
                 weights[i] += 350 - zhenLieCntFinal * 100;
-                if (ctx.claimedRoleaskday[3] > 0) weights[i] += 50;
+                if (ctx.getClaimedRoleAskDay(3) > 0) weights[i] += 50;
 
                 int huweicnt = 0;
                 for (int j = 1; j <= n; j++)
@@ -365,7 +365,7 @@ public class WolfBiter
         }
         k *= alivewuco;
         k /= Math.max(wuco, 1);
-        if (ctx.claimedRoleaskday[3] > 0) k = 0;
+        if (ctx.getClaimedRoleAskDay(3) > 0) k = 0;
 
         int hiddenHunterCnt = 0;
         for (int i = 1; i <= n; i++)
@@ -377,9 +377,9 @@ public class WolfBiter
 
     private void countGlobalWhiteBalls(int n, int gd, BiteAnalysis analysis) {
         int[] getWhite = new int[n + 1];
-        for (int i = 0; i < ctx.zhans.size(); i++)
+        for (int i = 0; i < ctx.getZhans().size(); i++)
         {
-            int zhan = ctx.zhans.get(i);
+            int zhan = ctx.getZhans().get(i);
             for (int j = 1; j <= gd; j++)
             {
                 int target = ctx.getSkillTarget(zhan, j);
