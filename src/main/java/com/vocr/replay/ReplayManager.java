@@ -1,7 +1,7 @@
 package com.vocr.replay;
 
 import com.vocr.config.PathConfig;
-import com.vocr.DebugLogger;
+import com.vocr.core.DebugLogger;
 
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\replay\ReplayManager.java
 import com.fasterxml.jackson.databind.ObjectMapper;

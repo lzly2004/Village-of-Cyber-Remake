@@ -1,6 +1,6 @@
 package com.vocr.config;
 
-import com.vocr.DebugLogger;
+import com.vocr.core.DebugLogger;
 
 // ProbabilityCalculator.java - 简化的概率计算类
 import com.fasterxml.jackson.databind.JsonNode;

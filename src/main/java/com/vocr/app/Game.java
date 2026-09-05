@@ -1,15 +1,15 @@
 package com.vocr.app;
 
-import com.vocr.DebugLogger;
-import com.vocr.GameRecorder;
+import com.vocr.core.DebugLogger;
+import com.vocr.core.GameRecorder;
+import com.vocr.core.MainLogic;
+import com.vocr.core.MainLogicInterface;
 import com.vocr.history.GameRecordManager;
-import com.vocr.MainLogic;
-import com.vocr.MainLogicInterface;
 import com.vocr.replay.ReplayManager;
-import com.vocr.Resources;
-import com.vocr.ResourcesInterface;
-import com.vocr.UI;
-import com.vocr.UIInterface;
+import com.vocr.resources.Resources;
+import com.vocr.resources.ResourcesInterface;
+import com.vocr.ui.UI;
+import com.vocr.ui.UIInterface;
 
 public class Game
 {   //单例模式
@@ -24,10 +24,11 @@ public class Game
     private Game()
     {
         this.resources = new Resources();
-        this.mainlogic = new MainLogic();
         this.replayManager = new ReplayManager();
         this.gameRecordManager = new GameRecordManager();
-        this.ui = new UI();
+        this.ui = new UI(resources, replayManager, gameRecordManager);
+        this.mainlogic = new MainLogic(ui::addEvent, gameRecordManager);
+        this.ui.attachMainLogic(mainlogic);
     }
     public static Game getInstance()
     {
