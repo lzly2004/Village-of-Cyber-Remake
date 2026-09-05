@@ -1,6 +1,8 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class MainLogic implements MainLogicInterface
 {
@@ -23,6 +25,7 @@ public class MainLogic implements MainLogicInterface
     private ExecutionManager executionManager;
     private GameRecorder recorder;
     private GameRecordManager gameRecordManager;
+    private final Consumer<Event> eventSink;
 
     /*
      * 参数取值表
@@ -40,7 +43,13 @@ public class MainLogic implements MainLogicInterface
     //若涉及到游戏结束，则夜间事件都不会显示。在判断游戏不结束之后，将其中的事件依次添加到UI类当中。
     MainLogic()
     {
+        this(event -> Game.getInstance().getUI().addEvent(event));
+    }
 
+    /** 允许测试或其他前端注入事件接收器，避免核心初始化过程依赖Swing单例。 */
+    MainLogic(Consumer<Event> eventSink)
+    {
+        this.eventSink = Objects.requireNonNull(eventSink, "事件接收器不能为空");
     }
     public GameContextView getGameContext()
     {//提供给UI类，封装后的游戏状态只读访问
@@ -102,6 +111,9 @@ public class MainLogic implements MainLogicInterface
 
         coManager = new COManager(ctx, suspicion, resultPresenter, probabilityCalculator, hunterGuarder);
 
+        // Replay系统: 录制器作为本局依赖显式传递给执行层。
+        this.recorder = new GameRecorder("replay_" + p.name(), gameRecordManager);
+
         // 构建统一的依赖容器
         GameModule gameModule = new GameModule.Builder()
                 .ctx(ctx)
@@ -116,6 +128,7 @@ public class MainLogic implements MainLogicInterface
                 .dieaux(dielogicCarrier::dieaux)
                 .nightaction(this::nightaction)
                 .gameRecordManager(gameRecordManager)
+                .recorder(recorder)
                 .build();
 
         nonHumanCoordinator = new NonHumanCoordinator(gameModule);
@@ -139,8 +152,6 @@ public class MainLogic implements MainLogicInterface
                 ctx.gyindex[nowgy++] = i;
         }
         // 怀疑度初始化已由 SuspicionSystem 构造自动完成
-        // Replay系统: 初始化录制器
-        this.recorder = new GameRecorder("replay_" + p.name(), gameRecordManager);
         this.recorder.startGame(p, 0L, gs.getPlayerSum(), gs);
         DebugLogger.info("[Replay] 录制器已初始化: " + p.name());
         //初始职业工作
@@ -281,8 +292,8 @@ public class MainLogic implements MainLogicInterface
                     DebugLogger.log("成功添加事件，事件信息：" + ctx.eventarray.get(i).toString());
                 }
             }
-            //将事件添加到UI类当中
-            Game.getInstance().getUI().addEvent(ctx.eventarray.get(i));
+            //将事件发送给当前前端（正式运行时为UI，测试时为内存事件列表）
+            eventSink.accept(ctx.eventarray.get(i));
         }
         ctx.eventarray.clear();//清空事件数组
     }

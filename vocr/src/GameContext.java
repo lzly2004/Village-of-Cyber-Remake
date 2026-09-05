@@ -365,8 +365,8 @@ class GameContext implements GameContextView
     void addLie(int player) { if (!lies.contains(player)) lies.add(player); }
     /** 添加猫候补 */
     void addMao(int player) { if (!maos.contains(player)) maos.add(player); }
-    void shuffleZhans() { java.util.Collections.shuffle(zhans); }
-    void shuffleLings() { java.util.Collections.shuffle(lings); }
+    void shuffleZhans() { ConstNum.shuffle(zhans); }
+    void shuffleLings() { ConstNum.shuffle(lings); }
 
     /** 获取指定日期夜间死亡玩家列表 */
     public ArrayList<Integer> dieAtNight(int day)

@@ -1,6 +1,6 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 class GameLogicUtils
 {
@@ -50,14 +50,9 @@ class GameLogicUtils
         }
     }
 
-    public static <T> ArrayList<T> shuffleList(ArrayList<T> originalList)
+    public static <T> ArrayList<T> shuffleList(List<T> originalList)
     {
-        if (originalList == null || originalList.isEmpty())
-            return new ArrayList<>();
-
-        ArrayList<T> shuffledList = new ArrayList<>(originalList);
-        Collections.shuffle(shuffledList);
-        return shuffledList;
+        return ConstNum.shuffledCopy(originalList);
     }
 
     public static ArrayList<Integer> getPriority(int[] array, boolean maxFirst)

@@ -1,6 +1,11 @@
 import javax.swing.ImageIcon;
 import java.awt.Image;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 class ConstNum
 {
@@ -35,12 +40,25 @@ class ConstNum
         return new ArrayList<>(recordedSequence);
     }
 
-    /** 获取随机数序列的校验和(大小+累加和) */
+    /** 获取随机数序列的强校验和，避免不同序列因长度和总和相同而被误判为一致。 */
     public static String getRandomChecksum()
     {
-        long sum = 0;
-        for (int val : recordedSequence) sum += val;
-        return "size=" + recordedSequence.size() + " sum=" + sum;
+        try
+        {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+            for (int value : recordedSequence)
+            {
+                buffer.clear();
+                buffer.putInt(value);
+                digest.update(buffer.array());
+            }
+            return "size=" + recordedSequence.size() + " sha256=" + toHex(digest.digest());
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new IllegalStateException("当前Java运行环境不支持SHA-256", e);
+        }
     }
 
     /** 设置固定随机种子,用于回归测试。调用后所有randomInt()结果可复现。 */
@@ -68,10 +86,41 @@ class ConstNum
 
     public static int randomInt(int min,int max)
     {//生成[min,max]的随机整数
+        if (min > max)
+            throw new IllegalArgumentException("随机数下界不能大于上界: " + min + " > " + max);
         if(min == max) return min;
         int result = min + rng.nextInt(max - min + 1);
         if (recordRandom) recordedSequence.add(result);
         return result;
+    }
+
+    /** 使用项目统一随机源进行原地Fisher-Yates洗牌。 */
+    public static <T> void shuffle(List<T> values)
+    {
+        if (values == null)
+            throw new IllegalArgumentException("待洗牌列表不能为空");
+        for (int i = values.size() - 1; i > 0; i--)
+        {
+            int target = randomInt(0, i);
+            Collections.swap(values, i, target);
+        }
+    }
+
+    /** 返回使用项目统一随机源洗牌后的副本，不修改调用方列表。 */
+    public static <T> ArrayList<T> shuffledCopy(List<T> values)
+    {
+        if (values == null || values.isEmpty()) return new ArrayList<>();
+        ArrayList<T> copy = new ArrayList<>(values);
+        shuffle(copy);
+        return copy;
+    }
+
+    private static String toHex(byte[] bytes)
+    {
+        StringBuilder result = new StringBuilder(bytes.length * 2);
+        for (byte value : bytes)
+            result.append(String.format("%02x", value & 0xff));
+        return result.toString();
     }
 
     public static ImageIcon scaleIcon(ImageIcon originalIcon, int width, int height)

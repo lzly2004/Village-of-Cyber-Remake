@@ -16,6 +16,7 @@ public class ExecutionManager
     private final java.util.function.BiConsumer<Integer, whyDie> dieaux;
     private final Runnable nightaction;
     private final GameRecordManager gameRecordManager;
+    private final GameRecorder recorder;
 
     public ExecutionManager(GameModule module)
     {
@@ -32,6 +33,7 @@ public class ExecutionManager
         this.dieaux = module.getDieaux();
         this.nightaction = module.getNightaction();
         this.gameRecordManager = module.getGameRecordManager();
+        this.recorder = module.getRecorder();
     }
 
     public boolean execute(int dailyVotingRule, List<Integer> chuxingList, boolean huibi)
@@ -163,9 +165,8 @@ public class ExecutionManager
         }
         
         try {
-            MainLogic ml = (MainLogic) Game.getInstance().getMainLogic();
-            if (ml != null && ml.getRecorder() != null) {
-                ml.getRecorder().recordVoteData(gd, ctx, dailyVotingRule, chuxingList);
+            if (recorder != null) {
+                recorder.recordVoteData(gd, ctx, dailyVotingRule, chuxingList);
                 DebugLogger.info("[Replay] 投票数据已记录: day=" + gd + ", rounds=" + shokeicnt);
             }
         } catch (Exception e) {
@@ -296,9 +297,8 @@ public class ExecutionManager
     
     private void recordReplayEnd(int endResult, int gameDay) {
         try {
-            MainLogic mainLogic = (MainLogic) Game.getInstance().getMainLogic();
-            if (mainLogic != null && mainLogic.getRecorder() != null) {
-                mainLogic.getRecorder().endGame(endResult, gameDay);
+            if (recorder != null) {
+                recorder.endGame(endResult, gameDay);
                 DebugLogger.info("[Replay] 游戏结束已记录: result=" + endResult + " day=" + gameDay);
             }
         } catch (Exception e) {
@@ -312,9 +312,8 @@ public class ExecutionManager
     
     public void recordReplayDailySnapshot(int day) {
         try {
-            MainLogic mainLogic = (MainLogic) Game.getInstance().getMainLogic();
-            if (mainLogic != null && mainLogic.getRecorder() != null) {
-                mainLogic.getRecorder().recordDailySnapshot(day, ctx);
+            if (recorder != null) {
+                recorder.recordDailySnapshot(day, ctx);
                 DebugLogger.info("[Replay] 每日快照已记录: day=" + day);
             }
         } catch (Exception e) {

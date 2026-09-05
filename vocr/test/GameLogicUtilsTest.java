@@ -76,15 +76,38 @@ class GameLogicUtilsTest {
             "零权重应抛IllegalArgumentException");
     }
 
-    // ========== isDayDie() ==========
+    // ========== whyDie.isDayDeath() ==========
 
     @Test
     void isDayDie_chuxing_shouldReturnTrue() {
-        assertTrue(GameLogicUtils.isDayDie(whyDie.chuxing), "处刑应为白天死亡");
+        assertTrue(whyDie.chuxing.isDayDeath(), "处刑应为白天死亡");
     }
 
     @Test
     void isDayDie_beiyao_shouldReturnFalse() {
-        assertFalse(GameLogicUtils.isDayDie(whyDie.beiyao), "被咬应为夜晚死亡");
+        assertFalse(whyDie.beiyao.isDayDeath(), "被咬应为夜晚死亡");
+    }
+
+    @Test
+    void shuffleList_sameSeed_shouldProduceSameOrderAndChecksum() {
+        ArrayList<Integer> input = new ArrayList<>(java.util.List.of(1, 2, 3, 4, 5, 6));
+
+        ConstNum.setRandomSeed(20260904L);
+        ConstNum.startRandomRecording();
+        ArrayList<Integer> first = GameLogicUtils.shuffleList(input);
+        String firstChecksum = ConstNum.getRandomChecksum();
+
+        ConstNum.setRandomSeed(20260904L);
+        ConstNum.startRandomRecording();
+        ArrayList<Integer> second = GameLogicUtils.shuffleList(input);
+        String secondChecksum = ConstNum.getRandomChecksum();
+
+        assertEquals(first, second);
+        assertEquals(firstChecksum, secondChecksum);
+        assertEquals(java.util.List.of(1, 2, 3, 4, 5, 6), input, "洗牌不得修改调用方列表");
+        assertTrue(firstChecksum.matches("size=5 sha256=[0-9a-f]{64}"));
+
+        ConstNum.stopRandomRecording();
+        ConstNum.resetRandomSeed();
     }
 }

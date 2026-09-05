@@ -13,6 +13,7 @@ public class GameModule {
     private final BiConsumer<Integer, whyDie> dieaux;
     private final Runnable nightaction;
     private final GameRecordManager gameRecordManager;
+    private final GameRecorder recorder;
 
     private GameModule(Builder builder) {
         this.ctx = builder.ctx;
@@ -27,6 +28,7 @@ public class GameModule {
         this.dieaux = builder.dieaux;
         this.nightaction = builder.nightaction;
         this.gameRecordManager = builder.gameRecordManager;
+        this.recorder = builder.recorder;
     }
 
     public GameContext getCtx() {
@@ -77,6 +79,10 @@ public class GameModule {
         return gameRecordManager;
     }
 
+    public GameRecorder getRecorder() {
+        return recorder;
+    }
+
     public static class Builder {
         private GameContext ctx;
         private SuspicionSystem suspicion;
@@ -90,6 +96,7 @@ public class GameModule {
         private BiConsumer<Integer, whyDie> dieaux;
         private Runnable nightaction;
         private GameRecordManager gameRecordManager;
+        private GameRecorder recorder;
 
         public Builder ctx(GameContext ctx) {
             this.ctx = ctx;
@@ -148,6 +155,11 @@ public class GameModule {
 
         public Builder gameRecordManager(GameRecordManager gameRecordManager) {
             this.gameRecordManager = gameRecordManager;
+            return this;
+        }
+
+        public Builder recorder(GameRecorder recorder) {
+            this.recorder = recorder;
             return this;
         }
 

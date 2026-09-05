@@ -69,9 +69,10 @@ public class ProbabilityCalculator {
      * 加载配置文件（JSON格式）
      */
     private void loadFromConfig() {
+        // 始终先建立完整默认表；文件只覆盖合法条目，任何缺失/损坏都不会留下空表。
+        initWithDefaultValues();
         if (configFilePath == null) {
             DebugLogger.log("未指定配置文件，使用默认概率值" + GameConstants.DEFAULT_PROBABILITY);
-            initWithDefaultValues();
             return;
         }
 
@@ -89,35 +90,37 @@ public class ProbabilityCalculator {
             JsonNode probabilities = root.get("probabilities");
             if (probabilities == null || !probabilities.isArray()) {
                 DebugLogger.error("JSON格式错误：缺少probabilities数组");
-                initWithDefaultValues();
                 return;
             }
 
-            int loadedCount = 0;
+            Map<String, Integer> loadedValues = new HashMap<>();
             for (JsonNode entry : probabilities) {
+                if (!entry.has("zhi") || !entry.has("situation") || !entry.has("p1")
+                        || !entry.has("p2") || !entry.has("probability")) {
+                    continue;
+                }
                 int zhi = entry.get("zhi").asInt();
                 int situation = entry.get("situation").asInt();
                 int p1 = entry.get("p1").asInt();
                 int p2 = entry.get("p2").asInt();
                 int probability = entry.get("probability").asInt();
 
-                if (isValid(zhi, situation, p1, p2)) {
+                if (isValid(zhi, situation, p1, p2) && probability >= 0 && probability <= 100) {
                     String key = String.format("%d %d %d %d", zhi, situation, p1, p2);
-                    probabilityMap.put(key, probability);
-                    loadedCount++;
+                    loadedValues.put(key, probability);
                 }
             }
 
-            DebugLogger.log(String.format("概率配置加载完成，成功加载 %d 条规则", loadedCount));
+            probabilityMap.putAll(loadedValues);
 
-            if (loadedCount < 100) {
-                DebugLogger.log("有效规则太少，用默认值填充缺失的规则");
-                initWithDefaultValues();
+            DebugLogger.log(String.format("概率配置加载完成，成功加载 %d 条规则", loadedValues.size()));
+
+            if (loadedValues.size() < getRuleCount()) {
+                DebugLogger.log("配置项不完整，缺失规则已使用默认概率补齐");
             }
 
         } catch (IOException e) {
             DebugLogger.error("加载配置文件失败: " + e.getMessage());
-            initWithDefaultValues();
         }
     }
 
@@ -142,7 +145,13 @@ public class ProbabilityCalculator {
      * 生成默认配置文件（JSON格式）
      */
     public void saveDefaultConfig(String outputPath) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(outputPath))) {
+        File outputFile = new File(outputPath);
+        File parent = outputFile.getParentFile();
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            DebugLogger.error("无法创建概率配置目录: " + parent);
+            return;
+        }
+        try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
             writer.println("{");
             writer.println("  \"description\": \"猫猎co概率配置文件\",");
             writer.println("  \"probabilities\": [");
@@ -212,5 +221,10 @@ public class ProbabilityCalculator {
         DebugLogger.log("  最小值: " + min);
         DebugLogger.log("  最大值: " + max);
         DebugLogger.log("  平均值: " + String.format("%.2f", average));
+    }
+
+    /** 当前内存中可用的合法组合数量。 */
+    int getRuleCount() {
+        return probabilityMap.size();
     }
 }

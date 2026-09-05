@@ -5,17 +5,26 @@ import java.io.IOException;
 
 public class GameRecordManager {
     private GameRecord record;
-    private static final String SAVE_PATH = PathConfig.GAME_RECORD;
+    private final String savePath;
 
-    public GameRecordManager() { load(); }
+    public GameRecordManager() { this(PathConfig.GAME_RECORD); }
+
+    /** 允许测试或便携运行环境指定独立存档位置。 */
+    public GameRecordManager(String savePath) {
+        if (savePath == null || savePath.isBlank()) {
+            throw new IllegalArgumentException("存档路径不能为空");
+        }
+        this.savePath = savePath;
+        load();
+    }
 
     public void load() {
-        File file = new File(SAVE_PATH);
+        File file = new File(savePath);
         if (file.exists() && file.length() > 10) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
                 record = mapper.readValue(file, GameRecord.class);
-                DebugLogger.info("[GameRecordManager] 已加载: " + SAVE_PATH);
+                DebugLogger.info("[GameRecordManager] 已加载: " + savePath);
             } catch (IOException e) {
                 DebugLogger.error("[GameRecordManager] 加载失败（文件可能损坏，将重建）: " + e.getMessage());
                 record = new GameRecord();
@@ -33,13 +42,13 @@ public class GameRecordManager {
 
     public void save() {
         try {
-            File file = new File(SAVE_PATH);
+            File file = new File(savePath);
             File dir = file.getParentFile();
             if (dir != null && !dir.exists()) dir.mkdirs();
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, record);
-            DebugLogger.info("[GameRecordManager] 已保存: " + SAVE_PATH);
+            DebugLogger.info("[GameRecordManager] 已保存: " + savePath);
         } catch (IOException e) {
             DebugLogger.error("[GameRecordManager] 保存失败: " + e.getMessage());
         }

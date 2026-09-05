@@ -1,3 +1,6 @@
+import groovy.json.JsonSlurper
+import java.nio.charset.StandardCharsets
+
 plugins {
     id 'java'
     id 'application'
@@ -19,8 +22,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.17.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.1'
-
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.0'
 }
 
 application {
@@ -29,37 +32,165 @@ application {
 
 sourceSets {
     main {
-        java {
-            srcDirs = ['vocr/src']
-        }
-        resources {
-            srcDirs = ['vocr/resources']
-        }
+        java.srcDirs = ['vocr/src']
+        resources.srcDirs = ['vocr/resources']
     }
     test {
-        java {
-            srcDirs = ['vocr/test']
-        }
+        java.srcDirs = ['vocr/test']
     }
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }
 
 test {
     useJUnitPlatform()
+    workingDir = rootDir
 }
 
+tasks.register('verifyProbabilityConfig') {
+    group = 'verification'
+    description = '校验唯一概率配置包含全部560种合法组合。'
+    inputs.file(layout.projectDirectory.file('config/probability.json'))
+
+    doLast {
+        File configFile = layout.projectDirectory.file('config/probability.json').asFile
+        def root = new JsonSlurper().parse(configFile)
+        if (!(root.probabilities instanceof List)) {
+            throw new GradleException("${configFile} 缺少 probabilities 数组")
+        }
+
+        List probabilities = root.probabilities as List
+        if (probabilities.size() != 560) {
+            throw new GradleException("概率配置应有560条，实际为${probabilities.size()}条")
+        }
+
+        Set<String> keys = new HashSet<>()
+        probabilities.eachWithIndex { entry, index ->
+            List<String> required = ['zhi', 'situation', 'p1', 'p2', 'probability']
+            if (!required.every { entry.containsKey(it) }) {
+                throw new GradleException("概率配置第${index + 1}条缺少必需字段")
+            }
+            int zhi = entry.zhi as int
+            int situation = entry.situation as int
+            int p1 = entry.p1 as int
+            int p2 = entry.p2 as int
+            int probability = entry.probability as int
+            if (!(zhi in 0..4) || !(situation in 0..6) || !(p1 in 0..3) || !(p2 in 0..3)) {
+                throw new GradleException("概率配置第${index + 1}条参数越界")
+            }
+            if (!(probability in 0..100)) {
+                throw new GradleException("概率配置第${index + 1}条概率不在0..100")
+            }
+            String key = "${zhi} ${situation} ${p1} ${p2}"
+            if (!keys.add(key)) {
+                throw new GradleException("概率配置存在重复组合: ${key}")
+            }
+        }
+    }
+}
+
+tasks.register('verifyRuntimeAssets') {
+    group = 'verification'
+    description = '校验代码依赖的音频存在、已拉取Git LFS且具有合法WAV文件头。'
+    inputs.files(fileTree('vocr/resources') { include '**/*.wav' })
+
+    doLast {
+        List<String> requiredAudio = [
+                'BGM/start_menu.wav',
+                'BGM/Info.wav',
+                'BGM/失败画面.wav',
+                'BGM/胜利画面.wav',
+                'BGM/replay_bgm.wav',
+                'BGM/纯音乐-优美旋律.wav',
+                'BGM/西江紫堂 - 灯り無き眼光.wav',
+                'BGM/Emotionally Unstable.wav',
+                'BGM/真甜呢丨先来一斤吧 - ラストボス02.wav',
+                'BGM/西江紫堂 - 黒き明日、清き闇.wav',
+                'BGM/西江紫堂 - BLOOD.wav',
+                'BGM/Death Impact.wav',
+                'BGM/永久色五色.wav',
+                'BGM/FELT LOVE.wav',
+                'BGM/Just Complex.wav',
+                'BGM/Peace of lost puzzle.wav',
+                'BGM/TEEK TEEK TEEK.wav',
+                'BGM/ダンジョン09.wav',
+                'BGM/ライアービジネス.wav',
+                'BGM/五月雨Vivaride.wav',
+                'BGM/真甜呢丨先来一斤吧 - ダンジョン14.wav',
+                'BGM/西江紫堂 - 五月雨Vivaride-Samidare bibaraido-.wav',
+                'sounds/click.wav',
+                'sounds/白天处刑音效.wav',
+                'sounds/平和音效.wav',
+                'sounds/夜间死亡音效.wav',
+                'sounds/村人胜利音效.wav',
+                'sounds/人狼胜利音效.wav',
+                'sounds/妖狐胜利音效.wav',
+                'sounds/入夜音效.wav',
+                'sounds/狼嚎音效.wav'
+        ]
+        List<File> requiredFiles = requiredAudio.collect { file("vocr/resources/${it}") }
+        List<File> missing = requiredFiles.findAll { !it.isFile() }
+        if (!missing.isEmpty()) {
+            String relativeFiles = missing.collect { rootDir.toPath().relativize(it.toPath()) }.join(', ')
+            throw new GradleException("代码引用的音频不存在：${relativeFiles}")
+        }
+
+        List<File> pointers = requiredFiles.findAll { file ->
+            byte[] prefix = new byte[(int) Math.min(file.length(), 128L)]
+            file.withInputStream { stream -> stream.read(prefix) }
+            new String(prefix, StandardCharsets.US_ASCII)
+                    .startsWith('version https://git-lfs.github.com/spec/v1')
+        }.sort { it.path }
+
+        if (!pointers.isEmpty()) {
+            String relativeFiles = pointers.collect { rootDir.toPath().relativize(it.toPath()) }.join(', ')
+            throw new GradleException("以下音频仍是Git LFS指针，不能打包：${relativeFiles}。请先运行 git lfs pull。")
+        }
+
+        List<File> invalidWav = requiredFiles.findAll { file ->
+            byte[] header = new byte[12]
+            int read = file.withInputStream { stream -> stream.read(header) }
+            read != 12 || new String(header, 0, 4, StandardCharsets.US_ASCII) != 'RIFF'
+                    || new String(header, 8, 4, StandardCharsets.US_ASCII) != 'WAVE'
+        }
+        if (!invalidWav.isEmpty()) {
+            String relativeFiles = invalidWav.collect { rootDir.toPath().relativize(it.toPath()) }.join(', ')
+            throw new GradleException("以下必需音频不是有效的RIFF/WAV文件：${relativeFiles}")
+        }
+    }
+}
+
+check.dependsOn tasks.named('verifyProbabilityConfig')
+
 tasks.register('fatJar', Jar) {
+    group = 'build'
+    description = '生成包含运行依赖的可执行JAR。'
     archiveClassifier = 'all'
+    dependsOn check, tasks.named('verifyRuntimeAssets')
     from sourceSets.main.output
-    dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     manifest {
-        attributes 'Main-Class': 'Game'
+        attributes 'Main-Class': application.mainClass.get()
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+distributions {
+    main {
+        contents {
+            from('config/probability.json') {
+                into 'config'
+            }
+        }
+    }
 }
