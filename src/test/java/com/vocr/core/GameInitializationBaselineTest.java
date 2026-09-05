@@ -25,6 +25,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiPredicate;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -169,29 +172,47 @@ class GameInitializationBaselineTest {
         appendArray(value, "actualRoleindex", context.actualRoleindex);
         appendArray(value, "gyindex", context.gyindex);
         appendArray(value, "rlindex", context.rlindex);
-        appendArray(value, "claimedRoleaskday", context.getClaimedRoleAskDaysSnapshot());
-        appendArray(value, "claimedRoleorder", context.getClaimedRoleOrderCountsSnapshot());
+        appendArray(value, "claimedRoleaskday", queriedInts(12, 11, context::getClaimedRoleAskDay));
+        appendArray(value, "claimedRoleorder", queriedInts(12, 11, context::getClaimedRoleOrderCount));
         appendArray(value, "nonHumanPlan", context.nonHumanPlan);
-        appendArray(value, "ybzw", context.getPreliminaryDivinationTargetsSnapshot());
-        appendArray(value, "zw", context.getPlannedDivinationResultsSnapshot());
-        appendArray(value, "nightDeathCount", context.getNightDeathCountsSnapshot());
-        value.append("doubleDeath=").append(Arrays.toString(context.getDoubleDeathOccurredSnapshot())).append('\n');
+        appendArray(value, "ybzw", queriedInts(status.getPlayerSum() + 1, status.getPlayerSum(),
+                context::getPreliminaryDivinationTarget));
+        appendArray(value, "zw", queriedInts(status.getPlayerSum() * 2 + 1, status.getPlayerSum(),
+                context::getPlannedDivinationResult));
+        appendArray(value, "nightDeathCount", queriedInts(GameConstants.MAX_GAME_DAYS + 1,
+                GameConstants.MAX_GAME_DAYS, context::getNightDeathCount));
+        value.append("doubleDeath=").append(Arrays.toString(queriedBooleans(
+                GameConstants.MAX_GAME_DAYS + 1, GameConstants.MAX_GAME_DAYS,
+                context::isDoubleDeathOccurred))).append('\n');
 
         for (int player = 1; player <= status.getPlayerSum(); player++) {
+            int currentPlayer = player;
             GameCharacter character = status.gc[player];
             value.append("player=").append(player).append('|').append(character.number).append('|')
                     .append(character.actualRole).append('|').append(character.getClaimedRole()).append('|')
                     .append(character.getClaimedRoleOrder()).append('|').append(character.getComingOutDay()).append('|')
                     .append(character.getDeathReason()).append('|').append(character.getDeathDay()).append('|')
                     .append(character.nonHumanMarker).append('|')
-                    .append(Arrays.toString(context.getSkillTargetsSnapshot(player))).append('|')
+                    .append(Arrays.toString(queriedInts(GameConstants.MAX_GAME_DAYS + 1,
+                            GameConstants.MAX_GAME_DAYS,
+                            day -> context.getSkillTarget(currentPlayer, day)))).append('|')
                     .append(Arrays.toString(character.suspicionValue)).append('|')
                     .append(Arrays.deepToString(character.top3SuspectedPlayers)).append('|')
-                    .append(Arrays.deepToString(context.getClaimedRoleScheduledSkillTargetsSnapshot(player))).append('\n');
+                    .append(Arrays.deepToString(queriedMatrix(GameConstants.CHARACTER_SUM + 1,
+                            GameConstants.MAX_GAME_DAYS + 1, status.getPlayerSum(),
+                            GameConstants.MAX_GAME_DAYS,
+                            (target, day) -> context.isClaimedRoleScheduled(currentPlayer, target, day))))
+                    .append('\n');
         }
         value.append("lined=").append(Arrays.deepToString(context.lined)).append('\n');
-        value.append("hiddenSeer=").append(Arrays.deepToString(context.getHiddenSeerScheduledSkillTargetsSnapshot())).append('\n');
-        value.append("hiddenHunter=").append(Arrays.deepToString(context.getHiddenHunterScheduledSkillTargetsSnapshot())).append('\n');
+        value.append("hiddenSeer=").append(Arrays.deepToString(queriedMatrix(
+                status.getPlayerSum() + 1, GameConstants.MAX_GAME_DAYS + 1,
+                status.getPlayerSum(), GameConstants.MAX_GAME_DAYS,
+                context::isHiddenSeerScheduled))).append('\n');
+        value.append("hiddenHunter=").append(Arrays.deepToString(queriedMatrix(
+                status.getPlayerSum() + 1, GameConstants.MAX_GAME_DAYS + 1,
+                status.getPlayerSum(), GameConstants.MAX_GAME_DAYS,
+                context::isHiddenHunterScheduled))).append('\n');
         for (Event event : result.events) {
             value.append("event=").append(event.eventname).append('|').append(event.ch1).append('|')
                     .append(event.ch2).append('|').append(event.ch3).append('\n');
@@ -202,6 +223,27 @@ class GameInitializationBaselineTest {
 
     private static void appendArray(StringBuilder output, String name, int[] values) {
         output.append(name).append('=').append(Arrays.toString(values)).append('\n');
+    }
+
+    private static int[] queriedInts(int length, int maxIndex, IntUnaryOperator query) {
+        int[] values = new int[length];
+        for (int index = 1; index <= maxIndex; index++) values[index] = query.applyAsInt(index);
+        return values;
+    }
+
+    private static boolean[] queriedBooleans(int length, int maxIndex, IntPredicate query) {
+        boolean[] values = new boolean[length];
+        for (int index = 1; index <= maxIndex; index++) values[index] = query.test(index);
+        return values;
+    }
+
+    private static boolean[][] queriedMatrix(int rows, int columns, int maxRow, int maxColumn,
+                                               BiPredicate<Integer, Integer> query) {
+        boolean[][] values = new boolean[rows][columns];
+        for (int row = 1; row <= maxRow; row++)
+            for (int column = 1; column <= maxColumn; column++)
+                values[row][column] = query.test(row, column);
+        return values;
     }
 
     private static String sha256(String value) {

@@ -76,12 +76,6 @@ class GameContextDeathTest
         assertTrue(context.isDoubleDeathOccurred(day));
         assertThrows(UnsupportedOperationException.class, () -> context.getDiebody().add(3));
 
-        int[] counts = context.getNightDeathCountsSnapshot();
-        boolean[] doubleDeaths = context.getDoubleDeathOccurredSnapshot();
-        counts[day] = 99;
-        doubleDeaths[day] = false;
-        assertEquals(2, context.getNightDeathCount(day));
-        assertTrue(context.isDoubleDeathOccurred(day));
     }
 
     @Test

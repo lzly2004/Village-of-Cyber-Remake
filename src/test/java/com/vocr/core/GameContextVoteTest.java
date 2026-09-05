@@ -140,6 +140,10 @@ class GameContextVoteTest
                 () -> context.recordVoteRound(1, 1, null));
         assertThrows(IllegalArgumentException.class,
                 () -> context.recordVoteRound(1, 1, new int[context.getPlayerSum()]));
+        assertThrows(IllegalArgumentException.class,
+                () -> context.getVoteTarget(0, 1, 1));
+        assertThrows(IllegalArgumentException.class,
+                () -> context.getVoteTarget(1, 1, GameConstants.MAX_VOTE_ROUNDS + 1));
     }
 
     @Test
@@ -159,18 +163,6 @@ class GameContextVoteTest
     }
 
     @Test
-    void voteTargetSnapshot_shouldNotExposeMutableHistory()
-    {
-        GameContext context = createContext();
-        context.recordVoteRound(1, 1, validTargets(context));
-
-        int[][] snapshot = context.getVoteTargetsSnapshot(1);
-        snapshot[1][1] = 0;
-
-        assertEquals(2, context.getVoteTarget(1, 1, 1));
-    }
-
-    @Test
     void selectedVoteTargets_shouldBeIndependentByPlayerAndDayAndToggleable()
     {
         GameContext context = createContext();
@@ -181,10 +173,6 @@ class GameContextVoteTest
         assertTrue(context.isSelectedVoteTarget(1, 1));
         assertFalse(context.isSelectedVoteTarget(1, 2));
         assertTrue(context.isSelectedVoteTarget(2, 2));
-
-        boolean[] snapshot = context.getSelectedVoteTargetsSnapshot(1);
-        snapshot[1] = false;
-        assertTrue(context.isSelectedVoteTarget(1, 1));
 
         context.setSelectedVoteTarget(1, 1, false);
         assertFalse(context.isSelectedVoteTarget(1, 1));

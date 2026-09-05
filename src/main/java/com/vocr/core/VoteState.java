@@ -142,21 +142,6 @@ final class VoteState
         selectedVoteTargets[player][day] = selected;
     }
 
-    int[][] getVoteTargetsSnapshot(int player)
-    {
-        validatePlayer(player, "投票玩家");
-        int[][] snapshot = new int[voteTargets[player].length][];
-        for (int day = 0; day < voteTargets[player].length; day++)
-            snapshot[day] = voteTargets[player][day].clone();
-        return snapshot;
-    }
-
-    boolean[] getSelectedVoteTargetsSnapshot(int player)
-    {
-        validatePlayer(player, "指定投票目标");
-        return selectedVoteTargets[player].clone();
-    }
-
     private void validatePlayer(int player, String stateName)
     {
         if (player < 1 || player > playerSum)

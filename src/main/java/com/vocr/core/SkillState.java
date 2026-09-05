@@ -106,22 +106,6 @@ final class SkillState
         hiddenHunterSchedule[target][day] = scheduled;
     }
 
-    int[] getSkillTargetsSnapshot(int player)
-    {
-        validatePlayer(player, "技能使用者");
-        return skillTargets[player].clone();
-    }
-
-    int[] getPreliminaryDivinationTargetsSnapshot() { return preliminaryDivinationTargets.clone(); }
-    int[] getPlannedDivinationResultsSnapshot() { return plannedDivinationResults.clone(); }
-    boolean[][] getClaimedRoleScheduleSnapshot(int player)
-    {
-        validatePlayer(player, "CO 技能使用者");
-        return copyMatrix(claimedRoleSchedules[player]);
-    }
-    boolean[][] getHiddenSeerScheduleSnapshot() { return copyMatrix(hiddenSeerSchedule); }
-    boolean[][] getHiddenHunterScheduleSnapshot() { return copyMatrix(hiddenHunterSchedule); }
-
     private void validateSchedule(int player, int target, int day)
     {
         validatePlayer(player, "CO 技能使用者");
@@ -152,11 +136,4 @@ final class SkillState
             throw new IllegalArgumentException("技能目标编码越界: " + target);
     }
 
-    private static boolean[][] copyMatrix(boolean[][] source)
-    {
-        boolean[][] snapshot = new boolean[source.length][];
-        for (int i = 0; i < source.length; i++)
-            snapshot[i] = source[i].clone();
-        return snapshot;
-    }
 }

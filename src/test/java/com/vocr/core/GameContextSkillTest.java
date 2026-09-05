@@ -46,24 +46,15 @@ class GameContextSkillTest
         assertThrows(IllegalArgumentException.class, () -> context.recordSkillTarget(1, 1, -1));
         assertThrows(IllegalArgumentException.class,
                 () -> context.recordSkillTarget(1, 1, context.getPlayerSum() * 2 + 1));
+        assertThrows(IllegalArgumentException.class, () -> context.getSkillTarget(0, 1));
+        assertThrows(IllegalArgumentException.class,
+                () -> context.getSkillTarget(1, GameConstants.MAX_GAME_DAYS + 1));
 
         assertEquals(2, context.getSkillTarget(1, 1));
     }
 
     @Test
-    void skillTargetSnapshot_shouldNotExposeMutableHistory()
-    {
-        GameContext context = createContext();
-        context.recordSkillTarget(1, 1, 2);
-
-        int[] snapshot = context.getSkillTargetsSnapshot(1);
-        snapshot[1] = 0;
-
-        assertEquals(2, context.getSkillTarget(1, 1));
-    }
-
-    @Test
-    void schedules_shouldBeIndependentToggleableAndDefensivelyCopied()
+    void schedules_shouldBeIndependentAndToggleable()
     {
         GameContext context = createContext();
         int day = context.getGameDay();
@@ -76,17 +67,6 @@ class GameContextSkillTest
         assertTrue(context.isHiddenSeerScheduled(3, day));
         assertTrue(context.isHiddenHunterScheduled(4, day));
         assertFalse(context.isHiddenHunterScheduled(3, day));
-
-        boolean[][] claimed = context.getClaimedRoleScheduledSkillTargetsSnapshot(1);
-        boolean[][] hiddenSeer = context.getHiddenSeerScheduledSkillTargetsSnapshot();
-        boolean[][] hiddenHunter = context.getHiddenHunterScheduledSkillTargetsSnapshot();
-        claimed[2][day] = false;
-        hiddenSeer[3][day] = false;
-        hiddenHunter[4][day] = false;
-
-        assertTrue(context.isClaimedRoleScheduled(1, 2, day));
-        assertTrue(context.isHiddenSeerScheduled(3, day));
-        assertTrue(context.isHiddenHunterScheduled(4, day));
 
         context.setClaimedRoleScheduled(1, 2, day, false);
         context.setHiddenSeerScheduled(3, day, false);
@@ -112,6 +92,8 @@ class GameContextSkillTest
                 () -> context.setHiddenSeerScheduled(context.getPlayerSum() + 1, day, true));
         assertThrows(IllegalArgumentException.class,
                 () -> context.setHiddenHunterScheduled(1, GameConstants.MAX_GAME_DAYS + 1, true));
+        assertThrows(IllegalArgumentException.class,
+                () -> context.isHiddenSeerScheduled(0, day));
 
         assertFalse(context.isClaimedRoleScheduled(1, 1, day));
         assertFalse(context.isHiddenSeerScheduled(1, day));
@@ -119,7 +101,7 @@ class GameContextSkillTest
     }
 
     @Test
-    void divinationPlans_shouldValidateAndDefensivelyExposeEncodedTargets()
+    void divinationPlans_shouldValidateEncodedTargets()
     {
         GameContext context = createContext();
         int blackTarget = context.getPlayerSum() + 2;
@@ -127,13 +109,6 @@ class GameContextSkillTest
         context.recordPreliminaryDivinationTarget(1, 2);
         context.recordPlannedDivinationResult(1, blackTarget);
 
-        assertEquals(2, context.getPreliminaryDivinationTarget(1));
-        assertEquals(blackTarget, context.getPlannedDivinationResult(1));
-
-        int[] preliminary = context.getPreliminaryDivinationTargetsSnapshot();
-        int[] planned = context.getPlannedDivinationResultsSnapshot();
-        preliminary[1] = 0;
-        planned[1] = 0;
         assertEquals(2, context.getPreliminaryDivinationTarget(1));
         assertEquals(blackTarget, context.getPlannedDivinationResult(1));
 

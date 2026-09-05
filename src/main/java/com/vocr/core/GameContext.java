@@ -251,8 +251,6 @@ class GameContext implements GameContextView
 
     // --- CO询问 ---
     public int getClaimedRoleAskDay(int role) { return claimedRoleAskDays[role]; }
-    int[] getClaimedRoleAskDaysSnapshot() { return claimedRoleAskDays.clone(); }
-    int[] getClaimedRoleOrderCountsSnapshot() { return claimedRoleOrderCounts.clone(); }
 
     // --- 占灵连线 ---
     public int getLined(int zhan, int ling) { return lined[zhan][ling]; }
@@ -464,28 +462,6 @@ class GameContext implements GameContextView
         skillState.setHiddenHunterScheduled(target, day, value);
     }
 
-    int[] getSkillTargetsSnapshot(int player) { return skillState.getSkillTargetsSnapshot(player); }
-    int[] getPreliminaryDivinationTargetsSnapshot() { return skillState.getPreliminaryDivinationTargetsSnapshot(); }
-    int[] getPlannedDivinationResultsSnapshot() { return skillState.getPlannedDivinationResultsSnapshot(); }
-    boolean[][] getClaimedRoleScheduledSkillTargetsSnapshot(int player)
-    {
-        return skillState.getClaimedRoleScheduleSnapshot(player);
-    }
-    boolean[][] getHiddenSeerScheduledSkillTargetsSnapshot()
-    {
-        return skillState.getHiddenSeerScheduleSnapshot();
-    }
-    boolean[][] getHiddenHunterScheduledSkillTargetsSnapshot()
-    {
-        return skillState.getHiddenHunterScheduleSnapshot();
-    }
-
-    int[][] getVoteTargetsSnapshot(int player) { return voteState.getVoteTargetsSnapshot(player); }
-    boolean[] getSelectedVoteTargetsSnapshot(int player)
-    {
-        return voteState.getSelectedVoteTargetsSnapshot(player);
-    }
-
     /**
      * 原子替换本夜尸体快照，并同步夜间死亡数和双死标记。
      */
@@ -517,8 +493,6 @@ class GameContext implements GameContextView
     }
 
     int getNightDeathCount(int day) { return nightDeathCount[day]; }
-    int[] getNightDeathCountsSnapshot() { return nightDeathCount.clone(); }
-    boolean[] getDoubleDeathOccurredSnapshot() { return isDoubleDeathOccurred.clone(); }
 
     /** 判断猫又是否明确出局 */
     public boolean isCatDefinitivelyOut()
