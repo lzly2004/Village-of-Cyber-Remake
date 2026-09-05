@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/vocr_jar</output-path>
     <root id="archive" name="vocr.jar">
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/vocr/src/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="vocr" />
       <element id="extracted-dir" path="$PROJECT_DIR$/bin/jackson-core-2.17.1.jar" path-in-jar="/" />

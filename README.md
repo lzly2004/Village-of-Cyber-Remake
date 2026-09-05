@@ -36,9 +36,10 @@ gradlew.bat fatJar
 
 ## 目录说明
 
-- `vocr/src/`：Java 生产代码
-- `vocr/test/`：JUnit 5 测试
-- `vocr/resources/`：图片、台词、事件映射、音效和 BGM
+- `src/main/java/com/vocr/`：Java 生产代码（当前统一根包）
+- `src/test/java/com/vocr/`：JUnit 5 测试
+- `src/main/resources/`：图片、台词、事件映射、音效和 BGM
+- `docs/legacy/`：从旧源码目录移出的历史设计文档和进度记录
 - `config/probability.json`：唯一的外部概率配置
 - `data/`：本地战绩和运行时数据（不提交）
 - `gradle/`、`gradlew*`：固定版本的构建入口

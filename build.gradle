@@ -27,17 +27,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'Game'
-}
-
-sourceSets {
-    main {
-        java.srcDirs = ['vocr/src']
-        resources.srcDirs = ['vocr/resources']
-    }
-    test {
-        java.srcDirs = ['vocr/test']
-    }
+    mainClass = 'com.vocr.Game'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -99,7 +89,7 @@ tasks.register('verifyProbabilityConfig') {
 tasks.register('verifyRuntimeAssets') {
     group = 'verification'
     description = '校验代码依赖的音频存在、已拉取Git LFS且具有合法WAV文件头。'
-    inputs.files(fileTree('vocr/resources') { include '**/*.wav' })
+    inputs.files(fileTree('src/main/resources') { include '**/*.wav' })
 
     doLast {
         List<String> requiredAudio = [
@@ -135,7 +125,7 @@ tasks.register('verifyRuntimeAssets') {
                 'sounds/入夜音效.wav',
                 'sounds/狼嚎音效.wav'
         ]
-        List<File> requiredFiles = requiredAudio.collect { file("vocr/resources/${it}") }
+        List<File> requiredFiles = requiredAudio.collect { file("src/main/resources/${it}") }
         List<File> missing = requiredFiles.findAll { !it.isFile() }
         if (!missing.isEmpty()) {
             String relativeFiles = missing.collect { rootDir.toPath().relativize(it.toPath()) }.join(', ')

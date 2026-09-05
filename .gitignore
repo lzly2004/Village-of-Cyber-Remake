@@ -18,7 +18,7 @@ Thumbs.db
 ~$*
 
 # Native库
-vocr/src/*.dll
+src/main/java/com/vocr/*.dll
 
 # 回归测试基线
 baseline/
