@@ -19,10 +19,6 @@ class GameCharacter
     int[][] voteTarget;//每天的的票型 int[N+1][4] N:最大游戏天数 最大可以取50 最多可以投3轮票 voteTarget[4][2] = 3: 第四天产生平票，第二轮投票中该玩家投给了玩家编号3的玩家
     boolean[] isSelectedVoteTarget;//角色是否当天被指定 boolean [N+1]
     boolean nonHumanMarker;//角色是否已经明确破绽了
-    //技能相关
-    int[] skillTarget;//每天使用技能的对象 int[N+1] 额外+配役人数代表黑色结果，否则代表白色结果和守护对象
-    //可以代表潜伏非人的预定编造结果（猎人日记）
-    boolean[][] claimedRoleScheduledSkillTargets;//若为职业co者，被安排的技能使用对象 boolean[配役人数+1][N+1]
     //生死相关
     private whyDie whyDie;//死亡原因枚举类型
     private int dieDay;//死亡日
@@ -41,8 +37,6 @@ class GameCharacter
         this.voteTarget = new int[GameConstants.MAX_GAME_DAYS+1][4];
         this.isSelectedVoteTarget = new boolean[GameConstants.MAX_GAME_DAYS+1];
         this.nonHumanMarker = false;
-        this.skillTarget = new int[GameConstants.MAX_GAME_DAYS+1];
-        this.claimedRoleScheduledSkillTargets = new boolean[GameConstants.CHARACTER_SUM+1][GameConstants.MAX_GAME_DAYS+1];
         this.whyDie = whyDie.NONE;
         this.comingOutDay = -1;
     }

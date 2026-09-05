@@ -172,8 +172,8 @@ class GameInitializationBaselineTest {
         appendArray(value, "claimedRoleaskday", context.getClaimedRoleAskDaysSnapshot());
         appendArray(value, "claimedRoleorder", context.getClaimedRoleOrderCountsSnapshot());
         appendArray(value, "nonHumanPlan", context.nonHumanPlan);
-        appendArray(value, "ybzw", context.ybzw);
-        appendArray(value, "zw", context.zw);
+        appendArray(value, "ybzw", context.getPreliminaryDivinationTargetsSnapshot());
+        appendArray(value, "zw", context.getPlannedDivinationResultsSnapshot());
         appendArray(value, "nightDeathCount", context.getNightDeathCountsSnapshot());
         value.append("doubleDeath=").append(Arrays.toString(context.getDoubleDeathOccurredSnapshot())).append('\n');
 
@@ -184,14 +184,14 @@ class GameInitializationBaselineTest {
                     .append(character.getClaimedRoleOrder()).append('|').append(character.getComingOutDay()).append('|')
                     .append(character.getDeathReason()).append('|').append(character.getDeathDay()).append('|')
                     .append(character.nonHumanMarker).append('|')
-                    .append(Arrays.toString(character.skillTarget)).append('|')
+                    .append(Arrays.toString(context.getSkillTargetsSnapshot(player))).append('|')
                     .append(Arrays.toString(character.suspicionValue)).append('|')
                     .append(Arrays.deepToString(character.top3SuspectedPlayers)).append('|')
-                    .append(Arrays.deepToString(character.claimedRoleScheduledSkillTargets)).append('\n');
+                    .append(Arrays.deepToString(context.getClaimedRoleScheduledSkillTargetsSnapshot(player))).append('\n');
         }
         value.append("lined=").append(Arrays.deepToString(context.lined)).append('\n');
-        value.append("hiddenSeer=").append(Arrays.deepToString(status.hiddenSeerScheduledSkillTargets)).append('\n');
-        value.append("hiddenHunter=").append(Arrays.deepToString(status.hiddenHunterScheduledSkillTargets)).append('\n');
+        value.append("hiddenSeer=").append(Arrays.deepToString(context.getHiddenSeerScheduledSkillTargetsSnapshot())).append('\n');
+        value.append("hiddenHunter=").append(Arrays.deepToString(context.getHiddenHunterScheduledSkillTargetsSnapshot())).append('\n');
         for (Event event : result.events) {
             value.append("event=").append(event.eventname).append('|').append(event.ch1).append('|')
                     .append(event.ch2).append('|').append(event.ch3).append('\n');

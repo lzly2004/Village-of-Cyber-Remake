@@ -4,8 +4,6 @@ import com.vocr.domain.GameResult;
 import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;
 
-import com.vocr.config.GameConstants;
-
 public class GameStatus
 {//游戏状态封装类
     public peiyi p;//游戏配役
@@ -15,8 +13,6 @@ public class GameStatus
     private int deathCounter;//游戏中当前的死亡人数计数
     private int aliveCounter;//游戏中当前的存活人数计数
     GameCharacter[] gc;//游戏角色数组 int[CharecterSum+1]
-    boolean[][] hiddenSeerScheduledSkillTargets;//潜伏占卜师的预告 int[getPlayerSum()+1][N+1]N:最大游戏天数 最大可以取50
-    boolean[][] hiddenHunterScheduledSkillTargets;//潜伏猎人的预告 int[getPlayerSum()+1][N+1]  N:最大游戏天数 最大可以取50
     public GameStatus()
     {//普通的构造函数。构造时赋初值-1，表示游戏还未开始
         //初始化游戏状态的其他字段
@@ -118,8 +114,6 @@ public class GameStatus
                 DebugLogger.error("第"+i+"个角色初始化失败");
             }
         }
-        this.hiddenHunterScheduledSkillTargets = new boolean[getPlayerSum()+1][GameConstants.MAX_GAME_DAYS+1];
-        this.hiddenSeerScheduledSkillTargets = new boolean[getPlayerSum()+1][GameConstants.MAX_GAME_DAYS+1];
     }
     public int getPlayerSum()
     {//得到本局游戏的玩家数

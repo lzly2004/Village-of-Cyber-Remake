@@ -85,10 +85,12 @@ public class COManager
                 if (gd == 3 && ctx.getActualRole(num) > 6 && ctx.isBlackResult(ctx.getSkillTarget(num, 1))
                         && ctx.getDiePlayerNum(whyDie.beiyao, 2) == ctx.getSkillTarget(num, 1) - ctx.getPlayerSum())
                 {
-                    if (ctx.zw[num] == ctx.getSkillTarget(num, 1) && ctx.getYBZW(num) > 0)
-                        ctx.setSkillTarget(num, 1, ctx.getYBZW(num));
-                    else if (ctx.getYBZW(num) == ctx.getSkillTarget(num, 1) && ctx.zw[num] > 0)
-                        ctx.setSkillTarget(num, 1, ctx.zw[num]);
+                    if (ctx.getPlannedDivinationResult(num) == ctx.getSkillTarget(num, 1)
+                            && ctx.getPreliminaryDivinationTarget(num) > 0)
+                        ctx.recordSkillTarget(num, 1, ctx.getPreliminaryDivinationTarget(num));
+                    else if (ctx.getPreliminaryDivinationTarget(num) == ctx.getSkillTarget(num, 1)
+                            && ctx.getPlannedDivinationResult(num) > 0)
+                        ctx.recordSkillTarget(num, 1, ctx.getPlannedDivinationResult(num));
                 }
                 for (int i = 0; i < ctx.getLings().size(); i++)
                 {
@@ -177,7 +179,7 @@ public class COManager
                         if (ctx.getSkillTarget(num, j) == 0)
                         {
                             int target = hunterGuarder.guard(num);
-                            ctx.setSkillTarget(num, j, target);
+                            ctx.recordSkillTarget(num, j, target);
                         }
                     }
                 }
@@ -239,7 +241,7 @@ public class COManager
                     boolean have_yugao = false;
                     for (int i = 1; i <= n; i++)
                     {
-                        if (ctx.getHiddenSeerScheduledSkillTargets()[i][gd - 1])
+                        if (ctx.isHiddenSeerScheduled(i, gd - 1))
                         {
                             have_yugao = true;
                             if (ctx.getDiebody().contains(i))
@@ -261,7 +263,7 @@ public class COManager
                         boolean have_yugao = false;
                         for (int j = 1; j <= n; j++)
                         {
-                            if (ctx.getClaimedRoleScheduledSkillTargets(zhan)[j][gd - 1])
+                            if (ctx.isClaimedRoleScheduled(zhan, j, gd - 1))
                             {
                                 have_yugao = true;
                                 if (ctx.getDiebody().contains(j))
@@ -288,7 +290,7 @@ public class COManager
             if (ctx.nonHumanPlan[i] == zhi && ctx.nonHumanPlan[i] != 4)
             {
                 if (gd == 2)
-                    ctx.setSkillTarget(i, 1, ctx.zw[i]);
+                    ctx.recordSkillTarget(i, 1, ctx.getPlannedDivinationResult(i));
                 response.add(new IntPair(i, zhi));
                 continue;
             }
@@ -338,7 +340,7 @@ public class COManager
             else if (ctx.nonHumanPlan[num] != 0 && ctx.nonHumanPlan[num] != 4)
             {
                 if (ctx.nonHumanPlan[num] == 1)
-                    ctx.setSkillTarget(num, 1, ctx.zw[num]);
+                    ctx.recordSkillTarget(num, 1, ctx.getPlannedDivinationResult(num));
                 response.add(new IntPair(num, ctx.nonHumanPlan[num]));
             }
             else

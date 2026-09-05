@@ -3,6 +3,7 @@ package com.vocr.core;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.IntPredicate;
 
 public class GameLogicUtils
 {
@@ -95,11 +96,11 @@ public class GameLogicUtils
         return p0 <= p;
     }
 
-    public static String buildSkillScheduleLog(String title, int n, int gd, boolean[][] schedule)
+    public static String buildSkillScheduleLog(String title, int n, IntPredicate isScheduled)
     {
         StringBuilder sb = new StringBuilder(title);
         for (int i = 1; i <= n; i++)
-            if (schedule[i][gd])
+            if (isScheduled.test(i))
                 sb.append(i).append(" ");
         return sb.toString();
     }

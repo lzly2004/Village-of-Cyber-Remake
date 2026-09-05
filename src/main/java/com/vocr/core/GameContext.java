@@ -33,8 +33,7 @@ class GameContext implements GameContextView
     private final int[] claimedRoleAskDays;
     private final int[] claimedRoleOrderCounts;
     final int[] nonHumanPlan;
-    final int[] ybzw;
-    final int[] zw;
+    private final SkillState skillState;
     final int[][] lined;
     private final ArrayList<Integer> seerCandidates;
     private final ArrayList<Integer> mediumCandidates;
@@ -64,8 +63,7 @@ class GameContext implements GameContextView
         this.claimedRoleAskDays = new int[12];
         this.claimedRoleOrderCounts = new int[12];
         this.nonHumanPlan = new int[n + 1];
-        this.ybzw = new int[n + 1];
-        this.zw = new int[n * 2 + 1];
+        this.skillState = new SkillState(n);
         this.lined = new int[n + 1][n + 1];
 
         this.seerCandidates = new ArrayList<>();
@@ -150,9 +148,7 @@ class GameContext implements GameContextView
     // --- 技能 ---
     public int getSkillTarget(int player, int day)
     {
-        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
-        assert isValidDayIndex(day) : "天数索引越界: " + day;
-        return gs.gc[player].skillTarget[day];
+        return skillState.getSkillTarget(player, day);
     }
     public int getVoteTarget(int player, int day, int round)
     {
@@ -227,22 +223,22 @@ class GameContext implements GameContextView
         assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
         return nonHumanPlan[player];
     }
-    public int getZW(int player)
+    int getPlannedDivinationResult(int player)
     {
-        assert player >= 1 && player <= zw.length - 1 : "占文索引越界: " + player;
-        return zw[player];
+        return skillState.getPlannedDivinationResult(player);
     }
-    public int getYBZW(int player)
+    int getPreliminaryDivinationTarget(int player)
     {
-        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
-        return ybzw[player];
+        return skillState.getPreliminaryDivinationTarget(player);
     }
 
     // --- 预告 ---
-    public boolean isClaimedRoleScheduled(int player, int target, int day) { return gs.gc[player].claimedRoleScheduledSkillTargets[target][day]; }
-    public boolean[][] getClaimedRoleScheduledSkillTargets(int player) { return gs.gc[player].claimedRoleScheduledSkillTargets; }
-    public boolean[][] getHiddenSeerScheduledSkillTargets() { return gs.hiddenSeerScheduledSkillTargets; }
-    public boolean[][] getHiddenHunterScheduledSkillTargets() { return gs.hiddenHunterScheduledSkillTargets; }
+    public boolean isClaimedRoleScheduled(int player, int target, int day)
+    {
+        return skillState.isClaimedRoleScheduled(player, target, day);
+    }
+    public boolean isHiddenSeerScheduled(int target, int day) { return skillState.isHiddenSeerScheduled(target, day); }
+    public boolean isHiddenHunterScheduled(int target, int day) { return skillState.isHiddenHunterScheduled(target, day); }
 
     // --- 共有者 ---
     public int getGyIndex(int n) { return gyindex[n]; }
@@ -298,8 +294,23 @@ class GameContext implements GameContextView
     /** 设置指定投票目标 */
     public void setIsSelectedVoteTarget(int player, int day, boolean value) { gs.gc[player].isSelectedVoteTarget[day] = value; }
 
-    /** 设置技能目标 */
-    void setSkillTarget(int player, int day, int target) { gs.gc[player].skillTarget[day] = target; }
+    /** 记录技能目标或带颜色编码的技能结果；0 表示清空。 */
+    void recordSkillTarget(int player, int day, int target)
+    {
+        skillState.recordSkillTarget(player, day, target);
+    }
+
+    /** 记录非人预备占文，仅允许实际玩家目标。 */
+    void recordPreliminaryDivinationTarget(int player, int target)
+    {
+        skillState.recordPreliminaryDivinationTarget(player, target);
+    }
+
+    /** 记录非人计划占文，支持以 playerSum 偏移编码的黑结果和 0 空值。 */
+    void recordPlannedDivinationResult(int player, int target)
+    {
+        skillState.recordPlannedDivinationResult(player, target);
+    }
 
     /**
      * 原子登记一次主动 CO：职业、首次 CO 日、同职业顺位和候补列表一起更新。
@@ -428,8 +439,39 @@ class GameContext implements GameContextView
     /** 设置单人职业下标 */
     void setActualRoleIndex(int role, int player) { actualRoleindex[role] = player; }
 
-    /** 设置CO技能预定目标 */
-    public void setClaimedRoleScheduled(int player, int target, int day, boolean value) { gs.gc[player].claimedRoleScheduledSkillTargets[target][day] = value; }
+    /** 设置已 CO 职业的技能预定目标。 */
+    public void setClaimedRoleScheduled(int player, int target, int day, boolean value)
+    {
+        skillState.setClaimedRoleScheduled(player, target, day, value);
+    }
+
+    /** 设置潜伏占卜师的技能预定目标。 */
+    public void setHiddenSeerScheduled(int target, int day, boolean value)
+    {
+        skillState.setHiddenSeerScheduled(target, day, value);
+    }
+
+    /** 设置潜伏猎人的技能预定目标。 */
+    public void setHiddenHunterScheduled(int target, int day, boolean value)
+    {
+        skillState.setHiddenHunterScheduled(target, day, value);
+    }
+
+    int[] getSkillTargetsSnapshot(int player) { return skillState.getSkillTargetsSnapshot(player); }
+    int[] getPreliminaryDivinationTargetsSnapshot() { return skillState.getPreliminaryDivinationTargetsSnapshot(); }
+    int[] getPlannedDivinationResultsSnapshot() { return skillState.getPlannedDivinationResultsSnapshot(); }
+    boolean[][] getClaimedRoleScheduledSkillTargetsSnapshot(int player)
+    {
+        return skillState.getClaimedRoleScheduleSnapshot(player);
+    }
+    boolean[][] getHiddenSeerScheduledSkillTargetsSnapshot()
+    {
+        return skillState.getHiddenSeerScheduleSnapshot();
+    }
+    boolean[][] getHiddenHunterScheduledSkillTargetsSnapshot()
+    {
+        return skillState.getHiddenHunterScheduleSnapshot();
+    }
 
     /**
      * 原子替换本夜尸体快照，并同步夜间死亡数和双死标记。

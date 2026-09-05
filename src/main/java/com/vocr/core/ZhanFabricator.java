@@ -24,7 +24,7 @@ public class ZhanFabricator
         int gd = ctx.getGameDay();
         if (ctx.getSkillTarget(num, 1) < 1)
         {
-            ctx.setSkillTarget(num, 1, ctx.zw[num]);
+            ctx.recordSkillTarget(num, 1, ctx.getPlannedDivinationResult(num));
         }
         int[] target = new int[3];
         boolean[] zhaned = new boolean[n + 1];
@@ -84,6 +84,6 @@ public class ZhanFabricator
                 weight[i] -= 49;
         }
         int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(weight[0], weight[1])));
-        ctx.setSkillTarget(num, gd, target[option]);
+        ctx.recordSkillTarget(num, gd, target[option]);
     }
 }

@@ -333,7 +333,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             }
             int cc = 0;
             for (int j = 1; j < playerSum; ++j) {
-                if (ui.ctx.getHiddenSeerScheduledSkillTargets()[j][ui.ctx.getGameDay()]) {
+                if (ui.ctx.isHiddenSeerScheduled(j, ui.ctx.getGameDay())) {
                     if (cc++ == 0) isSelectedVoteTargetResult.append(GameStrings.HIDDEN_ARROW);
                     isSelectedVoteTargetResult.append(ui.getJobText(j) + ",");
                 }
@@ -364,7 +364,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             }
             int vv = 0;
             for (int j = 1; j < playerSum; ++j) {
-                if (ui.ctx.getHiddenHunterScheduledSkillTargets()[j][ui.ctx.getGameDay()]) {
+                if (ui.ctx.isHiddenHunterScheduled(j, ui.ctx.getGameDay())) {
                     if (vv++ == 0) isSelectedVoteTargetResult.append(GameStrings.HIDDEN_ARROW);
                     isSelectedVoteTargetResult.append(ui.getJobText(j) + ",");
                 }
@@ -668,8 +668,8 @@ public class GameSceneVoteHandler implements SceneHandler {
             }
         }
         for (int y = 1; y <= this.ui.ctx.getPlayerSum(); ++y) {
-            if (isSeer && this.ui.ctx.getHiddenSeerScheduledSkillTargets()[y][this.ui.ctx.getGameDay()]) { flag[0] = true; return; }
-            if (!isSeer && this.ui.ctx.getHiddenHunterScheduledSkillTargets()[y][this.ui.ctx.getGameDay()]) { flag[0] = true; return; }
+            if (isSeer && this.ui.ctx.isHiddenSeerScheduled(y, this.ui.ctx.getGameDay())) { flag[0] = true; return; }
+            if (!isSeer && this.ui.ctx.isHiddenHunterScheduled(y, this.ui.ctx.getGameDay())) { flag[0] = true; return; }
         }
         flag[0] = false;
     }

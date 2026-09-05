@@ -71,8 +71,8 @@ public class NonHumanCoordinator
                 if(ctx.getActualRole(j) != 7) weight[j] = 1;
                 else weight[j] = -GameConstants.INF;
             }
-            ctx.ybzw[i] = suspicion.getOne(weight);
-            DebugLogger.log("非人的预备占文，非人:"+i+",预备占文:"+ctx.getYBZW(i));
+            ctx.recordPreliminaryDivinationTarget(i, suspicion.getOne(weight));
+            DebugLogger.log("非人的预备占文，非人:"+i+",预备占文:"+ctx.getPreliminaryDivinationTarget(i));
         }
     }
 
@@ -95,7 +95,7 @@ public class NonHumanCoordinator
         while(rlzhan != 0)
         {
             int rl = ConstNum.randomInt(1,ctx.initialWolfCount);
-            if(ctx.isDead(ctx.rlindex[rl]) || ctx.zw[ctx.rlindex[rl]] != 0) continue;
+            if(ctx.isDead(ctx.rlindex[rl]) || ctx.getPlannedDivinationResult(ctx.rlindex[rl]) != 0) continue;
             rlzhan--;
             ctx.nonHumanPlan[ctx.rlindex[rl]] = 1;
             int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(80-2*ctx.kz, 15, 5+ctx.kz, ctx.kz)));
@@ -106,18 +106,16 @@ public class NonHumanCoordinator
                 {
                     weight[i] = 1;
                 }
-                else if((op == 0 || op == 3) && ctx.getActualRole(i) != 7 && ctx.getYBZW(ctx.rlindex[rl]) != i)
+                else if((op == 0 || op == 3) && ctx.getActualRole(i) != 7 && ctx.getPreliminaryDivinationTarget(ctx.rlindex[rl]) != i)
                 {
                     weight[i] = 1;
                 }
                 else weight[i] = -GameConstants.INF;
             }
             int target = suspicion.getOne(weight);
-            if(op == 0 || op == 2 || diebody.contains(target))
-                ctx.zw[ctx.rlindex[rl]] = target;
-            else
-                ctx.zw[ctx.rlindex[rl]] = target + n;
-            DebugLogger.log("人狼上占的占文，人狼："+rl+",占文："+ ctx.zw[ctx.rlindex[rl]]);
+            ctx.recordPlannedDivinationResult(ctx.rlindex[rl],
+                    op == 0 || op == 2 || diebody.contains(target) ? target : target + n);
+            DebugLogger.log("人狼上占的占文，人狼："+rl+",占文："+ ctx.getPlannedDivinationResult(ctx.rlindex[rl]));
         }
         return rlz;
     }
@@ -150,7 +148,7 @@ public class NonHumanCoordinator
             while(true)
             {
                 rl = ConstNum.randomInt(1,ctx.initialWolfCount);
-                if(ctx.isDead(ctx.rlindex[rl]) || ctx.zw[ctx.rlindex[rl]] != 0) continue;
+                if(ctx.isDead(ctx.rlindex[rl]) || ctx.getPlannedDivinationResult(ctx.rlindex[rl]) != 0) continue;
                 ctx.nonHumanPlan[ctx.rlindex[rl]] = 2;
                 break;
             }
@@ -177,11 +175,9 @@ public class NonHumanCoordinator
                 {
                     target = ConstNum.randomInt(1,n);
                     DebugLogger.log("狂人占文对象：" + target);
-                    if(target == ctx.getYBZW(leader) || target == leader) continue;
-                    if(option == 0 || diebody.contains(target))
-                        ctx.zw[leader] = target;
-                    else
-                        ctx.zw[leader] = target + n;
+                    if(target == ctx.getPreliminaryDivinationTarget(leader) || target == leader) continue;
+                    ctx.recordPlannedDivinationResult(leader,
+                            option == 0 || diebody.contains(target) ? target : target + n);
                     break;
                 }
             }
@@ -191,15 +187,13 @@ public class NonHumanCoordinator
                 while(true)
                 {
                     target = ConstNum.randomInt(1,n);
-                    if(target == ctx.getYBZW(leader) || target == leader) continue;
+                    if(target == ctx.getPreliminaryDivinationTarget(leader) || target == leader) continue;
                     if(ctx.getActualRole(target) == 7 && option < 2) continue;
                     if(ctx.getActualRole(target) != 7 && option > 1) continue;
                     DebugLogger.log("狂信占文对象：" + target);
-                    if(option == 0 || option == 2 || diebody.contains(target))
-                        ctx.zw[leader] = target;
-                    else
-                        ctx.zw[leader] = target + n;
-                    DebugLogger.log("狂信占文：" + ctx.zw[leader]);
+                    ctx.recordPlannedDivinationResult(leader,
+                            option == 0 || option == 2 || diebody.contains(target) ? target : target + n);
+                    DebugLogger.log("狂信占文：" + ctx.getPlannedDivinationResult(leader));
                     break;
                 }
             }
@@ -223,13 +217,11 @@ public class NonHumanCoordinator
                 while (true)
                 {
                     target = ConstNum.randomInt(1, n);
-                    if (target == ctx.getYBZW(ctx.getFox()) || target == ctx.getFox()) continue;
+                    if (target == ctx.getPreliminaryDivinationTarget(ctx.getFox()) || target == ctx.getFox()) continue;
                     DebugLogger.log("妖狐占文对象：" + target);
-                    if (option == 0 || diebody.contains(target))
-                        ctx.zw[ctx.getFox()] = target;
-                    else
-                        ctx.zw[ctx.getFox()] = target + n;
-                    DebugLogger.log("妖狐占文：" + ctx.zw[ctx.getFox()]);
+                    ctx.recordPlannedDivinationResult(ctx.getFox(),
+                            option == 0 || diebody.contains(target) ? target : target + n);
+                    DebugLogger.log("妖狐占文：" + ctx.getPlannedDivinationResult(ctx.getFox()));
                     break;
                 }
             }
@@ -253,7 +245,7 @@ public class NonHumanCoordinator
                 int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(60 - ctx.kz, 20, 20+ctx.kz, 0)));
                 if(option == 2)
                 {
-                    ctx.zw[ctx.getDeviant()] = ctx.getFox();
+                    ctx.recordPlannedDivinationResult(ctx.getDeviant(), ctx.getFox());
                     DebugLogger.log("狐狸白球");
                 }
                 else
@@ -261,14 +253,12 @@ public class NonHumanCoordinator
                     {
                         target = ConstNum.randomInt(1, n);
                         DebugLogger.log("背德选择占文:"+target);
-                        if (target == ctx.getYBZW(ctx.getDeviant()) || target == ctx.getDeviant())
+                        if (target == ctx.getPreliminaryDivinationTarget(ctx.getDeviant()) || target == ctx.getDeviant())
                             continue;
                         if (ctx.getActualRole(target) == 10) continue;
-                        if (option == 0 || diebody.contains(target))
-                            ctx.zw[ctx.getDeviant()] = target;
-                        else
-                            ctx.zw[ctx.getDeviant()] = target + n;
-                        DebugLogger.log("背德占文:" + ctx.zw[ctx.getDeviant()]);
+                        ctx.recordPlannedDivinationResult(ctx.getDeviant(),
+                                option == 0 || diebody.contains(target) ? target : target + n);
+                        DebugLogger.log("背德占文:" + ctx.getPlannedDivinationResult(ctx.getDeviant()));
                         break;
                     }
             }
@@ -366,7 +356,7 @@ public class NonHumanCoordinator
             ctx.shuffleZhans();
             int removed = ctx.getZhans().get(0);
             if(removed == ctx.getActualRoleIndex(1)) continue;
-            ctx.setSkillTarget(removed, 1, 0);
+            ctx.recordSkillTarget(removed, 1, 0);
             ctx.nonHumanPlan[removed] = 0;
             ctx.removeClaimCandidate(1, removed);
         }
@@ -444,7 +434,7 @@ public class NonHumanCoordinator
             if(c.response.get(0).second() == 1 && c.response.get(0).first() != ctx.getActualRoleIndex(1))
             {
                 ctx.nonHumanPlan[c.response.get(0).first()] = 0;
-                ctx.setSkillTarget(c.response.get(0).first(), 1, 0);
+                ctx.recordSkillTarget(c.response.get(0).first(), 1, 0);
                 c.response.remove(0);
             }
         }
@@ -499,7 +489,7 @@ public class NonHumanCoordinator
                 {
                     c.jhzhan--;
                     ctx.nonHumanPlan[target] = 0;
-                    ctx.setSkillTarget(target, 1, 0);
+                    ctx.recordSkillTarget(target, 1, 0);
                 }
                 else if(ctx.getLings().size() + c.jhling > 4 && ctx.nonHumanPlan[target] == 2)
                 {
@@ -526,7 +516,7 @@ public class NonHumanCoordinator
                 {
                     if(ctx.nonHumanPlan[i] == 1)
                     {
-                        ctx.setSkillTarget(i, 1, ctx.zw[i]);
+                        ctx.recordSkillTarget(i, 1, ctx.getPlannedDivinationResult(i));
                         DebugLogger.log("添加占文：角色" + i + " 占文" + ctx.getSkillTarget(i, 1));
                     }
                     coManager.processActualCo(i, ctx.nonHumanPlan[i], diebody);
@@ -547,18 +537,18 @@ public class NonHumanCoordinator
         for(int i=1;i<=ctx.initialWolfCount;i++)
         {
             if(ctx.nonHumanPlan[ctx.rlindex[i]] != 1) continue;
-            if(diebody.contains(ctx.zw[ctx.rlindex[i]]))
+            if(diebody.contains(ctx.getPlannedDivinationResult(ctx.rlindex[i])))
             {
                 haverl = true;
                 ctx.addClaimCandidate(1, ctx.rlindex[i]);
-                ctx.setSkillTarget(ctx.rlindex[i], 1, ctx.zw[ctx.rlindex[i]]);
+                ctx.recordSkillTarget(ctx.rlindex[i], 1, ctx.getPlannedDivinationResult(ctx.rlindex[i]));
                 continue;
             }
-            if(diebody.contains(ctx.getYBZW(ctx.rlindex[i])))
+            if(diebody.contains(ctx.getPreliminaryDivinationTarget(ctx.rlindex[i])))
             {
                 haverl = true;
                 ctx.addClaimCandidate(1, ctx.rlindex[i]);
-                ctx.setSkillTarget(ctx.rlindex[i], 1, ctx.getYBZW(ctx.rlindex[i]));
+                ctx.recordSkillTarget(ctx.rlindex[i], 1, ctx.getPreliminaryDivinationTarget(ctx.rlindex[i]));
                 continue;
             }
             ctx.nonHumanPlan[ctx.rlindex[i]] = 0;
@@ -568,11 +558,11 @@ public class NonHumanCoordinator
             for(int i=1;i<=ctx.initialWolfCount;i++)
             {
                 if(ctx.nonHumanPlan[ctx.rlindex[i]] == 1) continue;
-                if(diebody.contains(ctx.getYBZW(ctx.rlindex[i])))
+                if(diebody.contains(ctx.getPreliminaryDivinationTarget(ctx.rlindex[i])))
                 {
                     haverl = true;
                     ctx.addClaimCandidate(1, ctx.rlindex[i]);
-                    ctx.setSkillTarget(ctx.rlindex[i], 1, ctx.getYBZW(ctx.rlindex[i]));
+                    ctx.recordSkillTarget(ctx.rlindex[i], 1, ctx.getPreliminaryDivinationTarget(ctx.rlindex[i]));
                     ctx.nonHumanPlan[ctx.rlindex[i]] = 1;
                 }
             }
@@ -580,10 +570,10 @@ public class NonHumanCoordinator
 
         DebugLogger.log("非人的初始工作：狂人狂信上占");
         int leader = ctx.getNonHumanLeader();
-        if(ctx.isAlive(leader) && diebody.contains(ctx.getYBZW(leader)))
+        if(ctx.isAlive(leader) && diebody.contains(ctx.getPreliminaryDivinationTarget(leader)))
         {
             ctx.nonHumanPlan[leader] = 1;
-            ctx.setSkillTarget(leader, 1, ctx.getYBZW(leader));
+            ctx.recordSkillTarget(leader, 1, ctx.getPreliminaryDivinationTarget(leader));
             ctx.addClaimCandidate(1, leader);
         }
         else if(ctx.nonHumanPlan[leader] == 1)
@@ -641,26 +631,26 @@ public class NonHumanCoordinator
             if(ctx.nonHumanPlan[ctx.rlindex[i]] == 1)
             {
                 ctx.addClaimCandidate(1, ctx.rlindex[i]);
-                ctx.setSkillTarget(ctx.rlindex[i], 1, ctx.zw[ctx.rlindex[i]]);
+                ctx.recordSkillTarget(ctx.rlindex[i], 1, ctx.getPlannedDivinationResult(ctx.rlindex[i]));
             }
         }
         DebugLogger.log("非人的初始工作：狂占信占");
         if(ctx.getNonHumanLeader() > 0 && ctx.nonHumanPlan[ctx.getNonHumanLeader()] == 1)
         {
             ctx.addClaimCandidate(1, ctx.getNonHumanLeader());
-            ctx.setSkillTarget(ctx.getNonHumanLeader(), 1, ctx.zw[ctx.getNonHumanLeader()]);
+            ctx.recordSkillTarget(ctx.getNonHumanLeader(), 1, ctx.getPlannedDivinationResult(ctx.getNonHumanLeader()));
         }
         DebugLogger.log("非人的初始工作：狐占");
         if(ctx.getFox() > 0 && ctx.nonHumanPlan[ctx.getFox()] == 1)
         {
             ctx.addClaimCandidate(1, ctx.getFox());
-            ctx.setSkillTarget(ctx.getFox(), 1, ctx.zw[ctx.getFox()]);
+            ctx.recordSkillTarget(ctx.getFox(), 1, ctx.getPlannedDivinationResult(ctx.getFox()));
         }
         DebugLogger.log("非人的初始工作：背占");
         if(ctx.getDeviant() > 0 && ctx.nonHumanPlan[ctx.getDeviant()] == 1)
         {
             ctx.addClaimCandidate(1, ctx.getDeviant());
-            ctx.setSkillTarget(ctx.getDeviant(), 1, ctx.zw[ctx.getDeviant()]);
+            ctx.recordSkillTarget(ctx.getDeviant(), 1, ctx.getPlannedDivinationResult(ctx.getDeviant()));
         }
         DebugLogger.log("非人的初始工作：真占");
         if(ctx.isAlive(ctx.getActualRoleIndex(1)))
@@ -759,7 +749,7 @@ public class NonHumanCoordinator
                     switch(option)
                     {
                         case 0:
-                            ctx.setSkillTarget(bplayer, 1, ctx.getYBZW(bplayer));
+                            ctx.recordSkillTarget(bplayer, 1, ctx.getPreliminaryDivinationTarget(bplayer));
                             response.add(new IntPair(bplayer,1));
                             morelzll = true;
                             break;
@@ -800,7 +790,7 @@ public class NonHumanCoordinator
                 switch(option)
                 {
                     case 0:
-                        ctx.setSkillTarget(bplayer, 1, ctx.getYBZW(bplayer));
+                        ctx.recordSkillTarget(bplayer, 1, ctx.getPreliminaryDivinationTarget(bplayer));
                         response.add(new IntPair(bplayer,1));
                         break;
                     case 1:

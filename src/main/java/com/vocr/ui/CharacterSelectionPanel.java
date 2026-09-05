@@ -147,14 +147,14 @@ class CharacterSelectionPanel {
                             handler.updateFlagFromVoteTargets(flag);
                             break;
                         case DIVINATION:
-                            ui.ctx.getHiddenSeerScheduledSkillTargets()[idx + 1][ui.ctx.getGameDay()] = true;
+                            ui.ctx.setHiddenSeerScheduled(idx + 1, ui.ctx.getGameDay(), true);
                             for (int a = 0; a < trueNums.size(); a++)
                                 ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), true);
                             flag[0] = true;
                             if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
                             break;
                         case GUARD:
-                            ui.ctx.getHiddenHunterScheduledSkillTargets()[idx + 1][ui.ctx.getGameDay()] = true;
+                            ui.ctx.setHiddenHunterScheduled(idx + 1, ui.ctx.getGameDay(), true);
                             for (int a = 0; a < trueNums.size(); a++)
                                 ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), true);
                             flag[0] = true;
@@ -238,13 +238,13 @@ class CharacterSelectionPanel {
                             handler.updateFlagFromVoteTargets(flag);
                             break;
                         case DIVINATION:
-                            ui.ctx.getHiddenSeerScheduledSkillTargets()[idx + 1][ui.ctx.getGameDay()] = false;
+                            ui.ctx.setHiddenSeerScheduled(idx + 1, ui.ctx.getGameDay(), false);
                             for (int a = 0; a < trueNums.size(); a++)
                                 ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), false);
                             handler.updateFlagFromScheduledTargets(trueNums, flag, true);
                             break;
                         case GUARD:
-                            ui.ctx.getHiddenHunterScheduledSkillTargets()[idx + 1][ui.ctx.getGameDay()] = false;
+                            ui.ctx.setHiddenHunterScheduled(idx + 1, ui.ctx.getGameDay(), false);
                             for (int a = 0; a < trueNums.size(); a++)
                                 ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), false);
                             handler.updateFlagFromScheduledTargets(trueNums, flag, false);

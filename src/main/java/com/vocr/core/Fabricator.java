@@ -72,7 +72,7 @@ public class Fabricator
         }
         if (target[1] == 0) target[1] = target[0];
         int op = GameLogicUtils.getEventIndexByProbability(weight);
-        ctx.setSkillTarget(num, gd, target[op]);
+        ctx.recordSkillTarget(num, gd, target[op]);
         DebugLogger.log("假猎" + CharacterKanjiName.values()[ctx.getCharacterNumber(num)]
                 + ",假猎目标" + CharacterKanjiName.values()[ctx.getCharacterNumber(target[op])]);
     }

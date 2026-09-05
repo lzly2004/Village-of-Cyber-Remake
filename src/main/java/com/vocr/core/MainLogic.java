@@ -216,12 +216,12 @@ public class MainLogic implements MainLogicInterface
         int mediumResult = num;
         if(ctx.getActualRole(num) == 7)
             mediumResult += ctx.getPlayerSum();//黑结果
-        ctx.setSkillTarget(ctx.getMedium(), ctx.getGameDay(), mediumResult);
+        ctx.recordSkillTarget(ctx.getMedium(), ctx.getGameDay(), mediumResult);
         //3,狼咬逻辑,wolf[0]:主咬狼；wolf[1]：被咬玩家
         int[] wolf = wolfwork();
         //4,猎人工作逻辑
         int lietarget = zhenlie(ctx.getHunter());
-        ctx.setSkillTarget(ctx.getHunter(), ctx.getGameDay(), lietarget);
+        ctx.recordSkillTarget(ctx.getHunter(), ctx.getGameDay(), lietarget);
         //5,死体逻辑，并且返回当天夜间死体
         dielogic(wolf[0],wolf[1],zhantarget,lietarget);
         ctx.setEndResult(judgeend());

@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * 游戏上下文访问接口 —— UI层通过此接口查询游戏状态。
- * 以只读查询为主，仅保留投票/CO预约两个必要的写操作。
+ * 以只读查询为主，仅保留投票和技能预约所需的写操作。
  * 由 GameContext（Phase 2创建）实现。
  */
 public interface GameContextView
@@ -60,18 +60,17 @@ public interface GameContextView
 
     // === 非人策略查询 ===
     int getNonHumanPlan(int player);
-    int getZW(int player);
-    int getYBZW(int player);
 
     // === 预告查询 ===
     boolean isClaimedRoleScheduled(int player, int target, int day);
-    boolean[][] getClaimedRoleScheduledSkillTargets(int player);
-    boolean[][] getHiddenSeerScheduledSkillTargets();
-    boolean[][] getHiddenHunterScheduledSkillTargets();
+    boolean isHiddenSeerScheduled(int target, int day);
+    boolean isHiddenHunterScheduled(int target, int day);
 
-    // === UI层写操作（投票/CO预约）===
+    // === UI层写操作（投票/技能预约）===
     void setIsSelectedVoteTarget(int player, int day, boolean value);
     void setClaimedRoleScheduled(int player, int target, int day, boolean value);
+    void setHiddenSeerScheduled(int target, int day, boolean value);
+    void setHiddenHunterScheduled(int target, int day, boolean value);
 
     // === 共有者查询 ===
     int getGyIndex(int n);

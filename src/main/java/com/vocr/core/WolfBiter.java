@@ -88,7 +88,7 @@ public class WolfBiter
         if (hiddenHunterCntFinal > 0 && kFinal > 0)
         {
             engine.addSimpleRule("R06_潜伏猎护卫目标减权",
-                    i -> ctx.getHiddenHunterScheduledSkillTargets()[i][n],
+                    i -> ctx.isHiddenHunterScheduled(i, n),
                     i -> (int) (-200.0 / hiddenHunterCntFinal * kFinal));
         }
 
@@ -147,7 +147,7 @@ public class WolfBiter
                             weights[ctx.getSkillTarget(i, j)] += 45 + 2 * analysis.baiqiu[i] + 10 * yFinal;
                     for (int j = 1; j <= n; j++)
                         if (ctx.getDeathReason(j) == whyDie.NONE
-                                && ctx.getClaimedRoleScheduledSkillTargets(i)[j][n]
+                                && ctx.isClaimedRoleScheduled(i, j, n)
                                 && ctx.getActualRole(j) != 7)
                             weights[j] += 15;
                 }
@@ -170,7 +170,7 @@ public class WolfBiter
                     }
                     for (int j = 1; j <= n; j++)
                         if (ctx.getDeathReason(j) == whyDie.NONE
-                                && ctx.getClaimedRoleScheduledSkillTargets(i)[j][gd]
+                                && ctx.isClaimedRoleScheduled(i, j, gd)
                                 && ctx.getActualRole(j) != 7)
                             weights[j] += 15;
                 }
@@ -206,11 +206,11 @@ public class WolfBiter
 
                 int huweicnt = 0;
                 for (int j = 1; j <= n; j++)
-                    if (ctx.getClaimedRoleScheduledSkillTargets(i)[j][gd]) huweicnt++;
+                    if (ctx.isClaimedRoleScheduled(i, j, gd)) huweicnt++;
                 if (huweicnt > 0)
                 {
                     for (int j = 1; j <= n; j++)
-                        if (ctx.getClaimedRoleScheduledSkillTargets(i)[j][gd])
+                        if (ctx.isClaimedRoleScheduled(i, j, gd))
                             weights[j] -= 200 / huweicnt;
                 }
             }
@@ -369,7 +369,7 @@ public class WolfBiter
 
         int hiddenHunterCnt = 0;
         for (int i = 1; i <= n; i++)
-            if (ctx.getHiddenHunterScheduledSkillTargets()[i][n]) hiddenHunterCnt++;
+            if (ctx.isHiddenHunterScheduled(i, n)) hiddenHunterCnt++;
 
         analysis.k = k;
         analysis.hiddenHunterCnt = hiddenHunterCnt;

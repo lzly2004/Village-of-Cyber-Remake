@@ -43,7 +43,7 @@ public class LingFabricator
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
         int shokei = ctx.getDiePlayerNum(whyDie.chuxing, gd);
-        ctx.setSkillTarget(num, gd, shokei);
+        ctx.recordSkillTarget(num, gd, shokei);
         if (shokei == ctx.getActualRoleIndex(10) && ctx.getActualRoleIndex(11) > 0
                 && ctx.getDeathReason(ctx.getActualRoleIndex(11)) == whyDie.dayhouzhui)
         {
@@ -138,7 +138,7 @@ public class LingFabricator
         }
         int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(baip, heip)));
         if (op == 1)
-            ctx.setSkillTarget(num, gd, ctx.getSkillTarget(num, gd) + n);
+            ctx.recordSkillTarget(num, gd, ctx.getSkillTarget(num, gd) + n);
     }
 
     private void collectLingOptions(ArrayList<Integer> option, int num, int shokei, int n, int gd,
@@ -164,6 +164,6 @@ public class LingFabricator
         int op = option.get(ConstNum.randomInt(0, option.size() - 1));
         if (!GameLogicUtils.probabilityJudge(p)) op = 1 - op;
         if (op == 1)
-            ctx.setSkillTarget(num, ctx.getGameDay(), ctx.getSkillTarget(num, ctx.getGameDay()) + ctx.getPlayerSum());
+            ctx.recordSkillTarget(num, ctx.getGameDay(), ctx.getSkillTarget(num, ctx.getGameDay()) + ctx.getPlayerSum());
     }
 }

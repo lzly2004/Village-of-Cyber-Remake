@@ -26,8 +26,10 @@ public class HunterGuarder
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
         DebugLogger.log("猎人编号：" + num + " 当前游戏日期：" + gd);
-        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("这个猎的预告：", n, gd, ctx.getClaimedRoleScheduledSkillTargets(num)));
-        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("潜伏猎人的预告：", n, gd, ctx.getHiddenHunterScheduledSkillTargets()));
+        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("这个猎的预告：", n,
+                target -> ctx.isClaimedRoleScheduled(num, target, gd)));
+        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("潜伏猎人的预告：", n,
+                target -> ctx.isHiddenHunterScheduled(target, gd)));
         boolean haveTarget = false;
         boolean qf = false;
         int[] huweiweight = new int[n + 1];
@@ -39,8 +41,8 @@ public class HunterGuarder
             {
                 continue;
             }
-            if ((!qf && !ctx.getClaimedRoleScheduledSkillTargets(num)[i][gd])
-                    || (qf && !ctx.getHiddenHunterScheduledSkillTargets()[i][gd]))
+            if ((!qf && !ctx.isClaimedRoleScheduled(num, i, gd))
+                    || (qf && !ctx.isHiddenHunterScheduled(i, gd)))
             {
                 continue;
             }
@@ -52,12 +54,12 @@ public class HunterGuarder
 
         if (haveTarget)
         {
-            boolean[][] schedule = qf
-                ? ctx.getHiddenHunterScheduledSkillTargets()
-                : ctx.getClaimedRoleScheduledSkillTargets(num);
             for (int i = 1; i <= n; i++)
             {
-                if (ctx.isDead(i) || !schedule[i][gd])
+                boolean scheduled = qf
+                        ? ctx.isHiddenHunterScheduled(i, gd)
+                        : ctx.isClaimedRoleScheduled(num, i, gd);
+                if (ctx.isDead(i) || !scheduled)
                     huweiweight[i] = -GameConstants.INF;
                 else
                     huweiweight[i] = 40;

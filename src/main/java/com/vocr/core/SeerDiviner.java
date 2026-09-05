@@ -27,7 +27,8 @@ public class SeerDiviner
         int gd = ctx.getGameDay();
 
         DebugLogger.log("占卜师编号：" + znum + " 当前游戏日期：" + gd);
-        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("这个占的预告：", n, gd, ctx.getClaimedRoleScheduledSkillTargets(znum)));
+        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("这个占的预告：", n,
+                target -> ctx.isClaimedRoleScheduled(znum, target, gd)));
         int[] weight = new int[n + 1];
         ArrayList<Integer> target = new ArrayList<>();
         boolean[] istarget = new boolean[n + 1];
@@ -43,14 +44,15 @@ public class SeerDiviner
             istarget[ztarget] = false;
         }
         int claimedRoleScheduledSkillTargetssum = 0;
-        boolean[][] schedule = (ctx.getClaimedRole(znum) == 1)
-            ? ctx.getClaimedRoleScheduledSkillTargets(znum)
-            : ctx.getHiddenSeerScheduledSkillTargets();
+        boolean isClaimedSeer = ctx.getClaimedRole(znum) == 1;
 
         for (int i = 1; i <= n; i++)
         {
             if (!istarget[i]) continue;
-            if (!schedule[i][gd])
+            boolean scheduled = isClaimedSeer
+                    ? ctx.isClaimedRoleScheduled(znum, i, gd)
+                    : ctx.isHiddenSeerScheduled(i, gd);
+            if (!scheduled)
             {
                 istarget[i] = false;
                 continue;
@@ -181,7 +183,7 @@ public class SeerDiviner
     private int assignDivineResult(int znum, int ztarget)
     {
         int target = (ctx.getActualRole(ztarget) != 7) ? ztarget : ztarget + ctx.getPlayerSum();
-        ctx.setSkillTarget(znum, ctx.getGameDay(), target);
+        ctx.recordSkillTarget(znum, ctx.getGameDay(), target);
         return target;
     }
 }
