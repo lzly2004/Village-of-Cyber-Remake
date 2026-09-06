@@ -10,14 +10,23 @@ import java.io.IOException;
 
 public class ReplayManager {
     public static final int MAX_SLOTS = 9;
-    private static final String SAVE_FILE = PathConfig.REPLAY_SAVES;
+    private final String saveFile;
 
     private ReplaySave[] slots = new ReplaySave[MAX_SLOTS];
 
-    public ReplayManager() { load(); }
+    public ReplayManager() { this(PathConfig.REPLAY_SAVES); }
+
+    /** 允许兼容性测试使用隔离的存档文件，不触碰用户的真实 Replay 数据。 */
+    ReplayManager(String saveFile) {
+        if (saveFile == null || saveFile.isBlank()) {
+            throw new IllegalArgumentException("Replay存档路径不能为空");
+        }
+        this.saveFile = saveFile;
+        load();
+    }
 
     public void load() {
-        File file = new File(SAVE_FILE);
+        File file = new File(saveFile);
         if (file.exists() && file.length() > 50) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
@@ -34,14 +43,14 @@ public class ReplayManager {
                     }
                 }
                 
-                DebugLogger.info("[ReplayManager] 已加载存档数据: " + SAVE_FILE + ", 有效存档=" + validCount + "/" + MAX_SLOTS);
+                DebugLogger.info("[ReplayManager] 已加载存档数据: " + saveFile + ", 有效存档=" + validCount + "/" + MAX_SLOTS);
             } catch (Exception e) {
                 DebugLogger.error("[ReplayManager] 加载失败（可能格式不兼容，将重建）: " + e.getMessage());
                 e.printStackTrace();
                 
                 // 备份损坏的文件
                 if (file.exists()) {
-                    File backup = new File(SAVE_FILE + ".corrupted." + System.currentTimeMillis());
+                    File backup = new File(saveFile + ".corrupted." + System.currentTimeMillis());
                     file.renameTo(backup);
                     DebugLogger.warn("[ReplayManager] 已备份损坏文件到: " + backup.getName());
                 }
@@ -60,7 +69,7 @@ public class ReplayManager {
 
     public void save() {
         try {
-            File file = new File(SAVE_FILE);
+            File file = new File(saveFile);
             File dir = file.getParentFile();
             if (dir != null && !dir.exists()) dir.mkdirs();
 
@@ -77,7 +86,7 @@ public class ReplayManager {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT, true);
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, slots);
-            DebugLogger.info("[ReplayManager] 已保存存档数据: " + SAVE_FILE);
+            DebugLogger.info("[ReplayManager] 已保存存档数据: " + saveFile);
         } catch (Exception e) {
             DebugLogger.error("[ReplayManager] 保存失败: " + e.getMessage());
             e.printStackTrace();

@@ -1,0 +1,10 @@
+# Peiyi: yaoohu (ordinal=3)
+# VillageCount: 4/19
+INIT|roles|1:7:1,2:12:7,3:6:10
+DAILY_SNAPSHOT|day=2|alive=2
+STATE|day=2|{1:n=7,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=2,st=3}{2:n=12,r=7,cr=0,cro=0,dd=2,wd=1,nm=1,cod=-1,st=0}{3:n=6,r=10,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0}
+VOTE_METHOD|day=2|rule=2|grey=1,2|design=12
+VOTE_DETAIL|day=2|round=1|1->2,3->2
+DAILY_SNAPSHOT|day=3|alive=2
+STATE|day=3|{1:n=7,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=2,st=3}{2:n=12,r=7,cr=0,cro=0,dd=2,wd=1,nm=1,cod=-1,st=0}{3:n=6,r=10,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0}
+END|result=FOX_WIN|day=3

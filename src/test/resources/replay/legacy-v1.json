@@ -1,0 +1,72 @@
+[
+  {
+    "version": 1,
+    "slotIndex": 0,
+    "saveTime": "2025/01/02 03:04:05",
+    "peiyiName": "tongchang",
+    "peiyiOrdinal": 2,
+    "peiyiVillageCount": 0,
+    "totalVillageCount": 0,
+    "totalDays": 3,
+    "endResult": 1,
+    "totalEvents": 6,
+    "daySnapshots": [
+      {
+        "dayNumber": 2,
+        "aliveCount": 1,
+        "players": [
+          {
+            "playerIndex": 1,
+            "characterNumber": 30,
+            "actualRole": 1,
+            "claimedRole": 1,
+            "claimedRoleOrder": 1,
+            "comingOutDay": 2,
+            "skillTarget": 2,
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 2,
+            "characterNumber": 35,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "deathDay": 2,
+            "deathReason": 1,
+            "nonHumanMarked": true
+          }
+        ],
+        "voteRounds": [
+          {
+            "round": 1,
+            "votes": [[1, 2]]
+          }
+        ],
+        "dailyVotingRule": 2,
+        "greyTargetCharNums": [30],
+        "designatedTargetCharNums": [35]
+      }
+    ],
+    "rawRecords": [
+      "# Peiyi: tongchang (ordinal=2)",
+      "# VillageCount: -1/-1",
+      "DAILY_SNAPSHOT|day=2|alive=1",
+      "STATE|day=2|{1:n=30,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=2,st=2}{2:n=35,r=7,cr=0,cro=0,dd=2,wd=1,nm=1,cod=-1,st=0}",
+      "VOTE_DETAIL|day=2|round=1|1->2",
+      "END|result=VILLAGE_WIN|day=3"
+    ],
+    "legacyOnly": "ignored"
+  },
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+]
