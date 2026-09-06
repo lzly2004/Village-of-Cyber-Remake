@@ -1,6 +1,5 @@
 package com.vocr.core;
 
-import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 import com.vocr.domain.IntPair;
@@ -14,272 +13,28 @@ import java.util.List;
 
 public class NonHumanCoordinator
 {
-    private final GameModule module;
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
+    private final NonHumanStrategyPlanner strategyPlanner;
     private final COManager coManager;
     private final ResultEventGenerator eventGenerator;
     private final Runnable gylogic;
-    private final Runnable deliverEvents;
 
     public NonHumanCoordinator(GameModule module)
     {
-        this.module = module;
         this.ctx = module.getCtx();
         this.suspicion = module.getSuspicion();
+        this.strategyPlanner = new NonHumanStrategyPlanner(ctx, suspicion);
         this.coManager = module.getCoManager();
         this.eventGenerator = new ResultEventGenerator(ctx);
         this.gylogic = module.getGylogic();
-        this.deliverEvents = module.getDeliverEvents();
     }
 
     public void coordinate(List<Integer> diebody)
     {
-        int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
-
-        generatePreliminaryDivinations(n);
-        initNonHumanPlans();
-        int rlz = assignWolfSeerTargets(n, diebody);
-        assignWolfMediumTargets(rlz);
-        assignMadmanFanaticStrategy(n, diebody);
-        assignFoxStrategy(n, diebody);
-        assignDeviantStrategy(n, diebody);
-
+        strategyPlanner.plan(diebody);
         handleDaytimeCO(diebody, gd);
-    }
-
-    private void generatePreliminaryDivinations(int n)
-    {
-        DebugLogger.log("非人的初始工作：所有非人都生成一份预备占文");
-        for(int i=1;i<=n;i++)
-        {
-            if(GameLogicUtils.feiren(ctx.getActualRole(i)) == 0) continue;
-            int[] weight = new int[n+1];
-            for(int j=1;j<=n;j++)
-            {
-                if(i == j)
-                {
-                    weight[j] = -GameConstants.INF;
-                    continue;
-                }
-                if(ctx.getActualRole(i) != 7 && ctx.getActualRole(i) != 9)
-                {
-                    weight[j] = 1;
-                    continue;
-                }
-                if(ctx.getActualRole(j) != 7) weight[j] = 1;
-                else weight[j] = -GameConstants.INF;
-            }
-            ctx.recordPreliminaryDivinationTarget(i, suspicion.getOne(weight));
-            DebugLogger.log("非人的预备占文，非人:"+i+",预备占文:"+ctx.getPreliminaryDivinationTarget(i));
-        }
-    }
-
-    private void initNonHumanPlans()
-    {
-        DebugLogger.log("非人的初始工作：非人决定自己的计划倾向");
-        for(int i=1;i<=ctx.getInitialWolfCount();i++)
-        {
-            DebugLogger.log("rlindex[i]:" + ctx.getRlIndex(i));
-            if(ctx.isDead(ctx.getRlIndex(i))) continue;
-            ctx.setNonHumanPlan(ctx.getRlIndex(i), NonHumanPlan.STAY_HIDDEN);
-        }
-    }
-
-    private int assignWolfSeerTargets(int n, List<Integer> diebody)
-    {
-        DebugLogger.log("非人的初始工作：人狼上占");
-        int aggression = ctx.getNonHumanAggression();
-        int wolfCount = ctx.getInitialWolfCount();
-        int rlzhan = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                10 - aggression, (11 - wolfCount) * 15, aggression + (wolfCount - 2) * 3)));
-        int rlz = rlzhan;
-        while(rlzhan != 0)
-        {
-            int rl = ConstNum.randomInt(1, wolfCount);
-            if(ctx.isDead(ctx.getRlIndex(rl)) || ctx.getPlannedDivinationResult(ctx.getRlIndex(rl)) != 0) continue;
-            rlzhan--;
-            ctx.setNonHumanPlan(ctx.getRlIndex(rl), NonHumanPlan.CLAIM_SEER);
-            int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                    80 - 2 * aggression, 15, 5 + aggression, aggression)));
-            int[] weight = new int[n+1];
-            for(int i=1;i<=n;i++)
-            {
-                if((op == 1 || op == 2) && ctx.getActualRole(i) == 7 && ctx.getRlIndex(rl) != i)
-                {
-                    weight[i] = 1;
-                }
-                else if((op == 0 || op == 3) && ctx.getActualRole(i) != 7 && ctx.getPreliminaryDivinationTarget(ctx.getRlIndex(rl)) != i)
-                {
-                    weight[i] = 1;
-                }
-                else weight[i] = -GameConstants.INF;
-            }
-            int target = suspicion.getOne(weight);
-            ctx.recordPlannedDivinationResult(ctx.getRlIndex(rl),
-                    op == 0 || op == 2 || diebody.contains(target) ? target : target + n);
-            DebugLogger.log("人狼上占的占文，人狼："+rl+",占文："+ ctx.getPlannedDivinationResult(ctx.getRlIndex(rl)));
-        }
-        return rlz;
-    }
-
-    private void assignWolfMediumTargets(int rlz)
-    {
-        DebugLogger.log("非人的初始工作：人狼上灵");
-        int p;
-        int aggression = ctx.getNonHumanAggression();
-        if(ctx.getInitialWolfCount() == 2)
-        {
-            if(rlz == 0)  p = aggression + 30;
-            else if(rlz == 1) p = 0;
-            else p = 0;
-        }
-        else if(ctx.getInitialWolfCount() == 3)
-        {
-            if(rlz == 0) p = aggression + 50;
-            else if(rlz == 1) p = aggression + 30;
-            else p = 0;
-        }
-        else
-        {
-            if(rlz == 0) p = aggression + 60;
-            else if(rlz == 1) p = aggression + 30;
-            else p = aggression + 10;
-        }
-        if(GameLogicUtils.probabilityJudge(p))
-        {
-            int rl;
-            while(true)
-            {
-                rl = ConstNum.randomInt(1, ctx.getInitialWolfCount());
-                if(ctx.isDead(ctx.getRlIndex(rl)) || ctx.getPlannedDivinationResult(ctx.getRlIndex(rl)) != 0) continue;
-                ctx.setNonHumanPlan(ctx.getRlIndex(rl), NonHumanPlan.CLAIM_MEDIUM);
-                break;
-            }
-        }
-    }
-
-    private void assignMadmanFanaticStrategy(int n, List<Integer> diebody)
-    {
-        DebugLogger.log("非人的初始工作：狂人狂信策略");
-        List<Integer> strategyWeights = ctx.usesFanatic()
-                ? List.of(55, 35, 10)
-                : List.of(35, 60, 5);
-        int kop = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(strategyWeights));
-        int leader = ctx.getNonHumanLeader();
-        if(kop == 1)
-            ctx.setNonHumanPlan(leader, NonHumanPlan.CLAIM_MEDIUM);
-        else if(kop == 2)
-            ctx.setNonHumanPlan(leader, NonHumanPlan.STAY_HIDDEN);
-        else
-        {
-            ctx.setNonHumanPlan(leader, NonHumanPlan.CLAIM_SEER);
-            if(!ctx.usesFanatic())
-            {
-                int aggression = ctx.getNonHumanAggression();
-                int target,option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                        75 - aggression, 25 + aggression)));
-                while(true)
-                {
-                    target = ConstNum.randomInt(1,n);
-                    DebugLogger.log("狂人占文对象：" + target);
-                    if(target == ctx.getPreliminaryDivinationTarget(leader) || target == leader) continue;
-                    ctx.recordPlannedDivinationResult(leader,
-                            option == 0 || diebody.contains(target) ? target : target + n);
-                    break;
-                }
-            }
-            else
-            {
-                int aggression = ctx.getNonHumanAggression();
-                int target,option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                        70 - 2 * aggression, 20, aggression + 10, aggression)));
-                while(true)
-                {
-                    target = ConstNum.randomInt(1,n);
-                    if(target == ctx.getPreliminaryDivinationTarget(leader) || target == leader) continue;
-                    if(ctx.getActualRole(target) == 7 && option < 2) continue;
-                    if(ctx.getActualRole(target) != 7 && option > 1) continue;
-                    DebugLogger.log("狂信占文对象：" + target);
-                    ctx.recordPlannedDivinationResult(leader,
-                            option == 0 || option == 2 || diebody.contains(target) ? target : target + n);
-                    DebugLogger.log("狂信占文：" + ctx.getPlannedDivinationResult(leader));
-                    break;
-                }
-            }
-        }
-    }
-
-    private void assignFoxStrategy(int n, List<Integer> diebody)
-    {
-        DebugLogger.log("非人的初始工作：妖狐策略");
-        if(ctx.getFox() > 0 && ctx.isAlive(ctx.getFox()))
-        {
-            int aggression = ctx.getNonHumanAggression();
-            int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                    5 + aggression, aggression, 95 - 2 * aggression)));
-            if(op == 1)
-                ctx.setNonHumanPlan(ctx.getFox(), NonHumanPlan.CLAIM_MEDIUM);
-            else if(op == 2)
-                ctx.setNonHumanPlan(ctx.getFox(), NonHumanPlan.STAY_HIDDEN);
-            else
-            {
-                ctx.setNonHumanPlan(ctx.getFox(), NonHumanPlan.CLAIM_SEER);
-                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                        90 - aggression, 10 + aggression)));
-                while (true)
-                {
-                    target = ConstNum.randomInt(1, n);
-                    if (target == ctx.getPreliminaryDivinationTarget(ctx.getFox()) || target == ctx.getFox()) continue;
-                    DebugLogger.log("妖狐占文对象：" + target);
-                    ctx.recordPlannedDivinationResult(ctx.getFox(),
-                            option == 0 || diebody.contains(target) ? target : target + n);
-                    DebugLogger.log("妖狐占文：" + ctx.getPlannedDivinationResult(ctx.getFox()));
-                    break;
-                }
-            }
-        }
-    }
-
-    private void assignDeviantStrategy(int n, List<Integer> diebody)
-    {
-        DebugLogger.log("非人的初始工作：背德策略");
-        if(ctx.getDeviant() > 0 && ctx.isAlive(ctx.getDeviant()))
-        {
-            int aggression = ctx.getNonHumanAggression();
-            int bop = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                    50 + aggression, 5, 45 - aggression)));
-            if(bop == 1)
-                ctx.setNonHumanPlan(ctx.getDeviant(), NonHumanPlan.CLAIM_MEDIUM);
-            else if(bop == 2)
-                ctx.setNonHumanPlan(ctx.getDeviant(), NonHumanPlan.STAY_HIDDEN);
-            else
-            {
-                DebugLogger.log("背德开始选择占文");
-                ctx.setNonHumanPlan(ctx.getDeviant(), NonHumanPlan.CLAIM_SEER);
-                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                        60 - aggression, 20, 20 + aggression, 0)));
-                if(option == 2)
-                {
-                    ctx.recordPlannedDivinationResult(ctx.getDeviant(), ctx.getFox());
-                    DebugLogger.log("狐狸白球");
-                }
-                else
-                    while (true)
-                    {
-                        target = ConstNum.randomInt(1, n);
-                        DebugLogger.log("背德选择占文:"+target);
-                        if (target == ctx.getPreliminaryDivinationTarget(ctx.getDeviant()) || target == ctx.getDeviant())
-                            continue;
-                        if (ctx.getActualRole(target) == 10) continue;
-                        ctx.recordPlannedDivinationResult(ctx.getDeviant(),
-                                option == 0 || diebody.contains(target) ? target : target + n);
-                        DebugLogger.log("背德占文:" + ctx.getPlannedDivinationResult(ctx.getDeviant()));
-                        break;
-                    }
-            }
-        }
     }
 
     private void handleDaytimeCO(List<Integer> diebody, int gd)
