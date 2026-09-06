@@ -29,7 +29,7 @@ public class ZhanFabricator
         int[] target = new int[3];
         boolean[] zhaned = new boolean[n + 1];
         int[] blackzhi = new int[7];
-        int heip = ctx.initialWolfCount, baip = n - ctx.initialWolfCount;
+        int heip = ctx.getInitialWolfCount(), baip = n - ctx.getInitialWolfCount();
         baip -= ctx.computeNightDeathDecrement();
         for (int i = 1; i <= n; i++)
             if (ctx.isAckWhite(i) && ctx.isAlive(i))
@@ -53,9 +53,9 @@ public class ZhanFabricator
                         feisum--;
                     }
                 }
-            if (heisum >= ctx.initialWolfCount) continue;
+            if (heisum >= ctx.getInitialWolfCount()) continue;
             if ((ctx.getClaimedRole(target[i]) == 0 || ctx.getClaimedRole(target[i]) == 6)
-                    && feisum + heisum >= ctx.initialNonHumanCount)
+                    && feisum + heisum >= ctx.getInitialNonHumanCount())
                 continue;
             if (Math.abs(ctx.getClaimedRole(target[i]) - 3) < 3)
             {

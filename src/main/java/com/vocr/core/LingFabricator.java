@@ -54,7 +54,8 @@ public class LingFabricator
         {
             return;
         }
-        int heisum = 0, feisum = 0, heip = ctx.initialWolfCount, baip = n - ctx.initialWolfCount;
+        int heisum = 0, feisum = 0;
+        int heip = ctx.getInitialWolfCount(), baip = n - ctx.getInitialWolfCount();
         int[] blackzhi = new int[7];
         boolean[] linged = new boolean[n * 3];
         for (int i = 2; i < gd; i++)
@@ -85,12 +86,12 @@ public class LingFabricator
                 baip--;
             }
         feisum += ctx.computeFeisum();
-        if (feisum + heisum >= ctx.initialNonHumanCount
+        if (feisum + heisum >= ctx.getInitialNonHumanCount()
                 && (ctx.getClaimedRole(shokei) == 0 || ctx.getClaimedRole(shokei) == 6))
         {
             return;
         }
-        if (heisum >= ctx.initialWolfCount - 1)
+        if (heisum >= ctx.getInitialWolfCount() - 1)
         {
             return;
         }

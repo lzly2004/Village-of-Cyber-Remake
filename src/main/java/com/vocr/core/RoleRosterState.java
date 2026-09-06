@@ -13,6 +13,7 @@ final class RoleRosterState
     private final int[] wolfPlayers;
     private final int sharedCount;
     private final int wolfCount;
+    private final int nonHumanCount;
 
     RoleRosterState(int[] rolesByPlayer)
     {
@@ -26,11 +27,14 @@ final class RoleRosterState
 
         int currentSharedCount = 0;
         int currentWolfCount = 0;
+        int currentNonHumanCount = 0;
         for (int player = 1; player <= playerSum; player++)
         {
             int role = rolesByPlayer[player];
             validateRole(role);
             playerByRole[role] = player;
+            if (role >= Role.renlang.ordinal())
+                currentNonHumanCount++;
 
             if (role == Role.gong.ordinal())
             {
@@ -45,6 +49,7 @@ final class RoleRosterState
         }
         this.sharedCount = currentSharedCount;
         this.wolfCount = currentWolfCount;
+        this.nonHumanCount = currentNonHumanCount;
     }
 
     int getPlayerByRole(int role)
@@ -75,6 +80,11 @@ final class RoleRosterState
     int getWolfCount()
     {
         return wolfCount;
+    }
+
+    int getNonHumanCount()
+    {
+        return nonHumanCount;
     }
 
     private static void validateRole(int role)

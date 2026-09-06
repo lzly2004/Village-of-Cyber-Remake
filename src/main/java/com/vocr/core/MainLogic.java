@@ -99,7 +99,8 @@ public class MainLogic implements MainLogicInterface
                 throw new IllegalStateException("游戏初始化失败: 玩家" + i + "角色未分配");
             }
         }
-        ctx = new GameContext(gs);
+        int nonHumanAggression = ConstNum.randomInt(0, 5);
+        ctx = new GameContext(gs, NonHumanConfiguration.from(p, nonHumanAggression));
         suspicion = ctx.getSuspicion();
         seerDiviner = new SeerDiviner(ctx, suspicion);
         hunterGuarder = new HunterGuarder(ctx, suspicion);
@@ -153,10 +154,7 @@ public class MainLogic implements MainLogicInterface
         dayActionCoordinator = new DayActionCoordinator(gameModule);
         executionManager = new ExecutionManager(gameModule);
 
-        // Phase 3: 统一数组引用 —— 所有数组/集合字段统一在 GameContext 中管理
-        ctx.initFromPeiyi(p);
         ctx.validateRoleRoster();
-        ctx.kz = ConstNum.randomInt(0,5);//初始化非人狂躁值
         // 得到职业编号
         DebugLogger.log("玩家数量："+ctx.getPlayerSum());
         for(int i=1;i<=ctx.getPlayerSum();i++)

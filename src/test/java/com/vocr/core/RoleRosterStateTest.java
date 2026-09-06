@@ -34,6 +34,7 @@ class RoleRosterStateTest
         assertEquals(0, roster.getWolfPlayer(6));
         assertEquals(2, roster.getSharedCount());
         assertEquals(2, roster.getWolfCount());
+        assertEquals(2, roster.getNonHumanCount());
     }
 
     @Test

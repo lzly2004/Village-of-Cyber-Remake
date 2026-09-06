@@ -124,6 +124,6 @@ class GameContextSkillTest
     {
         GameStatus status = new GameStatus();
         status.startGame(peiyi.jianyi);
-        return new GameContext(status);
+        return new GameContext(status, NonHumanConfiguration.from(peiyi.jianyi, 0));
     }
 }

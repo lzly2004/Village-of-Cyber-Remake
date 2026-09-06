@@ -69,10 +69,8 @@ public interface GameContextView
     void setHiddenHunterScheduled(int target, int day, boolean value);
 
     // === 人狼查询 ===
-    int getInitialWolfCount();
     boolean isWolfClaimedHunter();
     boolean isWolfClaimedCat();
-    int getKyojin();
 
     // === CO询问查询 ===
     int getClaimedRoleAskDay(int role);

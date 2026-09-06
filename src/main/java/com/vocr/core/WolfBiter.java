@@ -72,7 +72,7 @@ public class WolfBiter
                 i -> gd * 2);
 
         engine.addSimpleRule("R04_狂信减权",
-                i -> ctx.getKyojin() == 0 && i == ctx.getActualRoleIndex(9),
+                i -> ctx.usesFanatic() && i == ctx.getActualRoleIndex(9),
                 i -> -45);
 
         // --- 末狼猫嫌 ---
@@ -260,7 +260,7 @@ public class WolfBiter
 
     private int countAliveWolves() {
         int aliverl = 0;
-        for (int i = 1; i <= ctx.initialWolfCount; i++)
+        for (int i = 1; i <= ctx.getInitialWolfCount(); i++)
             if (ctx.getDeathReason(ctx.getRlIndex(i)) == whyDie.NONE) aliverl++;
         return aliverl;
     }

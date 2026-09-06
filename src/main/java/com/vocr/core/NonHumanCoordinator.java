@@ -79,7 +79,7 @@ public class NonHumanCoordinator
     private void initNonHumanPlans()
     {
         DebugLogger.log("非人的初始工作：非人决定自己的计划倾向");
-        for(int i=1;i<=ctx.initialWolfCount;i++)
+        for(int i=1;i<=ctx.getInitialWolfCount();i++)
         {
             DebugLogger.log("rlindex[i]:" + ctx.getRlIndex(i));
             if(ctx.isDead(ctx.getRlIndex(i))) continue;
@@ -90,15 +90,19 @@ public class NonHumanCoordinator
     private int assignWolfSeerTargets(int n, List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：人狼上占");
-        int rlzhan = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(10-ctx.kz, (11-ctx.initialWolfCount)*15, ctx.kz + (ctx.initialWolfCount-2)*3)));
+        int aggression = ctx.getNonHumanAggression();
+        int wolfCount = ctx.getInitialWolfCount();
+        int rlzhan = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                10 - aggression, (11 - wolfCount) * 15, aggression + (wolfCount - 2) * 3)));
         int rlz = rlzhan;
         while(rlzhan != 0)
         {
-            int rl = ConstNum.randomInt(1,ctx.initialWolfCount);
+            int rl = ConstNum.randomInt(1, wolfCount);
             if(ctx.isDead(ctx.getRlIndex(rl)) || ctx.getPlannedDivinationResult(ctx.getRlIndex(rl)) != 0) continue;
             rlzhan--;
             ctx.setNonHumanPlan(ctx.getRlIndex(rl), NonHumanPlan.CLAIM_SEER);
-            int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(80-2*ctx.kz, 15, 5+ctx.kz, ctx.kz)));
+            int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                    80 - 2 * aggression, 15, 5 + aggression, aggression)));
             int[] weight = new int[n+1];
             for(int i=1;i<=n;i++)
             {
@@ -124,30 +128,31 @@ public class NonHumanCoordinator
     {
         DebugLogger.log("非人的初始工作：人狼上灵");
         int p;
-        if(ctx.initialWolfCount == 2)
+        int aggression = ctx.getNonHumanAggression();
+        if(ctx.getInitialWolfCount() == 2)
         {
-            if(rlz == 0)  p = ctx.kz + 30;
+            if(rlz == 0)  p = aggression + 30;
             else if(rlz == 1) p = 0;
             else p = 0;
         }
-        else if(ctx.initialWolfCount == 3)
+        else if(ctx.getInitialWolfCount() == 3)
         {
-            if(rlz == 0) p = ctx.kz + 50;
-            else if(rlz == 1) p = ctx.kz + 30;
+            if(rlz == 0) p = aggression + 50;
+            else if(rlz == 1) p = aggression + 30;
             else p = 0;
         }
         else
         {
-            if(rlz == 0) p = ctx.kz + 60;
-            else if(rlz == 1) p = ctx.kz + 30;
-            else p = ctx.kz + 10;
+            if(rlz == 0) p = aggression + 60;
+            else if(rlz == 1) p = aggression + 30;
+            else p = aggression + 10;
         }
         if(GameLogicUtils.probabilityJudge(p))
         {
             int rl;
             while(true)
             {
-                rl = ConstNum.randomInt(1,ctx.initialWolfCount);
+                rl = ConstNum.randomInt(1, ctx.getInitialWolfCount());
                 if(ctx.isDead(ctx.getRlIndex(rl)) || ctx.getPlannedDivinationResult(ctx.getRlIndex(rl)) != 0) continue;
                 ctx.setNonHumanPlan(ctx.getRlIndex(rl), NonHumanPlan.CLAIM_MEDIUM);
                 break;
@@ -158,8 +163,10 @@ public class NonHumanCoordinator
     private void assignMadmanFanaticStrategy(int n, List<Integer> diebody)
     {
         DebugLogger.log("非人的初始工作：狂人狂信策略");
-        if(ctx.getPeiyi() == peiyi.kuangxin || ctx.getPeiyi() == peiyi.daxing) ctx.kyojin = 0;
-        int kop = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(55-20*ctx.getKyojin(),35+25*ctx.getKyojin(),10-5*ctx.getKyojin())));
+        List<Integer> strategyWeights = ctx.usesFanatic()
+                ? List.of(55, 35, 10)
+                : List.of(35, 60, 5);
+        int kop = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(strategyWeights));
         int leader = ctx.getNonHumanLeader();
         if(kop == 1)
             ctx.setNonHumanPlan(leader, NonHumanPlan.CLAIM_MEDIUM);
@@ -168,9 +175,11 @@ public class NonHumanCoordinator
         else
         {
             ctx.setNonHumanPlan(leader, NonHumanPlan.CLAIM_SEER);
-            if(ctx.getKyojin() == 1)
+            if(!ctx.usesFanatic())
             {
-                int target,option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(75-ctx.kz,25+ctx.kz)));
+                int aggression = ctx.getNonHumanAggression();
+                int target,option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                        75 - aggression, 25 + aggression)));
                 while(true)
                 {
                     target = ConstNum.randomInt(1,n);
@@ -183,7 +192,9 @@ public class NonHumanCoordinator
             }
             else
             {
-                int target,option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(70-2*ctx.kz,20,ctx.kz+10,ctx.kz)));
+                int aggression = ctx.getNonHumanAggression();
+                int target,option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                        70 - 2 * aggression, 20, aggression + 10, aggression)));
                 while(true)
                 {
                     target = ConstNum.randomInt(1,n);
@@ -205,7 +216,9 @@ public class NonHumanCoordinator
         DebugLogger.log("非人的初始工作：妖狐策略");
         if(ctx.getFox() > 0 && ctx.isAlive(ctx.getFox()))
         {
-            int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(5+ctx.kz,ctx.kz,95-2*ctx.kz)));
+            int aggression = ctx.getNonHumanAggression();
+            int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                    5 + aggression, aggression, 95 - 2 * aggression)));
             if(op == 1)
                 ctx.setNonHumanPlan(ctx.getFox(), NonHumanPlan.CLAIM_MEDIUM);
             else if(op == 2)
@@ -213,7 +226,8 @@ public class NonHumanCoordinator
             else
             {
                 ctx.setNonHumanPlan(ctx.getFox(), NonHumanPlan.CLAIM_SEER);
-                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(90 - ctx.kz, 10 + ctx.kz)));
+                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                        90 - aggression, 10 + aggression)));
                 while (true)
                 {
                     target = ConstNum.randomInt(1, n);
@@ -233,7 +247,9 @@ public class NonHumanCoordinator
         DebugLogger.log("非人的初始工作：背德策略");
         if(ctx.getDeviant() > 0 && ctx.isAlive(ctx.getDeviant()))
         {
-            int bop = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50+ctx.kz,5,45-ctx.kz)));
+            int aggression = ctx.getNonHumanAggression();
+            int bop = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                    50 + aggression, 5, 45 - aggression)));
             if(bop == 1)
                 ctx.setNonHumanPlan(ctx.getDeviant(), NonHumanPlan.CLAIM_MEDIUM);
             else if(bop == 2)
@@ -242,7 +258,8 @@ public class NonHumanCoordinator
             {
                 DebugLogger.log("背德开始选择占文");
                 ctx.setNonHumanPlan(ctx.getDeviant(), NonHumanPlan.CLAIM_SEER);
-                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(60 - ctx.kz, 20, 20+ctx.kz, 0)));
+                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                        60 - aggression, 20, 20 + aggression, 0)));
                 if(option == 2)
                 {
                     ctx.recordPlannedDivinationResult(ctx.getDeviant(), ctx.getFox());
@@ -379,7 +396,7 @@ public class NonHumanCoordinator
 
         // 统计已CO的狼队占/灵数量
         int lzsum = 0, llsum = 0;
-        for(int i=1;i<=ctx.initialWolfCount;i++)
+        for(int i=1;i<=ctx.getInitialWolfCount();i++)
         {
             if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 1)
                 lzsum++;
@@ -537,7 +554,7 @@ public class NonHumanCoordinator
         DebugLogger.log("非人的初始工作：明确咒杀");
         DebugLogger.log("非人的初始工作：人狼上占");
         boolean haverl = false;
-        for(int i=1;i<=ctx.initialWolfCount;i++)
+        for(int i=1;i<=ctx.getInitialWolfCount();i++)
         {
             if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) != NonHumanPlan.CLAIM_SEER) continue;
             if(diebody.contains(ctx.getPlannedDivinationResult(ctx.getRlIndex(i))))
@@ -558,7 +575,7 @@ public class NonHumanCoordinator
         }
         if(!haverl)
         {
-            for(int i=1;i<=ctx.initialWolfCount;i++)
+            for(int i=1;i<=ctx.getInitialWolfCount();i++)
             {
                 if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) == NonHumanPlan.CLAIM_SEER) continue;
                 if(diebody.contains(ctx.getPreliminaryDivinationTarget(ctx.getRlIndex(i))))
@@ -598,7 +615,7 @@ public class NonHumanCoordinator
         }
         DebugLogger.log("非人的初始工作：灵能co");
         DebugLogger.log("非人的初始工作：遍历每个人狼，判断是否有计划上灵的人狼");
-        for(int i=1;i<=ctx.initialWolfCount;i++)
+                    for(int i=1;i<=ctx.getInitialWolfCount();i++)
         {
             if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) != NonHumanPlan.CLAIM_MEDIUM) continue;
             ctx.addClaimCandidate(2, ctx.getRlIndex(i));
@@ -629,7 +646,7 @@ public class NonHumanCoordinator
     private void buildSeerCOList()
     {
         DebugLogger.log("非人的初始工作：狼占");
-        for (int i=1;i<=ctx.initialWolfCount;i++)
+        for (int i=1;i<=ctx.getInitialWolfCount();i++)
         {
             if(ctx.isDead(ctx.getRlIndex(i))) continue;
             if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) == NonHumanPlan.CLAIM_SEER)
@@ -667,7 +684,7 @@ public class NonHumanCoordinator
     private void buildMediumCOList()
     {
         DebugLogger.log("非人的初始工作：狼灵");
-        for(int i=1;i<=ctx.initialWolfCount;i++)
+        for(int i=1;i<=ctx.getInitialWolfCount();i++)
         {
             if(ctx.isDead(ctx.getRlIndex(i))) continue;
             if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) == NonHumanPlan.CLAIM_MEDIUM)
@@ -730,7 +747,7 @@ public class NonHumanCoordinator
                 {
                     int lz = 0,ll = 0;
                     int lzweight = 10,llweight = 10,lmlweight = 10,lwcoweight = 10;
-                    for(int i=1;i<=ctx.initialWolfCount;i++)
+        for(int i=1;i<=ctx.getInitialWolfCount();i++)
                         if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 1)
                             lz++;
                         else if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 2)
@@ -763,7 +780,7 @@ public class NonHumanCoordinator
                         case 1:
                             response.add(new IntPair(bplayer,2));
                             morelzll = true;
-                            for(int k=1;k<=ctx.initialWolfCount;k++)
+                            for(int k=1;k<=ctx.getInitialWolfCount();k++)
                             {
                                 NonHumanPlan wolfPlan = ctx.getNonHumanPlan(ctx.getRlIndex(k));
                                 if(wolfPlan == NonHumanPlan.CLAIM_MEDIUM
@@ -795,7 +812,13 @@ public class NonHumanCoordinator
                     case 8: case 9:
                     option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(95,5,0,0)));break;
                     case 10:option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(80,5,10,5)));break;
-                    case 11:option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(45+ctx.kz,30,20,5-ctx.kz)));break;
+                    case 11:
+                    {
+                        int aggression = ctx.getNonHumanAggression();
+                        option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                                45 + aggression, 30, 20, 5 - aggression)));
+                        break;
+                    }
                 }
                 switch(option)
                 {

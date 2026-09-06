@@ -96,7 +96,8 @@ class GameContextVoteTest
     {
         GameStatus status = new GameStatus();
         status.startGame(peiyi.jianyi);
-        GameContext context = new GameContext(status);
+        GameContext context = new GameContext(
+                status, NonHumanConfiguration.from(peiyi.jianyi, 0));
         int[] targets = validTargets(context);
         context.recordVoteRound(2, 1, targets);
         context.setSelectedVoteTarget(2, 2, true);
@@ -208,6 +209,6 @@ class GameContextVoteTest
     {
         GameStatus status = new GameStatus();
         status.startGame(peiyi.jianyi);
-        return new GameContext(status);
+        return new GameContext(status, NonHumanConfiguration.from(peiyi.jianyi, 0));
     }
 }

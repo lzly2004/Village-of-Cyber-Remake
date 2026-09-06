@@ -28,6 +28,7 @@ class GameContext implements GameContextView
     private final boolean[] isDoubleDeathOccurred;
     private final int[] nightDeathCount;
     private final RoleRosterState roleRosterState;
+    private final NonHumanConfiguration nonHumanConfiguration;
     private final int[] claimedRoleAskDays;
     private final int[] claimedRoleOrderCounts;
     private final NonHumanPlanState nonHumanPlanState;
@@ -43,16 +44,15 @@ class GameContext implements GameContextView
     private final PendingEventQueue pendingEvents;
 
     // === 标量状态 ===
-    int kyojin;
-    int initialWolfCount;
-    int initialNonHumanCount;
     private boolean wolfClaimedHunter;
     private boolean wolfClaimedCat;
-    int kz;
 
-    GameContext(GameStatus gs)
+    GameContext(GameStatus gs, NonHumanConfiguration nonHumanConfiguration)
     {
         this.gs = gs;
+        if (nonHumanConfiguration == null)
+            throw new IllegalArgumentException("非人阵营配置不能为空");
+        this.nonHumanConfiguration = nonHumanConfiguration;
 
         int n = gs.getPlayerSum();
         this.isDoubleDeathOccurred = new boolean[GameConstants.MAX_GAME_DAYS + 1];
@@ -243,10 +243,12 @@ class GameContext implements GameContextView
 
     // --- 人狼 ---
     int getRlIndex(int n) { return roleRosterState.getWolfPlayer(n); }
-    public int getInitialWolfCount() { return initialWolfCount; }
+    int getInitialWolfCount() { return nonHumanConfiguration.initialWolfCount(); }
+    int getInitialNonHumanCount() { return nonHumanConfiguration.initialNonHumanCount(); }
+    int getNonHumanAggression() { return nonHumanConfiguration.aggression(); }
+    boolean usesFanatic() { return nonHumanConfiguration.usesFanatic(); }
     public boolean isWolfClaimedHunter() { return wolfClaimedHunter; }
     public boolean isWolfClaimedCat() { return wolfClaimedCat; }
-    public int getKyojin() { return kyojin; }
 
     // --- CO询问 ---
     public int getClaimedRoleAskDay(int role) { return claimedRoleAskDays[role]; }
@@ -556,28 +558,20 @@ class GameContext implements GameContextView
         return array;
     }
 
-    /** 根据配役初始化狼数量、非人数量、狂人标记 */
-    void initFromPeiyi(peiyi p)
-    {
-        switch (p)
-        {
-            case jianyi:  initialWolfCount = 2; initialNonHumanCount = 3; kyojin = 1; break;
-            case tongchang: initialWolfCount = 3; initialNonHumanCount = 4; kyojin = 1; break;
-            case yaoohu: initialWolfCount = 3; initialNonHumanCount = 5; kyojin = 1; break;
-            case kuangxin: initialWolfCount = 3; initialNonHumanCount = 5; kyojin = 0; break;
-            case beide:  initialWolfCount = 3; initialNonHumanCount = 6; kyojin = 1; break;
-            case maoyou: initialWolfCount = 4; initialNonHumanCount = 6; kyojin = 1; break;
-            case daxing:  initialWolfCount = 4; initialNonHumanCount = 7; kyojin = 0; break;
-        }
-    }
-
     /** 获取非人统领（狂人或狂信者）的职业编号 */
-    public int getNonHumanLeader() { return roleRosterState.getPlayerByRole(9 - kyojin); }
+    int getNonHumanLeader()
+    {
+        return roleRosterState.getPlayerByRole(nonHumanConfiguration.leaderRole().ordinal());
+    }
 
     void validateRoleRoster()
     {
-        if (roleRosterState.getWolfCount() != initialWolfCount)
+        if (roleRosterState.getWolfCount() != getInitialWolfCount())
             throw new IllegalStateException("人狼名册人数与配役不一致: " + roleRosterState.getWolfCount());
+        if (roleRosterState.getNonHumanCount() != getInitialNonHumanCount())
+            throw new IllegalStateException("非人名册人数与配役不一致: " + roleRosterState.getNonHumanCount());
+        if (getNonHumanLeader() == 0)
+            throw new IllegalStateException("非人统领职业与配役不一致");
         int expectedSharedCount = getPeiyi() == peiyi.jianyi ? 0 : 2;
         if (roleRosterState.getSharedCount() != expectedSharedCount)
             throw new IllegalStateException("共有者名册人数与配役不一致: " + roleRosterState.getSharedCount());

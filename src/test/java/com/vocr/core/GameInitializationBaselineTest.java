@@ -166,9 +166,11 @@ class GameInitializationBaselineTest {
         value.append("game=").append(status.p).append('|').append(status.gameDay).append('|')
                 .append(status.getAliveCounter()).append('|').append(status.getDeathCounter()).append('|')
                 .append(status.end).append('\n');
-        value.append("ctx=").append(context.initialWolfCount).append('|')
-                .append(context.initialNonHumanCount).append('|').append(context.kyojin).append('|')
-                .append(context.kz).append('|').append(context.getZhans()).append('|').append(context.getLings())
+        value.append("ctx=").append(context.getInitialWolfCount()).append('|')
+                .append(context.getInitialNonHumanCount()).append('|')
+                .append(context.usesFanatic() ? 0 : 1).append('|')
+                .append(context.getNonHumanAggression()).append('|')
+                .append(context.getZhans()).append('|').append(context.getLings())
                 .append('|').append(context.getLies()).append('|').append(context.getMaos()).append('|')
                 .append(context.getDiebody()).append('\n');
         appendArray(value, "actualRoleindex", queriedInts(Role.values().length + 1,
