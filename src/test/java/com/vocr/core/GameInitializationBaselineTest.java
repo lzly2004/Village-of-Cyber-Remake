@@ -133,6 +133,18 @@ class GameInitializationBaselineTest {
         assertEquals(first.randomChecksum, second.randomChecksum);
     }
 
+    @Test
+    void curseKillInitialization_shouldRemainCompatible() {
+        InitializationResult result = initialize(peiyi.yaoohu, 17L, "curse-golden");
+        GameContext context = (GameContext) result.logic.getGameContext();
+
+        assertEquals(List.of(10, 4), context.getDiebody());
+        assertEquals("c789a5bb88211b91ae9c528497b6d6140be0a45cf801ec05484fdb18b94aee91",
+                sha256(snapshot(result)));
+        assertEquals("size=406 sha256=8ff208e4b9fcf87240b468fc34e79c80f1ec4ee85094a95eb1a8873faf7fb1e5",
+                result.randomChecksum);
+    }
+
     private InitializationResult initialize(peiyi configuration, long seed, String label) {
         ConstNum.setRandomSeed(seed);
         ConstNum.startRandomRecording();
