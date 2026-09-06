@@ -586,7 +586,7 @@ public class NonHumanCoordinator
         for(int i=0;i<ctx.getZhans().size();i++)
         {
             int zhan = ctx.getZhans().get(i);
-            ctx.eventarray.add(new Event(EventName.zs14,ctx.getCharacterName(zhan),
+            ctx.queueEvent(new Event(EventName.zs14,ctx.getCharacterName(zhan),
                     ctx.getCharacterName(ctx.getSkillTarget(zhan, 1))));
             ctx.registerClaim(zhan, 1);
             ctx.addLazySuspicionValue(zhan, GameConstants.SUSPICION_DECREASE_SEER_CO);

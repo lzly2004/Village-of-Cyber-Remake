@@ -42,7 +42,7 @@ class GameContext implements GameContextView
     private final ArrayList<Integer> hunterCandidates;
     private final ArrayList<Integer> catCandidates;
     private final ArrayList<Integer> diebody;
-    final ArrayList<Event> eventarray;
+    private final PendingEventQueue pendingEvents;
 
     // === 标量状态 ===
     int kyojin;
@@ -75,7 +75,7 @@ class GameContext implements GameContextView
         this.hunterCandidates = new ArrayList<>();
         this.catCandidates = new ArrayList<>();
         this.diebody = new ArrayList<>();
-        this.eventarray = new ArrayList<>();
+        this.pendingEvents = new PendingEventQueue();
 
         this.suspicion = new SuspicionSystem(this);
     }
@@ -288,6 +288,14 @@ class GameContext implements GameContextView
         return result;
     }
     // ==================== Action API（状态修改） ====================
+
+    // --- 待交付事件 ---
+    void queueEvent(Event event) { pendingEvents.add(event); }
+    Event getPendingEvent(int index) { return pendingEvents.get(index); }
+    int getPendingEventCount() { return pendingEvents.size(); }
+    boolean hasPendingEvents() { return !pendingEvents.isEmpty(); }
+    void clearPendingEvents() { pendingEvents.clear(); }
+    void shufflePendingEvents() { pendingEvents.shuffle(); }
 
     /** 标记玩家为非人破绽 */
     void markNonHuman(int player) { gs.gc[player].nonHumanMarker = true; }

@@ -293,25 +293,19 @@ public class MainLogic implements MainLogicInterface
         coManager.askCoByRole(aclaimedRole);
         deliverEvents();
     }
-    private void deliverEvents()//发送当前得到的事件并清空事件数组
+    private void deliverEvents()//发送当前得到的事件并清空待交付队列
     {
-        for(int i=0;i<ctx.eventarray.size();i++)
+        for(int i=0;i<ctx.getPendingEventCount();i++)
         {
+            Event event = ctx.getPendingEvent(i);
             //输出测试信息
-            
-            {
-                DebugLogger.log("添加事件中");
-                if(ctx.eventarray.get(i) == null)
-                    DebugLogger.log("事件为空");
-                else
-                {
-                    DebugLogger.log("成功添加事件，事件信息：" + ctx.eventarray.get(i).toString());
-                }
-            }
+
+            DebugLogger.log("添加事件中");
+            DebugLogger.log("成功添加事件，事件信息：" + event.toString());
             //将事件发送给当前前端（正式运行时为UI，测试时为内存事件列表）
-            eventSink.accept(ctx.eventarray.get(i));
+            eventSink.accept(event);
         }
-        ctx.eventarray.clear();//清空事件数组
+        ctx.clearPendingEvents();//清空待交付队列
     }
     public void askCo(List<Integer> askList)
     {

@@ -57,9 +57,9 @@ public class ExecutionManager
         
         logSkillSchedule(n, gd);
         
-        ctx.eventarray.clear();
+        ctx.clearPendingEvents();
         if(dailyVotingRule == 2) handleAvoidanceCO(chuxingList, huibi);
-        if(ctx.eventarray.size() > 0)
+        if(ctx.hasPendingEvents())
         {
             deliverEvents.run();
             return false;
@@ -296,16 +296,16 @@ public class ExecutionManager
         CharacterEnglishName player = ctx.getCharacterName(suspicion.getOne(weight));
         switch (endResult) {
             case VILLAGE_WIN:
-                ctx.eventarray.add(new Event(EventName.crsl, player, null));
+                ctx.queueEvent(new Event(EventName.crsl, player, null));
                 break;
             case WOLF_WIN:
                 if ((ctx.getNonHumanLeader() > 0 && ctx.isAlive(ctx.getNonHumanLeader())))
-                    ctx.eventarray.add(new Event(EventName.krsl, ctx.getCharacterName(ctx.getNonHumanLeader()), null));
+                    ctx.queueEvent(new Event(EventName.krsl, ctx.getCharacterName(ctx.getNonHumanLeader()), null));
                 else
-                    ctx.eventarray.add(new Event(EventName.rlsl, player, null));
+                    ctx.queueEvent(new Event(EventName.rlsl, player, null));
                 break;
             case FOX_WIN:
-                ctx.eventarray.add(new Event(EventName.yhsl, player, null));
+                ctx.queueEvent(new Event(EventName.yhsl, player, null));
                 break;
         }
         deliverEvents.run();

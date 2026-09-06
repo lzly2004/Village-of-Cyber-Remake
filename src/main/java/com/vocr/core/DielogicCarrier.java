@@ -26,7 +26,7 @@ public class DielogicCarrier
     public void execute(int wolf, int wolfbite, int zhantarget, int lietarget)
     {
         ArrayList<Integer> diebody = new ArrayList<>();
-        ctx.eventarray.clear();
+        ctx.clearPendingEvents();
 
         handleWolfBite(wolf, wolfbite, lietarget, diebody);
         handleCurseKill(zhantarget, diebody);
@@ -67,9 +67,7 @@ public class DielogicCarrier
 
     private void shuffleAndLogEvents(ArrayList<Integer> diebody)
     {
-        ArrayList<Event> shuffled = GameLogicUtils.shuffleList(ctx.eventarray);
-        ctx.eventarray.clear();
-        ctx.eventarray.addAll(shuffled);
+        ctx.shufflePendingEvents();
         for (int i = 0; i < diebody.size(); i++)
         {
             DebugLogger.log("夜间死体：" + CharacterKanjiName.values()[ctx.getCharacterNumber(diebody.get(i))]);
@@ -80,7 +78,7 @@ public class DielogicCarrier
     {
         if (diebody.size() < 1)
         {
-            ctx.eventarray.add(new Event(EventName.wsw, null, null));
+            ctx.queueEvent(new Event(EventName.wsw, null, null));
         }
         else if (diebody.size() == 1)
         {
