@@ -259,12 +259,10 @@ public class ExecutionManager
                     coManager.processActualCo(num,ctx.getActualRole(num),ctx.getDiebody());
                     continue;
                 }
-                if(ctx.nonHumanPlan[num] != 0 && ctx.nonHumanPlan[num] != 4 && ctx.getClaimedRoleAskDay(ctx.nonHumanPlan[num]) == 0)
+                NonHumanPlan plan = ctx.getNonHumanPlan(num);
+                if(plan.isClaimPlan() && ctx.getClaimedRoleAskDay(plan.claimedRole()) == 0)
                 {
-                    if(ctx.getClaimedRoleAskDay(ctx.nonHumanPlan[num]) == 0)
-                        coManager.processActualCo(num,ctx.nonHumanPlan[num],ctx.getDiebody());
-                    else
-                        ctx.nonHumanPlan[num] = 0;
+                    coManager.processActualCo(num, plan.claimedRole(), ctx.getDiebody());
                     continue;
                 }
                 if(ctx.getClaimedRoleAskDay(3) == 0  || ctx.getClaimedRoleAskDay(5) == 0)

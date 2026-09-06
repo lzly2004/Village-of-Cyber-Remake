@@ -175,7 +175,8 @@ class GameInitializationBaselineTest {
         appendArray(value, "rlindex", context.rlindex);
         appendArray(value, "claimedRoleaskday", queriedInts(12, 11, context::getClaimedRoleAskDay));
         appendArray(value, "claimedRoleorder", queriedInts(12, 11, context::getClaimedRoleOrderCount));
-        appendArray(value, "nonHumanPlan", context.nonHumanPlan);
+        appendArray(value, "nonHumanPlan", queriedInts(status.getPlayerSum() + 1,
+                status.getPlayerSum(), player -> context.getNonHumanPlan(player).legacyCode()));
         appendArray(value, "ybzw", queriedInts(status.getPlayerSum() + 1, status.getPlayerSum(),
                 context::getPreliminaryDivinationTarget));
         appendArray(value, "zw", queriedInts(status.getPlayerSum() * 2 + 1, status.getPlayerSum(),

@@ -75,12 +75,12 @@ public class DayActionCoordinator
             for(int i=1;i<=n;i++)
             {
                 if(ctx.getClaimedRole(i) != 0) continue;
-                if(ctx.getActualRole(i) == 2 || ctx.nonHumanPlan[i] == 2)
+                if(ctx.getActualRole(i) == 2 || ctx.getNonHumanPlan(i) == NonHumanPlan.CLAIM_MEDIUM)
                 {
                     coManager.processActualCo(i,2,diebody);
                     continue;
                 }
-                if(ctx.getActualRole(i) == 1 || ctx.nonHumanPlan[i] == 1)
+                if(ctx.getActualRole(i) == 1 || ctx.getNonHumanPlan(i) == NonHumanPlan.CLAIM_SEER)
                 {
                     coManager.processActualCo(i,1,diebody);
                 }
@@ -120,17 +120,20 @@ public class DayActionCoordinator
                     int target = ctx.getSkillTarget(zhan, gd - 1) - n;
                     if(ctx.isDead(target) || ctx.getClaimedRole(target) != 0)
                         continue;
-                    if(ctx.getActualRole(target) == 5 || ctx.nonHumanPlan[target] == 5)
+                    if(ctx.getActualRole(target) == 5
+                            || ctx.getNonHumanPlan(target) == NonHumanPlan.CLAIM_CAT)
                     {
                         // 如果猫又已明确出局，非人不能CO猫
                         if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut())
-                            ctx.nonHumanPlan[target] = 0;
+                            ctx.clearNonHumanPlan(target);
                         else
                         {
                             response.add(new IntPair(target,5));havecatco = true;continue;
                         }
                     }
-                    if(ctx.getActualRole(target) < 7 || ctx.nonHumanPlan[target] == 0 || ctx.nonHumanPlan[target] == 3) continue;
+                    NonHumanPlan plan = ctx.getNonHumanPlan(target);
+                    if(ctx.getActualRole(target) < 7 || plan == NonHumanPlan.NONE
+                            || plan == NonHumanPlan.CLAIM_HUNTER) continue;
                     int zhi = ctx.getActualRole(target);
                     int maolieIdx = zhi == 7 ? 0 : zhi - 7;
                     if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(maolieIdx,1,coManager.getp1(zhi),coManager.getp2(zhi))))
@@ -138,11 +141,14 @@ public class DayActionCoordinator
                         int lweight = 50+50*ctx.getMaos().size(),mweight = 50 + 50*ctx.getLies().size();
                         if((zhi == 7 && ctx.isWolfClaimedHunter()) || ctx.getClaimedRoleAskDay(3) != 0) lweight = 0;
                         if((zhi == 7 && ctx.isWolfClaimedCat()) || ctx.getCat() == 0 || ctx.isCatDefinitivelyOut() || ctx.getClaimedRoleAskDay(5) != 0) mweight = 0;
-                        if(lweight + mweight == 0) ctx.nonHumanPlan[target] = 0;
+                        if(lweight + mweight == 0) ctx.clearNonHumanPlan(target);
                         else
                         {
-                            ctx.nonHumanPlan[target] = 3 + 2 * GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(lweight,mweight)));
-                            if(ctx.nonHumanPlan[target] == 5)
+                            int role = 3 + 2 * GameLogicUtils.getEventIndexByProbability(
+                                    new ArrayList<>(List.of(lweight,mweight)));
+                            NonHumanPlan responsePlan = NonHumanPlan.claimRole(role);
+                            ctx.setNonHumanPlan(target, responsePlan);
+                            if(responsePlan == NonHumanPlan.CLAIM_CAT)
                             {
                                 response.add(new IntPair(target,5));havecatco = true;
                                 if(zhi == 7) ctx.markWolfClaimedRole(5);
@@ -151,7 +157,7 @@ public class DayActionCoordinator
                         }
                     }
                     else if(zhi == 7)
-                        ctx.nonHumanPlan[target] = 0;
+                        ctx.clearNonHumanPlan(target);
                 }
             }
         }

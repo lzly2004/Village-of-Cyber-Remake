@@ -32,7 +32,7 @@ class GameContext implements GameContextView
     final int[] rlindex;
     private final int[] claimedRoleAskDays;
     private final int[] claimedRoleOrderCounts;
-    final int[] nonHumanPlan;
+    private final NonHumanPlanState nonHumanPlanState;
     private final SuspicionState suspicionState;
     private final SkillState skillState;
     private final VoteState voteState;
@@ -64,7 +64,7 @@ class GameContext implements GameContextView
         this.rlindex = new int[n + 1];
         this.claimedRoleAskDays = new int[12];
         this.claimedRoleOrderCounts = new int[12];
-        this.nonHumanPlan = new int[n + 1];
+        this.nonHumanPlanState = new NonHumanPlanState(n);
         this.suspicionState = new SuspicionState(n);
         this.skillState = new SkillState(n);
         this.voteState = new VoteState(n);
@@ -221,10 +221,9 @@ class GameContext implements GameContextView
     public boolean isDoubleDeathOccurred(int day) { return isDoubleDeathOccurred[day]; }
 
     // --- 非人策略 ---
-    public int getNonHumanPlan(int player)
+    NonHumanPlan getNonHumanPlan(int player)
     {
-        assert isValidPlayerIndex(player) : "玩家索引越界: " + player;
-        return nonHumanPlan[player];
+        return nonHumanPlanState.get(player);
     }
     int getPlannedDivinationResult(int player)
     {
@@ -296,6 +295,10 @@ class GameContext implements GameContextView
     boolean hasPendingEvents() { return !pendingEvents.isEmpty(); }
     void clearPendingEvents() { pendingEvents.clear(); }
     void shufflePendingEvents() { pendingEvents.shuffle(); }
+
+    // --- 非人公开身份计划 ---
+    void setNonHumanPlan(int player, NonHumanPlan plan) { nonHumanPlanState.set(player, plan); }
+    void clearNonHumanPlan(int player) { nonHumanPlanState.clear(player); }
 
     /** 标记玩家为非人破绽 */
     void markNonHuman(int player) { gs.gc[player].nonHumanMarker = true; }

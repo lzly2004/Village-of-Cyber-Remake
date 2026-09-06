@@ -32,12 +32,16 @@ public class Fabricator
         for (int i = 1; i <= n; i++)
         {
             if (ctx.getActualRole(i) < 7 || !ctx.isAlive(i)) continue;
-            if (ctx.getClaimedRole(i) == 6 || (ctx.getClaimedRole(i) == 0 && ctx.nonHumanPlan[i] == 0)) continue;
-            if (ctx.getClaimedRole(i) == 1 || (ctx.getClaimedRole(i) == 0 && ctx.nonHumanPlan[i] == 1))
+            NonHumanPlan plan = ctx.getNonHumanPlan(i);
+            if (ctx.getClaimedRole(i) == 6
+                    || (ctx.getClaimedRole(i) == 0 && plan == NonHumanPlan.NONE)) continue;
+            if (ctx.getClaimedRole(i) == 1
+                    || (ctx.getClaimedRole(i) == 0 && plan == NonHumanPlan.CLAIM_SEER))
             {
                 zhanFabricator.fabricate(diebody, i);
             }
-            else if (ctx.getClaimedRole(i) == 2 || (ctx.getClaimedRole(i) == 0 && ctx.nonHumanPlan[i] == 2))
+            else if (ctx.getClaimedRole(i) == 2
+                    || (ctx.getClaimedRole(i) == 0 && plan == NonHumanPlan.CLAIM_MEDIUM))
             {
                 lingFabricator.fabricate(i);
                 DebugLogger.log("假灵能结果：" + ctx.getSkillTarget(i, gd));

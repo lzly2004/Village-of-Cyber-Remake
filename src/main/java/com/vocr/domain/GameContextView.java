@@ -59,9 +59,6 @@ public interface GameContextView
     peiyi getPeiyi();
     boolean isDoubleDeathOccurred(int day);
 
-    // === 非人策略查询 ===
-    int getNonHumanPlan(int player);
-
     // === 预告查询 ===
     boolean isClaimedRoleScheduled(int player, int target, int day);
     boolean isHiddenSeerScheduled(int target, int day);

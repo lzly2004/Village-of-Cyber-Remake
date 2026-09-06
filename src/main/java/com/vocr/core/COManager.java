@@ -287,14 +287,15 @@ public class COManager
                     response.add(new IntPair(i, zhi));
                 continue;
             }
-            if (ctx.nonHumanPlan[i] == zhi && ctx.nonHumanPlan[i] != 4)
+            NonHumanPlan plan = ctx.getNonHumanPlan(i);
+            if (plan.claimsRole(zhi))
             {
                 if (gd == 2)
                     ctx.recordSkillTarget(i, 1, ctx.getPlannedDivinationResult(i));
                 response.add(new IntPair(i, zhi));
                 continue;
             }
-            if (zhi < 3 || zhi == 4 || ctx.nonHumanPlan[i] != 0) continue;
+            if (zhi < 3 || zhi == 4 || plan != NonHumanPlan.NONE) continue;
             switch (ctx.getActualRole(i))
             {
                 case 7:
@@ -337,11 +338,12 @@ public class COManager
             {
                 response.add(new IntPair(num, ctx.getActualRole(num)));
             }
-            else if (ctx.nonHumanPlan[num] != 0 && ctx.nonHumanPlan[num] != 4)
+            else if (ctx.getNonHumanPlan(num).isClaimPlan())
             {
-                if (ctx.nonHumanPlan[num] == 1)
+                NonHumanPlan plan = ctx.getNonHumanPlan(num);
+                if (plan == NonHumanPlan.CLAIM_SEER)
                     ctx.recordSkillTarget(num, 1, ctx.getPlannedDivinationResult(num));
-                response.add(new IntPair(num, ctx.nonHumanPlan[num]));
+                response.add(new IntPair(num, plan.claimedRole()));
             }
             else
             {
