@@ -188,12 +188,12 @@ public class COManager
             {
                 ctx.registerClaim(num, 4);
                 int gy = 1;
-                if (ctx.gyindex[2] == num) gy = 2;
+                if (ctx.getGyIndex(2) == num) gy = 2;
                 ctx.addLazySuspicionValue(num, -GameConstants.INF);
-                eventGenerator.addEvent(EventName.qfjc5, num, ctx.gyindex[3 - gy]);
-                eventGenerator.addEvent(EventName.qfjcqr5r, ctx.gyindex[3 - gy], num);
-                if (ctx.getClaimedRole(ctx.gyindex[3 - gy]) != zhi)
-                    ctx.revealClaim(ctx.gyindex[3 - gy], zhi, gd);
+                eventGenerator.addEvent(EventName.qfjc5, num, ctx.getGyIndex(3 - gy));
+                eventGenerator.addEvent(EventName.qfjcqr5r, ctx.getGyIndex(3 - gy), num);
+                if (ctx.getClaimedRole(ctx.getGyIndex(3 - gy)) != zhi)
+                    ctx.revealClaim(ctx.getGyIndex(3 - gy), zhi, gd);
                 break;
             }
             case 5:
@@ -231,9 +231,9 @@ public class COManager
                 if (ctx.isDoubleDeathOccurred(i))
                     counter++;
             }
-            if (counter == 2 && ctx.getDeathReason(ctx.actualRoleindex[5]) != whyDie.NONE)
+            if (counter == 2 && ctx.getDeathReason(ctx.getActualRoleIndex(5)) != whyDie.NONE)
                 return;
-            if (ctx.isDoubleDeathOccurred(gd - 1) && ctx.getDeathReason(ctx.actualRoleindex[5]) != whyDie.NONE)
+            if (ctx.isDoubleDeathOccurred(gd - 1) && ctx.getDeathReason(ctx.getActualRoleIndex(5)) != whyDie.NONE)
             {
                 boolean canclaim = false;
                 if (gd == 3 && ctx.getClaimedRoleAskDay(1) != 2)
@@ -365,7 +365,7 @@ public class COManager
                         if (ctx.isWolfClaimedHunter())
                         {
                             // 如果猫又已明确出局，不能CO猫
-                            if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
+                            if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
                                 response.add(new IntPair(num, 5));
                             else
                                 response.add(new IntPair(num, 6));
@@ -380,7 +380,7 @@ public class COManager
                         }
                         option = 0;
                         // 如果猫又已明确出局，不能CO猫
-                        if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
+                        if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
                             option = GameLogicUtils.getEventIndexByProbability(
                                     new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
                                             50 + 50 * ctx.getLies().size())));
@@ -399,7 +399,7 @@ public class COManager
                         }
                         option = 0;
                         // 如果猫又已明确出局，不能CO猫
-                        if (ctx.actualRoleindex[5] != 0 && !ctx.isCatDefinitivelyOut())
+                        if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
                             option = GameLogicUtils.getEventIndexByProbability(
                                     new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
                                             50 + 50 * ctx.getLies().size())));
@@ -418,15 +418,15 @@ public class COManager
     {
         if (isHumanWolf)
         {
-            if ((ctx.actualRoleindex[3] < 1 || ctx.isWolfClaimedHunter() || ctx.getClaimedRoleAskDay(3) > 0)
-                    && (ctx.actualRoleindex[5] < 1 || ctx.isWolfClaimedCat() || ctx.getClaimedRoleAskDay(5) > 0))
+            if ((ctx.getActualRoleIndex(3) < 1 || ctx.isWolfClaimedHunter() || ctx.getClaimedRoleAskDay(3) > 0)
+                    && (ctx.getActualRoleIndex(5) < 1 || ctx.isWolfClaimedCat() || ctx.getClaimedRoleAskDay(5) > 0))
                 return;
         }
         // 如果猫又已明确出局，不能CO猫
-        if (ctx.actualRoleindex[3] < 1 || (isHumanWolf && ctx.isWolfClaimedHunter()) || ctx.getClaimedRoleAskDay(3) > 0
+        if (ctx.getActualRoleIndex(3) < 1 || (isHumanWolf && ctx.isWolfClaimedHunter()) || ctx.getClaimedRoleAskDay(3) > 0
                 || ctx.isCatDefinitivelyOut())
             processActualCo(num, 3, diebody);
-        else if (ctx.actualRoleindex[5] < 1 || (isHumanWolf && ctx.isWolfClaimedCat()) || ctx.getClaimedRoleAskDay(5) > 0)
+        else if (ctx.getActualRoleIndex(5) < 1 || (isHumanWolf && ctx.isWolfClaimedCat()) || ctx.getClaimedRoleAskDay(5) > 0)
             processActualCo(num, 3, diebody);
         else
             processActualCo(num, 3 + 2 * GameLogicUtils.getEventIndexByProbability(

@@ -155,19 +155,13 @@ public class MainLogic implements MainLogicInterface
 
         // Phase 3: 统一数组引用 —— 所有数组/集合字段统一在 GameContext 中管理
         ctx.initFromPeiyi(p);
+        ctx.validateRoleRoster();
         ctx.kz = ConstNum.randomInt(0,5);//初始化非人狂躁值
         // 得到职业编号
-        int nowrl = 1;
-        int nowgy = 1;
         DebugLogger.log("玩家数量："+ctx.getPlayerSum());
         for(int i=1;i<=ctx.getPlayerSum();i++)
         {
             DebugLogger.log("玩家"+i+"的职业："+ctx.getActualRole(i));
-            ctx.setActualRoleIndex(ctx.getActualRole(i), i);
-            if(ctx.getActualRole(i) == 7)
-                ctx.rlindex[nowrl++] = i;
-            if(ctx.getActualRole(i) == 4)
-                ctx.gyindex[nowgy++] = i;
         }
         // 怀疑度初始化已由 SuspicionSystem 构造自动完成
         this.recorder.startGame(p, 0L, gs.getPlayerSum(), gs);

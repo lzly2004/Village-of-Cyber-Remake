@@ -114,9 +114,9 @@ public class ResultPresenter
             {
                 eventGenerator.addEvent(EventName.gprz11r, target, num);
                 int gy = 1;
-                if (ctx.gyindex[2] == target) gy = 2;
-                if (ctx.getDeathReason(ctx.gyindex[3 - gy]) == whyDie.NONE)
-                    eventGenerator.addEvent(EventName.gprz11p, ctx.gyindex[3 - gy], target);
+                if (ctx.getGyIndex(2) == target) gy = 2;
+                if (ctx.getDeathReason(ctx.getGyIndex(3 - gy)) == whyDie.NONE)
+                    eventGenerator.addEvent(EventName.gprz11p, ctx.getGyIndex(3 - gy), target);
             }
         }
     }

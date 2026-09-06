@@ -24,8 +24,6 @@ public interface GameContextView
     int getComingOutDay(int player);
     int getClaimedRoleOrder(int player);
     int getClaimedRoleOrderCount(int role);
-    int getActualRoleIndex(int role);
-
     int getMedium();
     int getHunter();
     int getCat();
@@ -70,11 +68,7 @@ public interface GameContextView
     void setHiddenSeerScheduled(int target, int day, boolean value);
     void setHiddenHunterScheduled(int target, int day, boolean value);
 
-    // === 共有者查询 ===
-    int getGyIndex(int n);
-
     // === 人狼查询 ===
-    int getRlIndex(int n);
     int getInitialWolfCount();
     boolean isWolfClaimedHunter();
     boolean isWolfClaimedCat();

@@ -81,9 +81,9 @@ public class NonHumanCoordinator
         DebugLogger.log("非人的初始工作：非人决定自己的计划倾向");
         for(int i=1;i<=ctx.initialWolfCount;i++)
         {
-            DebugLogger.log("rlindex[i]:" + ctx.rlindex[i]);
-            if(ctx.isDead(ctx.rlindex[i])) continue;
-            ctx.setNonHumanPlan(ctx.rlindex[i], NonHumanPlan.STAY_HIDDEN);
+            DebugLogger.log("rlindex[i]:" + ctx.getRlIndex(i));
+            if(ctx.isDead(ctx.getRlIndex(i))) continue;
+            ctx.setNonHumanPlan(ctx.getRlIndex(i), NonHumanPlan.STAY_HIDDEN);
         }
     }
 
@@ -95,27 +95,27 @@ public class NonHumanCoordinator
         while(rlzhan != 0)
         {
             int rl = ConstNum.randomInt(1,ctx.initialWolfCount);
-            if(ctx.isDead(ctx.rlindex[rl]) || ctx.getPlannedDivinationResult(ctx.rlindex[rl]) != 0) continue;
+            if(ctx.isDead(ctx.getRlIndex(rl)) || ctx.getPlannedDivinationResult(ctx.getRlIndex(rl)) != 0) continue;
             rlzhan--;
-            ctx.setNonHumanPlan(ctx.rlindex[rl], NonHumanPlan.CLAIM_SEER);
+            ctx.setNonHumanPlan(ctx.getRlIndex(rl), NonHumanPlan.CLAIM_SEER);
             int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(80-2*ctx.kz, 15, 5+ctx.kz, ctx.kz)));
             int[] weight = new int[n+1];
             for(int i=1;i<=n;i++)
             {
-                if((op == 1 || op == 2) && ctx.getActualRole(i) == 7 && ctx.rlindex[rl] != i)
+                if((op == 1 || op == 2) && ctx.getActualRole(i) == 7 && ctx.getRlIndex(rl) != i)
                 {
                     weight[i] = 1;
                 }
-                else if((op == 0 || op == 3) && ctx.getActualRole(i) != 7 && ctx.getPreliminaryDivinationTarget(ctx.rlindex[rl]) != i)
+                else if((op == 0 || op == 3) && ctx.getActualRole(i) != 7 && ctx.getPreliminaryDivinationTarget(ctx.getRlIndex(rl)) != i)
                 {
                     weight[i] = 1;
                 }
                 else weight[i] = -GameConstants.INF;
             }
             int target = suspicion.getOne(weight);
-            ctx.recordPlannedDivinationResult(ctx.rlindex[rl],
+            ctx.recordPlannedDivinationResult(ctx.getRlIndex(rl),
                     op == 0 || op == 2 || diebody.contains(target) ? target : target + n);
-            DebugLogger.log("人狼上占的占文，人狼："+rl+",占文："+ ctx.getPlannedDivinationResult(ctx.rlindex[rl]));
+            DebugLogger.log("人狼上占的占文，人狼："+rl+",占文："+ ctx.getPlannedDivinationResult(ctx.getRlIndex(rl)));
         }
         return rlz;
     }
@@ -148,8 +148,8 @@ public class NonHumanCoordinator
             while(true)
             {
                 rl = ConstNum.randomInt(1,ctx.initialWolfCount);
-                if(ctx.isDead(ctx.rlindex[rl]) || ctx.getPlannedDivinationResult(ctx.rlindex[rl]) != 0) continue;
-                ctx.setNonHumanPlan(ctx.rlindex[rl], NonHumanPlan.CLAIM_MEDIUM);
+                if(ctx.isDead(ctx.getRlIndex(rl)) || ctx.getPlannedDivinationResult(ctx.getRlIndex(rl)) != 0) continue;
+                ctx.setNonHumanPlan(ctx.getRlIndex(rl), NonHumanPlan.CLAIM_MEDIUM);
                 break;
             }
         }
@@ -381,9 +381,9 @@ public class NonHumanCoordinator
         int lzsum = 0, llsum = 0;
         for(int i=1;i<=ctx.initialWolfCount;i++)
         {
-            if(ctx.getClaimedRole(ctx.rlindex[i]) == 1)
+            if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 1)
                 lzsum++;
-            else if(ctx.getClaimedRole(ctx.rlindex[i]) == 2)
+            else if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 2)
                 llsum++;
         }
 
@@ -525,8 +525,8 @@ public class NonHumanCoordinator
                     coManager.processActualCo(i, plan.claimedRole(), diebody);
                 }
             }
-            if((ctx.gyindex[1] <= 0 || ctx.getClaimedRole(ctx.gyindex[1]) != 4) &&
-               (ctx.gyindex[2] <= 0 || ctx.getClaimedRole(ctx.gyindex[2]) != 4))
+            if((ctx.getGyIndex(1) <= 0 || ctx.getClaimedRole(ctx.getGyIndex(1)) != 4) &&
+               (ctx.getGyIndex(2) <= 0 || ctx.getClaimedRole(ctx.getGyIndex(2)) != 4))
                 gylogic.run();
         }
         c.response.clear();
@@ -539,34 +539,34 @@ public class NonHumanCoordinator
         boolean haverl = false;
         for(int i=1;i<=ctx.initialWolfCount;i++)
         {
-            if(ctx.getNonHumanPlan(ctx.rlindex[i]) != NonHumanPlan.CLAIM_SEER) continue;
-            if(diebody.contains(ctx.getPlannedDivinationResult(ctx.rlindex[i])))
+            if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) != NonHumanPlan.CLAIM_SEER) continue;
+            if(diebody.contains(ctx.getPlannedDivinationResult(ctx.getRlIndex(i))))
             {
                 haverl = true;
-                ctx.addClaimCandidate(1, ctx.rlindex[i]);
-                ctx.recordSkillTarget(ctx.rlindex[i], 1, ctx.getPlannedDivinationResult(ctx.rlindex[i]));
+                ctx.addClaimCandidate(1, ctx.getRlIndex(i));
+                ctx.recordSkillTarget(ctx.getRlIndex(i), 1, ctx.getPlannedDivinationResult(ctx.getRlIndex(i)));
                 continue;
             }
-            if(diebody.contains(ctx.getPreliminaryDivinationTarget(ctx.rlindex[i])))
+            if(diebody.contains(ctx.getPreliminaryDivinationTarget(ctx.getRlIndex(i))))
             {
                 haverl = true;
-                ctx.addClaimCandidate(1, ctx.rlindex[i]);
-                ctx.recordSkillTarget(ctx.rlindex[i], 1, ctx.getPreliminaryDivinationTarget(ctx.rlindex[i]));
+                ctx.addClaimCandidate(1, ctx.getRlIndex(i));
+                ctx.recordSkillTarget(ctx.getRlIndex(i), 1, ctx.getPreliminaryDivinationTarget(ctx.getRlIndex(i)));
                 continue;
             }
-            ctx.clearNonHumanPlan(ctx.rlindex[i]);
+            ctx.clearNonHumanPlan(ctx.getRlIndex(i));
         }
         if(!haverl)
         {
             for(int i=1;i<=ctx.initialWolfCount;i++)
             {
-                if(ctx.getNonHumanPlan(ctx.rlindex[i]) == NonHumanPlan.CLAIM_SEER) continue;
-                if(diebody.contains(ctx.getPreliminaryDivinationTarget(ctx.rlindex[i])))
+                if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) == NonHumanPlan.CLAIM_SEER) continue;
+                if(diebody.contains(ctx.getPreliminaryDivinationTarget(ctx.getRlIndex(i))))
                 {
                     haverl = true;
-                    ctx.addClaimCandidate(1, ctx.rlindex[i]);
-                    ctx.recordSkillTarget(ctx.rlindex[i], 1, ctx.getPreliminaryDivinationTarget(ctx.rlindex[i]));
-                    ctx.setNonHumanPlan(ctx.rlindex[i], NonHumanPlan.CLAIM_SEER);
+                    ctx.addClaimCandidate(1, ctx.getRlIndex(i));
+                    ctx.recordSkillTarget(ctx.getRlIndex(i), 1, ctx.getPreliminaryDivinationTarget(ctx.getRlIndex(i)));
+                    ctx.setNonHumanPlan(ctx.getRlIndex(i), NonHumanPlan.CLAIM_SEER);
                 }
             }
         }
@@ -600,8 +600,8 @@ public class NonHumanCoordinator
         DebugLogger.log("非人的初始工作：遍历每个人狼，判断是否有计划上灵的人狼");
         for(int i=1;i<=ctx.initialWolfCount;i++)
         {
-            if(ctx.getNonHumanPlan(ctx.rlindex[i]) != NonHumanPlan.CLAIM_MEDIUM) continue;
-            ctx.addClaimCandidate(2, ctx.rlindex[i]);
+            if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) != NonHumanPlan.CLAIM_MEDIUM) continue;
+            ctx.addClaimCandidate(2, ctx.getRlIndex(i));
             break;
         }
         DebugLogger.log("非人的初始工作：狂灵信灵");
@@ -631,11 +631,11 @@ public class NonHumanCoordinator
         DebugLogger.log("非人的初始工作：狼占");
         for (int i=1;i<=ctx.initialWolfCount;i++)
         {
-            if(ctx.isDead(ctx.rlindex[i])) continue;
-            if(ctx.getNonHumanPlan(ctx.rlindex[i]) == NonHumanPlan.CLAIM_SEER)
+            if(ctx.isDead(ctx.getRlIndex(i))) continue;
+            if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) == NonHumanPlan.CLAIM_SEER)
             {
-                ctx.addClaimCandidate(1, ctx.rlindex[i]);
-                ctx.recordSkillTarget(ctx.rlindex[i], 1, ctx.getPlannedDivinationResult(ctx.rlindex[i]));
+                ctx.addClaimCandidate(1, ctx.getRlIndex(i));
+                ctx.recordSkillTarget(ctx.getRlIndex(i), 1, ctx.getPlannedDivinationResult(ctx.getRlIndex(i)));
             }
         }
         DebugLogger.log("非人的初始工作：狂占信占");
@@ -669,10 +669,10 @@ public class NonHumanCoordinator
         DebugLogger.log("非人的初始工作：狼灵");
         for(int i=1;i<=ctx.initialWolfCount;i++)
         {
-            if(ctx.isDead(ctx.rlindex[i])) continue;
-            if(ctx.getNonHumanPlan(ctx.rlindex[i]) == NonHumanPlan.CLAIM_MEDIUM)
+            if(ctx.isDead(ctx.getRlIndex(i))) continue;
+            if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) == NonHumanPlan.CLAIM_MEDIUM)
             {
-                ctx.addClaimCandidate(2, ctx.rlindex[i]);
+                ctx.addClaimCandidate(2, ctx.getRlIndex(i));
                 break;
             }
         }
@@ -731,9 +731,9 @@ public class NonHumanCoordinator
                     int lz = 0,ll = 0;
                     int lzweight = 10,llweight = 10,lmlweight = 10,lwcoweight = 10;
                     for(int i=1;i<=ctx.initialWolfCount;i++)
-                        if(ctx.getClaimedRole(ctx.rlindex[i]) == 1)
+                        if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 1)
                             lz++;
-                        else if(ctx.getClaimedRole(ctx.rlindex[i]) == 2)
+                        else if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 2)
                             ll++;
                     if(lz > 1)  lzweight = 0;
                     if(ll > 0)  llweight = 0;
@@ -746,7 +746,7 @@ public class NonHumanCoordinator
                     {
                         lmlweight = 0;
                     }
-                    if(ctx.getPeiyi() == peiyi.jianyi && (ctx.getZhans().contains(ctx.rlindex[1]) || ctx.getZhans().contains(ctx.rlindex[2])))
+                    if(ctx.getPeiyi() == peiyi.jianyi && (ctx.getZhans().contains(ctx.getRlIndex(1)) || ctx.getZhans().contains(ctx.getRlIndex(2))))
                     {
                         lzweight = 0;
                         llweight = 0;
@@ -765,10 +765,10 @@ public class NonHumanCoordinator
                             morelzll = true;
                             for(int k=1;k<=ctx.initialWolfCount;k++)
                             {
-                                NonHumanPlan wolfPlan = ctx.getNonHumanPlan(ctx.rlindex[k]);
+                                NonHumanPlan wolfPlan = ctx.getNonHumanPlan(ctx.getRlIndex(k));
                                 if(wolfPlan == NonHumanPlan.CLAIM_MEDIUM
                                         && !bplayers.contains(wolfPlan.legacyCode()))
-                                    ctx.setNonHumanPlan(ctx.rlindex[k], NonHumanPlan.STAY_HIDDEN);
+                                    ctx.setNonHumanPlan(ctx.getRlIndex(k), NonHumanPlan.STAY_HIDDEN);
                             }
                             break;
                         case 2:

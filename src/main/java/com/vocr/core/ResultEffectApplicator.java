@@ -56,9 +56,9 @@ public class ResultEffectApplicator
                 ctx.revealClaim(target, 4, gd);
                 ctx.markNonHuman(num);
                 int gy = 1;
-                if (ctx.gyindex[2] == target) gy = 2;
-                if (ctx.getClaimedRole(ctx.gyindex[3 - gy]) != 4)
-                    ctx.revealClaim(ctx.gyindex[3 - gy], 4, gd);
+                if (ctx.getGyIndex(2) == target) gy = 2;
+                if (ctx.getClaimedRole(ctx.getGyIndex(3 - gy)) != 4)
+                    ctx.revealClaim(ctx.getGyIndex(3 - gy), 4, gd);
             }
         }
     }

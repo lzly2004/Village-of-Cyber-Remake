@@ -3,6 +3,7 @@ package com.vocr.core;
 import com.vocr.domain.Event;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.GameResult;
+import com.vocr.domain.Role;
 import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;
 
@@ -170,9 +171,11 @@ class GameInitializationBaselineTest {
                 .append(context.kz).append('|').append(context.getZhans()).append('|').append(context.getLings())
                 .append('|').append(context.getLies()).append('|').append(context.getMaos()).append('|')
                 .append(context.getDiebody()).append('\n');
-        appendArray(value, "actualRoleindex", context.actualRoleindex);
-        appendArray(value, "gyindex", context.gyindex);
-        appendArray(value, "rlindex", context.rlindex);
+        appendArray(value, "actualRoleindex", queriedInts(Role.values().length + 1,
+                Role.values().length - 1, context::getActualRoleIndex));
+        appendArray(value, "gyindex", queriedInts(3, 2, context::getGyIndex));
+        appendArray(value, "rlindex", queriedInts(status.getPlayerSum() + 1,
+                status.getPlayerSum(), context::getRlIndex));
         appendArray(value, "claimedRoleaskday", queriedInts(12, 11, context::getClaimedRoleAskDay));
         appendArray(value, "claimedRoleorder", queriedInts(12, 11, context::getClaimedRoleOrderCount));
         appendArray(value, "nonHumanPlan", queriedInts(status.getPlayerSum() + 1,

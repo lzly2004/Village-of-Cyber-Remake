@@ -27,9 +27,7 @@ class GameContext implements GameContextView
     // === 核心状态数组 ===
     private final boolean[] isDoubleDeathOccurred;
     private final int[] nightDeathCount;
-    final int[] actualRoleindex;
-    final int[] gyindex;
-    final int[] rlindex;
+    private final RoleRosterState roleRosterState;
     private final int[] claimedRoleAskDays;
     private final int[] claimedRoleOrderCounts;
     private final NonHumanPlanState nonHumanPlanState;
@@ -59,9 +57,7 @@ class GameContext implements GameContextView
         int n = gs.getPlayerSum();
         this.isDoubleDeathOccurred = new boolean[GameConstants.MAX_GAME_DAYS + 1];
         this.nightDeathCount = new int[GameConstants.MAX_GAME_DAYS + 1];
-        this.actualRoleindex = new int[Role.values().length + 1];
-        this.gyindex = new int[3];
-        this.rlindex = new int[n + 1];
+        this.roleRosterState = new RoleRosterState(extractAssignedRoles(gs));
         this.claimedRoleAskDays = new int[12];
         this.claimedRoleOrderCounts = new int[12];
         this.nonHumanPlanState = new NonHumanPlanState(n);
@@ -116,21 +112,21 @@ class GameContext implements GameContextView
     public CharacterEnglishName getCharacterName(int player) { return CharacterEnglishName.values()[gs.gc[player].number]; }
 
     /** 灵能者（役职2） */
-    public int getMedium() { return actualRoleindex[2]; }
+    public int getMedium() { return roleRosterState.getPlayerByRole(Role.ling.ordinal()); }
     /** 猎人（役职3） */
-    public int getHunter() { return actualRoleindex[3]; }
+    public int getHunter() { return roleRosterState.getPlayerByRole(Role.lie.ordinal()); }
     /** 猫又（役职5） */
-    public int getCat() { return actualRoleindex[5]; }
+    public int getCat() { return roleRosterState.getPlayerByRole(Role.mao.ordinal()); }
     /** 妖狐（役职10） */
-    public int getFox() { return actualRoleindex[10]; }
+    public int getFox() { return roleRosterState.getPlayerByRole(Role.yaohu.ordinal()); }
     /** 背德者（役职11） */
-    public int getDeviant() { return actualRoleindex[11]; }
+    public int getDeviant() { return roleRosterState.getPlayerByRole(Role.beidezhe.ordinal()); }
 
     public int getClaimedRole(int player) { return gs.gc[player].getClaimedRole(); }
     public int getComingOutDay(int player) { return gs.gc[player].getComingOutDay(); }
     public int getClaimedRoleOrder(int player) { return gs.gc[player].getClaimedRoleOrder(); }
     public int getClaimedRoleOrderCount(int role) { return claimedRoleOrderCounts[role]; }
-    public int getActualRoleIndex(int role) { return actualRoleindex[role]; }
+    int getActualRoleIndex(int role) { return roleRosterState.getPlayerByRole(role); }
     public int getDiePlayerNum(whyDie why, int day)
     {
         int num = -1;
@@ -243,10 +239,10 @@ class GameContext implements GameContextView
     public boolean isHiddenHunterScheduled(int target, int day) { return skillState.isHiddenHunterScheduled(target, day); }
 
     // --- 共有者 ---
-    public int getGyIndex(int n) { return gyindex[n]; }
+    int getGyIndex(int n) { return roleRosterState.getSharedPlayer(n); }
 
     // --- 人狼 ---
-    public int getRlIndex(int n) { return rlindex[n]; }
+    int getRlIndex(int n) { return roleRosterState.getWolfPlayer(n); }
     public int getInitialWolfCount() { return initialWolfCount; }
     public boolean isWolfClaimedHunter() { return wolfClaimedHunter; }
     public boolean isWolfClaimedCat() { return wolfClaimedCat; }
@@ -450,15 +446,6 @@ class GameContext implements GameContextView
         gs.recordDeath(player, reason, getGameDay());
     }
 
-    /** 设置共有者下标 */
-    void setGyIndex(int n, int player) { gyindex[n] = player; }
-
-    /** 设置人狼下标 */
-    void setRlIndex(int n, int player) { rlindex[n] = player; }
-
-    /** 设置单人职业下标 */
-    void setActualRoleIndex(int role, int player) { actualRoleindex[role] = player; }
-
     /** 设置已 CO 职业的技能预定目标。 */
     public void setClaimedRoleScheduled(int player, int target, int day, boolean value)
     {
@@ -572,7 +559,24 @@ class GameContext implements GameContextView
     }
 
     /** 获取非人统领（狂人或狂信者）的职业编号 */
-    public int getNonHumanLeader() { return actualRoleindex[9 - kyojin]; }
+    public int getNonHumanLeader() { return roleRosterState.getPlayerByRole(9 - kyojin); }
+
+    void validateRoleRoster()
+    {
+        if (roleRosterState.getWolfCount() != initialWolfCount)
+            throw new IllegalStateException("人狼名册人数与配役不一致: " + roleRosterState.getWolfCount());
+        int expectedSharedCount = getPeiyi() == peiyi.jianyi ? 0 : 2;
+        if (roleRosterState.getSharedCount() != expectedSharedCount)
+            throw new IllegalStateException("共有者名册人数与配役不一致: " + roleRosterState.getSharedCount());
+    }
+
+    private static int[] extractAssignedRoles(GameStatus status)
+    {
+        int[] rolesByPlayer = new int[status.getPlayerSum() + 1];
+        for (int player = 1; player <= status.getPlayerSum(); player++)
+            rolesByPlayer[player] = status.gc[player].actualRole;
+        return rolesByPlayer;
+    }
 
     /** 判断技能结果是否是"黒"（结果编号 > 玩家总数 = 黒判定） */
     public boolean isBlackResult(int skillTarget) { return skillTarget > gs.getPlayerSum(); }

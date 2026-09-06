@@ -261,7 +261,7 @@ public class WolfBiter
     private int countAliveWolves() {
         int aliverl = 0;
         for (int i = 1; i <= ctx.initialWolfCount; i++)
-            if (ctx.getDeathReason(ctx.rlindex[i]) == whyDie.NONE) aliverl++;
+            if (ctx.getDeathReason(ctx.getRlIndex(i)) == whyDie.NONE) aliverl++;
         return aliverl;
     }
 

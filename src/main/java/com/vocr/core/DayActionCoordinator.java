@@ -91,7 +91,7 @@ public class DayActionCoordinator
 
     private void handleCatHunterCO(List<Integer> diebody)
     {
-        if(ctx.getPeiyi() != peiyi.jianyi && ctx.gyindex[1] > 0 && ctx.isDead(ctx.gyindex[1]) && ctx.isDead(ctx.gyindex[2]))
+        if(ctx.getPeiyi() != peiyi.jianyi && ctx.getGyIndex(1) > 0 && ctx.isDead(ctx.getGyIndex(1)) && ctx.isDead(ctx.getGyIndex(2)))
             coManager.askCoByRole(Role.mao);
 
         if(diebody.size() == 2)
