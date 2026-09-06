@@ -34,7 +34,7 @@ class GameContext implements GameContextView
     private final SuspicionState suspicionState;
     private final SkillState skillState;
     private final VoteState voteState;
-    final int[][] lined;
+    private final SeerMediumLinkState seerMediumLinkState;
     private final ArrayList<Integer> seerCandidates;
     private final ArrayList<Integer> mediumCandidates;
     private final ArrayList<Integer> hunterCandidates;
@@ -64,7 +64,7 @@ class GameContext implements GameContextView
         this.suspicionState = new SuspicionState(n);
         this.skillState = new SkillState(n);
         this.voteState = new VoteState(n);
-        this.lined = new int[n + 1][n + 1];
+        this.seerMediumLinkState = new SeerMediumLinkState(n);
 
         this.seerCandidates = new ArrayList<>();
         this.mediumCandidates = new ArrayList<>();
@@ -252,7 +252,10 @@ class GameContext implements GameContextView
     public int getClaimedRoleAskDay(int role) { return claimedRoleAskDays[role]; }
 
     // --- 占灵连线 ---
-    public int getLined(int zhan, int ling) { return lined[zhan][ling]; }
+    boolean isSeerMediumLinked(int seer, int medium)
+    {
+        return seerMediumLinkState.isLinked(seer, medium);
+    }
 
     // --- 死体 ---
     public List<Integer> getDiebody() { return List.copyOf(diebody); }
@@ -295,6 +298,16 @@ class GameContext implements GameContextView
     // --- 非人公开身份计划 ---
     void setNonHumanPlan(int player, NonHumanPlan plan) { nonHumanPlanState.set(player, plan); }
     void clearNonHumanPlan(int player) { nonHumanPlanState.clear(player); }
+
+    // --- 占灵连线 ---
+    void establishSeerMediumLink(int seer, int medium)
+    {
+        seerMediumLinkState.establish(seer, medium);
+    }
+    void clearSeerMediumLink(int seer, int medium)
+    {
+        seerMediumLinkState.clear(seer, medium);
+    }
 
     /** 标记玩家为非人破绽 */
     void markNonHuman(int player) { gs.gc[player].nonHumanMarker = true; }

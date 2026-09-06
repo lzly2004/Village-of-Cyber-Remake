@@ -104,14 +104,14 @@ public class COManager
                                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_CONFLICT);
                                 ctx.addLazySuspicionValue(ctx.getLings().get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
                                 suspicion.adjustMutualSuspicion(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
-                                ctx.lined[num][ctx.getLings().get(i)] = 0;
+                                ctx.clearSeerMediumLink(num, ctx.getLings().get(i));
                             }
                             else if (ctx.getSuspicionValue(num, ctx.getLings().get(i)) <= GameConstants.INFJ
                                     && ctx.getSkillTarget(ctx.getLings().get(i), k) == ctx.getSkillTarget(num, j)
                                     && ctx.isBlackResult(ctx.getSkillTarget(num, j)))
                             {
                                 suspicion.adjustMutualSuspicion(num, ctx.getLings().get(i), -10, -10);
-                                ctx.lined[num][ctx.getLings().get(i)] = 1;
+                                ctx.establishSeerMediumLink(num, ctx.getLings().get(i));
                             }
                         }
                 }

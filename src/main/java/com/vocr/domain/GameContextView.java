@@ -77,9 +77,6 @@ public interface GameContextView
     // === CO询问查询 ===
     int getClaimedRoleAskDay(int role);
 
-    // === 占灵连线 ===
-    int getLined(int zhan, int ling);
-
     // === 死体查询 ===
     List<Integer> getDiebody();
     int getDiePlayerNum(whyDie why, int day);

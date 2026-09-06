@@ -120,7 +120,8 @@ public class LingFabricator
         }
         collectLingOptions(option, num, shokei, n, gd,
                 zhan -> ctx.getSuspicionValue(zhan, num) < GameConstants.INFJ
-                        && ctx.getSuspicionValue(num, zhan) < GameConstants.INFJ && ctx.lined[zhan][num] == 1,
+                        && ctx.getSuspicionValue(num, zhan) < GameConstants.INFJ
+                        && ctx.isSeerMediumLinked(zhan, num),
                 true);
         if (option.size() > 0)
         {

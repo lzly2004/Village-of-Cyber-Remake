@@ -99,7 +99,7 @@ public class ResultEffectApplicator
                         && ctx.isBlackResult(ctx.getSkillTarget(ctx.getZhans().get(i), j)))
                 {
                     suspicion.adjustMutualSuspicion(num, ctx.getZhans().get(i), -10, -10);
-                    ctx.lined[ctx.getZhans().get(i)][num] = 1;
+                    ctx.establishSeerMediumLink(ctx.getZhans().get(i), num);
                 }
             }
         }

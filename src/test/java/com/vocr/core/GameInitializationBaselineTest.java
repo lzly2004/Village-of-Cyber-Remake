@@ -215,7 +215,10 @@ class GameInitializationBaselineTest {
                             (target, day) -> context.isClaimedRoleScheduled(currentPlayer, target, day))))
                     .append('\n');
         }
-        value.append("lined=").append(Arrays.deepToString(context.lined)).append('\n');
+        value.append("lined=").append(Arrays.deepToString(queriedIntMatrix(
+                status.getPlayerSum() + 1, status.getPlayerSum() + 1,
+                status.getPlayerSum(), status.getPlayerSum(),
+                (seer, medium) -> context.isSeerMediumLinked(seer, medium) ? 1 : 0))).append('\n');
         value.append("hiddenSeer=").append(Arrays.deepToString(queriedMatrix(
                 status.getPlayerSum() + 1, GameConstants.MAX_GAME_DAYS + 1,
                 status.getPlayerSum(), GameConstants.MAX_GAME_DAYS,
