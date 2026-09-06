@@ -11,7 +11,6 @@ import com.vocr.domain.whyDie;
 import com.vocr.config.GameConstants;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,23 +28,14 @@ class GameContext implements GameContextView
     private final int[] nightDeathCount;
     private final RoleRosterState roleRosterState;
     private final NonHumanConfiguration nonHumanConfiguration;
-    private final int[] claimedRoleAskDays;
-    private final int[] claimedRoleOrderCounts;
+    private final ClaimState claimState;
     private final NonHumanPlanState nonHumanPlanState;
     private final SuspicionState suspicionState;
     private final SkillState skillState;
     private final VoteState voteState;
     private final SeerMediumLinkState seerMediumLinkState;
-    private final ArrayList<Integer> seerCandidates;
-    private final ArrayList<Integer> mediumCandidates;
-    private final ArrayList<Integer> hunterCandidates;
-    private final ArrayList<Integer> catCandidates;
     private final ArrayList<Integer> diebody;
     private final PendingEventQueue pendingEvents;
-
-    // === 标量状态 ===
-    private boolean wolfClaimedHunter;
-    private boolean wolfClaimedCat;
 
     GameContext(GameStatus gs, NonHumanConfiguration nonHumanConfiguration)
     {
@@ -58,18 +48,13 @@ class GameContext implements GameContextView
         this.isDoubleDeathOccurred = new boolean[GameConstants.MAX_GAME_DAYS + 1];
         this.nightDeathCount = new int[GameConstants.MAX_GAME_DAYS + 1];
         this.roleRosterState = new RoleRosterState(extractAssignedRoles(gs));
-        this.claimedRoleAskDays = new int[12];
-        this.claimedRoleOrderCounts = new int[12];
+        this.claimState = new ClaimState(n);
         this.nonHumanPlanState = new NonHumanPlanState(n);
         this.suspicionState = new SuspicionState(n);
         this.skillState = new SkillState(n);
         this.voteState = new VoteState(n);
         this.seerMediumLinkState = new SeerMediumLinkState(n);
 
-        this.seerCandidates = new ArrayList<>();
-        this.mediumCandidates = new ArrayList<>();
-        this.hunterCandidates = new ArrayList<>();
-        this.catCandidates = new ArrayList<>();
         this.diebody = new ArrayList<>();
         this.pendingEvents = new PendingEventQueue();
 
@@ -125,7 +110,7 @@ class GameContext implements GameContextView
     public int getClaimedRole(int player) { return gs.gc[player].getClaimedRole(); }
     public int getComingOutDay(int player) { return gs.gc[player].getComingOutDay(); }
     public int getClaimedRoleOrder(int player) { return gs.gc[player].getClaimedRoleOrder(); }
-    public int getClaimedRoleOrderCount(int role) { return claimedRoleOrderCounts[role]; }
+    public int getClaimedRoleOrderCount(int role) { return claimState.getOrderCount(role); }
     int getActualRoleIndex(int role) { return roleRosterState.getPlayerByRole(role); }
     public int getDiePlayerNum(whyDie why, int day)
     {
@@ -140,10 +125,10 @@ class GameContext implements GameContextView
     }
 
     // --- 职业候补 ---
-    public List<Integer> getZhans() { return Collections.unmodifiableList(seerCandidates); }
-    public List<Integer> getLings() { return Collections.unmodifiableList(mediumCandidates); }
-    public List<Integer> getLies() { return Collections.unmodifiableList(hunterCandidates); }
-    public List<Integer> getMaos() { return Collections.unmodifiableList(catCandidates); }
+    public List<Integer> getZhans() { return claimState.getCandidates(Role.zhan.ordinal()); }
+    public List<Integer> getLings() { return claimState.getCandidates(Role.ling.ordinal()); }
+    public List<Integer> getLies() { return claimState.getCandidates(Role.lie.ordinal()); }
+    public List<Integer> getMaos() { return claimState.getCandidates(Role.mao.ordinal()); }
 
     // --- 技能 ---
     public int getSkillTarget(int player, int day)
@@ -247,11 +232,11 @@ class GameContext implements GameContextView
     int getInitialNonHumanCount() { return nonHumanConfiguration.initialNonHumanCount(); }
     int getNonHumanAggression() { return nonHumanConfiguration.aggression(); }
     boolean usesFanatic() { return nonHumanConfiguration.usesFanatic(); }
-    public boolean isWolfClaimedHunter() { return wolfClaimedHunter; }
-    public boolean isWolfClaimedCat() { return wolfClaimedCat; }
+    public boolean isWolfClaimedHunter() { return claimState.isWolfClaimedHunter(); }
+    public boolean isWolfClaimedCat() { return claimState.isWolfClaimedCat(); }
 
     // --- CO询问 ---
-    public int getClaimedRoleAskDay(int role) { return claimedRoleAskDays[role]; }
+    public int getClaimedRoleAskDay(int role) { return claimState.getRequestDay(role); }
 
     // --- 占灵连线 ---
     boolean isSeerMediumLinked(int seer, int medium)
@@ -274,8 +259,7 @@ class GameContext implements GameContextView
 
     /** 计算职业候补对非人阵营的计数（占灵共用逻辑） */
     public int computeFeisum() {
-        return Math.max(0, seerCandidates.size() - 1) + Math.max(0, mediumCandidates.size() - 1)
-             + Math.max(0, hunterCandidates.size() - 1) + Math.max(0, catCandidates.size() - 1);
+        return claimState.getNonHumanCandidateCount();
     }
 
     // --- 便捷查询 ---
@@ -352,13 +336,11 @@ class GameContext implements GameContextView
         GameCharacter character = gs.gc[player];
         character.recordClaimIdentity(role, getGameDay());
 
-        ArrayList<Integer> candidates = mutableClaimCandidates(role);
-        if (candidates != null)
+        if (claimState.hasCandidateList(role))
         {
             if (character.getClaimedRoleOrder() == 0)
-                character.assignClaimOrder(++claimedRoleOrderCounts[role]);
-            if (!candidates.contains(player))
-                candidates.add(player);
+                character.assignClaimOrder(claimState.nextOrder(role));
+            claimState.addCandidate(role, player);
         }
 
         if (character.actualRole == 7 && (role == 3 || role == 5))
@@ -375,40 +357,25 @@ class GameContext implements GameContextView
     /** 首次记录某职业被询问 CO；已经记录时保持原日期并返回 false。 */
     boolean tryRecordClaimRequest(int role, int day)
     {
-        if (!isValidClaimRole(role))
-            throw new IllegalArgumentException("可声明职业越界: " + role);
-        if (!isValidDayIndex(day))
-            throw new IllegalArgumentException("CO 询问日期越界: " + day);
-        if (claimedRoleAskDays[role] != 0)
-            return false;
-        claimedRoleAskDays[role] = day;
-        return true;
+        return claimState.tryRecordRequest(role, day);
     }
 
     /** 添加一个尚未正式 CO 的职业候补。 */
     void addClaimCandidate(int role, int player)
     {
-        if (!isValidPlayerIndex(player))
-            throw new IllegalArgumentException("玩家索引越界: " + player);
-        ArrayList<Integer> candidates = requiredMutableClaimCandidates(role);
-        if (!candidates.contains(player))
-            candidates.add(player);
+        claimState.addCandidate(role, player);
     }
 
     /** 移除一个尚未正式 CO 的职业候补。 */
     void removeClaimCandidate(int role, int player)
     {
-        if (!isValidPlayerIndex(player))
-            throw new IllegalArgumentException("玩家索引越界: " + player);
-        requiredMutableClaimCandidates(role).remove(Integer.valueOf(player));
+        claimState.removeCandidate(role, player);
     }
 
     /** 记录非人阵营已经规划或完成猎人/猫又 CO。 */
     void markWolfClaimedRole(int role)
     {
-        if (role == 3) wolfClaimedHunter = true;
-        else if (role == 5) wolfClaimedCat = true;
-        else throw new IllegalArgumentException("狼方标记只支持猎人或猫又 CO: " + role);
+        claimState.markWolfClaimedRole(role);
     }
 
     private void validateClaim(int player, int role, int day)
@@ -424,26 +391,6 @@ class GameContext implements GameContextView
     private boolean isValidClaimRole(int role)
     {
         return role >= 1 && role <= 6;
-    }
-
-    private ArrayList<Integer> mutableClaimCandidates(int role)
-    {
-        return switch (role)
-        {
-            case 1 -> seerCandidates;
-            case 2 -> mediumCandidates;
-            case 3 -> hunterCandidates;
-            case 5 -> catCandidates;
-            default -> null;
-        };
-    }
-
-    private ArrayList<Integer> requiredMutableClaimCandidates(int role)
-    {
-        ArrayList<Integer> candidates = mutableClaimCandidates(role);
-        if (candidates == null)
-            throw new IllegalArgumentException("该职业没有 CO 候补列表: " + role);
-        return candidates;
     }
 
     /**
@@ -543,8 +490,8 @@ class GameContext implements GameContextView
         return false;
     }
 
-    void shuffleZhans() { ConstNum.shuffle(seerCandidates); }
-    void shuffleLings() { ConstNum.shuffle(mediumCandidates); }
+    void shuffleZhans() { claimState.shuffleSeerCandidates(); }
+    void shuffleLings() { claimState.shuffleMediumCandidates(); }
 
     /** 获取指定日期夜间死亡玩家列表 */
     public ArrayList<Integer> dieAtNight(int day)
