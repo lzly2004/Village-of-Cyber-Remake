@@ -33,6 +33,7 @@ class GameContext implements GameContextView
     private final int[] claimedRoleAskDays;
     private final int[] claimedRoleOrderCounts;
     final int[] nonHumanPlan;
+    private final SuspicionState suspicionState;
     private final SkillState skillState;
     private final VoteState voteState;
     final int[][] lined;
@@ -64,6 +65,7 @@ class GameContext implements GameContextView
         this.claimedRoleAskDays = new int[12];
         this.claimedRoleOrderCounts = new int[12];
         this.nonHumanPlan = new int[n + 1];
+        this.suspicionState = new SuspicionState(n);
         this.skillState = new SkillState(n);
         this.voteState = new VoteState(n);
         this.lined = new int[n + 1][n + 1];
@@ -172,30 +174,32 @@ class GameContext implements GameContextView
     // --- 怀疑度 ---
     public int getSuspicionValue(int subject, int target)
     {
-        assert isValidPlayerIndex(subject) : "主体玩家索引越界: " + subject;
-        assert isValidPlayerIndex(target) : "目标玩家索引越界: " + target;
-        return gs.gc[subject].suspicionValue[target];
+        return suspicionState.getSuspicionValue(subject, target);
     }
-    public void setSuspicionValue(int subject, int target, int value)
+    void setSuspicionValue(int subject, int target, int value)
     {
-        assert isValidPlayerIndex(subject) : "主体玩家索引越界: " + subject;
-        assert isValidPlayerIndex(target) : "目标玩家索引越界: " + target;
-        gs.gc[subject].suspicionValue[target] = value;
+        suspicionState.setSuspicionValue(subject, target, value);
     }
-    public void addSuspicionValue(int subject, int target, int delta)
+    void addSuspicionValue(int subject, int target, int delta)
     {
-        assert isValidPlayerIndex(subject) : "主体玩家索引越界: " + subject;
-        assert isValidPlayerIndex(target) : "目标玩家索引越界: " + target;
-        gs.gc[subject].suspicionValue[target] += delta;
+        suspicionState.addSuspicionValue(subject, target, delta);
     }
-    public int getTop3SuspectedPlayer(int player, int rank, int day) { return gs.gc[player].top3SuspectedPlayers[rank][day]; }
-    public void setTop3SuspectedPlayer(int player, int rank, int day, int value) { gs.gc[player].top3SuspectedPlayers[rank][day] = value; }
-    public int[] getSuspicionValueArray(int player) { return gs.gc[player].suspicionValue; }
-    public int getLazySuspicionValue(int player) { return suspicion.getLazySuspicionValue()[player]; }
-    public void addLazySuspicionValue(int player, int delta) { suspicion.addLazySuspicionValue(player, delta); }
-    public void setLazySuspicionValue(int player, int value) { suspicion.setLazySuspicionValue(player, value); }
-    public int[] getTop3SuspectedPlayers(int player, int day) { return gs.gc[player].top3SuspectedPlayers[day]; }
-    public boolean isAckWhite(int player) { return suspicion.isAckWhite(player); }
+    void addMutualSuspicion(int firstPlayer, int secondPlayer, int firstDelta, int secondDelta)
+    {
+        suspicionState.addMutualSuspicion(firstPlayer, secondPlayer, firstDelta, secondDelta);
+    }
+    public int getTop3SuspectedPlayer(int player, int rank, int day)
+    {
+        return suspicionState.getTopSuspectedPlayer(player, rank, day);
+    }
+    void setTop3SuspectedPlayer(int player, int rank, int day, int value)
+    {
+        suspicionState.setTopSuspectedPlayer(player, rank, day, value);
+    }
+    int getLazySuspicionValue(int player) { return suspicionState.getLazySuspicionValue(player); }
+    void addLazySuspicionValue(int player, int delta) { suspicionState.addLazySuspicionValue(player, delta); }
+    void resetLazySuspicionValues() { suspicionState.resetLazySuspicionValues(); }
+    boolean isAckWhite(int player) { return suspicion.isAckWhite(player); }
 
     public SuspicionSystem getSuspicion() { return suspicion; }
 

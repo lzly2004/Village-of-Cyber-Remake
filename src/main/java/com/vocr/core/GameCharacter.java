@@ -2,8 +2,6 @@ package com.vocr.core;
 
 import com.vocr.domain.whyDie;
 
-import com.vocr.config.GameConstants;
-
 class GameCharacter
 {//游戏角色封装类
     //角色编号
@@ -13,9 +11,6 @@ class GameCharacter
     private int claimedRole;//当前声称的职业 claimedRole
     private int claimedRoleOrder;//当前声称的职业是同职业声称者中的第几个,从1开始计数
     private int comingOutDay;//当前角色是第几天co出来的职业 默认值是-1 若当前角色是村人，此项无意义
-    //怀疑相关
-    int[][] top3SuspectedPlayers;//怀疑前三的角色在gc数组中是第几个,int [3+1][N+1]
-    int[] suspicionValue;//对其他角色的怀疑度 int [配役人数+1]
     boolean nonHumanMarker;//角色是否已经明确破绽了
     //生死相关
     private whyDie whyDie;//死亡原因枚举类型
@@ -30,8 +25,6 @@ class GameCharacter
         this.claimedRole = 0;
         this.dieDay = 0;
         this.claimedRoleOrder = 0;
-        this.top3SuspectedPlayers = new int[GameConstants.TOP3_ARRAY_SIZE][GameConstants.MAX_GAME_DAYS+1];
-        this.suspicionValue = new int[GameConstants.CHARACTER_SUM+1];
         this.nonHumanMarker = false;
         this.whyDie = whyDie.NONE;
         this.comingOutDay = -1;

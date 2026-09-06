@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
+import java.util.function.IntBinaryOperator;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 import java.util.Set;
@@ -196,8 +197,14 @@ class GameInitializationBaselineTest {
                     .append(Arrays.toString(queriedInts(GameConstants.MAX_GAME_DAYS + 1,
                             GameConstants.MAX_GAME_DAYS,
                             day -> context.getSkillTarget(currentPlayer, day)))).append('|')
-                    .append(Arrays.toString(character.suspicionValue)).append('|')
-                    .append(Arrays.deepToString(character.top3SuspectedPlayers)).append('|')
+                    .append(Arrays.toString(queriedInts(GameConstants.CHARACTER_SUM + 1,
+                            status.getPlayerSum(),
+                            target -> context.getSuspicionValue(currentPlayer, target)))).append('|')
+                    .append(Arrays.deepToString(queriedIntMatrix(GameConstants.TOP3_ARRAY_SIZE,
+                            GameConstants.MAX_GAME_DAYS + 1, GameConstants.TOP3_ARRAY_SIZE - 1,
+                            GameConstants.MAX_GAME_DAYS,
+                            (rank, day) -> context.getTop3SuspectedPlayer(currentPlayer, rank, day))))
+                    .append('|')
                     .append(Arrays.deepToString(queriedMatrix(GameConstants.CHARACTER_SUM + 1,
                             GameConstants.MAX_GAME_DAYS + 1, status.getPlayerSum(),
                             GameConstants.MAX_GAME_DAYS,
@@ -243,6 +250,15 @@ class GameInitializationBaselineTest {
         for (int row = 1; row <= maxRow; row++)
             for (int column = 1; column <= maxColumn; column++)
                 values[row][column] = query.test(row, column);
+        return values;
+    }
+
+    private static int[][] queriedIntMatrix(int rows, int columns, int maxRow, int maxColumn,
+                                             IntBinaryOperator query) {
+        int[][] values = new int[rows][columns];
+        for (int row = 1; row <= maxRow; row++)
+            for (int column = 1; column <= maxColumn; column++)
+                values[row][column] = query.applyAsInt(row, column);
         return values;
     }
 

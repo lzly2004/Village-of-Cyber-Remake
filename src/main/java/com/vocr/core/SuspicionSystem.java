@@ -7,45 +7,16 @@ import java.util.List;
 
 class SuspicionSystem
 {
-    private GameContext ctx;
-    private int[] lazySuspicionValue;
+    private final GameContext ctx;
 
     public SuspicionSystem(GameContext ctx)
     {
         this.ctx = ctx;
-        int n = ctx.getPlayerSum();
-        this.lazySuspicionValue = new int[n + 1];
-        
-        for (int i = 1; i <= n; i++)
-        {
-            for (int j = 1; j <= n; j++)
-            {
-                if (i == j)
-                    ctx.setSuspicionValue(i, j, -GameConstants.INF);
-                else
-                    ctx.setSuspicionValue(i, j, 50);
-            }
-        }
     }
 
-    public int[] getLazySuspicionValue() { return lazySuspicionValue; }
-    public void addLazySuspicionValue(int player, int delta)
+    public void adjustMutualSuspicion(int num1, int num2, int w1, int w2)
     {
-        assert ctx.isValidPlayerIndex(player) : "玩家索引越界: " + player;
-        lazySuspicionValue[player] += delta;
-    }
-    public void setLazySuspicionValue(int player, int value)
-    {
-        assert ctx.isValidPlayerIndex(player) : "玩家索引越界: " + player;
-        lazySuspicionValue[player] = value;
-    }
-
-    public void updateTop3Aux2(int num1, int num2, int w1, int w2)
-    {
-        assert ctx.isValidPlayerIndex(num1) : "玩家1索引越界: " + num1;
-        assert ctx.isValidPlayerIndex(num2) : "玩家2索引越界: " + num2;
-        ctx.addSuspicionValue(num1, num2, w1);
-        ctx.addSuspicionValue(num2, num1, w2);
+        ctx.addMutualSuspicion(num1, num2, w1, w2);
     }
 
     public boolean isAckWhite(int num)
@@ -80,7 +51,7 @@ class SuspicionSystem
     {
         if (num < 1) return;
         if (ctx.getClaimedRole(num) == 4) return;
-        lazySuspicionValue[num] -= GameConstants.INF;
+        ctx.addLazySuspicionValue(num, -GameConstants.INF);
         DebugLogger.log("玩家" + num + " 确定猫");
     }
 
@@ -163,7 +134,7 @@ class SuspicionSystem
         
         updateBaseSuspicion(n, gd, zhans, lings, lies);
         applyDivinationWhiteBallBonus(n, gd, zhans);
-        resetLazySuspicion(n);
+        resetLazySuspicion();
         computeTop3SuspectedPlayers(n, gd);
     }
     
@@ -193,7 +164,7 @@ class SuspicionSystem
                             ctx.addSuspicionValue(i, j, 15 + 5 * lies.size());
                             break;
                     }
-                    ctx.addSuspicionValue(i, j, lazySuspicionValue[j]);
+                    ctx.addSuspicionValue(i, j, ctx.getLazySuspicionValue(j));
                     if (GameLogicUtils.zhenying(ctx.getActualRole(i)) == 0)
                     {
                         int fr = GameLogicUtils.feiren(ctx.getActualRole(j));
@@ -256,10 +227,9 @@ class SuspicionSystem
         }
     }
     
-    private void resetLazySuspicion(int n)
+    private void resetLazySuspicion()
     {
-        for (int i = 1; i <= n; i++)
-            lazySuspicionValue[i] = 0;
+        ctx.resetLazySuspicionValues();
     }
     
     private void computeTop3SuspectedPlayers(int n, int gd)

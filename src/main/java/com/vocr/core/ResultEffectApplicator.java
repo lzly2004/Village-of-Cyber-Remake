@@ -19,13 +19,13 @@ public class ResultEffectApplicator
     {
         ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_INCREASE_BLACK_BALL_TARGET);
         ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_BLACK_BALL_CASTER);
-        suspicion.updateTop3Aux2(num, target, GameConstants.INF, GameConstants.INF);
+        suspicion.adjustMutualSuspicion(num, target, GameConstants.INF, GameConstants.INF);
     }
 
     public void applyWhiteBallSuspicion(int num, int target)
     {
         ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_DECREASE_WHITE_BALL_TARGET);
-        suspicion.updateTop3Aux2(num, target, -5, -10);
+        suspicion.adjustMutualSuspicion(num, target, -5, -10);
     }
 
     public void applyContradictionMark(int num)
@@ -70,7 +70,7 @@ public class ResultEffectApplicator
         {
             for (int i = 0; i < ctx.getLings().size(); i++)
             {
-                suspicion.updateTop3Aux2(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
+                suspicion.adjustMutualSuspicion(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
             }
             ctx.registerClaim(num, 2);
             ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
@@ -92,13 +92,13 @@ public class ResultEffectApplicator
                 {
                     ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_CONFLICT);
                     ctx.addLazySuspicionValue(ctx.getZhans().get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
-                    suspicion.updateTop3Aux2(num, ctx.getZhans().get(i), GameConstants.INF, GameConstants.INF);
+                    suspicion.adjustMutualSuspicion(num, ctx.getZhans().get(i), GameConstants.INF, GameConstants.INF);
                 }
                 if (ctx.getSuspicionValue(num, ctx.getZhans().get(i)) <= GameConstants.INFJ
                         && ctx.getSkillTarget(num, gd - 1) == ctx.getSkillTarget(ctx.getZhans().get(i), j)
                         && ctx.isBlackResult(ctx.getSkillTarget(ctx.getZhans().get(i), j)))
                 {
-                    suspicion.updateTop3Aux2(num, ctx.getZhans().get(i), -10, -10);
+                    suspicion.adjustMutualSuspicion(num, ctx.getZhans().get(i), -10, -10);
                     ctx.lined[ctx.getZhans().get(i)][num] = 1;
                 }
             }
@@ -109,6 +109,6 @@ public class ResultEffectApplicator
     {
         ctx.addLazySuspicionValue(target, 10);
         ctx.addLazySuspicionValue(num, 2);
-        suspicion.updateTop3Aux2(num, target, GameConstants.INF, GameConstants.INF);
+        suspicion.adjustMutualSuspicion(num, target, GameConstants.INF, GameConstants.INF);
     }
 }

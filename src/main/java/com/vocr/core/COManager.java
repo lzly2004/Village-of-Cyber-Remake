@@ -80,7 +80,7 @@ public class COManager
             {
                 for (int i = 0; i < ctx.getZhans().size(); i++)
                 {
-                    suspicion.updateTop3Aux2(num, ctx.getZhans().get(i), GameConstants.INF, GameConstants.INF);
+                    suspicion.adjustMutualSuspicion(num, ctx.getZhans().get(i), GameConstants.INF, GameConstants.INF);
                 }
                 if (gd == 3 && ctx.getActualRole(num) > 6 && ctx.isBlackResult(ctx.getSkillTarget(num, 1))
                         && ctx.getDiePlayerNum(whyDie.beiyao, 2) == ctx.getSkillTarget(num, 1) - ctx.getPlayerSum())
@@ -103,14 +103,14 @@ public class COManager
                             {
                                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_CONFLICT);
                                 ctx.addLazySuspicionValue(ctx.getLings().get(i), GameConstants.SUSPICION_INCREASE_CONFLICT);
-                                suspicion.updateTop3Aux2(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
+                                suspicion.adjustMutualSuspicion(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
                                 ctx.lined[num][ctx.getLings().get(i)] = 0;
                             }
                             else if (ctx.getSuspicionValue(num, ctx.getLings().get(i)) <= GameConstants.INFJ
                                     && ctx.getSkillTarget(ctx.getLings().get(i), k) == ctx.getSkillTarget(num, j)
                                     && ctx.isBlackResult(ctx.getSkillTarget(num, j)))
                             {
-                                suspicion.updateTop3Aux2(num, ctx.getLings().get(i), -10, -10);
+                                suspicion.adjustMutualSuspicion(num, ctx.getLings().get(i), -10, -10);
                                 ctx.lined[num][ctx.getLings().get(i)] = 1;
                             }
                         }
@@ -125,7 +125,7 @@ public class COManager
                     target -= ctx.getPlayerSum();
                     ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_INCREASE_BLACK_BALL_TARGET);
                     ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_INCREASE_BLACK_BALL_CASTER);
-                    suspicion.updateTop3Aux2(num, target, GameConstants.INF, GameConstants.INF);
+                    suspicion.adjustMutualSuspicion(num, target, GameConstants.INF, GameConstants.INF);
                     eventGenerator.addEvent(EventName.zjgh8b, num, target);
                     DebugLogger.log("添加事件占结果黑，占卜师编号：" + num + "黑球姓名:"
                             + ctx.getCharacterName(target).toString());
@@ -134,7 +134,7 @@ public class COManager
                 else if (target > 0)
                 {
                     ctx.addLazySuspicionValue(target, GameConstants.SUSPICION_DECREASE_WHITE_BALL_TARGET);
-                    suspicion.updateTop3Aux2(num, target, -5, -10);
+                    suspicion.adjustMutualSuspicion(num, target, -5, -10);
                     eventGenerator.addEvent(EventName.zjgb8, num, target);
                     if (ctx.getDeathReason(target) == whyDie.NONE)
                         eventGenerator.addEvent(EventName.jbdh8r, target, num);
@@ -150,7 +150,7 @@ public class COManager
             {
                 for (int i = 0; i < ctx.getLings().size(); i++)
                 {
-                    suspicion.updateTop3Aux2(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
+                    suspicion.adjustMutualSuspicion(num, ctx.getLings().get(i), GameConstants.INF, GameConstants.INF);
                 }
                 ctx.registerClaim(num, 2);
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
@@ -168,7 +168,7 @@ public class COManager
             }
             case 3:
                 for (int i = 0; i < ctx.getLies().size(); i++)
-                    suspicion.updateTop3Aux2(ctx.getLies().get(i), num, GameConstants.INF, GameConstants.INF);
+                    suspicion.adjustMutualSuspicion(ctx.getLies().get(i), num, GameConstants.INF, GameConstants.INF);
                 ctx.registerClaim(num, 3);
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 eventGenerator.addEvent(EventName.lrco, num);
@@ -198,7 +198,7 @@ public class COManager
             }
             case 5:
                 for (int i = 0; i < ctx.getMaos().size(); i++)
-                    suspicion.updateTop3Aux2(ctx.getMaos().get(i), num, GameConstants.INF, GameConstants.INF);
+                    suspicion.adjustMutualSuspicion(ctx.getMaos().get(i), num, GameConstants.INF, GameConstants.INF);
                 ctx.registerClaim(num, 5);
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 eventGenerator.addEvent(EventName.mco, num);

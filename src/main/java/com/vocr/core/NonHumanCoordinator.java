@@ -591,7 +591,7 @@ public class NonHumanCoordinator
             ctx.registerClaim(zhan, 1);
             ctx.addLazySuspicionValue(zhan, GameConstants.SUSPICION_DECREASE_SEER_CO);
             for(int j=0;j<i;j++)
-                suspicion.updateTop3Aux2(zhan,ctx.getZhans().get(j),GameConstants.INF,GameConstants.INF);
+                suspicion.adjustMutualSuspicion(zhan,ctx.getZhans().get(j),GameConstants.INF,GameConstants.INF);
         }
         DebugLogger.log("非人的初始工作：灵能co");
         DebugLogger.log("非人的初始工作：遍历每个人狼，判断是否有计划上灵的人狼");
@@ -616,7 +616,7 @@ public class NonHumanCoordinator
             ctx.registerClaim(ling, 2);
             ctx.addLazySuspicionValue(ling, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
             for(int j=0;j<i;j++)
-                suspicion.updateTop3Aux2(ling,ctx.getLings().get(j),GameConstants.INF,GameConstants.INF);
+                suspicion.adjustMutualSuspicion(ling,ctx.getLings().get(j),GameConstants.INF,GameConstants.INF);
         }
         DebugLogger.log("非人的初始工作：共逻辑");
         gylogic.run();

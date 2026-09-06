@@ -48,9 +48,7 @@ public interface GameContextView
 
     // === 怀疑度查询 ===
     int getSuspicionValue(int subject, int target);
-    int getLazySuspicionValue(int player);
     int getTop3SuspectedPlayer(int player, int rank, int day);
-    boolean isAckWhite(int player);
 
     // === 游戏状态查询 ===
     int getGameDay();

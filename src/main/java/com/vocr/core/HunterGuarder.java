@@ -142,7 +142,11 @@ public class HunterGuarder
 
         // R8: 怀疑度排序加权
         engine.addComplexRule("R08_怀疑度排序加权", weights -> {
-            ArrayList<Integer> suspectorder = GameLogicUtils.getPriority(ctx.getSuspicionValueArray(numFinal), true);
+            // 保留旧数组的固定角色槽位；未参战槽位的 0 也会影响并列名次。
+            int[] suspicionValues = new int[GameConstants.CHARACTER_SUM + 1];
+            for (int player = 1; player <= n; player++)
+                suspicionValues[player] = ctx.getSuspicionValue(numFinal, player);
+            ArrayList<Integer> suspectorder = GameLogicUtils.getPriority(suspicionValues, true);
             for (int i = 1; i <= n; i++)
                 weights[i] += 5 * suspectorder.get(i);
         });

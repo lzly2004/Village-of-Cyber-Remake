@@ -67,9 +67,9 @@ public class VoteSelector
         {
             if (ctx.isDead(i)) continue;
             int shokeitaregt = voteTargets[i];
-            suspicion.updateTop3Aux2(i, shokeitaregt, 1, 1);
+            suspicion.adjustMutualSuspicion(i, shokeitaregt, 1, 1);
             if (voteTargets[shokeitaregt] == i)
-                suspicion.updateTop3Aux2(i, shokeitaregt, 1, 1);
+                suspicion.adjustMutualSuspicion(i, shokeitaregt, 1, 1);
         }
         for (int i = 1; i <= n; i++)
         {
@@ -82,7 +82,7 @@ public class VoteSelector
                     if (ctx.isDead(k)) continue;
                     if (i == k || j == k) continue;
                     if (voteTargets[i] == j && voteTargets[j] == k)
-                        suspicion.updateTop3Aux2(i, k, -1, 0);
+                        suspicion.adjustMutualSuspicion(i, k, -1, 0);
                 }
             }
         }
