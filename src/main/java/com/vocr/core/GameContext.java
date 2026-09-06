@@ -23,9 +23,8 @@ class GameContext implements GameContextView
     private final GameStatus gs;
     private final SuspicionSystem suspicion;
 
-    // === 核心状态数组 ===
-    private final boolean[] isDoubleDeathOccurred;
-    private final int[] nightDeathCount;
+    // === 核心状态 ===
+    private final NightDeathState nightDeathState;
     private final RoleRosterState roleRosterState;
     private final NonHumanConfiguration nonHumanConfiguration;
     private final ClaimState claimState;
@@ -34,7 +33,6 @@ class GameContext implements GameContextView
     private final SkillState skillState;
     private final VoteState voteState;
     private final SeerMediumLinkState seerMediumLinkState;
-    private final ArrayList<Integer> diebody;
     private final PendingEventQueue pendingEvents;
 
     GameContext(GameStatus gs, NonHumanConfiguration nonHumanConfiguration)
@@ -45,8 +43,7 @@ class GameContext implements GameContextView
         this.nonHumanConfiguration = nonHumanConfiguration;
 
         int n = gs.getPlayerSum();
-        this.isDoubleDeathOccurred = new boolean[GameConstants.MAX_GAME_DAYS + 1];
-        this.nightDeathCount = new int[GameConstants.MAX_GAME_DAYS + 1];
+        this.nightDeathState = new NightDeathState(n);
         this.roleRosterState = new RoleRosterState(extractAssignedRoles(gs));
         this.claimState = new ClaimState(n);
         this.nonHumanPlanState = new NonHumanPlanState(n);
@@ -55,7 +52,6 @@ class GameContext implements GameContextView
         this.voteState = new VoteState(n);
         this.seerMediumLinkState = new SeerMediumLinkState(n);
 
-        this.diebody = new ArrayList<>();
         this.pendingEvents = new PendingEventQueue();
 
         this.suspicion = new SuspicionSystem(this);
@@ -199,7 +195,7 @@ class GameContext implements GameContextView
         return gs.end == GameResult.NONE ? gs.gameDay - 1 : gs.gameDay;
     }
     public peiyi getPeiyi() { return gs.p; }
-    public boolean isDoubleDeathOccurred(int day) { return isDoubleDeathOccurred[day]; }
+    public boolean isDoubleDeathOccurred(int day) { return nightDeathState.isDoubleDeathOccurred(day); }
 
     // --- 非人策略 ---
     NonHumanPlan getNonHumanPlan(int player)
@@ -245,7 +241,7 @@ class GameContext implements GameContextView
     }
 
     // --- 死体 ---
-    public List<Integer> getDiebody() { return List.copyOf(diebody); }
+    public List<Integer> getDiebody() { return nightDeathState.getLatestDeaths(); }
 
     /** 计算夜间死亡对白牌数量的扣除（占灵共用逻辑） */
     public int computeNightDeathDecrement() {
@@ -450,13 +446,10 @@ class GameContext implements GameContextView
             snapshot.add(player);
         }
 
-        diebody.clear();
-        diebody.addAll(snapshot);
-        nightDeathCount[day] = snapshot.size();
-        isDoubleDeathOccurred[day] = snapshot.size() > 1;
+        nightDeathState.recordNightDeaths(day, snapshot);
     }
 
-    int getNightDeathCount(int day) { return nightDeathCount[day]; }
+    int getNightDeathCount(int day) { return nightDeathState.getDeathCount(day); }
 
     /** 判断猫又是否明确出局 */
     public boolean isCatDefinitivelyOut()
@@ -470,24 +463,8 @@ class GameContext implements GameContextView
         if (deathReason == whyDie.chuxing || deathReason == whyDie.daymaozhou)
             return true;
         
-        // 条件2: 累计两晚以上夜间死者不止一个
-        int doubleDeathCount = 0;
-        for (int day = 1; day <= getGameDay(); day++)
-        {
-            if (isDoubleDeathOccurred[day])
-                doubleDeathCount++;
-        }
-        if (doubleDeathCount >= 2)
-            return true;
-        
-        // 条件3: 某个夜间死亡4人
-        for (int day = 1; day <= getGameDay(); day++)
-        {
-            if (nightDeathCount[day] >= 4)
-                return true;
-        }
-        
-        return false;
+        // 条件2/3: 至少两晚双死，或某个夜间死亡4人
+        return nightDeathState.hasDefinitiveCatEvidenceThrough(getGameDay());
     }
 
     void shuffleZhans() { claimState.shuffleSeerCandidates(); }
