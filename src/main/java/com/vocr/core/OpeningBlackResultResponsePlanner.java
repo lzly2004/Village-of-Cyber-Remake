@@ -85,11 +85,11 @@ final class OpeningBlackResultResponsePlanner
                             wolfSeerOrMediumResponseAdded = true;
                             for(int wolfOrder=1;wolfOrder<=ctx.getInitialWolfCount();wolfOrder++)
                             {
-                                NonHumanPlan wolfPlan = ctx.getNonHumanPlan(ctx.getRlIndex(wolfOrder));
-                                // 兼容旧实现：这里比较计划编码而不是当前人狼编号，玩法正确性需另行审计。
+                                int wolf = ctx.getRlIndex(wolfOrder);
+                                NonHumanPlan wolfPlan = ctx.getNonHumanPlan(wolf);
                                 if(wolfPlan == NonHumanPlan.CLAIM_MEDIUM
-                                        && !blackTargets.contains(wolfPlan.legacyCode()))
-                                    ctx.setNonHumanPlan(ctx.getRlIndex(wolfOrder), NonHumanPlan.STAY_HIDDEN);
+                                        && !blackTargets.contains(wolf))
+                                    ctx.setNonHumanPlan(wolf, NonHumanPlan.STAY_HIDDEN);
                             }
                             break;
                         case 2:
