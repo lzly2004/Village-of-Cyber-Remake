@@ -14,12 +14,14 @@ final class RegularClaimCoordinator
 {
     private final GameContext ctx;
     private final COManager coManager;
+    private final OpeningBlackResultResponsePlanner blackResultResponsePlanner;
     private final Runnable gylogic;
 
     RegularClaimCoordinator(GameContext ctx, COManager coManager, Runnable gylogic)
     {
         this.ctx = ctx;
         this.coManager = coManager;
+        this.blackResultResponsePlanner = new OpeningBlackResultResponsePlanner(ctx);
         this.gylogic = gylogic;
     }
 
@@ -57,7 +59,7 @@ final class RegularClaimCoordinator
             DebugLogger.log("本次无占，共逻辑");
             gylogic.run();
         } else {
-            handleBlackResponses(context.playerCount, context.blackResponses);
+            blackResultResponsePlanner.collectResponses(context.playerCount, context.blackResponses);
         }
 
         // Phase 5: 处理猫又CO响应 + 裁剪响应 + 处理剩余响应
@@ -350,132 +352,4 @@ final class RegularClaimCoordinator
         }
     }
 
-    private void handleBlackResponses(int n, ArrayList<IntPair> response)
-    {
-        boolean morelzll = false,morelmll = false;
-        ArrayList<Integer> bplayers = new ArrayList<>();
-        for(int i=0;i<ctx.getZhans().size();i++)
-        {
-            int zhan = ctx.getZhans().get(i);
-            if(ctx.getSkillTarget(zhan,1) <= n) continue;
-            int bplayer = ctx.getSkillTarget(zhan,1) - n;
-            if(!bplayers.contains(bplayer))
-                bplayers.add(bplayer);
-        }
-        for(int j=0;j<bplayers.size();j++)
-        {
-            int bplayer = bplayers.get(j);
-            if(ctx.isDead(bplayer)) continue;
-            if(ctx.getActualRole(bplayer) < 7)
-            {
-                response.add(new IntPair(bplayer,ctx.getActualRole(bplayer)));
-            }
-            else if(ctx.getActualRole(bplayer) == 7)
-            {
-                NonHumanPlan plan = ctx.getNonHumanPlan(bplayer);
-                if(plan.isClaimPlan())
-                {
-                    response.add(new IntPair(bplayer, plan.claimedRole()));
-                }
-                else
-                {
-                    int lz = 0,ll = 0;
-                    int lzweight = 10,llweight = 10,lmlweight = 10,lwcoweight = 10;
-        for(int i=1;i<=ctx.getInitialWolfCount();i++)
-                        if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 1)
-                            lz++;
-                        else if(ctx.getClaimedRole(ctx.getRlIndex(i)) == 2)
-                            ll++;
-                    if(lz > 1)  lzweight = 0;
-                    if(ll > 0)  llweight = 0;
-                    if(morelzll)
-                    {
-                        lzweight = 0;
-                        llweight = 0;
-                    }
-                    if(morelmll)
-                    {
-                        lmlweight = 0;
-                    }
-                    if(ctx.getPeiyi() == peiyi.jianyi && (ctx.getZhans().contains(ctx.getRlIndex(1)) || ctx.getZhans().contains(ctx.getRlIndex(2))))
-                    {
-                        lzweight = 0;
-                        llweight = 0;
-                        lmlweight = 0;
-                    }
-                    int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(lzweight,llweight,lmlweight,lwcoweight)));
-                    switch(option)
-                    {
-                        case 0:
-                            ctx.recordSkillTarget(bplayer, 1, ctx.getPreliminaryDivinationTarget(bplayer));
-                            response.add(new IntPair(bplayer,1));
-                            morelzll = true;
-                            break;
-                        case 1:
-                            response.add(new IntPair(bplayer,2));
-                            morelzll = true;
-                            for(int k=1;k<=ctx.getInitialWolfCount();k++)
-                            {
-                                NonHumanPlan wolfPlan = ctx.getNonHumanPlan(ctx.getRlIndex(k));
-                                if(wolfPlan == NonHumanPlan.CLAIM_MEDIUM
-                                        && !bplayers.contains(wolfPlan.legacyCode()))
-                                    ctx.setNonHumanPlan(ctx.getRlIndex(k), NonHumanPlan.STAY_HIDDEN);
-                            }
-                            break;
-                        case 2:
-                            int role = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50 + 50 * ctx.getLies().size(),50+50 * ctx.getMaos().size()))) * 2;
-                        if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut()) role = 3;
-                        NonHumanPlan responsePlan = NonHumanPlan.claimRole(role);
-                        ctx.setNonHumanPlan(bplayer, responsePlan);
-                        if(responsePlan == NonHumanPlan.CLAIM_CAT)
-                            response.add(new IntPair(bplayer,5));
-                        morelmll = true;
-                        break;
-                        case 3:
-                            ctx.clearNonHumanPlan(bplayer);
-                            break;
-                    }
-                }
-            }
-            else
-            {
-                DebugLogger.log("白非接黒并且没有之前的计划->狂狐背");
-                int option = 0;
-                switch(bplayer)
-                {
-                    case 8: case 9:
-                    option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(95,5,0,0)));break;
-                    case 10:option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(80,5,10,5)));break;
-                    case 11:
-                    {
-                        int aggression = ctx.getNonHumanAggression();
-                        option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
-                                45 + aggression, 30, 20, 5 - aggression)));
-                        break;
-                    }
-                }
-                switch(option)
-                {
-                    case 0:
-                        ctx.recordSkillTarget(bplayer, 1, ctx.getPreliminaryDivinationTarget(bplayer));
-                        response.add(new IntPair(bplayer,1));
-                        break;
-                    case 1:
-                        response.add(new IntPair(bplayer,2));
-                        break;
-                    case 2:
-                        int role = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(50 + 50 * ctx.getLies().size(),50+50 * ctx.getMaos().size()))) * 2;
-                        if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut()) role = 3;
-                        NonHumanPlan responsePlan = NonHumanPlan.claimRole(role);
-                        ctx.setNonHumanPlan(bplayer, responsePlan);
-                        if(responsePlan == NonHumanPlan.CLAIM_CAT)
-                            response.add(new IntPair(bplayer,5));
-                        break;
-                    case 3:
-                        ctx.clearNonHumanPlan(bplayer);
-                        break;
-                }
-            }
-        }
-    }
 }
