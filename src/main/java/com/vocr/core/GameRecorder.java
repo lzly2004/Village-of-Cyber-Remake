@@ -1,12 +1,8 @@
 package com.vocr.core;
 
-import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
-import com.vocr.domain.EventName;
 import com.vocr.domain.peiyi;
-import com.vocr.domain.whyDie;
 
-import com.vocr.config.GameConstants;
 import com.vocr.config.PathConfig;
 import com.vocr.history.GameRecord;
 import com.vocr.history.GameRecordManager;
@@ -42,10 +38,8 @@ public class GameRecorder
 {
     private final String runLabel;           // 本次运行的标签
     private final List<String> records;      // 结构化记录
+    private final GameSnapshotRecordWriter snapshotWriter;
     private boolean active = false;          // 是否正在录制
-    private peiyi gamePeiyi = null;
-    private long gameSeed = 0;
-    private int playerCount = 0;
     private int gameDurationDays = 0;
     private final GameRecordManager gameRecordManager;
 
@@ -56,6 +50,7 @@ public class GameRecorder
     {
         this.runLabel = runLabel;
         this.records = new ArrayList<>();
+        this.snapshotWriter = new GameSnapshotRecordWriter(records);
         this.gameRecordManager = gameRecordManager;
     }
 
@@ -64,9 +59,6 @@ public class GameRecorder
     public void startGame(peiyi p, long seed, int playerCount, GameStatus gs)
     {
         this.active = true;
-        this.gamePeiyi = p;
-        this.gameSeed = seed;
-        this.playerCount = playerCount;
         this.records.clear();
 
         records.add("# ==========================================");
@@ -245,12 +237,7 @@ public class GameRecorder
     public void recordStateSnapshot(int day, GameStatus gs)
     {
         if (!active) return;
-        records.add(buildStateLine(day, gs.getPlayerSum(), i -> {
-            GameCharacter gc = gs.gc[i];
-            return String.format("%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d",
-                    i, gc.number, gc.actualRole, gc.getClaimedRole(), gc.getClaimedRoleOrder(),
-                    gc.getDeathDay(), gc.getDeathReason().ordinal(), gc.nonHumanMarker);
-        }));
+        snapshotWriter.writeStateSnapshot(day, gs);
     }
 
     /**
@@ -260,38 +247,7 @@ public class GameRecorder
     public void recordDailySnapshot(int day, GameContext ctx)
     {
         if (!active) return;
-
-        int playerSum = ctx.getPlayerSum();
-
-        int aliveCount = 0;
-        for (int i = 1; i <= playerSum; i++) {
-            if (ctx.isAlive(i)) aliveCount++;
-        }
-        records.add("DAILY_SNAPSHOT|day=" + day + "|alive=" + aliveCount);
-
-        String stateLine = buildStateLine(day, playerSum, i -> {
-            int charNum = ctx.getCharacterNumber(i);
-            if (charNum == 0) {
-                DebugLogger.warn("[GameRecorder] ⚠️ 玩家" + i + "的characterNumber=0!");
-            }
-            return String.format("%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d,cod=%d,st=%d",
-                    i, charNum, ctx.getActualRole(i), ctx.getClaimedRole(i), ctx.getClaimedRoleOrder(i),
-                    ctx.getDeathDay(i), ctx.getDeathReason(i).ordinal(), ctx.isNonHumanMarked(i) ? 1 : 0,
-                    ctx.getComingOutDay(i), ctx.getSkillTarget(i, day - 1));
-        });
-        records.add(stateLine);
-        DebugLogger.info("[GameRecorder] STATE行: " + stateLine);
-
-        DebugLogger.info("[GameRecorder] 每日快照已记录: day=" + day + " alive=" + aliveCount);
-    }
-
-    private String buildStateLine(int day, int playerSum, java.util.function.IntFunction<String> playerDataProvider)
-    {
-        StringBuilder sb = new StringBuilder("STATE|day=" + day + "|");
-        for (int i = 1; i <= playerSum; i++) {
-            sb.append("{").append(playerDataProvider.apply(i)).append("}");
-        }
-        return sb.toString();
+        snapshotWriter.writeDailySnapshot(day, ctx);
     }
 
     /**
@@ -300,51 +256,7 @@ public class GameRecorder
      */
     public void recordVoteData(int day, GameContext ctx) {
         if (!active) return;
-
-        // 记录投票方式额外信息
-        int dailyVotingRule = ctx.getVotingRule(day);
-        List<Integer> votingCandidates = ctx.getVotingCandidates(day);
-        StringBuilder methodSb = new StringBuilder("VOTE_METHOD|day=" + day + "|rule=" + dailyVotingRule);
-        if (!votingCandidates.isEmpty()) {
-            methodSb.append("|grey=");
-            for (int candidate : votingCandidates) methodSb.append(candidate).append(",");
-            methodSb.setLength(methodSb.length() - 1);
-        }
-        // 指定投票対象从ctx读取
-        StringBuilder designSb = new StringBuilder();
-        for (int i = 1; i <= ctx.getPlayerSum(); i++) {
-            if (ctx.isSelectedVoteTarget(i, day)) {
-                designSb.append(ctx.getCharacterNumber(i)).append(",");
-            }
-        }
-        if (designSb.length() > 0) {
-            designSb.setLength(designSb.length() - 1);
-            methodSb.append("|design=").append(designSb);
-        }
-        records.add(methodSb.toString());
-        DebugLogger.info("[GameRecorder] " + methodSb.toString());
-
-        int playerSum = ctx.getPlayerSum();
-
-        // 投票明细（多轮）- 从ctx读取实际的voteTarget数据
-        for (int round = 1; round <= GameConstants.MAX_VOTE_ROUNDS; round++) {
-            boolean hasVote = false;
-            int validVoteCnt = 0;
-            StringBuilder voteSb = new StringBuilder("VOTE_DETAIL|day=" + day + "|round=" + round + "|");
-            for (int i = 1; i <= playerSum; i++) {
-                int target = ctx.getVoteTarget(i, day, round);
-                if (target > 0 || ctx.getDeathDay(i) == day) {
-                    voteSb.append(i).append("->").append(target).append(",");
-                    hasVote = true;
-                    if (target > 0) validVoteCnt++;
-                }
-            }
-            if (hasVote && validVoteCnt > 0) {
-                voteSb.setLength(voteSb.length() - 1);
-                records.add(voteSb.toString());
-                DebugLogger.info("[GameRecorder] VOTE_DETAIL: " + voteSb.toString());
-            }
-        }
+        snapshotWriter.writeVoteData(day, ctx);
     }
 
     // ==================== 保存 ====================
