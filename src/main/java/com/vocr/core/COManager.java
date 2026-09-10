@@ -1,6 +1,5 @@
 package com.vocr.core;
 
-import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.EventName;
 import com.vocr.domain.IntPair;
 import com.vocr.domain.peiyi;
@@ -18,7 +17,7 @@ public class COManager
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
     private final ResultPresenter resultPresenter;
-    private final ProbabilityCalculator probabilityCalculator;
+    private final ClaimResponsePlanner responsePlanner;
     private final ResultEventGenerator eventGenerator;
     private final HunterGuarder hunterGuarder;
 
@@ -29,7 +28,7 @@ public class COManager
         this.ctx = ctx;
         this.suspicion = suspicion;
         this.resultPresenter = resultPresenter;
-        this.probabilityCalculator = probabilityCalculator;
+        this.responsePlanner = new ClaimResponsePlanner(ctx, probabilityCalculator);
         this.eventGenerator = new ResultEventGenerator(ctx);
         this.hunterGuarder = hunterGuarder;
     }
@@ -37,34 +36,13 @@ public class COManager
     /** 猫又CO概率参数p1：狼队中已CO且非默认CO（claimedRole=6）的人数 */
     public int getp1(int zhi)
     {
-        if (zhi != 7) return 0;
-        int p1 = 0;
-        for (int i = 1; i <= ctx.getInitialWolfCount(); i++)
-            if (ctx.getClaimedRole(ctx.getRlIndex(i)) != 0 && ctx.getClaimedRole(ctx.getRlIndex(i)) != 6)
-                p1++;
-        return p1;
+        return responsePlanner.getP1(zhi);
     }
 
     /** 猫又CO概率参数p2：case 7/9返回狼队生存人数-1，其余返回死亡计数器映射值 */
     public int getp2(int zhi)
     {
-        if (zhi == 7 || zhi == 9)
-        {
-            int p2 = 0;
-            for (int i = 1; i <= ctx.getInitialWolfCount(); i++)
-                if (ctx.isAlive(ctx.getRlIndex(i)))
-                    p2++;
-            return p2 - 1;
-        }
-        return deathCounterP2();
-    }
-
-    private int deathCounterP2()
-    {
-        if (ctx.getDeathCounter() <= 3) return 0;
-        if (ctx.getDeathCounter() <= ctx.getAliveCounter()) return 1;
-        if (ctx.getAliveCounter() > 6) return 2;
-        return 3;
+        return responsePlanner.getP2(zhi);
     }
 
     public void processActualCo(int num, int zhi, List<Integer> diebody)
@@ -212,206 +190,18 @@ public class COManager
 
     public void askCoByRole(Role aclaimedRole)
     {
-        int n = ctx.getPlayerSum();
-        int gd = ctx.getGameDay();
-        DebugLogger.log("询问职业：" + aclaimedRole);
-        int zhi = aclaimedRole.ordinal();
-        if (!ctx.tryRecordClaimRequest(zhi, gd))
-            return;
-        if (zhi > 3 && zhi < 6)
-        {
-            if (ctx.getPeiyi() == peiyi.jianyi) return;
-            if (zhi == 5 && ctx.getPeiyi() != peiyi.maoyou && ctx.getPeiyi() != peiyi.daxing) return;
-        }
-        if (zhi == 5)
-        {
-            int counter = 0;
-            for (int i = 1; i <= gd; i++)
-            {
-                if (ctx.isDoubleDeathOccurred(i))
-                    counter++;
-            }
-            if (counter == 2 && ctx.getDeathReason(ctx.getActualRoleIndex(5)) != whyDie.NONE)
-                return;
-            if (ctx.isDoubleDeathOccurred(gd - 1) && ctx.getDeathReason(ctx.getActualRoleIndex(5)) != whyDie.NONE)
-            {
-                boolean canclaim = false;
-                if (gd == 3 && ctx.getClaimedRoleAskDay(1) != 2)
-                {
-                    boolean have_yugao = false;
-                    for (int i = 1; i <= n; i++)
-                    {
-                        if (ctx.isHiddenSeerScheduled(i, gd - 1))
-                        {
-                            have_yugao = true;
-                            if (ctx.getDiebody().contains(i))
-                                canclaim = true;
-                        }
-                    }
-                }
-                for (int i = 0; i < ctx.getZhans().size(); i++)
-                {
-                    int zhan = ctx.getZhans().get(i);
-                    if (ctx.isNonHumanMarked(zhan)) continue;
-                    if (ctx.isAlive(zhan))
-                    {
-                        if (ctx.getDiebody().contains(ctx.getSkillTarget(zhan, gd - 1)))
-                            canclaim = true;
-                    }
-                    else
-                    {
-                        boolean have_yugao = false;
-                        for (int j = 1; j <= n; j++)
-                        {
-                            if (ctx.isClaimedRoleScheduled(zhan, j, gd - 1))
-                            {
-                                have_yugao = true;
-                                if (ctx.getDiebody().contains(j))
-                                    canclaim = true;
-                            }
-                        }
-                        if (!have_yugao)
-                            canclaim = true;
-                    }
-                }
-                if (!canclaim) return;
-            }
-        }
-        ArrayList<IntPair> response = new ArrayList<>();
-        for (int i = 1; i <= n; i++)
-        {
-            if (ctx.isDead(i) || ctx.getClaimedRole(i) != 0) continue;
-            if (ctx.getActualRole(i) < 7)
-            {
-                if (ctx.getActualRole(i) == zhi)
-                    response.add(new IntPair(i, zhi));
-                continue;
-            }
-            NonHumanPlan plan = ctx.getNonHumanPlan(i);
-            if (plan.claimsRole(zhi))
-            {
-                if (gd == 2)
-                    ctx.recordSkillTarget(i, 1, ctx.getPlannedDivinationResult(i));
-                response.add(new IntPair(i, zhi));
-                continue;
-            }
-            if (zhi < 3 || zhi == 4 || plan != NonHumanPlan.NONE) continue;
-            switch (ctx.getActualRole(i))
-            {
-                case 7:
-                    if (zhi == 3 && ctx.isWolfClaimedHunter()) break;
-                    if (zhi == 5 && ctx.isWolfClaimedCat()) break;
-                    int probability = probabilityCalculator.maolieco(0, 3, getp1(7), getp2(7));
-                    if (GameLogicUtils.probabilityJudge(probability))
-                    {
-                        response.add(new IntPair(i, zhi));
-                        ctx.markWolfClaimedRole(zhi);
-                    }
-                    break;
-                default:
-                    if (GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(
-                            ctx.getActualRole(i) - 7, 3, getp1(ctx.getActualRole(i)), getp2(ctx.getActualRole(i)))))
-                    {
-                        response.add(new IntPair(i, zhi));
-                    }
-                    break;
-            }
-        }
-        response = GameLogicUtils.shuffleList(response);
-        if (aclaimedRole == Role.gong && response.size() > 1)
-            response.remove(1);
-        for (int i = 0; i < response.size(); i++)
-        {
-            processActualCo(response.get(i).first(), response.get(i).second(), ctx.getDiebody());
-        }
+        applyResponses(responsePlanner.planResponsesForRole(aclaimedRole));
     }
 
     public void askCoByList(List<Integer> askList)
     {
-        ArrayList<IntPair> response = new ArrayList<>();
-        int probability;
-        for (int i = 0; i < askList.size(); i++)
-        {
-            int num = askList.get(i);
-            if (ctx.getClaimedRole(num) != 0) continue;
-            if (ctx.getActualRole(num) < 7)
-            {
-                response.add(new IntPair(num, ctx.getActualRole(num)));
-            }
-            else if (ctx.getNonHumanPlan(num).isClaimPlan())
-            {
-                NonHumanPlan plan = ctx.getNonHumanPlan(num);
-                if (plan == NonHumanPlan.CLAIM_SEER)
-                    ctx.recordSkillTarget(num, 1, ctx.getPlannedDivinationResult(num));
-                response.add(new IntPair(num, plan.claimedRole()));
-            }
-            else
-            {
-                int option = 0;
-                switch (ctx.getActualRole(num))
-                {
-                    case 7:
-                        if (ctx.isWolfClaimedHunter() && ctx.isWolfClaimedCat())
-                        {
-                            response.add(new IntPair(num, 6));
-                            break;
-                        }
-                        probability = probabilityCalculator.maolieco(0, 2, getp1(7), getp2(7));
-                        if (!GameLogicUtils.probabilityJudge(probability))
-                        {
-                            response.add(new IntPair(num, 6));
-                            break;
-                        }
-                        if (ctx.isWolfClaimedHunter())
-                        {
-                            // 如果猫又已明确出局，不能CO猫
-                            if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
-                                response.add(new IntPair(num, 5));
-                            else
-                                response.add(new IntPair(num, 6));
-                            ctx.markWolfClaimedRole(5);
-                            break;
-                        }
-                        if (ctx.isWolfClaimedCat())
-                        {
-                            response.add(new IntPair(num, 3));
-                            ctx.markWolfClaimedRole(3);
-                            break;
-                        }
-                        option = 0;
-                        // 如果猫又已明确出局，不能CO猫
-                        if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
-                            option = GameLogicUtils.getEventIndexByProbability(
-                                    new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
-                                            50 + 50 * ctx.getLies().size())));
-                        response.add(new IntPair(num, 3 + 2 * option));
-                        break;
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                        probability = probabilityCalculator.maolieco(ctx.getActualRole(num) - 7, 2,
-                                getp1(ctx.getActualRole(num)), getp2(ctx.getActualRole(num)));
-                        if (!GameLogicUtils.probabilityJudge(probability))
-                        {
-                            response.add(new IntPair(num, 6));
-                            break;
-                        }
-                        option = 0;
-                        // 如果猫又已明确出局，不能CO猫
-                        if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
-                            option = GameLogicUtils.getEventIndexByProbability(
-                                    new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
-                                            50 + 50 * ctx.getLies().size())));
-                        response.add(new IntPair(num, 3 + 2 * option));
-                        break;
-                }
-            }
-        }
-        for (int i = 0; i < response.size(); i++)
-        {
-            processActualCo(response.get(i).first(), response.get(i).second(), ctx.getDiebody());
-        }
+        applyResponses(responsePlanner.planResponsesForPlayers(askList));
+    }
+
+    private void applyResponses(List<IntPair> responses)
+    {
+        for (IntPair response : responses)
+            processActualCo(response.first(), response.second(), ctx.getDiebody());
     }
 
     public void processMaoLieCo(int num, boolean isHumanWolf, List<Integer> diebody)
