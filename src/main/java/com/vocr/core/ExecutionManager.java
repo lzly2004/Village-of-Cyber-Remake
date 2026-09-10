@@ -1,31 +1,26 @@
 package com.vocr.core;
 
 import com.vocr.domain.CharacterEnglishName;
-import com.vocr.domain.CharacterKanjiName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 import com.vocr.domain.GameResult;
-import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;
 
 import com.vocr.config.GameConstants;
 import com.vocr.config.ProbabilityCalculator;
 import com.vocr.history.GameRecordManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ExecutionManager
 {
-    private final GameModule module;
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
     private final COManager coManager;
     private final ProbabilityCalculator probabilityCalculator;
-    private final VoteSelector voteSelector;
+    private final DayVoteCoordinator dayVoteCoordinator;
     private final GameEndChecker gameEndChecker;
     private final ResultEventGenerator eventGenerator;
-    private final Runnable gylogic;
     private final Runnable deliverEvents;
     private final java.util.function.BiConsumer<Integer, whyDie> dieaux;
     private final Runnable nightaction;
@@ -34,15 +29,13 @@ public class ExecutionManager
 
     public ExecutionManager(GameModule module)
     {
-        this.module = module;
         this.ctx = module.getCtx();
         this.suspicion = module.getSuspicion();
         this.coManager = module.getCoManager();
         this.probabilityCalculator = module.getProbabilityCalculator();
-        this.voteSelector = module.getVoteSelector();
+        this.dayVoteCoordinator = new DayVoteCoordinator(ctx, module.getVoteSelector(), module.getRecorder());
         this.gameEndChecker = module.getGameEndChecker();
         this.eventGenerator = new ResultEventGenerator(ctx);
-        this.gylogic = module.getGylogic();
         this.deliverEvents = module.getDeliverEvents();
         this.dieaux = module.getDieaux();
         this.nightaction = module.getNightaction();
@@ -55,7 +48,7 @@ public class ExecutionManager
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
         
-        logSkillSchedule(n, gd);
+        dayVoteCoordinator.logSkillSchedule(n, gd);
         
         ctx.clearPendingEvents();
         if(dailyVotingRule == 2) handleAvoidanceCO(chuxingList, huibi);
@@ -65,132 +58,13 @@ public class ExecutionManager
             return false;
         }
         
-        boolean[] votable = prepareVoting(n, gd, dailyVotingRule, chuxingList);
-        
-        int topnum = executeVoting(n, gd, votable, dailyVotingRule, chuxingList);
+        int topnum = dayVoteCoordinator.conductVoting(n, gd, dailyVotingRule, chuxingList);
         
         deliverEvents.run();
         processExecution(n, gd, topnum);
         
         deliverEvents.run();
         return checkAndHandleGameEnd(gd);
-    }
-    
-    private void logSkillSchedule(int n, int gd)
-    {
-        for(int i=0;i<ctx.getZhans().size();i++)
-        {
-            int zhan = ctx.getZhans().get(i);
-            DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("占卜师候补编号：" + ctx.getClaimedRoleOrder(zhan) + "预告情况：",
-                    n, target -> ctx.isClaimedRoleScheduled(zhan, target, gd)));
-        }
-        for (int i = 0; i < ctx.getLies().size(); i++)
-        {
-            int lie = ctx.getLies().get(i);
-            DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("猎人候补编号：" + ctx.getClaimedRoleOrder(lie) + "指定护卫情况：",
-                    n, target -> ctx.isClaimedRoleScheduled(lie, target, gd)));
-        }
-        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("潜伏占预告情况：", n,
-                target -> ctx.isHiddenSeerScheduled(target, gd)));
-        DebugLogger.log(GameLogicUtils.buildSkillScheduleLog("潜伏猎人指定护卫情况：", n,
-                target -> ctx.isHiddenHunterScheduled(target, gd)));
-    }
-
-    private boolean[] prepareVoting(int n, int gd, int dailyVotingRule, List<Integer> chuxingList)
-    {
-        boolean[] votable = new boolean[n+1];
-        boolean haveVotable = false;
-        if(dailyVotingRule == 1)
-        {
-            for(int i=1;i<=n;i++)
-            {
-                if(ctx.isAlive(i) && (ctx.getClaimedRole(i) == 6 || ctx.getClaimedRole(i) == 0))
-                {
-                    votable[i] = true;
-                }
-            }
-            for(int i=0;i<ctx.getZhans().size();i++)
-            {
-                int zhan = ctx.getZhans().get(i);
-                for(int j=1;j<gd;j++)
-                {
-                    int target = ctx.getSkillTarget(zhan, j);
-                    if(target > 0)
-                    {
-                        if(ctx.isBlackResult(target)) votable[ctx.getActualTarget(target)] = false;
-                        else votable[target] = false;
-                    }
-                }
-            }
-            for(int i=1;i<=n;i++)
-            {
-                if(votable[i])haveVotable = true;
-            }
-        }
-        else if(dailyVotingRule == 2)
-        {
-            for(int i=0;i<chuxingList.size();i++)
-            {
-                int num = chuxingList.get(i);
-                if(ctx.isAlive(num))
-                {
-                    votable[num] = true;
-                    haveVotable = true;
-                }
-            }
-        }
-        else if(!haveVotable)
-        {
-            for(int i=1;i<=n;i++)
-            {
-                if(ctx.isAlive(i))
-                {
-                    votable[i] = true;
-                    haveVotable = true;
-                }
-            }
-        }
-        return votable;
-    }
-    
-    private int executeVoting(int n, int gd, boolean[] votable, int dailyVotingRule, List<Integer> chuxingList)
-    {
-        int shokeicnt = 1, topnum = 0;
-        while(true)
-        {
-            topnum = voteSelector.select(shokeicnt,votable);
-            if(topnum != 0) break;
-            if(shokeicnt < GameConstants.MAX_VOTE_ROUNDS)
-                shokeicnt++;
-        }
-        ctx.completeVoting(gd, dailyVotingRule, chuxingList, shokeicnt);
-        DebugLogger.log("投票结束，一共投票了" + shokeicnt + "轮" + "\n票型：\n" );
-        for(int k=1;k<=shokeicnt;k++)
-        {
-            DebugLogger.log("第" + k + "轮投票结果：");
-            int[] beitou = new int[n+1];
-            for(int i=1;i<=n;i++)
-            {
-                beitou[ctx.getVoteTarget(i, gd, k)]++;
-            }
-            for(int i=1;i<=n;i++)
-            {
-                if(ctx.isDead(i))continue;
-                DebugLogger.log(CharacterKanjiName.values()[ctx.getCharacterNumber(i)]+""+beitou[i]+"票 投票先 "
-                        +CharacterKanjiName.values()[ctx.getCharacterNumber(ctx.getVoteTarget(i, gd, k))]);
-            }
-        }
-        
-        try {
-            if (recorder != null) {
-                recorder.recordVoteData(gd, ctx);
-                DebugLogger.info("[Replay] 投票数据已记录: day=" + gd + ", rounds=" + shokeicnt);
-            }
-        } catch (Exception e) {
-            DebugLogger.warn("[Replay] 记录投票数据失败: " + e.getMessage());
-        }
-        
-        return topnum;
     }
     
     private void processExecution(int n, int gd, int topnum)
