@@ -14,6 +14,7 @@ final class RegularClaimCoordinator
 {
     private final GameContext ctx;
     private final COManager coManager;
+    private final OpeningClaimCandidateBuilder claimCandidateBuilder;
     private final OpeningBlackResultResponsePlanner blackResultResponsePlanner;
     private final Runnable gylogic;
 
@@ -21,6 +22,7 @@ final class RegularClaimCoordinator
     {
         this.ctx = ctx;
         this.coManager = coManager;
+        this.claimCandidateBuilder = new OpeningClaimCandidateBuilder(ctx);
         this.blackResultResponsePlanner = new OpeningBlackResultResponsePlanner(ctx);
         this.gylogic = gylogic;
     }
@@ -78,10 +80,7 @@ final class RegularClaimCoordinator
 
     private void executeInitialCOSetup()
     {
-        DebugLogger.log("非人的初始工作：占卜co");
-        buildSeerCOList();
-        DebugLogger.log("非人的初始工作：灵能co");
-        buildMediumCOList();
+        claimCandidateBuilder.build();
         DebugLogger.log("非人的初始工作：共逻辑");
         gylogic.run();
         DebugLogger.log("非人的初始工作：真占（已在占卜co阶段加入，跳过重复添加）");
@@ -277,79 +276,6 @@ final class RegularClaimCoordinator
                 gylogic.run();
         }
         context.blackResponses.clear();
-    }
-
-    private void buildSeerCOList()
-    {
-        DebugLogger.log("非人的初始工作：狼占");
-        for (int i=1;i<=ctx.getInitialWolfCount();i++)
-        {
-            if(ctx.isDead(ctx.getRlIndex(i))) continue;
-            if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) == NonHumanPlan.CLAIM_SEER)
-            {
-                ctx.addClaimCandidate(1, ctx.getRlIndex(i));
-                ctx.recordSkillTarget(ctx.getRlIndex(i), 1, ctx.getPlannedDivinationResult(ctx.getRlIndex(i)));
-            }
-        }
-        DebugLogger.log("非人的初始工作：狂占信占");
-        if(ctx.getNonHumanLeader() > 0
-                && ctx.getNonHumanPlan(ctx.getNonHumanLeader()) == NonHumanPlan.CLAIM_SEER)
-        {
-            ctx.addClaimCandidate(1, ctx.getNonHumanLeader());
-            ctx.recordSkillTarget(ctx.getNonHumanLeader(), 1, ctx.getPlannedDivinationResult(ctx.getNonHumanLeader()));
-        }
-        DebugLogger.log("非人的初始工作：狐占");
-        if(ctx.getFox() > 0 && ctx.getNonHumanPlan(ctx.getFox()) == NonHumanPlan.CLAIM_SEER)
-        {
-            ctx.addClaimCandidate(1, ctx.getFox());
-            ctx.recordSkillTarget(ctx.getFox(), 1, ctx.getPlannedDivinationResult(ctx.getFox()));
-        }
-        DebugLogger.log("非人的初始工作：背占");
-        if(ctx.getDeviant() > 0 && ctx.getNonHumanPlan(ctx.getDeviant()) == NonHumanPlan.CLAIM_SEER)
-        {
-            ctx.addClaimCandidate(1, ctx.getDeviant());
-            ctx.recordSkillTarget(ctx.getDeviant(), 1, ctx.getPlannedDivinationResult(ctx.getDeviant()));
-        }
-        DebugLogger.log("非人的初始工作：真占");
-        if(ctx.isAlive(ctx.getActualRoleIndex(1)))
-        {
-            ctx.addClaimCandidate(1, ctx.getActualRoleIndex(1));
-        }
-    }
-
-    private void buildMediumCOList()
-    {
-        DebugLogger.log("非人的初始工作：狼灵");
-        for(int i=1;i<=ctx.getInitialWolfCount();i++)
-        {
-            if(ctx.isDead(ctx.getRlIndex(i))) continue;
-            if(ctx.getNonHumanPlan(ctx.getRlIndex(i)) == NonHumanPlan.CLAIM_MEDIUM)
-            {
-                ctx.addClaimCandidate(2, ctx.getRlIndex(i));
-                break;
-            }
-        }
-        DebugLogger.log("非人的初始工作：狂灵信灵");
-        if(ctx.getNonHumanLeader() > 0 && ctx.isAlive(ctx.getNonHumanLeader())
-                && ctx.getNonHumanPlan(ctx.getNonHumanLeader()) == NonHumanPlan.CLAIM_MEDIUM)
-        {
-            ctx.addClaimCandidate(2, ctx.getNonHumanLeader());
-        }
-        DebugLogger.log("非人的初始工作：狐灵");
-        if(ctx.getFox() > 0 && ctx.getNonHumanPlan(ctx.getFox()) == NonHumanPlan.CLAIM_MEDIUM)
-        {
-            ctx.addClaimCandidate(2, ctx.getFox());
-        }
-        DebugLogger.log("非人的初始工作：背灵");
-        if(ctx.getDeviant() > 0 && ctx.getNonHumanPlan(ctx.getDeviant()) == NonHumanPlan.CLAIM_MEDIUM)
-        {
-            ctx.addClaimCandidate(2, ctx.getDeviant());
-        }
-        DebugLogger.log("非人的初始工作：真灵");
-        if(ctx.isAlive(ctx.getActualRoleIndex(2)))
-        {
-            ctx.addClaimCandidate(2, ctx.getActualRoleIndex(2));
-        }
     }
 
 }
