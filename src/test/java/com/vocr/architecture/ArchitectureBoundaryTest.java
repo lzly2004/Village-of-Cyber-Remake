@@ -1,0 +1,66 @@
+package com.vocr.architecture;
+
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
+class ArchitectureBoundaryTest {
+    private static JavaClasses productionClasses;
+
+    @BeforeAll
+    static void importProductionClasses() {
+        productionClasses = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .importPackages("com.vocr");
+    }
+
+    @Test
+    void domainShouldRemainIndependentFromOtherProjectPackages() {
+        classes()
+                .that().resideInAPackage("com.vocr.domain..")
+                .should().onlyDependOnClassesThat().resideInAnyPackage(
+                        "java..",
+                        "com.vocr.domain..")
+                .because("领域类型应当能够独立于应用编排、基础设施和界面演进")
+                .check(productionClasses);
+    }
+
+    @Test
+    void coreShouldNotDependOnPresentationOrReplayImplementations() {
+        noClasses()
+                .that().resideInAPackage("com.vocr.core..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "com.vocr.app..",
+                        "com.vocr.replay..",
+                        "com.vocr.resources..",
+                        "com.vocr.ui..")
+                .because("核心对局逻辑不应反向依赖启动层、界面或录像与资源实现")
+                .check(productionClasses);
+    }
+
+    @Test
+    void rulesShouldRemainGeneric() {
+        classes()
+                .that().resideInAPackage("com.vocr.rules..")
+                .should().onlyDependOnClassesThat().resideInAnyPackage(
+                        "java..",
+                        "com.vocr.config..",
+                        "com.vocr.rules..")
+                .because("通用权重规则组件只应依赖自身和底层配置常量")
+                .check(productionClasses);
+    }
+
+    @Test
+    void nonPresentationPackagesShouldNotDependOnUi() {
+        noClasses()
+                .that().resideOutsideOfPackages("com.vocr.app..", "com.vocr.ui..")
+                .should().dependOnClassesThat().resideInAPackage("com.vocr.ui..")
+                .because("只有启动层和界面层可以直接组装具体界面")
+                .check(productionClasses);
+    }
+}
