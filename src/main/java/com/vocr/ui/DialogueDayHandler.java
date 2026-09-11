@@ -20,7 +20,7 @@ public class DialogueDayHandler implements SceneHandler {
             return;
         }
         boolean isConnect = true;
-        switch (event.eventname) {
+        switch (event.eventname()) {
             case jhdh8b:
             case gyfo1r:
             case qfjcqr5r:
@@ -53,9 +53,9 @@ public class DialogueDayHandler implements SceneHandler {
             if (!ui.specialEvent[0]) {
                     DebugLogger.log("**********不为空且不是特殊事件");
                 UIHelpers.renderLinkIconPair(ui, CharIcon);
-                if (event.eventname == EventName.gprz11r) {
+                if (event.eventname() == EventName.gprz11r) {
                     DebugLogger.log("共有认证rrrr");
-                    if (ui.getEvents().getFirst().eventname == EventName.gprz11p) {
+                    if (ui.getEvents().getFirst().eventname() == EventName.gprz11p) {
                             DebugLogger.log("共有认证pppp");
                         ui.linkIcon.add(CharIcon[0]);
                         ui.specialEvent[0] = true;

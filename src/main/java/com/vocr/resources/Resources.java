@@ -70,7 +70,7 @@ public class Resources implements ResourcesInterface {
         String[] targetImageNames = parseImageNames(
             resolveSpecialOrDefault(imageLineData, ch2Name, ImageLineData::getSpecial, ImageLineData::getDefaultImage));
         if (targetImageNames == null || targetImageNames.length == 0) {
-            DebugLogger.error("角色" + event.ch1.name() + "事件" + event.eventname.name() + "无默认图片，返回全局兜底图数组");
+            DebugLogger.error("角色" + event.ch1().name() + "事件" + event.eventname().name() + "无默认图片，返回全局兜底图数组");
             return new ImageIcon[]{getGlobalDefaultImage()};
         }
 
@@ -86,22 +86,22 @@ public class Resources implements ResourcesInterface {
      * 解析事件资源的核心查找逻辑：角色配置 → 事件配置 → 返回[ch2Name, eventConfig]
      */
     private Object[] resolveResourceLookup(Map<String, ? extends Map<String, ?>> resourceMap, Event event, String ctx) {
-        if (event == null || event.ch1 == null || event.eventname == null) {
+        if (event == null || event.ch1() == null || event.eventname() == null) {
             DebugLogger.error(ctx + "：事件/角色/事件名为空");
             return null;
         }
-        String ch1Name = event.ch1.name();
+        String ch1Name = event.ch1().name();
         Map<String, ?> charConfig = resourceMap.get(ch1Name);
         if (charConfig == null) {
             DebugLogger.error(ctx + "：角色" + ch1Name + "无配置");
             return null;
         }
-        Object eventConfig = charConfig.get(event.eventname.name());
+        Object eventConfig = charConfig.get(event.eventname().name());
         if (eventConfig == null) {
-            DebugLogger.error(ctx + "：角色" + ch1Name + "无事件" + event.eventname.name() + "的配置");
+            DebugLogger.error(ctx + "：角色" + ch1Name + "无事件" + event.eventname().name() + "的配置");
             return null;
         }
-        String ch2Name = event.ch2 != null ? event.ch2.name() : "";
+        String ch2Name = event.ch2() != null ? event.ch2().name() : "";
         return new Object[]{ch2Name, eventConfig};
     }
 
@@ -312,14 +312,14 @@ public class Resources implements ResourcesInterface {
     @Override
     public String getEventText(Event event) {
         Object[] lookup = resolveResourceLookup(lineResource, event, "台词");
-        if (lookup == null) return "错误：" + (event == null ? "事件对象为空" : event.ch1 == null ? "说话角色为空" : "事件名为空");
+        if (lookup == null) return "错误：" + (event == null ? "事件对象为空" : event.ch1() == null ? "说话角色为空" : "事件名为空");
         String ch2Name = (String) lookup[0];
         LineData lineData = (LineData) lookup[1];
 
         String targetLine = (String) resolveSpecialOrDefault(lineData, ch2Name, LineData::getSpecial, LineData::getDefaultLine);
         if (targetLine == null || targetLine.isEmpty())
-            return String.format("角色%s事件%s无可用台词", event.ch1.name(), event.eventname.name());
-        return replaceParams(targetLine, event.ch1, event.ch2);
+            return String.format("角色%s事件%s无可用台词", event.ch1().name(), event.eventname().name());
+        return replaceParams(targetLine, event.ch1(), event.ch2());
     }
 
     //枚举→日文名转换方法

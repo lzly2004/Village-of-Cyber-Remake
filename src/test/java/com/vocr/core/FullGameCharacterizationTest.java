@@ -161,8 +161,8 @@ class FullGameCharacterizationTest
 
         for (Event event : events)
         {
-            trace.append("event=").append(event.eventname).append('|')
-                    .append(event.ch1).append('|').append(event.ch2).append('|').append(event.ch3).append('\n');
+            trace.append("event=").append(event.eventname()).append('|')
+                    .append(event.ch1()).append('|').append(event.ch2()).append('|').append(event.ch3()).append('\n');
         }
         for (String record : logic.getRecorder().getRecords())
         {

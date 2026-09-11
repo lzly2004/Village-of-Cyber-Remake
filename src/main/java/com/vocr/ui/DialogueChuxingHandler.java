@@ -33,19 +33,19 @@ public class DialogueChuxingHandler implements SceneHandler {
                 dialogText.setText("");
                 nextBtn.setVisible(true);
                 String resultText;
-                if (event.eventname == EventName.cxs) {
-                    resultText = String.format(GameStrings.EXECUTED_FORMAT, event.ch1.name());
-                } else if (event.eventname == EventName.hzsw) {
-                    resultText = String.format(GameStrings.FOLLOW_DEATH_FORMAT, event.ch1.name());
-                } else if (event.eventname == EventName.mzsw) {
-                    resultText = String.format(GameStrings.CAT_CURSE_FORMAT, event.ch1.name());
+                if (event.eventname() == EventName.cxs) {
+                    resultText = String.format(GameStrings.EXECUTED_FORMAT, event.ch1().name());
+                } else if (event.eventname() == EventName.hzsw) {
+                    resultText = String.format(GameStrings.FOLLOW_DEATH_FORMAT, event.ch1().name());
+                } else if (event.eventname() == EventName.mzsw) {
+                    resultText = String.format(GameStrings.CAT_CURSE_FORMAT, event.ch1().name());
                 } else {
                     resultText = "";
                 }
                 UIHelpers.bindTypewriter(dialogText, resultText, nextBtn, () -> {
-                    if (ui.getEvents().isEmpty() || (ui.getEvents().getFirst().eventname != EventName.cxs
-                            && ui.getEvents().getFirst().eventname != EventName.hzsw
-                            && ui.getEvents().getFirst().eventname != EventName.mzsw)) {
+                    if (ui.getEvents().isEmpty() || (ui.getEvents().getFirst().eventname() != EventName.cxs
+                            && ui.getEvents().getFirst().eventname() != EventName.hzsw
+                            && ui.getEvents().getFirst().eventname() != EventName.mzsw)) {
                         ui.currentScene = UI.Scene.GAME_SCENE_NIGHT;
                     }
                     ui.run();

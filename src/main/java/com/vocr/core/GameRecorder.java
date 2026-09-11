@@ -226,10 +226,10 @@ public class GameRecorder
         if (!active || evt == null) return;
         records.add(String.format("GAME_EVENT|day=%d|event=%s|ch1=%s|ch2=%s|ch3=%s",
                 day,
-                evt.eventname != null ? evt.eventname.name() : "null",
-                evt.ch1 != null ? evt.ch1.name() : "null",
-                evt.ch2 != null ? evt.ch2.name() : "null",
-                evt.ch3 != null ? evt.ch3.name() : "null"));
+                evt.eventname() != null ? evt.eventname().name() : "null",
+                evt.ch1() != null ? evt.ch1().name() : "null",
+                evt.ch2() != null ? evt.ch2().name() : "null",
+                evt.ch3() != null ? evt.ch3().name() : "null"));
     }
 
     // ==================== 状态快照 ====================

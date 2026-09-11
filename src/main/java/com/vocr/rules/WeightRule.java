@@ -1,40 +1,44 @@
 package com.vocr.rules;
 
-import java.util.function.*;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 
 /**
- * 单条权重规则 — 描述 "满足某条件时，对权重做何种修正"。
+ * 单条权重规则 — 简单规则和复杂规则是互斥的合法形态。
  */
-public class WeightRule
+public sealed interface WeightRule permits SimpleWeightRule, ComplexWeightRule
 {
-    private final String name;
-    private final IntPredicate condition;
-    private final IntUnaryOperator adjustment;
-    private final Consumer<int[]> complexAction;
+    String name();
 
-    private WeightRule(String name, IntPredicate condition, IntUnaryOperator adjustment,
-                       Consumer<int[]> complexAction)
+    static WeightRule simple(String name, IntPredicate condition, IntUnaryOperator adjustment)
     {
-        this.name = name;
-        this.condition = condition;
-        this.adjustment = adjustment;
-        this.complexAction = complexAction;
+        return new SimpleWeightRule(name, condition, adjustment);
     }
 
-    public static WeightRule simple(String name, IntPredicate condition,
-                                    IntUnaryOperator adjustment)
+    static WeightRule complex(String name, Consumer<int[]> action)
     {
-        return new WeightRule(name, condition, adjustment, null);
+        return new ComplexWeightRule(name, action);
     }
 
-    public static WeightRule complex(String name, Consumer<int[]> action)
-    {
-        return new WeightRule(name, null, null, action);
-    }
+    default String getName() { return name(); }
+}
 
-    public boolean isSimple() { return condition != null; }
-    public String getName() { return name; }
-    public boolean appliesTo(int i) { return condition.test(i); }
-    public int getAdjustment(int i) { return adjustment.applyAsInt(i); }
-    public void applyComplex(int[] weights) { complexAction.accept(weights); }
+record SimpleWeightRule(String name, IntPredicate condition,
+                        IntUnaryOperator adjustment) implements WeightRule
+{
+    SimpleWeightRule
+    {
+        Objects.requireNonNull(condition, "简单规则条件不能为空");
+        Objects.requireNonNull(adjustment, "简单规则权重修正不能为空");
+    }
+}
+
+record ComplexWeightRule(String name, Consumer<int[]> action) implements WeightRule
+{
+    ComplexWeightRule
+    {
+        Objects.requireNonNull(action, "复杂规则动作不能为空");
+    }
 }

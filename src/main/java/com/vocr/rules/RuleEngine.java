@@ -35,17 +35,17 @@ public class RuleEngine
     {
         for (WeightRule rule : rules)
         {
-            if (rule.isSimple())
+            switch (rule)
             {
-                for (int i = 1; i < weights.length; i++)
+                case SimpleWeightRule simple ->
                 {
-                    if (rule.appliesTo(i))
-                        weights[i] += rule.getAdjustment(i);
+                    for (int i = 1; i < weights.length; i++)
+                    {
+                        if (simple.condition().test(i))
+                            weights[i] += simple.adjustment().applyAsInt(i);
+                    }
                 }
-            }
-            else
-            {
-                rule.applyComplex(weights);
+                case ComplexWeightRule complex -> complex.action().accept(weights);
             }
         }
         clamp(weights);

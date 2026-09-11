@@ -11,7 +11,7 @@ import java.awt.*;
 public class DialogueDayDeathHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
-        if (ui.getEvents().getFirst().eventname == EventName.wsw) {
+        if (ui.getEvents().getFirst().eventname() == EventName.wsw) {
             ui.resources.playSound("平和音效.wav");
             DialogueBox.Components dc = DialogueBox.setup(ui, "haikei3.png");
             ui.getEvents().poll();
@@ -34,7 +34,7 @@ public class DialogueDayDeathHandler implements SceneHandler {
             ds.dc().nextBtn.setVisible(false);
             ds.dc().nextBtn.setEnabled(false);
             Timer typeTimer = UIHelpers.bindTypewriter(ds.dc().dialogText, ds.text(), ds.dc().nextBtn, () -> {
-                if (ui.getEvents().isEmpty() || ui.getEvents().getFirst().eventname != EventName.yjsw) {
+                if (ui.getEvents().isEmpty() || ui.getEvents().getFirst().eventname() != EventName.yjsw) {
                     UIHelpers.playDayPhaseBgm(ui);
                     ui.currentScene = UI.Scene.DIALOGUE_DAY;
                 }

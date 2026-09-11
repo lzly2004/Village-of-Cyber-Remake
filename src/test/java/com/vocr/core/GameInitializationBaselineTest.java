@@ -242,8 +242,8 @@ class GameInitializationBaselineTest {
                 status.getPlayerSum(), GameConstants.MAX_GAME_DAYS,
                 context::isHiddenHunterScheduled))).append('\n');
         for (Event event : result.events) {
-            value.append("event=").append(event.eventname).append('|').append(event.ch1).append('|')
-                    .append(event.ch2).append('|').append(event.ch3).append('\n');
+            value.append("event=").append(event.eventname()).append('|').append(event.ch1()).append('|')
+                    .append(event.ch2()).append('|').append(event.ch3()).append('\n');
         }
         value.append("random=").append(result.randomChecksum).append('\n');
         return value.toString();

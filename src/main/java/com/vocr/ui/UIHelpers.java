@@ -74,7 +74,7 @@ public class UIHelpers {
     public static JLabel createCharacterLabel(Event event, ImageIcon[] CharIcon,
                                               boolean[] shouldAddToLinkIcon) {
         JLabel Chara;
-        switch (event.eventname) {
+        switch (event.eventname()) {
             case gyfo1:
             case qfjc5:
             case zjgh8b:
@@ -154,7 +154,7 @@ public class UIHelpers {
     public static DialogueSetup prepareDialogueEvent(UI ui, String bgImage, Event event) {
         DialogueBox.Components dc = DialogueBox.setup(ui, bgImage);
         JLabel nameLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label, 40, 10, 1000, 30,
-                ui.uiComponentFactory.getCharacterFullName(event.ch1));
+                ui.uiComponentFactory.getCharacterFullName(event.ch1()));
         dc.dialogPanel.add(nameLabel);
         return new DialogueSetup(dc, ui.resources.getEventText(event), ui.resources.getEventImage(event));
     }

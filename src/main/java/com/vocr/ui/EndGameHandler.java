@@ -37,7 +37,7 @@ public class EndGameHandler implements SceneHandler {
         }
         DialogueBox.Components dc = DialogueBox.setupWithIcon(ui, bgIcon);
         JLabel nameLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label, 20, 10, 1000, 30,
-                ui.uiComponentFactory.getCharacterFullName(event.ch1));
+                ui.uiComponentFactory.getCharacterFullName(event.ch1()));
         dc.dialogPanel.add(nameLabel);
         Timer typeTimer = UIHelpers.bindTypewriter(dc.dialogText, ui.resources.getEventText(event), dc.nextBtn, () -> {
             dc.dialogPanel.setVisible(false);
@@ -71,7 +71,7 @@ public class EndGameHandler implements SceneHandler {
         Event event = current;
         while (event != null && iterations < MAX_SEEK_ITERATIONS) {
             for (EventName t : targets) {
-                if (event.eventname == t) return event;
+                if (event.eventname() == t) return event;
             }
             event = ui.getEvents().poll();
             iterations++;
