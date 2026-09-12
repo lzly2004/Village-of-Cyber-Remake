@@ -111,7 +111,7 @@ public class ProbabilityGenerator {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            DebugLogger.error("生成概率配置失败", e);
         }
     }
 

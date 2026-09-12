@@ -16,8 +16,7 @@ public class RecordSceneHandler implements SceneHandler {
         try {
             doRender(ui);
         } catch (Exception ex) {
-            DebugLogger.error("[RecordSceneHandler] 渲染异常: " + ex.getMessage());
-            ex.printStackTrace();
+            DebugLogger.error("[RecordSceneHandler] 渲染异常", ex);
             ui.jPanel.removeAll();
             JTextArea errorMsg = TextareaSimpleFactory.createBoldTitleTextArea(Color.RED, 24, "战绩加载失败，请返回主菜单");
             errorMsg.setBounds(400, 300, 500, 40);

@@ -2,6 +2,7 @@ package com.vocr.logging;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,7 +42,11 @@ public final class DebugLogger
 
     public static void warn(String message) { getInstance().warn0(message); }
 
+    public static void warn(String message, Throwable cause) { getInstance().warn0(message, cause); }
+
     public static void error(String message) { getInstance().error0(message); }
+
+    public static void error(String message, Throwable cause) { getInstance().error0(message, cause); }
 
     // ==================== 实例字段 ====================
     private boolean enabled = true;           // 总开关
@@ -130,7 +135,11 @@ public final class DebugLogger
 
     public void warn0(String message) { log(LogLevel.WARN, message); }
 
+    public void warn0(String message, Throwable cause) { log(LogLevel.WARN, message, cause); }
+
     public void error0(String message) { log(LogLevel.ERROR, message); }
+
+    public void error0(String message, Throwable cause) { log(LogLevel.ERROR, message, cause); }
 
     // ==================== 格式化输出(用于 MainLogic 调试) ====================
 
@@ -163,22 +172,32 @@ public final class DebugLogger
 
     private void log(LogLevel level, String message)
     {
+        log(level, message, null);
+    }
+
+    private void log(LogLevel level, String message, Throwable cause)
+    {
         if (!enabled) return;
 
+        boolean writeToConsole = level.level >= minConsoleLevel.level;
+        boolean writeToFile = fileWriter != null && level.level >= minFileLevel.level;
+        if (!writeToConsole && !writeToFile) return;
+
+        String formatted = formatMessage(level, message);
+
         // 控制台输出
-        if (level.level >= minConsoleLevel.level)
+        if (writeToConsole)
         {
-            String formatted = formatMessage(level, message);
-            if (level == LogLevel.ERROR)
-                System.err.println(formatted);
-            else
-                System.out.println(formatted);
+            PrintStream stream = level == LogLevel.ERROR ? System.err : System.out;
+            stream.println(formatted);
+            if (cause != null) cause.printStackTrace(stream);
         }
 
         // 文件输出
-        if (fileWriter != null && level.level >= minFileLevel.level)
+        if (writeToFile)
         {
-            fileWriter.println(formatMessage(level, message));
+            fileWriter.println(formatted);
+            if (cause != null) cause.printStackTrace(fileWriter);
             fileWriter.flush();
         }
     }

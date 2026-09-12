@@ -49,8 +49,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         try {
             doRender(ui);
         } catch (Exception ex) {
-            DebugLogger.error("[ReplayBrowserHandler] 渲染异常: " + ex.getMessage());
-            ex.printStackTrace();
+            DebugLogger.error("[ReplayBrowserHandler] 渲染异常", ex);
         }
     }
 

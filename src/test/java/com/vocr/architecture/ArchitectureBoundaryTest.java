@@ -1,5 +1,7 @@
 package com.vocr.architecture;
 
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaAccess;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -10,6 +12,14 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 class ArchitectureBoundaryTest {
+    private static final DescribedPredicate<JavaAccess<?>> DIRECT_PROCESS_OUTPUT =
+            DescribedPredicate.describe(
+                    "call Throwable.printStackTrace(...) or access System.out/System.err",
+                    access -> (access.getName().equals("printStackTrace")
+                            && access.getTargetOwner().isAssignableTo(Throwable.class))
+                            || (access.getTargetOwner().isEquivalentTo(System.class)
+                            && (access.getName().equals("out") || access.getName().equals("err"))));
+
     private static JavaClasses productionClasses;
 
     @BeforeAll
@@ -63,6 +73,15 @@ class ArchitectureBoundaryTest {
                         "java..",
                         "com.vocr.logging..")
                 .because("普通诊断日志不应反向读取任何游戏状态")
+                .check(productionClasses);
+    }
+
+    @Test
+    void directProcessOutputShouldRemainInsideLogging() {
+        noClasses()
+                .that().resideOutsideOfPackage("com.vocr.logging..")
+                .should().accessTargetWhere(DIRECT_PROCESS_OUTPUT)
+                .because("生产代码的异常和控制台输出应统一经过日志边界")
                 .check(productionClasses);
     }
 

@@ -163,8 +163,7 @@ public class Resources implements ResourcesInterface {
             }
             return new ImageIcon(imageUrl);
         } catch (Exception e) {
-            DebugLogger.error("图片" + imageName + "加载失败");
-            e.printStackTrace();
+            DebugLogger.warn("图片" + imageName + "加载失败，使用兜底图片", e);
             return getImage("frame.png");
         }
     }
@@ -182,8 +181,7 @@ public class Resources implements ResourcesInterface {
             );
             DebugLogger.log("成功加载 " + lineResource.size() + " 个角色的台词配置");
         } catch (IOException e) {
-            DebugLogger.error("加载失败！");
-            e.printStackTrace();
+            DebugLogger.error("加载台词配置失败: " + LINE_JSON_PATH, e);
             lineResource = Map.of(); // 初始化空Map避免NPE
         }
     }
@@ -201,8 +199,7 @@ public class Resources implements ResourcesInterface {
             );
             DebugLogger.log("成功加载 " + eventImageMapping.size() + " 个角色的图片映射配置");
         } catch (IOException e) {
-            DebugLogger.error("加载失败！");
-            e.printStackTrace();
+            DebugLogger.error("加载事件图片映射失败: " + IMAGE_MAPPING_PATH, e);
             eventImageMapping = Map.of(); // 初始化空Map避免NPE
         }
     }
@@ -261,8 +258,7 @@ public class Resources implements ResourcesInterface {
             DebugLogger.info("[BGM] 播放成功: " + bgmName);
             return true;
         } catch (Exception e) {
-            DebugLogger.error("BGM " + bgmName + " 播放失败: " + e.getClass().getName() + " - " + e.getMessage());
-            e.printStackTrace();
+            DebugLogger.warn("BGM " + bgmName + " 播放失败", e);
             return false;
         }
     }
@@ -289,7 +285,7 @@ public class Resources implements ResourcesInterface {
                     try {
                         ais.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        DebugLogger.warn("音效播放结束后关闭输入流失败", e);
                     }
                 }
             });
@@ -298,13 +294,16 @@ public class Resources implements ResourcesInterface {
                 clip.start();
             } catch (Exception openEx) {
                 clip.close();
-                try { ais.close(); } catch (IOException ex) { ex.printStackTrace(); }
+                try {
+                    ais.close();
+                } catch (IOException ex) {
+                    openEx.addSuppressed(ex);
+                }
                 throw openEx;
             }
             return true;
         } catch (Exception e) {
-            DebugLogger.error("音效 " + soundName + " 播放失败");
-            e.printStackTrace();
+            DebugLogger.warn("音效 " + soundName + " 播放失败", e);
             return false;
         }
     }
@@ -382,8 +381,7 @@ public class Resources implements ResourcesInterface {
             return content.isEmpty() ? "文件内容为空：" + helpTitle : content;
 
         } catch (Exception e) {
-            DebugLogger.error("读取异常：");
-            e.printStackTrace();
+            DebugLogger.warn("读取文本资源异常: " + helpTitle, e);
             return "加载失败：" + e.getMessage();
         }
     }

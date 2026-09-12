@@ -57,8 +57,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             renderInfoArea(ui, day);
             renderButtons(ui, day);
         } catch (Exception e) {
-            DebugLogger.error("[ReplayPlayerHandler] 渲染组件时出错: " + e.getMessage());
-            e.printStackTrace();
+            DebugLogger.error("[ReplayPlayerHandler] 渲染组件时出错", e);
             showErrorState(ui, "渲染出错: " + e.getMessage());
             return;
         }
@@ -431,8 +430,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 renderNormalInfoPanel(ui, day, playerSum, boardIcon);
             }
         } catch (Exception e) {
-            DebugLogger.error("[ReplayPlayerHandler] infoArea 异常: " + e.getMessage());
-            e.printStackTrace();
+            DebugLogger.warn("[ReplayPlayerHandler] infoArea 异常，显示空信息面板", e);
             renderEmptyInfoPanel(ui);
         }
     }

@@ -48,14 +48,13 @@ public class Game
             resources.run();
             ui.run();
         } catch (Exception e) {
-            DebugLogger.error("未捕获异常，游戏崩溃: " + e.getMessage());
-            e.printStackTrace();
+            DebugLogger.error("未捕获异常，游戏崩溃", e);
             if (mainlogic != null && mainlogic.getRecorder() != null) {
                 try {
                     mainlogic.getRecorder().endGame(0, 0);
                     DebugLogger.info("崩溃时已尝试保存Replay数据（endResult=0, gameDay=0）");
                 } catch (Exception ex) {
-                    DebugLogger.error("保存Replay数据失败: " + ex.getMessage());
+                    DebugLogger.error("保存Replay数据失败", ex);
                 }
             }
             javax.swing.JOptionPane.showMessageDialog(null,
@@ -66,8 +65,7 @@ public class Game
     public static void main(String[] args)
    {
        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-           DebugLogger.error("线程[" + t.getName() + "]未捕获异常: " + e.getMessage());
-           e.printStackTrace();
+           DebugLogger.error("线程[" + t.getName() + "]未捕获异常", e);
        });
        getInstance().run();
    }

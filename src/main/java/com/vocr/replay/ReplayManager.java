@@ -45,8 +45,7 @@ public class ReplayManager {
                 
                 DebugLogger.info("[ReplayManager] 已加载存档数据: " + saveFile + ", 有效存档=" + validCount + "/" + MAX_SLOTS);
             } catch (Exception e) {
-                DebugLogger.error("[ReplayManager] 加载失败（可能格式不兼容，将重建）: " + e.getMessage());
-                e.printStackTrace();
+                DebugLogger.error("[ReplayManager] 加载失败（可能格式不兼容，将重建）", e);
                 
                 // 备份损坏的文件
                 if (file.exists()) {
@@ -88,8 +87,7 @@ public class ReplayManager {
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, slots);
             DebugLogger.info("[ReplayManager] 已保存存档数据: " + saveFile);
         } catch (Exception e) {
-            DebugLogger.error("[ReplayManager] 保存失败: " + e.getMessage());
-            e.printStackTrace();
+            DebugLogger.error("[ReplayManager] 保存失败", e);
         }
     }
 
