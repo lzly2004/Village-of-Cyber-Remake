@@ -8,8 +8,7 @@ import com.vocr.domain.EventName;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.whyDie;
 
-import com.vocr.config.GameConstants;
-
+import java.awt.Image;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
@@ -21,6 +20,14 @@ import javax.swing.JTextArea;
 import javax.swing.Timer;
 
 public class UIHelpers {
+
+    /** 按指定尺寸平滑缩放 Swing 图标。 */
+    public static ImageIcon scaleIcon(ImageIcon originalIcon, int width, int height) {
+        if (originalIcon == null) return null;
+        Image scaledImage = originalIcon.getImage().getScaledInstance(
+                width, height, Image.SCALE_SMOOTH);
+        return new ImageIcon(scaledImage);
+    }
 
     public static void setButtonListener(JButton button, UI ui, Runnable action) {
         button.addActionListener(e -> {
@@ -56,7 +63,7 @@ public class UIHelpers {
         ImageIcon img = ui.resources.getImage(imageName);
         if (img == null) return null;
         return LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, img);
+                UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT, img);
     }
 
     /** 创建并添加窗口全屏背景到ui.jPanel，若图片不存在则不添加 */
@@ -82,14 +89,14 @@ public class UIHelpers {
             case gprz11p:
             case zcrh12:
                 Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 300,
-                        GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                        UIConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
                 shouldAddToLinkIcon[0] = true;
                 break;
             default:
                 Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        (GameConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
-                        GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                        (UIConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
+                        UIConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
                 shouldAddToLinkIcon[0] = false;
                 break;
@@ -100,12 +107,12 @@ public class UIHelpers {
     /** 连接事件角色对显示：当前事件角色(右)+linkIcon中缓存的上一事件角色(左) */
     public static void renderLinkIconPair(UI ui, ImageIcon[] CharIcon) {
         JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 650,
-                GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                UIConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
                 CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
         ui.diaPanel.add(Chara);
         ui.resizeComponents();
         JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 300,
-                GameConstants.WINDOW_HEIGHT - ui.linkIcon.get(0).getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                UIConstants.WINDOW_HEIGHT - ui.linkIcon.get(0).getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
                 ui.linkIcon.get(0).getIconWidth(), ui.linkIcon.get(0).getIconHeight(),
                 ui.linkIcon.get(0));
         ui.diaPanel.add(Chara2);
@@ -126,7 +133,7 @@ public class UIHelpers {
     public static Timer bindTypewriter(JTextArea target, String fullText,
                                        JButton nextBtn, Runnable onComplete) {
         final int[] index = {0};
-        Timer timer = new Timer(GameConstants.TYPEWRITER_DELAY_MS, e -> {
+        Timer timer = new Timer(UIConstants.TYPEWRITER_DELAY_MS, e -> {
             if (index[0] < fullText.length()) {
                 target.append(String.valueOf(fullText.charAt(index[0])));
                 index[0]++;

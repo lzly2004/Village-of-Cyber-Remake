@@ -1,7 +1,5 @@
 package com.vocr.ui;
 
-import com.vocr.config.GameConstants;
-
 // InfoSceneHandler.java - 信息界面场景处理器
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +39,7 @@ public class InfoSceneHandler implements SceneHandler {
         JLabel backgroundLabel_2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage("avg1_resized(3).png"));
         JButton btnMenu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
-                GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
+                UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBtitile.png"));
         btnMenu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(btnMenu);
@@ -59,11 +57,11 @@ public class InfoSceneHandler implements SceneHandler {
         JLabel bg2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage("avg1_resized(3).png"));
         JButton menu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
-                GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
+                UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBtitile.png"));
         menu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         JButton back = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 400,
-                GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT,
+                UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT,
                 ui.resources.getImage("PVBreturn.png"));
         back.addActionListener(e -> ui.transitionTo(backTarget));
         return new InfoBackground(ui, bg, bg2, menu, back);

@@ -102,4 +102,23 @@ class ArchitectureBoundaryTest {
                 .because("只有启动层和界面层可以直接组装具体界面")
                 .check(productionClasses);
     }
+
+    @Test
+    void platformIndependentPackagesShouldNotDependOnDesktopPresentationApis() {
+        noClasses()
+                .that().resideInAnyPackage(
+                        "com.vocr.config..",
+                        "com.vocr.core..",
+                        "com.vocr.domain..",
+                        "com.vocr.history..",
+                        "com.vocr.logging..",
+                        "com.vocr.replay..",
+                        "com.vocr.rules..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "java.awt..",
+                        "javax.sound..",
+                        "javax.swing..")
+                .because("对局、领域和基础设施代码不应通过JDK桌面类型绕过展示层边界")
+                .check(productionClasses);
+    }
 }

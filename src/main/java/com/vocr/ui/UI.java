@@ -8,7 +8,6 @@ import com.vocr.domain.Event;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.whyDie;
 
-import com.vocr.config.GameConstants;
 import com.vocr.history.GameRecordManager;
 import com.vocr.replay.ReplayManager;
 import com.vocr.replay.ReplaySave;
@@ -202,15 +201,15 @@ public class UI implements UIInterface
         sceneHandlers.put(Scene.REPLAY_BROWSER_SCENE, new ReplayBrowserHandler());
         sceneHandlers.put(Scene.REPLAY_PLAYER_SCENE, new ReplayPlayerHandler());
         currentScene = Scene.START_SCENE;//初始为开始界面
-        jFrame = new JFrame(GameConstants.WINDOW_TITLE);
+        jFrame = new JFrame(UIConstants.WINDOW_TITLE);
         jFrame.setResizable(false);
-        jFrame.setSize(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT);
+        jFrame.setSize(UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setLocationRelativeTo(null);
         ImageIcon frameIcon = new ImageIcon("src/main/resources/images/Icon2.png");
         jFrame.setIconImage(frameIcon.getImage());
-        jPanel = PanelSimpleFactory.createSimplePanel(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, true, false);
-        diaPanel = PanelSimpleFactory.createSimplePanel(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, false, false);
+        jPanel = PanelSimpleFactory.createSimplePanel(UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT, true, false);
+        diaPanel = PanelSimpleFactory.createSimplePanel(UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT, false, false);
         jFrame.add(jPanel);
     }//初始化
     public void resizeComponents()
@@ -296,8 +295,8 @@ public class UI implements UIInterface
 
     /** 指定面板类型 */
 
-    JTextArea piaoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, "");
-    JTextArea piaoText1 = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, "");
+    JTextArea piaoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, UIConstants.FONT_SIZE_VOTE, "");
+    JTextArea piaoText1 = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, UIConstants.FONT_SIZE_VOTE, "");
 
     int chuxingWho = 0;//记录到底处刑的是谁，用于处刑人名显示
     //信息场景

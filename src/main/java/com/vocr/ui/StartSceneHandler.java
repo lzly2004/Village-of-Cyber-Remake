@@ -2,8 +2,6 @@ package com.vocr.ui;
 
 import com.vocr.logging.DebugLogger;
 
-import com.vocr.config.GameConstants;
-
 // StartSceneHandler.java - 新建文件
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -36,12 +34,12 @@ public class StartSceneHandler implements SceneHandler {
         );
         ui.jPanel.add(titleLabel);
 
-        int x = GameConstants.START_BTN_X;
-        int y = GameConstants.START_BTN_Y;
-        int width = GameConstants.START_BTN_W;
-        int height = GameConstants.START_BTN_H;
-        int x_div = GameConstants.START_BTN_X_GAP;
-        int y_div = GameConstants.START_BTN_Y_GAP;
+        int x = UIConstants.START_BTN_X;
+        int y = UIConstants.START_BTN_Y;
+        int width = UIConstants.START_BTN_W;
+        int height = UIConstants.START_BTN_H;
+        int x_div = UIConstants.START_BTN_X_GAP;
+        int y_div = UIConstants.START_BTN_Y_GAP;
 
         JButton btnStart = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x, y, width, height,

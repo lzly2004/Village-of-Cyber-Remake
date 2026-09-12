@@ -5,7 +5,6 @@ import com.vocr.logging.DebugLogger;
 import com.vocr.domain.CharacterKanjiName;
 import com.vocr.domain.whyDie;
 
-import com.vocr.config.GameConstants;
 import com.vocr.replay.DaySnapshot;
 
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\ReplayPlayerHandler.java
@@ -103,7 +102,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         if (bgImg != null) {
             JLabel background = LabelSimpleFactory.makeLabel(
                     LabelConst.Simple_Label, 0, 0,
-                    GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
+                    UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT,
                     bgImg
             );
             ui.jPanel.add(background);

@@ -66,7 +66,7 @@ public class GameSceneHandler implements SceneHandler {
         }
         JButton backBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                 1050, 560,
-                GameConstants.RETURN_WIDTH * 6 / 10, GameConstants.RETURN_HEIGHT * 6 / 10,
+                UIConstants.RETURN_WIDTH * 6 / 10, UIConstants.RETURN_HEIGHT * 6 / 10,
                 ui.resources.getImage("PVBtitile.png"));
         backBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(backBtn);
@@ -88,14 +88,14 @@ public class GameSceneHandler implements SceneHandler {
         }
         ui.jPanel.removeAll();
         JLabel label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
+                UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT,
                 ui.resources.getImage("komorebi000night01.png"));
         ui.jPanel.add(label);
         ui.resizeComponents();
         ui.getJFrame().setVisible(true);
         ui.resources.playBgm("");
         ui.resources.playSound("入夜音效.wav");
-        Timer timer = new Timer(GameConstants.NIGHT_SCREEN_DURATION_MS, new ActionListener() {
+        Timer timer = new Timer(UIConstants.NIGHT_SCREEN_DURATION_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (ui.currentScene != UI.Scene.GAME_SCENE_NIGHT) return;
@@ -140,7 +140,7 @@ public class GameSceneHandler implements SceneHandler {
         dc.dialogPanel.add(dc.dialogText);
         dc.dialogPanel.add(dc.back);
         ui.resources.playSound("狼嚎音效.wav");
-        Timer timer = new Timer(GameConstants.HOWL_TRANSITION_MS, e -> {
+        Timer timer = new Timer(UIConstants.HOWL_TRANSITION_MS, e -> {
             if (ui.currentScene != UI.Scene.GAME_SCENE_DAY) return;
             dc.dialogPanel.setVisible(true);
             typeTimer.start();

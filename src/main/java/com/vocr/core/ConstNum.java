@@ -2,8 +2,6 @@ package com.vocr.core;
 
 import com.vocr.logging.DebugLogger;
 
-import javax.swing.ImageIcon;
-import java.awt.Image;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -127,11 +125,4 @@ public class ConstNum
         return result.toString();
     }
 
-    public static ImageIcon scaleIcon(ImageIcon originalIcon, int width, int height)
-    {
-        if (originalIcon == null) return null;
-        Image scaledImage = originalIcon.getImage().getScaledInstance(
-                width, height, Image.SCALE_SMOOTH);
-        return new ImageIcon(scaledImage);
-    }
 }

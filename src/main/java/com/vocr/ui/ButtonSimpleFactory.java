@@ -1,9 +1,5 @@
 package com.vocr.ui;
 
-import com.vocr.core.ConstNum;
-
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -40,7 +36,7 @@ public class ButtonSimpleFactory
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setForeground(Color.white);
-        btn.setFont(new Font(GameConstants.FONT_FAMILY, Font.BOLD, GameConstants.FONT_SIZE_BUTTON));
+        btn.setFont(new Font(UIConstants.FONT_FAMILY, Font.BOLD, UIConstants.FONT_SIZE_BUTTON));
         btn.setFocusPainted(false);
     }
     public static JButton createDraggableButton(String text,ImageIcon icon) //创建一个拖动button:指定的时候使用
@@ -146,7 +142,7 @@ public class ButtonSimpleFactory
         btn.setBounds(x,y,width,height);
         if(icon != null)
         {
-            ImageIcon scaledIcon = ConstNum.scaleIcon(icon, width, height);
+            ImageIcon scaledIcon = UIHelpers.scaleIcon(icon, width, height);
             btn.setIcon(scaledIcon);
         }
         if(text != null)

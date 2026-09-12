@@ -3,8 +3,6 @@ package com.vocr.ui;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -46,17 +44,17 @@ public class DialogueDayDeathHandler implements SceneHandler {
                 typeTimer.stop();
                 ds.dc().dialogPanel.setVisible(false);
                 JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        (GameConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
-                        GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                        (UIConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
+                        UIConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
                 ui.diaPanel.add(Chara);
-                Timer t1 = new Timer(GameConstants.TRANSITION_SHORT_MS, e -> {
+                Timer t1 = new Timer(UIConstants.TRANSITION_SHORT_MS, e -> {
                     ui.resources.playSound("夜间死亡音效.wav");
                     Chara.setVisible(false);
                     if (CharIcon.length >= 2) {
                         JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Text_Label,
-                                (GameConstants.WINDOW_WIDTH - CharIcon[1].getIconWidth()) / 2,
-                                GameConstants.WINDOW_HEIGHT - CharIcon[1].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                                (UIConstants.WINDOW_WIDTH - CharIcon[1].getIconWidth()) / 2,
+                                UIConstants.WINDOW_HEIGHT - CharIcon[1].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
                                 CharIcon[1].getIconWidth(), CharIcon[1].getIconHeight(), CharIcon[1]);
                         ui.diaPanel.add(Chara2);
                         ui.diaPanel.setComponentZOrder(Chara2, 1);
@@ -65,7 +63,7 @@ public class DialogueDayDeathHandler implements SceneHandler {
                     ((Timer) e.getSource()).stop();
                 });
                 t1.start();
-                Timer t2 = new Timer(GameConstants.TRANSITION_MEDIUM_MS, e -> {
+                Timer t2 = new Timer(UIConstants.TRANSITION_MEDIUM_MS, e -> {
                     ds.dc().dialogPanel.setVisible(true);
                     ds.dc().nextBtn.setVisible(true);
                     ds.dc().nextBtn.setEnabled(true);

@@ -6,8 +6,6 @@ import com.vocr.domain.GameContextView;
 import com.vocr.domain.GameResult;
 import com.vocr.domain.whyDie;
 
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -16,8 +14,8 @@ public class EndAnimeHandler implements SceneHandler {
     public void render(UI ui) {
         ui.jPanel.removeAll();
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
-                1130, 720 - GameConstants.RETURN_HEIGHT,
-                GameConstants.RETURN_WIDTH * 6 / 10, GameConstants.RETURN_HEIGHT * 6 / 10,
+                1130, 720 - UIConstants.RETURN_HEIGHT,
+                UIConstants.RETURN_WIDTH * 6 / 10, UIConstants.RETURN_HEIGHT * 6 / 10,
                 ui.resources.getImage("PVBtitile.png"));
         nextBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(nextBtn);

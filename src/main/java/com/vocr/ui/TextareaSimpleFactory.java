@@ -1,7 +1,5 @@
 package com.vocr.ui;
 
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -55,7 +53,7 @@ public class TextareaSimpleFactory
                 .fontStyle(Font.BOLD)
                 .fontSize(24)
                 .text(text)
-                .background(GameConstants.COLOR_TRANSLUCENT_BLACK) // 半透明背景
+                .background(UIConstants.COLOR_TRANSLUCENT_BLACK) // 半透明背景
                 .opaque(true)
                 .build();
     }
@@ -90,7 +88,7 @@ public class TextareaSimpleFactory
         private int fontStyle = Font.PLAIN;
         private int fontSize = 26;
         private Color foreground = Color.WHITE;
-        private Color background = GameConstants.COLOR_TRANSPARENT;
+        private Color background = UIConstants.COLOR_TRANSPARENT;
         private String text = "";
         private boolean focusable = false;
         private boolean opaque = DEFAULT_OPAQUE; // 新增：默认继承工厂类的配置
@@ -147,7 +145,7 @@ public class TextareaSimpleFactory
             textArea.setWrapStyleWord(DEFAULT_WRAP_STYLE_WORD);
             textArea.setBorder(DEFAULT_BORDER);
             // 可变参数配置
-            textArea.setFont(new Font(GameConstants.FONT_FAMILY, fontStyle, fontSize));
+            textArea.setFont(new Font(UIConstants.FONT_FAMILY, fontStyle, fontSize));
             textArea.setForeground(foreground);
             textArea.setBackground(background);
             //后续添加更正

@@ -4,8 +4,6 @@ import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -22,14 +20,14 @@ public class DialogueChuxingHandler implements SceneHandler {
         JButton nextBtn = ds.dc().nextBtn;
         ImageIcon[] CharIcon = ds.charIcon();
         JLabel Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                (GameConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
-                GameConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                (UIConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
+                UIConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
                 CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
         ui.diaPanel.add(Chara);
         Timer typeTimer = UIHelpers.bindTypewriter(dialogText, ds.text(), nextBtn, () -> {
             dialogPanel.setVisible(false);
             nextBtn.setVisible(false);
-            Timer timer = new Timer(GameConstants.TRANSITION_MEDIUM_MS, e1 -> {
+            Timer timer = new Timer(UIConstants.TRANSITION_MEDIUM_MS, e1 -> {
                 dialogText.setText("");
                 nextBtn.setVisible(true);
                 String resultText;
@@ -58,8 +56,8 @@ public class DialogueChuxingHandler implements SceneHandler {
             Chara.setVisible(false);
             if (CharIcon.length >= 2) {
                 JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        (GameConstants.WINDOW_WIDTH - CharIcon[1].getIconWidth()) / 2,
-                        GameConstants.WINDOW_HEIGHT - CharIcon[1].getIconHeight() - GameConstants.CHAR_ICON_BOTTOM_MARGIN,
+                        (UIConstants.WINDOW_WIDTH - CharIcon[1].getIconWidth()) / 2,
+                        UIConstants.WINDOW_HEIGHT - CharIcon[1].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
                         CharIcon[1].getIconWidth(), CharIcon[1].getIconHeight(), CharIcon[1]);
                 ui.diaPanel.add(Chara2);
                 ui.resizeComponents();

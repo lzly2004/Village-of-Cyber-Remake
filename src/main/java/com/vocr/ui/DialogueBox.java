@@ -2,8 +2,6 @@ package com.vocr.ui;
 
 import com.vocr.resources.ResourcesInterface;
 
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -31,7 +29,7 @@ public class DialogueBox
     {
         Components c = new Components();
         c.background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
-                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, bgIcon);
+                UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT, bgIcon);
         ImageIcon backIcon = resources.getImage("messageframe.png");
         c.dialogPanel = PanelSimpleFactory.createSimplePanel(260, 450,
                 backIcon.getIconWidth(), backIcon.getIconHeight(), false, true);

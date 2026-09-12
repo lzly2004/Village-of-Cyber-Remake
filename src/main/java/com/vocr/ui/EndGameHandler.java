@@ -6,8 +6,6 @@ import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -46,7 +44,7 @@ public class EndGameHandler implements SceneHandler {
                 case END_WOLF:    ui.resources.playSound("人狼胜利音效.wav"); break;
                 case END_FOX:     ui.resources.playSound("妖狐胜利音效.wav"); break;
             }
-            Timer t = new Timer(GameConstants.ENDING_DISPLAY_MS, e1 -> {
+            Timer t = new Timer(UIConstants.ENDING_DISPLAY_MS, e1 -> {
                 ui.currentScene = UI.Scene.END_ANIME;
                 ui.run();
                 ((Timer) e1.getSource()).stop();

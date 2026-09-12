@@ -95,7 +95,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         }
         ImageIcon musicBtnIcon = ui.resources.getImage("musicBtn.png");
         JButton btnMusic = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 15, 35,
-                GameConstants.RETURN_WIDTH, GameConstants.RETURN_HEIGHT, musicBtnIcon);
+                UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT, musicBtnIcon);
         btnMusic.addActionListener(e -> {
             int cur = ui.count % bgmSongs.length;
             ui.name = bgmSongs[cur];
@@ -307,7 +307,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (greyResult.cxList.isEmpty()) votePanel.greyBtn.setVisible(false);
         votePanel.returnBtn.setVisible(true); votePanel.scrollPane1.setVisible(true);
 
-        JTextArea isSelectedVoteTargetText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, "");
+        JTextArea isSelectedVoteTargetText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, UIConstants.FONT_SIZE_VOTE, "");
         StringBuilder isSelectedVoteTargetResult = new StringBuilder("-指定内容-\n");
         int playerSum = ui.ctx.getPlayerSum() + 1;
         if (ui.isVote[0]) {
@@ -502,15 +502,15 @@ public class GameSceneVoteHandler implements SceneHandler {
     // ===================================================================
     void stylePiaoTextArea(JTextArea area, String text, int x, int y, int w, int h) {
         area.setText(text);
-        TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, GameConstants.FONT_SIZE_VOTE, text);
+        TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, UIConstants.FONT_SIZE_VOTE, text);
         area.setForeground(Color.black);
-        area.setFont(new Font(GameConstants.FONT_FAMILY, Font.BOLD, GameConstants.FONT_SIZE_VOTE));
+        area.setFont(new Font(UIConstants.FONT_FAMILY, Font.BOLD, UIConstants.FONT_SIZE_VOTE));
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         area.setEditable(false);
         area.setFocusable(false);
         area.setOpaque(false);
-        area.setBackground(GameConstants.COLOR_TRANSPARENT);
+        area.setBackground(UIConstants.COLOR_TRANSPARENT);
         area.setBorder(BorderFactory.createEmptyBorder());
         area.setBounds(x, y, w, h);
         this.ui.jPanel.add(area);
@@ -522,7 +522,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         tishiText.setBounds(300, 300, 500, 200);
         this.ui.jPanel.add(tishiText);
         this.ui.jPanel.setComponentZOrder(tishiText, 0);
-        Timer timer = new Timer(GameConstants.TRANSITION_SHORT_MS, new ActionListener() {
+        Timer timer = new Timer(UIConstants.TRANSITION_SHORT_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 tishiText.setVisible(false);

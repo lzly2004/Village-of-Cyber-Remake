@@ -3,8 +3,6 @@ package com.vocr.ui;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.SelectionType;
 
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -118,7 +116,7 @@ class CharacterSelectionPanel {
 
         handler.renderSkillTargets(panel, 50, 74, 20, 128);
 
-        panel.setBounds(GameConstants.INFO_PANEL_X, GameConstants.INFO_PANEL_Y,
+        panel.setBounds(UIConstants.INFO_PANEL_X, UIConstants.INFO_PANEL_Y,
                 200 + vi.boardIcon.getIconWidth(), 50 + vi.boardIcon.getIconHeight());
         panel.add(LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 200 + vi.boardIcon.getIconWidth(), 50 + vi.boardIcon.getIconHeight(), vi.boardIcon));

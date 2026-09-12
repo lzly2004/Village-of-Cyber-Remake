@@ -1,7 +1,5 @@
 package com.vocr.ui;
 
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -28,7 +26,7 @@ public class PanelSimpleFactory
            jPanel.setSize(width,height);
        }
        if(isWhiteBk)
-           jPanel.setBackground(GameConstants.COLOR_TRANSPARENT);
+           jPanel.setBackground(UIConstants.COLOR_TRANSPARENT);
        jPanel.setOpaque(isOpaque);
        return jPanel;
     }
@@ -54,7 +52,7 @@ public class PanelSimpleFactory
             jPanel.setBounds(x,y,width,height);
         }
         if(isWhiteBk)
-            jPanel.setBackground(GameConstants.COLOR_TRANSPARENT);
+            jPanel.setBackground(UIConstants.COLOR_TRANSPARENT);
         jPanel.setOpaque(isOpaque);
         return jPanel;
     }

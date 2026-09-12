@@ -1,9 +1,5 @@
 package com.vocr.ui;
 
-import com.vocr.core.ConstNum;
-
-import com.vocr.config.GameConstants;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -88,7 +84,7 @@ public class LabelSimpleFactory
     {
         JLabel label = new JLabel();
         label.setBounds(x,y,width,height);
-        if(icon != null) label.setIcon(ConstNum.scaleIcon(icon, width, height));
+        if(icon != null) label.setIcon(UIHelpers.scaleIcon(icon, width, height));
         if(text != null) label.setText(text);
         applyLabelStyle(label, kind);
         return label;
@@ -103,12 +99,12 @@ public class LabelSimpleFactory
             case LabelConst.Text_Label ->
             {
                 label.setForeground(Color.WHITE);
-                label.setFont(new Font(GameConstants.FONT_FAMILY, Font.PLAIN, GameConstants.FONT_SIZE_DIALOG));
+                label.setFont(new Font(UIConstants.FONT_FAMILY, Font.PLAIN, UIConstants.FONT_SIZE_DIALOG));
             }
             case LabelConst.Black_Label ->
             {
                 label.setForeground(Color.BLACK);
-                label.setFont(new Font(GameConstants.FONT_FAMILY, Font.BOLD, GameConstants.FONT_SIZE_TITLE));
+                label.setFont(new Font(UIConstants.FONT_FAMILY, Font.BOLD, UIConstants.FONT_SIZE_TITLE));
             }
         }
     }

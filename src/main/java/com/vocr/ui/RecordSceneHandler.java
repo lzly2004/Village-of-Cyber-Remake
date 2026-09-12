@@ -2,7 +2,6 @@ package com.vocr.ui;
 
 import com.vocr.logging.DebugLogger;
 
-import com.vocr.config.GameConstants;
 import com.vocr.history.GameRecord;
 
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\RecordSceneHandler.java
@@ -32,7 +31,7 @@ public class RecordSceneHandler implements SceneHandler {
             if (fallbackBg != null) {
                 JLabel errorBg = LabelSimpleFactory.makeLabel(
                         LabelConst.Simple_Label, 0, 0,
-                        GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
+                        UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT,
                         fallbackBg
                 );
                 ui.jPanel.add(errorBg);
@@ -109,7 +108,7 @@ public class RecordSceneHandler implements SceneHandler {
         if (bgImg != null) {
             JLabel background = LabelSimpleFactory.makeLabel(
                     LabelConst.Simple_Label, 0, 0,
-                    GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
+                    UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT,
                     bgImg
             );
             ui.jPanel.add(background);
