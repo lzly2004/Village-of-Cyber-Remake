@@ -89,6 +89,7 @@ class ReplayCompatibilityTest
         assertEquals(30, day.players[0].characterNumber);
         assertEquals(2, day.players[0].comingOutDay);
         assertEquals(2, day.players[0].skillTarget);
+        assertEquals(2, save.getVisibleSkillTarget(1, 1, 2));
         assertEquals(35, day.players[1].characterNumber);
         assertEquals(2, day.players[1].deathDay);
         assertEquals(1, day.players[1].deathReason);
@@ -121,6 +122,7 @@ class ReplayCompatibilityTest
         assertEquals(3, day2.players.length);
         assertEquals(7, day2.players[0].characterNumber);
         assertEquals(3, day2.players[0].skillTarget);
+        assertEquals(3, save.getVisibleSkillTarget(1, 1, 2));
         assertEquals(12, day2.players[1].characterNumber);
         assertEquals(2, day2.players[1].deathDay);
         assertEquals(1, day2.players[1].deathReason);

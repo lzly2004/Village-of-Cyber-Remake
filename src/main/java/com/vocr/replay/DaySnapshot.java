@@ -90,6 +90,7 @@ public class DaySnapshot {
         public int claimedRoleOrder;
         public int comingOutDay;  // CO日期，-1表示未CO
         public int skillTarget;  // 技能目标（占卜/灵能/猎人），0表示无
+        public int[] skillTargets = new int[0]; // v3：按游戏日期保存的完整技能历史
         public int deathDay;
         public int deathReason;
         public boolean nonHumanMarked;
@@ -115,7 +116,7 @@ public class DaySnapshot {
                 String dataPart = str.substring(colonPos + 1); // "n=42,r=6,..."
                 String[] pairs = dataPart.split(",");
                 for (String pair : pairs) {
-                    String[] kv = pair.split("=");
+                    String[] kv = pair.split("=", 2);
                     if (kv.length < 2) continue;
                     String key = kv[0].trim();
                     String value = kv[1].trim();
@@ -134,6 +135,7 @@ public class DaySnapshot {
                         case "nm": ps.nonHumanMarked = Integer.parseInt(value) == 1; break;
                         case "cod": ps.comingOutDay = Integer.parseInt(value); break;
                         case "st": ps.skillTarget = Integer.parseInt(value); break;
+                        case "sh": ps.skillTargets = parseSkillHistory(value); break;
                     }
                 }
                 
@@ -147,6 +149,16 @@ public class DaySnapshot {
                 DebugLogger.error("[DaySnapshot] 解析PlayerStatus失败: " + e.getMessage() + ", 原始数据=" + str);
                 return null;
             }
+        }
+
+        private static int[] parseSkillHistory(String value)
+        {
+            if (value == null || value.isBlank()) return new int[0];
+            String[] encodedTargets = value.split("/");
+            int[] history = new int[encodedTargets.length];
+            for (int day = 0; day < encodedTargets.length; day++)
+                history[day] = Integer.parseInt(encodedTargets[day]);
+            return history;
         }
 
         public boolean isAlive(int currentDay) {

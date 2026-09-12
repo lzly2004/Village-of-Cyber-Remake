@@ -135,6 +135,10 @@ public class ReplayManager {
             if (save.totalVillageCount <= 0) save.totalVillageCount = -1;
             DebugLogger.info("[ReplayManager] 迁移存档版本: v1 -> v2");
         }
+        if (save.version == 2) {
+            save.version = 3;
+            DebugLogger.info("[ReplayManager] 迁移存档版本: v2 -> v3");
+        }
         if (save.version < ReplaySave.CURRENT_VERSION) {
             DebugLogger.warn("[ReplayManager] 存档版本 v" + save.version + " 无法自动迁移到 v" + ReplaySave.CURRENT_VERSION);
         }

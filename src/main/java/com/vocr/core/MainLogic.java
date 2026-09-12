@@ -130,7 +130,7 @@ public class MainLogic implements MainLogicInterface
             probabilityCalculator = new ProbabilityCalculator();
         }
 
-        coManager = new COManager(ctx, suspicion, resultPresenter, probabilityCalculator, hunterGuarder);
+        coManager = new COManager(ctx, suspicion, resultPresenter, probabilityCalculator);
 
         // Replay系统: 录制器作为本局依赖显式传递给执行层。
         this.recorder = new GameRecorder("replay_" + p.name(), gameRecordManager);
@@ -216,6 +216,8 @@ public class MainLogic implements MainLogicInterface
         //4,猎人工作逻辑
         int lietarget = zhenlie(ctx.getHunter());
         ctx.recordSkillTarget(ctx.getHunter(), ctx.getGameDay(), lietarget);
+        // 假猎人日记必须与真猎人一样，在当夜死亡公开前确定。
+        fabricator.prepareFakeHunterDiaries();
         //5,死体逻辑，并且返回当天夜间死体
         dielogic(wolf[0],wolf[1],zhantarget,lietarget);
         ctx.setEndResult(judgeend());

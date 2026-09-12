@@ -6,6 +6,8 @@ import com.vocr.config.GameConstants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.IntUnaryOperator;
 
 class SuspicionSystem
 {
@@ -59,11 +61,17 @@ class SuspicionSystem
 
     public int getOne(int[] val)
     {
+        return getOne(val, bound -> ConstNum.randomInt(0, bound - 1));
+    }
+
+    int getOne(int[] val, IntUnaryOperator boundedRandom)
+    {
         int playerNum = ctx.getPlayerSum();
         if (playerNum < 1)
             throw new IllegalArgumentException("玩家数量不能小于1，当前数量：" + playerNum);
         if (val == null || val.length < playerNum + 1)
             throw new IllegalArgumentException("权重数组为空或长度不足，需至少包含" + (playerNum + 1) + "个元素");
+        Objects.requireNonNull(boundedRandom, "随机数来源不能为空");
 
         int maxVal = Integer.MIN_VALUE;
         int maxIdx = -1;
@@ -111,7 +119,9 @@ class SuspicionSystem
             return maxIdx >= 1 ? maxIdx : 1;
         }
 
-        int randomNum = ConstNum.randomInt(0, totalWeight - 1);
+        int randomNum = boundedRandom.applyAsInt(totalWeight);
+        if (randomNum < 0 || randomNum >= totalWeight)
+            throw new IllegalArgumentException("随机数来源返回越界值: " + randomNum + ", bound=" + totalWeight);
         int cumulativeWeight = 0;
         for (int i = 1; i <= playerNum; i++)
         {

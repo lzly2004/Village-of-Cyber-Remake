@@ -21,18 +21,15 @@ public class COManager
     private final ResultPresenter resultPresenter;
     private final ClaimResponsePlanner responsePlanner;
     private final ResultEventGenerator eventGenerator;
-    private final HunterGuarder hunterGuarder;
 
     public COManager(GameContext ctx, SuspicionSystem suspicion,
-                     ResultPresenter resultPresenter, ProbabilityCalculator probabilityCalculator,
-                     HunterGuarder hunterGuarder)
+                     ResultPresenter resultPresenter, ProbabilityCalculator probabilityCalculator)
     {
         this.ctx = ctx;
         this.suspicion = suspicion;
         this.resultPresenter = resultPresenter;
         this.responsePlanner = new ClaimResponsePlanner(ctx, probabilityCalculator);
         this.eventGenerator = new ResultEventGenerator(ctx);
-        this.hunterGuarder = hunterGuarder;
     }
 
     /** 猫又CO概率参数p1：狼队中已CO且非默认CO（claimedRole=6）的人数 */
@@ -152,17 +149,6 @@ public class COManager
                 ctx.registerClaim(num, 3);
                 ctx.addLazySuspicionValue(num, GameConstants.SUSPICION_DECREASE_MEDIUM_CO);
                 eventGenerator.addEvent(EventName.lrco, num);
-                if (ctx.getActualRole(num) != 3)
-                {
-                    for (int j = 2; j < gd; j++)
-                    {
-                        if (ctx.getSkillTarget(num, j) == 0)
-                        {
-                            int target = hunterGuarder.guard(num);
-                            ctx.recordSkillTarget(num, j, target);
-                        }
-                    }
-                }
                 break;
             case 4:
             {

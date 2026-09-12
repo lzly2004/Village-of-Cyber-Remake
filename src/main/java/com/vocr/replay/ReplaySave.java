@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReplaySave {
-    public static final int CURRENT_VERSION = 2;
+    public static final int CURRENT_VERSION = 3;
 
     public int version = CURRENT_VERSION;
     public int slotIndex;
@@ -170,6 +170,51 @@ public class ReplaySave {
             if (snap != null && snap.dayNumber == day) return true;
         }
         return false;
+    }
+
+    /**
+     * 返回在指定复盘日期已经可见的技能记录。
+     *
+     * v3 优先读取不晚于 visibleDay + 1 的最新完整历史，以包含当天白天发生的
+     * 晚 CO 回填；旧录像没有完整历史时，退回原来的“技能日次日 st”读取方式。
+     */
+    public int getVisibleSkillTarget(int playerIndex, int skillDay, int visibleDay)
+    {
+        if (daySnapshots == null || playerIndex < 1 || skillDay < 1 || visibleDay < 1) return 0;
+
+        int latestHistoryDay = -1;
+        int historyTarget = 0;
+        int historyCutoffDay = visibleDay + 1;
+        for (DaySnapshot snapshot : daySnapshots)
+        {
+            if (snapshot == null || snapshot.dayNumber > historyCutoffDay
+                    || snapshot.dayNumber <= latestHistoryDay) continue;
+            DaySnapshot.PlayerStatus player = findPlayer(snapshot, playerIndex);
+            if (player == null || player.skillTargets == null
+                    || skillDay >= player.skillTargets.length) continue;
+            latestHistoryDay = snapshot.dayNumber;
+            historyTarget = player.skillTargets[skillDay];
+        }
+        if (latestHistoryDay >= 0) return historyTarget;
+
+        DaySnapshot legacySnapshot = findSnapshot(skillDay + 1);
+        DaySnapshot.PlayerStatus legacyPlayer = findPlayer(legacySnapshot, playerIndex);
+        return legacyPlayer != null ? legacyPlayer.skillTarget : 0;
+    }
+
+    private DaySnapshot findSnapshot(int day)
+    {
+        for (DaySnapshot snapshot : daySnapshots)
+            if (snapshot != null && snapshot.dayNumber == day) return snapshot;
+        return null;
+    }
+
+    private DaySnapshot.PlayerStatus findPlayer(DaySnapshot snapshot, int playerIndex)
+    {
+        if (snapshot == null || snapshot.players == null) return null;
+        for (DaySnapshot.PlayerStatus player : snapshot.players)
+            if (player != null && player.playerIndex == playerIndex) return player;
+        return null;
     }
 
     public String getPeiyiDisplayName() {

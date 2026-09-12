@@ -86,7 +86,7 @@ public class GameRecorder
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             Map<String, Object> meta = new LinkedHashMap<>();
             meta.put("type", "GAME_METADATA");
-            meta.put("version", 2);
+            meta.put("version", 3);
             meta.put("peiyiName", p.name());
             meta.put("peiyiOrdinal", p.ordinal());
             meta.put("peiyiVillageCount", peiyiVillage);

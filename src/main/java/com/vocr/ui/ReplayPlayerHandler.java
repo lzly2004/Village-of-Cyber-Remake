@@ -819,8 +819,8 @@ public class ReplayPlayerHandler implements SceneHandler {
             DaySnapshot.PlayerStatus p = snap.players[idx];
             if (p == null) continue;
             if (p.deathDay > 0 && d >= p.deathDay) break;
-            if (p.skillTarget != 0) {
-                int target = p.skillTarget;
+            int target = ui.currentReplaySave.getVisibleSkillTarget(p.playerIndex, d, endDay);
+            if (target != 0) {
                 int effectiveTarget = target;
                 boolean isBlack = false;
                 if (target > playerSum) {

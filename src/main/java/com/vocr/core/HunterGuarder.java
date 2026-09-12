@@ -9,6 +9,7 @@ import com.vocr.config.GameConstants;
 import com.vocr.rules.RuleEngine;
 
 import java.util.ArrayList;
+import java.util.function.IntUnaryOperator;
 
 public class HunterGuarder
 {
@@ -22,6 +23,11 @@ public class HunterGuarder
     }
 
     public int guard(int num)
+    {
+        return guard(num, bound -> ConstNum.randomInt(0, bound - 1));
+    }
+
+    int guard(int num, IntUnaryOperator boundedRandom)
     {
         if (ctx.getDeathReason(num) != whyDie.NONE) return 0;
 
@@ -159,7 +165,7 @@ public class HunterGuarder
         // Phase 3: 选择目标
         // ============================================================
 
-        int result = suspicion.getOne(huweiweight);
+        int result = suspicion.getOne(huweiweight, boundedRandom);
 
         DebugLogger.log("最终护卫对象：" + CharacterKanjiName.values()[ctx.getCharacterNumber(result)]);
         return result;

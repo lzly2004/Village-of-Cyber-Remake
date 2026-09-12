@@ -5,6 +5,7 @@ import com.vocr.logging.DebugLogger;
 import com.vocr.config.GameConstants;
 
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.function.IntFunction;
 
 /** 将游戏状态与投票状态编码为 Replay 使用的文本记录。 */
@@ -43,15 +44,31 @@ final class GameSnapshotRecordWriter
             int characterNumber = ctx.getCharacterNumber(player);
             if (characterNumber == 0)
                 DebugLogger.warn("[GameRecorder] ⚠️ 玩家" + player + "的characterNumber=0!");
-            return String.format("%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d,cod=%d,st=%d",
+            return String.format("%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d,cod=%d,st=%d,sh=%s",
                     player, characterNumber, ctx.getActualRole(player), ctx.getClaimedRole(player),
                     ctx.getClaimedRoleOrder(player), ctx.getDeathDay(player),
                     ctx.getDeathReason(player).ordinal(), ctx.isNonHumanMarked(player) ? 1 : 0,
-                    ctx.getComingOutDay(player), ctx.getSkillTarget(player, day - 1));
+                    ctx.getComingOutDay(player), ctx.getSkillTarget(player, day - 1),
+                    buildSkillHistory(ctx, player, day));
         });
         records.add(stateLine);
         DebugLogger.info("[GameRecorder] STATE行: " + stateLine);
         DebugLogger.info("[GameRecorder] 每日快照已记录: day=" + day + " alive=" + aliveCount);
+    }
+
+    /**
+     * 快照同时携带截至当日开始前的完整技能历史。
+     *
+     * 旧的 st 字段只保存 day - 1 的单个结果，无法表达晚 CO 对更早猎人日记的回填；
+     * sh 保留按技能日索引的完整历史，且不移除 st，以继续兼容旧 Replay。
+     */
+    private String buildSkillHistory(GameContext ctx, int player, int snapshotDay)
+    {
+        StringJoiner history = new StringJoiner("/");
+        history.add("0"); // 保留下标 0，使数组下标与游戏日期一致。
+        for (int skillDay = 1; skillDay < snapshotDay; skillDay++)
+            history.add(Integer.toString(ctx.getSkillTarget(player, skillDay)));
+        return history.toString();
     }
 
     void writeVoteData(int day, GameContext ctx)
