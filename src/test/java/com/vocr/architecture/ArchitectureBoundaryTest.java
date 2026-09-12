@@ -56,6 +56,26 @@ class ArchitectureBoundaryTest {
     }
 
     @Test
+    void loggingShouldRemainIndependentFromGamePackages() {
+        classes()
+                .that().resideInAPackage("com.vocr.logging..")
+                .should().onlyDependOnClassesThat().resideInAnyPackage(
+                        "java..",
+                        "com.vocr.logging..")
+                .because("普通诊断日志不应反向读取任何游戏状态")
+                .check(productionClasses);
+    }
+
+    @Test
+    void configurationAndHistoryShouldNotDependOnCore() {
+        noClasses()
+                .that().resideInAnyPackage("com.vocr.config..", "com.vocr.history..")
+                .should().dependOnClassesThat().resideInAPackage("com.vocr.core..")
+                .because("配置与战绩组件不应仅为了日志而反向依赖核心对局实现")
+                .check(productionClasses);
+    }
+
+    @Test
     void nonPresentationPackagesShouldNotDependOnUi() {
         noClasses()
                 .that().resideOutsideOfPackages("com.vocr.app..", "com.vocr.ui..")

@@ -1,5 +1,7 @@
 package com.vocr.core;
 
+import com.vocr.logging.DebugLogger;
+
 import com.vocr.config.GameConstants;
 
 import java.util.List;

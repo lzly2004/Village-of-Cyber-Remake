@@ -1,5 +1,7 @@
 package com.vocr.core;
 
+import com.vocr.logging.DebugLogger;
+
 import com.vocr.domain.CharacterKanjiName;
 import com.vocr.domain.whyDie;
 

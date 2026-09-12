@@ -1,5 +1,7 @@
 package com.vocr.core;
 
+import com.vocr.logging.DebugLogger;
+
 import javax.swing.ImageIcon;
 import java.awt.Image;
 import java.nio.ByteBuffer;

@@ -1,6 +1,6 @@
 package com.vocr.history;
 
-import com.vocr.core.DebugLogger;
+import com.vocr.logging.DebugLogger;
 import com.vocr.domain.peiyi;
 
 import java.math.BigDecimal;

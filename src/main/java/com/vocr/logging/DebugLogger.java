@@ -1,36 +1,31 @@
-package com.vocr.core;
-
-import com.vocr.domain.GameResult;
-import com.vocr.domain.whyDie;
+package com.vocr.logging;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * 统一调试日志系统 — 第0步重构核心基础设施。
- * 集中管理项目中所有调试输出,替代分散的 isTest/istest 标志和 System.out/err 调用。
+ * 集中管理项目中的普通诊断日志。
  *
  * 功能:
  *   1. 全局开关: enabled 控制所有调试输出
  *   2. 分级日志: DEBUG(详细) / INFO(关键事件) / WARN(警告) / ERROR(错误)
  *   3. 双重输出: 控制台 + 文件(可选)
- *   4. 结构化游戏状态录制: 用于回归测试基线
+ *
+ * 对局轨迹和 Replay 由各自的确定性记录组件负责，不进入普通日志。
  */
-public class DebugLogger
+public final class DebugLogger
 {
     // ==================== 单例 ====================
-    private static DebugLogger instance = null;
+    private static final DebugLogger INSTANCE = new DebugLogger();
+
+    private DebugLogger() {}
 
     public static DebugLogger getInstance()
     {
-        if (instance == null)
-            instance = new DebugLogger();
-        return instance;
+        return INSTANCE;
     }
 
     /**
@@ -54,10 +49,6 @@ public class DebugLogger
     private LogLevel minFileLevel = LogLevel.INFO;      // 文件最低输出级别
     private PrintWriter fileWriter = null;    // 文件输出
     private String currentLogFilePath = null;
-
-    // 结构化事件录制(用于回归测试)
-    private boolean recordingEnabled = false;
-    private final List<String> recordedEvents = new ArrayList<>();
 
     // 时间戳格式化
     private static final DateTimeFormatter TIME_FMT =
@@ -92,7 +83,7 @@ public class DebugLogger
     public void setMinFileLevel(LogLevel level) { this.minFileLevel = level; }
 
     /**
-     * 开始将日志写入文件。用于录制完整一局游戏的输出。
+     * 开始将普通诊断日志写入文件。
      * @param filePath 日志文件路径(如 "logs/baseline_2026-06-15.log")
      */
     public void startFileLogging(String filePath)
@@ -130,85 +121,6 @@ public class DebugLogger
     }
 
     public String getCurrentLogFilePath() { return currentLogFilePath; }
-
-    // ==================== 结构化录制(回归测试用) ====================
-
-    public void startRecording()
-    {
-        recordingEnabled = true;
-        recordedEvents.clear();
-        debug("=== 结构化录制已开始 ===");
-    }
-
-    public void stopRecording()
-    {
-        recordingEnabled = false;
-        debug("=== 结构化录制已停止,共录制 " + recordedEvents.size() + " 条事件 ===");
-    }
-
-    /**
-     * 录制一条结构化事件。用于回归基线对比。
-     * 格式: "EVENT|eventName|ch1|ch2|gameDay|extra"
-     */
-    public void recordGameEvent(String category, String details)
-    {
-        if (!recordingEnabled) return;
-        String entry = category + "|" + details;
-        recordedEvents.add(entry);
-        debug("[REC] " + entry);
-    }
-
-    /**
-     * 录制游戏状态快照
-     */
-    public void recordGameSnapshot(String label, GameStatus gs)
-    {
-        if (!recordingEnabled) return;
-        StringBuilder sb = new StringBuilder();
-        sb.append("SNAPSHOT|").append(label).append("|");
-        sb.append("day=").append(gs.gameDay).append("|");
-        sb.append("alive=").append(gs.getAliveCounter()).append("|");
-        sb.append("end=").append(gs.end).append("|");
-        for (int i = 1; i <= gs.getPlayerSum(); i++)
-        {
-            GameCharacter gc = gs.gc[i];
-            sb.append("[")
-                    .append(gc.number).append(":")
-                    .append("role=").append(gc.actualRole).append(",")
-                    .append("claimed=").append(gc.getClaimedRole()).append(",")
-                    .append("dieDay=").append(gc.getDeathDay()).append(",")
-                    .append("whyDie=").append(gc.getDeathReason()).append(",")
-                    .append("nonHumanMarker=").append(gc.nonHumanMarker)
-                    .append("]");
-        }
-        recordedEvents.add(sb.toString());
-        debug("[REC] Snapshot: " + label);
-    }
-
-    public List<String> getRecordedEvents() { return new ArrayList<>(recordedEvents); }
-
-    public void saveRecordedEvents(String filePath)
-    {
-        try
-        {
-            java.io.File dir = new java.io.File(filePath).getParentFile();
-            if (dir != null && !dir.exists()) dir.mkdirs();
-            try (PrintWriter pw = new PrintWriter(new FileWriter(filePath)))
-            {
-                pw.println("# Game Event Recording — Baseline");
-                pw.println("# Generated: " + LocalDateTime.now().format(TIME_FMT));
-                pw.println("# Total events: " + recordedEvents.size());
-                pw.println("# ========================================");
-                for (String entry : recordedEvents)
-                    pw.println(entry);
-            }
-            info("录制事件已保存至: " + filePath);
-        }
-        catch (IOException e)
-        {
-            error("保存录制事件失败: " + e.getMessage());
-        }
-    }
 
     // ==================== 核心日志方法 ====================
 

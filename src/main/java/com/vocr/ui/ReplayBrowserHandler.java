@@ -1,6 +1,6 @@
 package com.vocr.ui;
 
-import com.vocr.core.DebugLogger;
+import com.vocr.logging.DebugLogger;
 import com.vocr.core.GameRecorder;
 
 import com.vocr.replay.ReplayManager;

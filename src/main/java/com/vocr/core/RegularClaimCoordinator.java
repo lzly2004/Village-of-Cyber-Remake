@@ -1,5 +1,7 @@
 package com.vocr.core;
 
+import com.vocr.logging.DebugLogger;
+
 import com.vocr.domain.IntPair;
 import com.vocr.domain.peiyi;
 import com.vocr.domain.Role;

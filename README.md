@@ -41,6 +41,7 @@ gradlew.bat fatJar
 - `src/main/java/com/vocr/core/`：对局状态、流程协调、规则执行和录像采集
 - `src/main/java/com/vocr/domain/`：事件、角色、配役、死亡原因等领域类型
 - `src/main/java/com/vocr/history/`：战绩数据及持久化
+- `src/main/java/com/vocr/logging/`：与游戏状态无关的普通诊断日志
 - `src/main/java/com/vocr/replay/`：复盘存档模型及管理
 - `src/main/java/com/vocr/resources/`：图片、台词和音频等资源访问
 - `src/main/java/com/vocr/rules/`：通用权重规则引擎

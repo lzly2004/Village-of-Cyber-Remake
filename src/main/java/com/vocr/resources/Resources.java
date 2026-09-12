@@ -1,6 +1,6 @@
 package com.vocr.resources;
 
-import com.vocr.core.DebugLogger;
+import com.vocr.logging.DebugLogger;
 
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.CharacterKatakanaName;

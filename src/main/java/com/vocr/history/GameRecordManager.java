@@ -1,7 +1,7 @@
 package com.vocr.history;
 
 import com.vocr.config.PathConfig;
-import com.vocr.core.DebugLogger;
+import com.vocr.logging.DebugLogger;
 
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\history\GameRecordManager.java
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,5 +1,7 @@
 package com.vocr.core;
 
+import com.vocr.logging.DebugLogger;
+
 import com.vocr.domain.GameResult;
 import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;

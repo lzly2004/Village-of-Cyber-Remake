@@ -1,5 +1,7 @@
 package com.vocr.core;
 
+import com.vocr.logging.DebugLogger;
+
 /** 根据开局非人计划与真实职业建立首日占卜师、灵媒师 CO 候补。 */
 final class OpeningClaimCandidateBuilder
 {
