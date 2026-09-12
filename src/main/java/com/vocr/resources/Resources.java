@@ -5,9 +5,6 @@ import com.vocr.logging.DebugLogger;
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.CharacterKatakanaName;
 import com.vocr.domain.Event;
-import com.vocr.domain.EventName;
-
-import com.vocr.history.GameRecord;
 
 import javax.swing.*;
 import javax.sound.sampled.*;
@@ -385,26 +382,6 @@ public class Resources implements ResourcesInterface {
             return "加载失败：" + e.getMessage();
         }
     }
-    @Override
-    public void save(GameInfo GameInfo, int cnt) {
-        // 存档功能暂未实现
-        DebugLogger.log("[Resources.save] 存档功能暂未实现");
-    }
-
-    @Override
-    public GameInfo load(int cnt) {
-        // 读档功能暂未实现
-        DebugLogger.log("[Resources.load] 读档功能暂未实现，返回null");
-        return null;
-    }
-
-    @Override
-    public GameRecord getRecord() {
-        // 获取游戏记录功能暂未实现
-        DebugLogger.log("[Resources.getRecord] 获取游戏记录功能暂未实现，返回null");
-        return null;
-    }
-
     // 内部类：JSON映射实体
     private static class LineData {
         @JsonProperty("default")

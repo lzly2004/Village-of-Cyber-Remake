@@ -95,6 +95,19 @@ class ArchitectureBoundaryTest {
     }
 
     @Test
+    void resourcesAndReplayShouldNotDependOnLiveGameOrHistoryImplementations() {
+        noClasses()
+                .that().resideInAnyPackage(
+                        "com.vocr.resources..",
+                        "com.vocr.replay..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "com.vocr.core..",
+                        "com.vocr.history..")
+                .because("资源加载与录像持久化应消费稳定数据，不应反向持有实时对局或历史战绩实现")
+                .check(productionClasses);
+    }
+
+    @Test
     void nonPresentationPackagesShouldNotDependOnUi() {
         noClasses()
                 .that().resideOutsideOfPackages("com.vocr.app..", "com.vocr.ui..")

@@ -2,8 +2,6 @@ package com.vocr.resources;
 
 import com.vocr.domain.Event;
 
-import com.vocr.history.GameRecord;
-
 import javax.swing.*;
 
 public interface ResourcesInterface
@@ -30,15 +28,4 @@ public interface ResourcesInterface
     ImageIcon[] getEventImage(Event event);
     //参数：事件
     //提供给UI类，调用之后返回一个事件的图片图标。
-    void save(GameInfo gameInfo,int cnt);
-    //参数：局内信息;第cnt个存档
-    //实现：提供给UI类，存档，存为第cnt个存档。有可能会覆盖已有的存档。此时不改变胜场数胜率等数据，
-    //当cnt为0，表示不存档，此时这个函数的功能是记录对局记录，调整胜场数胜率等数据
-    //cnt=0时存储的有可能是还没有打完的对局，需要自己判断
-    GameInfo load(int cnt);
-    //提供给UI类，
-    //参数：第cnt个存档
-    //返回：第cnt个存档的存档信息
-    GameRecord getRecord();
-    //提供给UI类，返回历史对局情况
 }

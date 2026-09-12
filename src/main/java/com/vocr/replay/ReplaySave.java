@@ -1,7 +1,6 @@
 package com.vocr.replay;
 
 import com.vocr.logging.DebugLogger;
-import com.vocr.core.GameRecorder;
 
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\replay\ReplaySave.java
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,14 +32,14 @@ public class ReplaySave {
 
     public ReplaySave() {}
 
-    public static ReplaySave fromRecorder(int slot, GameRecorder recorder) {
+    public static ReplaySave fromRecords(int slot, List<String> records) {
         ReplaySave save = new ReplaySave();
         save.slotIndex = slot;
         save.saveTime = LocalDateTime.now().format(DT_FMT);
-        save.rawRecords = new ArrayList<>(recorder.getRecords());
+        save.rawRecords = new ArrayList<>(records);
         save.totalEvents = save.rawRecords.size();
         
-        DebugLogger.info("[ReplaySave] 开始从GameRecorder构建: records=" + save.totalEvents);
+        DebugLogger.info("[ReplaySave] 开始从录像记录构建: records=" + save.totalEvents);
 
         boolean foundJsonMetadata = false;
         ObjectMapper mapper = new ObjectMapper();
@@ -159,7 +158,7 @@ public class ReplaySave {
             save.totalDays = Math.max(save.totalDays, maxSnapshotDay);
         }
 
-        DebugLogger.info("[ReplaySave] 从GameRecorder构建完成: slot=" + slot +
+        DebugLogger.info("[ReplaySave] 从录像记录构建完成: slot=" + slot +
                 ", peiyi=" + save.peiyiName + ", days=" + save.totalDays +
                 ", snapshots=" + save.daySnapshots.size() +
                 ", result=" + save.endResult);

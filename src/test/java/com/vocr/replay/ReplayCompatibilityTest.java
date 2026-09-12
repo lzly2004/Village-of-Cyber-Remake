@@ -2,8 +2,6 @@ package com.vocr.replay;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vocr.core.GameRecorder;
-import com.vocr.history.GameRecordManager;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -52,17 +50,7 @@ class ReplayCompatibilityTest
         {
             records = new String(fixture.readAllBytes(), StandardCharsets.UTF_8).lines().toList();
         }
-        GameRecorder recorder = new GameRecorder(
-                "legacy-v0", new GameRecordManager(tempDir.resolve("record.json").toString()))
-        {
-            @Override
-            public List<String> getRecords()
-            {
-                return List.copyOf(records);
-            }
-        };
-
-        ReplaySave rebuilt = ReplaySave.fromRecorder(3, recorder);
+        ReplaySave rebuilt = ReplaySave.fromRecords(3, records);
         assertLegacyRecording(rebuilt, records);
 
         ObjectMapper mapper = new ObjectMapper()

@@ -212,7 +212,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         GameRecorder recorder = ui.mainLogic.getRecorder();
         if (recorder == null) return;
 
-        ReplaySave save = ReplaySave.fromRecorder(slotIndex, recorder);
+        ReplaySave save = ReplaySave.fromRecords(slotIndex, recorder.getRecords());
         ui.replayManager.saveToSlot(slotIndex, save);
         recorder.endGame(recorder.isActive() ? 0 : 0, 0);
         recorder.setActive(false);
