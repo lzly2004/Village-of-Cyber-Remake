@@ -147,7 +147,6 @@ public final class GameStrings
     public static String getDeathFollow(int day) { return String.format(DEATH_FOLLOW_FORMAT, day); }
     public static String getDeathCat(int day) { return String.format(DEATH_CAT_FORMAT, day); }
     public static String getVoteTitleFree(int day) { return String.format(VOTE_TITLE_FREE, day); }
-    public static String getVoteTitleGrey(int day) { return String.format(VOTE_TITLE_GREY, day); }
     public static String getVoteTitleRedo(int day) { return String.format(VOTE_TITLE_REDO, day); }
     public static String getVoteTitleDesign(int day, String targetText) { return String.format(VOTE_TITLE_DESIGN, day, targetText); }
     public static String getVoteHistoryTitle(int day, int round, String extra) { return String.format(VOTE_HISTORY_TITLE, day, round, extra); }

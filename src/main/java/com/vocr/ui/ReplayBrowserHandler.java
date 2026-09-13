@@ -250,17 +250,6 @@ public class ReplayBrowserHandler implements SceneHandler {
         }
     }
 
-    private JButton createDialogButton(UI ui, String text, Color color, int x, int y) {
-        JButton btn = new JButton(text);
-        btn.setBounds(x, y, 80, 40);
-        btn.setFont(new Font("Dialog", Font.BOLD, 18));
-        btn.setForeground(color);
-        btn.setBackground(Color.DARK_GRAY);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        return btn;
-    }
-
     private JButton createButton(UI ui, String imageName, int x, int y, int w, int h) {
         ImageIcon img = ui.resources.getImage(imageName);
         return ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);

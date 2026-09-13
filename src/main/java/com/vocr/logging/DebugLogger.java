@@ -53,7 +53,6 @@ public final class DebugLogger
     private LogLevel minConsoleLevel = LogLevel.DEBUG;  // 控制台最低输出级别
     private LogLevel minFileLevel = LogLevel.INFO;      // 文件最低输出级别
     private PrintWriter fileWriter = null;    // 文件输出
-    private String currentLogFilePath = null;
 
     // 时间戳格式化
     private static final DateTimeFormatter TIME_FMT =
@@ -101,7 +100,6 @@ public final class DebugLogger
                 dir.mkdirs();
 
             fileWriter = new PrintWriter(new FileWriter(filePath, true)); // 追加模式
-            currentLogFilePath = filePath;
             info0("=== 日志文件已开启: " + filePath + " ===");
         }
         catch (IOException e)
@@ -121,11 +119,8 @@ public final class DebugLogger
             fileWriter.flush();
             fileWriter.close();
             fileWriter = null;
-            currentLogFilePath = null;
         }
     }
-
-    public String getCurrentLogFilePath() { return currentLogFilePath; }
 
     // ==================== 核心日志方法 ====================
 

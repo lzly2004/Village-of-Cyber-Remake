@@ -1,7 +1,5 @@
 package com.vocr.ui;
 
-import com.vocr.logging.DebugLogger;
-
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
@@ -33,17 +31,6 @@ public class UIHelpers {
         button.addActionListener(e -> {
             ui.resources.playSound("click.wav");
             action.run();
-        });
-    }
-
-    public static void setButtonListenerNoSound(JButton button, Runnable action) {
-        button.addActionListener(e -> action.run());
-    }
-
-    public static void setButtonSceneTransition(JButton button, UI ui, UI.Scene scene) {
-        button.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
-            ui.transitionTo(scene);
         });
     }
 
@@ -241,17 +228,6 @@ public class UIHelpers {
         if (icon == null) return null;
         JLabel label = new JLabel(icon);
         label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
-        return label;
-    }
-
-    public static void addIconLabel(UI ui, String imageName, int x, int y) {
-        JLabel label = createIconLabel(ui, imageName, x, y);
-        if (label != null) ui.jPanel.add(label);
-    }
-
-    public static JLabel createIconLabelWithLog(UI ui, String imageName, int x, int y, String logPrefix) {
-        JLabel label = createIconLabel(ui, imageName, x, y);
-        if (label == null) DebugLogger.warn("[" + logPrefix + "] 图标未找到: " + imageName);
         return label;
     }
 

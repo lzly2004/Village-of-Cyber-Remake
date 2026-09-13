@@ -15,8 +15,6 @@ class ConstNum
 
     // ==================== 可复现随机数系统(第0步重构) ====================
     private static java.util.Random rng = new java.util.Random();
-    private static boolean useFixedSeed = false;
-    private static long fixedSeed = 0;
 
     // ==================== 随机数序列录制(回归测试) ====================
     private static boolean recordRandom = false;
@@ -33,12 +31,6 @@ class ConstNum
     public static ArrayList<Integer> stopRandomRecording()
     {
         recordRandom = false;
-        return new ArrayList<>(recordedSequence);
-    }
-
-    /** 获取当前已录制的随机数序列 */
-    public static ArrayList<Integer> getRecordedSequence()
-    {
         return new ArrayList<>(recordedSequence);
     }
 
@@ -67,8 +59,6 @@ class ConstNum
     public static void setRandomSeed(long seed)
     {
         rng = new java.util.Random(seed);
-        useFixedSeed = true;
-        fixedSeed = seed;
         DebugLogger.info("随机种子已固定: " + seed);
     }
 
@@ -76,15 +66,8 @@ class ConstNum
     public static void resetRandomSeed()
     {
         rng = new java.util.Random();
-        useFixedSeed = false;
         DebugLogger.info("随机种子已重置为系统时间");
     }
-
-    /** 获取当前使用的随机种子(仅当种子被固定时有效) */
-    public static long getCurrentSeed() { return useFixedSeed ? fixedSeed : -1; }
-
-    /** 是否正在使用固定种子 */
-    public static boolean isUsingFixedSeed() { return useFixedSeed; }
 
     public static int randomInt(int min,int max)
     {//生成[min,max]的随机整数

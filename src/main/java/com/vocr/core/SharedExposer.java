@@ -23,8 +23,6 @@ class SharedExposer
         this.exposureProgress = 0;
     }
 
-    public int getExposureProgress() { return exposureProgress; }
-
     private void applyGuardianCO(int player)
     {
         ctx.revealClaim(player, 4, ctx.getGameDay());

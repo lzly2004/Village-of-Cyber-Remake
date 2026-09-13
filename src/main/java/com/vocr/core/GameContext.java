@@ -65,12 +65,6 @@ class GameContext implements GameContextView
         return player >= 1 && player <= getPlayerSum();
     }
 
-    /** 验证角色索引在有效范围内 (1..RoleCount) */
-    public boolean isValidRoleIndex(int role)
-    {
-        return role >= 1 && role < Role.values().length;
-    }
-
     /** 验证天数在有效范围内 (1..MAX_GAME_DAYS) */
     public boolean isValidDayIndex(int day)
     {
@@ -188,8 +182,6 @@ class GameContext implements GameContextView
     public int getDeathCounter() { return gs.getDeathCounter(); }
     public GameResult getEndResult() { return gs.end; }
     public void setEndResult(GameResult result) { gs.end = result; }
-    /** 兼容旧接口：返回游戏结果的整数值 */
-    public int getEndResultValue() { return gs.end.getValue(); }
     /** 获取有效游戏天数（游戏进行中返回 getGameDay()-1，结束后返回 getGameDay()） */
     public int getEffectiveGameDay() {
         return gs.end == GameResult.NONE ? gs.gameDay - 1 : gs.gameDay;

@@ -79,9 +79,6 @@ public interface GameContextView
     List<Integer> getDiebody();
     int getDiePlayerNum(whyDie why, int day);
 
-    // === 便捷查询 ===
+    // === 声称角色查询 ===
     List<Integer> getClaimedRole(int role, boolean mustAlive);
-    default List<Integer> getAliveClaimedRole(int role) {
-        return getClaimedRole(role, true);
-    }
 }

@@ -91,11 +91,6 @@ public class ReplayManager {
         }
     }
 
-    public boolean isSlotEmpty(int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= MAX_SLOTS) return true;
-        return slots[slotIndex] == null;
-    }
-
     public ReplaySave getSlot(int slotIndex) {
         if (slotIndex < 0 || slotIndex >= MAX_SLOTS) return null;
         return slots[slotIndex];
@@ -107,13 +102,6 @@ public class ReplayManager {
         slots[slotIndex].slotIndex = slotIndex;
         save();
         DebugLogger.info("[ReplayManager] 已保存到槽位 " + slotIndex);
-    }
-
-    public void deleteSlot(int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= MAX_SLOTS) return;
-        slots[slotIndex] = null;
-        save();
-        DebugLogger.info("[ReplayManager] 已删除槽位 " + slotIndex);
     }
 
     public int getUsedSlotCount() {

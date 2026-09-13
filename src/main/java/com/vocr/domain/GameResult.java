@@ -15,13 +15,4 @@ public enum GameResult {
     public int getValue() {
         return value;
     }
-
-    public static GameResult fromValue(int value) {
-        for (GameResult result : values()) {
-            if (result.value == value) {
-                return result;
-            }
-        }
-        return NONE;
-    }
 }

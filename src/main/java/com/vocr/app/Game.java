@@ -1,15 +1,11 @@
 package com.vocr.app;
 
 import com.vocr.logging.DebugLogger;
-import com.vocr.core.GameRecorder;
 import com.vocr.core.MainLogic;
-import com.vocr.core.MainLogicInterface;
 import com.vocr.history.GameRecordManager;
 import com.vocr.replay.ReplayManager;
 import com.vocr.resources.Resources;
-import com.vocr.resources.ResourcesInterface;
 import com.vocr.ui.UI;
-import com.vocr.ui.UIInterface;
 
 public class Game
 {   //单例模式
@@ -69,24 +65,4 @@ public class Game
        });
        getInstance().run();
    }
-    public UIInterface getUI()
-    {
-        return ui;
-    }
-    public MainLogicInterface getMainLogic()
-    {
-        return mainlogic;
-    }
-    public ResourcesInterface getResources()
-    {
-        return resources;
-    }
-    public ReplayManager getReplayManager()
-    {
-        return replayManager;
-    }
-    public GameRecordManager getGameRecordManager()
-    {
-        return gameRecordManager;
-    }
 }

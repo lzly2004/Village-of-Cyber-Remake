@@ -58,20 +58,6 @@ public class TextareaSimpleFactory
                 .build();
     }
 
-    /**
-     * 黑色文字型：加粗字体+50号+黑色文字+全透明背景（醒目标题）
-     * @param text 标题文本
-     */
-    public static JTextArea createBlackTitleTextArea(String text)
-    {
-        return createTextAreaBuilder()
-                .fontStyle(Font.BOLD)
-                .fontSize(50)
-                .text(text)
-                .foreground(Color.BLACK) // 黑色文字
-                .build();
-    }
-
     // ==================== 2. 自定义方法：支持灵活配置（如需扩展场景） ====================
     /**
      * 自定义配置：返回建造者，支持链式调用，灵活设置所有参数
