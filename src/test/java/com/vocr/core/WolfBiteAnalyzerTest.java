@@ -3,7 +3,6 @@ package com.vocr.core;
 import com.vocr.domain.Role;
 import com.vocr.domain.peiyi;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -12,20 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WolfBiteAnalyzerTest
 {
-    @AfterEach
-    void restoreRandomSource()
-    {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
-
     @Test
     void analyze_shouldDescribeDefaultOpeningWithoutRandomCalls()
     {
         GameContext context = createContext();
         WolfBiteAnalyzer analyzer = new WolfBiteAnalyzer(context);
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         WolfBiteAnalyzer.Analysis analysis = analyzer.analyze(
                 context.getPlayerSum(), context.getGameDay());
 
@@ -42,7 +34,7 @@ class WolfBiteAnalyzerTest
         assertArrayEquals(new boolean[context.getPlayerSum() + 1], analysis.plausibleMediums);
         assertArrayEquals(new int[context.getPlayerSum() + 1], analysis.whiteBallsBySeer);
         assertArrayEquals(new int[context.getPlayerSum() + 1], analysis.whiteBallsReceived);
-        assertTrue(ConstNum.stopRandomRecording().isEmpty());
+        assertTrue(context.getRandom().stopRecording().isEmpty());
     }
 
     @Test
@@ -78,8 +70,7 @@ class WolfBiteAnalyzerTest
 
     private static GameContext createContext()
     {
-        ConstNum.setRandomSeed(20260910L);
-        GameStatus status = new GameStatus();
+        GameStatus status = new GameStatus(new GameRandom(20260910L));
         status.startGame(peiyi.jianyi);
         return new GameContext(status, NonHumanConfiguration.from(peiyi.jianyi, 0));
     }

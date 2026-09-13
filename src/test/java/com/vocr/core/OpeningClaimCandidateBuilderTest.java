@@ -2,7 +2,6 @@ package com.vocr.core;
 
 import com.vocr.domain.peiyi;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,24 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OpeningClaimCandidateBuilderTest
 {
-    @AfterEach
-    void restoreRandomSource()
-    {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
-
     @Test
     void build_shouldIncludeLivingTrueSeerAndMediumWithoutRandomCalls()
     {
         GameContext context = createContext();
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         new OpeningClaimCandidateBuilder(context).build();
 
         assertEquals(List.of(context.getActualRoleIndex(1)), context.getZhans());
         assertEquals(List.of(context.getActualRoleIndex(2)), context.getLings());
-        assertTrue(ConstNum.stopRandomRecording().isEmpty());
+        assertTrue(context.getRandom().stopRecording().isEmpty());
     }
 
     @Test
@@ -73,8 +65,7 @@ class OpeningClaimCandidateBuilderTest
 
     private static GameContext createContext()
     {
-        ConstNum.setRandomSeed(20260910L);
-        GameStatus status = new GameStatus();
+        GameStatus status = new GameStatus(new GameRandom(20260910L));
         status.startGame(peiyi.jianyi);
         return new GameContext(status, NonHumanConfiguration.from(peiyi.jianyi, 0));
     }

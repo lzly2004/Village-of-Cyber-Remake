@@ -48,9 +48,9 @@ class SharedExposer
                 applyGuardianCO(ctx.getGyIndex(2));
                 return;
             }
-            if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
+            if (ctx.getRandom().probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
             {
-                if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
+                if (ctx.getRandom().probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
                 {
                     eventGenerator.addEvent(EventName.gyfo1, ctx.getGyIndex(1), ctx.getGyIndex(2));
                     eventGenerator.addEvent(EventName.gyfo1r, ctx.getGyIndex(2), ctx.getGyIndex(1));
@@ -65,8 +65,8 @@ class SharedExposer
             }
             else
             {
-                exposureProgress = ConstNum.randomInt(1, 90);
-                if (GameLogicUtils.probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
+                exposureProgress = ctx.getRandom().randomInt(1, 90);
+                if (ctx.getRandom().probabilityJudge(GameConstants.PROB_SHARED_EXPOSURE_DECISION))
                 {
                     eventGenerator.addEvent(EventName.gyho2, ctx.getGyIndex(1));
                     applyGuardianCO(ctx.getGyIndex(1));
@@ -82,9 +82,9 @@ class SharedExposer
         int qfnum = 1;
         if (ctx.getClaimedRole(ctx.getGyIndex(1)) == 4) qfnum = 2;
         if (exposureProgress == 0)
-            exposureProgress = ConstNum.randomInt(1, 90);
+            exposureProgress = ctx.getRandom().randomInt(1, 90);
         else
-            exposureProgress += ConstNum.randomInt(5, 15);
+            exposureProgress += ctx.getRandom().randomInt(5, 15);
         if (ctx.isDead(ctx.getGyIndex(3 - qfnum))
                 || ctx.isDead(ctx.getGyIndex(qfnum)))
             exposureProgress = GameConstants.INF;

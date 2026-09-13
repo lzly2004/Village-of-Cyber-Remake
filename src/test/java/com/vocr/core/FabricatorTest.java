@@ -2,7 +2,6 @@ package com.vocr.core;
 
 import com.vocr.domain.peiyi;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -13,17 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FabricatorTest
 {
-    @AfterEach
-    void restoreRandomSource()
-    {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
-
     @Test
     void fakeHunterDiary_shouldUseFreeNightSlotsWithoutConflictingWithSeerMediumPlans()
     {
-        GameStatus status = new GameStatus();
+        GameStatus status = new GameStatus(new GameRandom(20260912L));
         status.startGame(peiyi.jianyi);
         GameContext context = new GameContext(status, NonHumanConfiguration.from(peiyi.jianyi, 0));
         context.incrementGameDay();
@@ -43,7 +35,7 @@ class FabricatorTest
         Fabricator fabricator = new Fabricator(
                 context, suspicion, new SeerDiviner(context, suspicion), hunterGuarder);
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         fabricator.prepareFakeHunterDiaries();
         assertEquals(0, context.getSkillTarget(plannedSeer, 2));
         assertEquals(0, context.getSkillTarget(plannedMedium, 2));
@@ -52,6 +44,6 @@ class FabricatorTest
         fabricator.prepareFakeHunterDiaries();
         assertTrue(context.getSkillTarget(plannedSeer, 2) > 0,
                 "占卜计划被取消后，当夜空闲技能槽应开始保存潜在假猎人日记");
-        assertTrue(ConstNum.stopRandomRecording().isEmpty(), "潜在日记不得改变主游戏随机序列");
+        assertTrue(context.getRandom().stopRecording().isEmpty(), "潜在日记不得改变主游戏随机序列");
     }
 }

@@ -115,7 +115,7 @@ final class RegularClaimCoordinator
     private void processCatCOResponses(RegularClaimContext context, List<Integer> nightDeaths)
     {
         DebugLogger.log("本次有无猫又co：");
-        context.blackResponses = GameLogicUtils.shuffleList(context.blackResponses);
+        context.blackResponses = ctx.getRandom().shuffledCopy(context.blackResponses);
 
         // 统计已CO的狼队占/灵数量
         int lzsum = 0, llsum = 0;
@@ -170,7 +170,7 @@ final class RegularClaimCoordinator
         // 裁剪占CO（最多4人）
         while(ctx.getZhans().size() + rezhan > 4 && !context.blackResponses.isEmpty())
         {
-            context.blackResponses = GameLogicUtils.shuffleList(context.blackResponses);
+            context.blackResponses = ctx.getRandom().shuffledCopy(context.blackResponses);
             if(context.blackResponses.get(0).second() == 1
                     && context.blackResponses.get(0).first() != ctx.getActualRoleIndex(1))
             {
@@ -183,7 +183,7 @@ final class RegularClaimCoordinator
         // 裁剪灵CO（最多3人）
         while(ctx.getLings().size() + reling > 3 && !context.blackResponses.isEmpty())
         {
-            context.blackResponses = GameLogicUtils.shuffleList(context.blackResponses);
+            context.blackResponses = ctx.getRandom().shuffledCopy(context.blackResponses);
             if(context.blackResponses.get(0).second() == 2
                     && context.blackResponses.get(0).first() != ctx.getActualRoleIndex(2))
             {
@@ -228,7 +228,7 @@ final class RegularClaimCoordinator
         while(ctx.getZhans().size() + context.pendingSeerClaims > 5
                 || ctx.getLings().size() + context.pendingMediumClaims > 4)
         {
-            int target = ConstNum.randomInt(1, playerCount);
+            int target = ctx.getRandom().randomInt(1, playerCount);
             NonHumanPlan plan = ctx.getNonHumanPlan(target);
             if(ctx.getClaimedRole(target) == 0 && plan.isSeerOrMediumClaim())
             {

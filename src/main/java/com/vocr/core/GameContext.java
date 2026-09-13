@@ -21,6 +21,7 @@ import java.util.List;
 class GameContext implements GameContextView
 {
     private final GameStatus gs;
+    private final GameRandom random;
     private final SuspicionSystem suspicion;
 
     // === 核心状态 ===
@@ -38,6 +39,7 @@ class GameContext implements GameContextView
     GameContext(GameStatus gs, NonHumanConfiguration nonHumanConfiguration)
     {
         this.gs = gs;
+        this.random = gs.getRandom();
         if (nonHumanConfiguration == null)
             throw new IllegalArgumentException("非人阵营配置不能为空");
         this.nonHumanConfiguration = nonHumanConfiguration;
@@ -45,16 +47,21 @@ class GameContext implements GameContextView
         int n = gs.getPlayerSum();
         this.nightDeathState = new NightDeathState(n);
         this.roleRosterState = new RoleRosterState(extractAssignedRoles(gs));
-        this.claimState = new ClaimState(n);
+        this.claimState = new ClaimState(n, random);
         this.nonHumanPlanState = new NonHumanPlanState(n);
         this.suspicionState = new SuspicionState(n);
         this.skillState = new SkillState(n);
         this.voteState = new VoteState(n);
         this.seerMediumLinkState = new SeerMediumLinkState(n);
 
-        this.pendingEvents = new PendingEventQueue();
+        this.pendingEvents = new PendingEventQueue(random);
 
         this.suspicion = new SuspicionSystem(this);
+    }
+
+    GameRandom getRandom()
+    {
+        return random;
     }
 
     // ==================== 边界检查 ====================

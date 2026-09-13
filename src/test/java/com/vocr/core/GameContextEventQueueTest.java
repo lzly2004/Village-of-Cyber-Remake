@@ -5,7 +5,6 @@ import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 import com.vocr.domain.peiyi;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -19,13 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GameContextEventQueueTest
 {
-    @AfterEach
-    void resetRandomSeed()
-    {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
-
     @Test
     void queue_shouldPreserveAppendOrderAndClearAsOneBuffer()
     {
@@ -69,17 +61,17 @@ class GameContextEventQueueTest
                 event(EventName.yjsw, CharacterEnglishName.Matthäus),
                 event(EventName.yjsw, CharacterEnglishName.Otfried));
 
-        ConstNum.setRandomSeed(20260906L);
-        ConstNum.startRandomRecording();
-        ArrayList<Event> expected = GameLogicUtils.shuffleList(original);
-        ArrayList<Integer> expectedRandomSequence = ConstNum.stopRandomRecording();
+        GameRandom expectedRandom = new GameRandom(20260906L);
+        expectedRandom.startRecording();
+        ArrayList<Event> expected = expectedRandom.shuffledCopy(original);
+        ArrayList<Integer> expectedRandomSequence = expectedRandom.stopRecording();
 
         for (Event event : original)
             context.queueEvent(event);
-        ConstNum.setRandomSeed(20260906L);
-        ConstNum.startRandomRecording();
+        context.getRandom().reseedForTest(20260906L);
+        context.getRandom().startRecording();
         context.shufflePendingEvents();
-        ArrayList<Integer> actualRandomSequence = ConstNum.stopRandomRecording();
+        ArrayList<Integer> actualRandomSequence = context.getRandom().stopRecording();
 
         assertEquals(expectedRandomSequence, actualRandomSequence);
         assertEquals(expected.size(), context.getPendingEventCount());

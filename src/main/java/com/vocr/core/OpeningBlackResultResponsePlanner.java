@@ -73,7 +73,7 @@ final class OpeningBlackResultResponsePlanner
                         wolfHunterOrCatWeight = 0;
                     }
 
-                    int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                    int option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                             wolfSeerWeight, wolfMediumWeight, wolfHunterOrCatWeight, stayHiddenWeight)));
                     switch(option)
                     {
@@ -136,14 +136,14 @@ final class OpeningBlackResultResponsePlanner
         switch(blackTarget)
         {
             case 8: case 9:
-                option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(95,5,0,0)));
+                option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(95,5,0,0)));
                 break;
             case 10:
-                option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(80,5,10,5)));
+                option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(80,5,10,5)));
                 break;
             case 11:
                 int aggression = ctx.getNonHumanAggression();
-                option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                         45 + aggression, 30, 20, 5 - aggression)));
                 break;
         }
@@ -172,7 +172,7 @@ final class OpeningBlackResultResponsePlanner
 
     private int chooseHunterOrCatRole()
     {
-        int role = 5 - GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+        int role = 5 - ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                 50 + 50 * ctx.getLies().size(), 50 + 50 * ctx.getMaos().size()))) * 2;
         if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut()) role = 3;
         return role;

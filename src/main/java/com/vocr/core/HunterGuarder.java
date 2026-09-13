@@ -24,7 +24,7 @@ class HunterGuarder
 
     public int guard(int num)
     {
-        return guard(num, bound -> ConstNum.randomInt(0, bound - 1));
+        return guard(num, bound -> ctx.getRandom().randomInt(0, bound - 1));
     }
 
     int guard(int num, IntUnaryOperator boundedRandom)

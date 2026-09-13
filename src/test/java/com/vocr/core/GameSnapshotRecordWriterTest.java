@@ -68,8 +68,8 @@ class GameSnapshotRecordWriterTest
         List<String> records = new ArrayList<>();
         GameSnapshotRecordWriter writer = new GameSnapshotRecordWriter(records);
 
-        ConstNum.setRandomSeed(20260912L);
-        ConstNum.startRandomRecording();
+        context.getRandom().reseedForTest(20260912L);
+        context.getRandom().startRecording();
         int firstTarget;
         try
         {
@@ -86,12 +86,11 @@ class GameSnapshotRecordWriterTest
                 fabricator.prepareFakeHunterDiaries();
                 assertTrue(context.getSkillTarget(fakeHunter, skillDay) > 0);
             }
-            assertTrue(ConstNum.stopRandomRecording().isEmpty(), "假猎人日记不得消耗主游戏随机序列");
+            assertTrue(context.getRandom().stopRecording().isEmpty(), "假猎人日记不得消耗主游戏随机序列");
         }
         finally
         {
-            ConstNum.stopRandomRecording();
-            ConstNum.resetRandomSeed();
+            context.getRandom().stopRecording();
         }
 
         context.incrementGameDay();

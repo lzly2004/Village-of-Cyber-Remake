@@ -62,13 +62,13 @@ class ZhanFabricator
                 if (blackzhi[ctx.getClaimedRole(target[i])] > 0 && ctx.getClaimedRole(target[i]) != 1) continue;
                 if (ctx.getClaimedRole(target[i]) == 1 && blackzhi[ctx.getClaimedRole(target[i])] > 1) continue;
             }
-            int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(baip, heip)));
+            int option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(baip, heip)));
             target[i] += option * n;
             int targetRole = (option == 1) ? ctx.getActualRole(target[i] - n) : 0;
             DivinationFabricationStrategy strategy = DivinationFabricationStrategy.forRole(ctx.getActualRole(num));
             if (strategy != null)
             {
-                target[i] = strategy.adjustTarget(option, target[i], targetRole, n);
+                target[i] = strategy.adjustTarget(option, target[i], targetRole, n, ctx.getRandom());
             }
         }
         if (target[0] < 1 && target[1] < 1) return;
@@ -83,7 +83,7 @@ class ZhanFabricator
             else if (diebody.contains(target[i] - n) && diebody.size() < 2)
                 weight[i] -= 49;
         }
-        int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(weight[0], weight[1])));
+        int option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(weight[0], weight[1])));
         ctx.recordSkillTarget(num, gd, target[option]);
     }
 }

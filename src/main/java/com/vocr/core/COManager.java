@@ -207,7 +207,7 @@ class COManager
         else if (ctx.getActualRoleIndex(5) < 1 || (isHumanWolf && ctx.isWolfClaimedCat()) || ctx.getClaimedRoleAskDay(5) > 0)
             processActualCo(num, 3, diebody);
         else
-            processActualCo(num, 3 + 2 * GameLogicUtils.getEventIndexByProbability(
+            processActualCo(num, 3 + 2 * ctx.getRandom().weightedIndex(
                     new ArrayList<>(List.of(50 + 50 * ctx.getLies().size(), 50 + 50 * ctx.getMaos().size()))), diebody);
     }
 }

@@ -16,6 +16,7 @@ final class ClaimState
     private static final int CAT = 5;
 
     private final int playerSum;
+    private final GameRandom random;
     private final int[] requestDays;
     private final int[] orderCounts;
     private final ArrayList<Integer> seerCandidates = new ArrayList<>();
@@ -27,9 +28,15 @@ final class ClaimState
 
     ClaimState(int playerSum)
     {
+        this(playerSum, new GameRandom());
+    }
+
+    ClaimState(int playerSum, GameRandom random)
+    {
         if (playerSum < 1)
             throw new IllegalArgumentException("玩家人数必须为正数: " + playerSum);
         this.playerSum = playerSum;
+        this.random = java.util.Objects.requireNonNull(random, "单局随机源不能为空");
         this.requestDays = new int[Role.values().length];
         this.orderCounts = new int[Role.values().length];
     }
@@ -90,12 +97,12 @@ final class ClaimState
 
     void shuffleSeerCandidates()
     {
-        ConstNum.shuffle(seerCandidates);
+        random.shuffle(seerCandidates);
     }
 
     void shuffleMediumCandidates()
     {
-        ConstNum.shuffle(mediumCandidates);
+        random.shuffle(mediumCandidates);
     }
 
     int getNonHumanCandidateCount()

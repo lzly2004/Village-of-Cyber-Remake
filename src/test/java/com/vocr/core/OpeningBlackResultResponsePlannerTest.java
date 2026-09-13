@@ -3,7 +3,6 @@ package com.vocr.core;
 import com.vocr.domain.IntPair;
 import com.vocr.domain.peiyi;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -14,13 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OpeningBlackResultResponsePlannerTest
 {
-    @AfterEach
-    void restoreRandomSource()
-    {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
-
     @Test
     void collectResponses_shouldDeduplicateBlackTargetsAndUseActualVillageRole()
     {
@@ -32,12 +24,12 @@ class OpeningBlackResultResponsePlannerTest
         markBlackResult(context, secondClaimedSeer, villager);
         List<IntPair> responses = new ArrayList<>();
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         new OpeningBlackResultResponsePlanner(context)
                 .collectResponses(context.getPlayerSum(), responses);
 
         assertEquals(List.of(new IntPair(villager, 6)), responses);
-        assertTrue(ConstNum.stopRandomRecording().isEmpty());
+        assertTrue(context.getRandom().stopRecording().isEmpty());
     }
 
     @Test
@@ -49,13 +41,13 @@ class OpeningBlackResultResponsePlannerTest
         markBlackResult(context, context.getActualRoleIndex(1), wolf);
         List<IntPair> responses = new ArrayList<>();
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         new OpeningBlackResultResponsePlanner(context)
                 .collectResponses(context.getPlayerSum(), responses);
 
         assertEquals(List.of(new IntPair(wolf, 2)), responses);
         assertEquals(NonHumanPlan.CLAIM_MEDIUM, context.getNonHumanPlan(wolf));
-        assertTrue(ConstNum.stopRandomRecording().isEmpty());
+        assertTrue(context.getRandom().stopRecording().isEmpty());
     }
 
     @Test
@@ -65,14 +57,14 @@ class OpeningBlackResultResponsePlannerTest
         int wolf = context.getRlIndex(1);
         markBlackResult(context, context.getActualRoleIndex(1), wolf);
         List<IntPair> responses = new ArrayList<>();
-        ConstNum.setRandomSeed(0L);
+        context.getRandom().reseedForTest(0L);
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         new OpeningBlackResultResponsePlanner(context)
                 .collectResponses(context.getPlayerSum(), responses);
 
         assertEquals(List.of(new IntPair(wolf, 1)), responses);
-        assertEquals(List.of(0), ConstNum.stopRandomRecording());
+        assertEquals(List.of(0), context.getRandom().stopRecording());
         assertEquals(NonHumanPlan.NONE, context.getNonHumanPlan(wolf));
         assertEquals(0, context.getSkillTarget(wolf, 1));
     }
@@ -89,9 +81,9 @@ class OpeningBlackResultResponsePlannerTest
         markBlackResult(context, context.getActualRoleIndex(1), respondingWolf);
         markBlackResult(context, context.getActualRoleIndex(2), plannedMediumWolf);
         List<IntPair> responses = new ArrayList<>();
-        ConstNum.setRandomSeed(3L);
+        context.getRandom().reseedForTest(3L);
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         new OpeningBlackResultResponsePlanner(context)
                 .collectResponses(context.getPlayerSum(), responses);
 
@@ -99,7 +91,7 @@ class OpeningBlackResultResponsePlannerTest
                 new IntPair(respondingWolf, 2),
                 new IntPair(plannedMediumWolf, 2)), responses);
         assertEquals(NonHumanPlan.CLAIM_MEDIUM, context.getNonHumanPlan(plannedMediumWolf));
-        assertEquals(List.of(14), ConstNum.stopRandomRecording());
+        assertEquals(List.of(14), context.getRandom().stopRecording());
     }
 
     @Test
@@ -111,15 +103,15 @@ class OpeningBlackResultResponsePlannerTest
         context.setNonHumanPlan(plannedMediumWolf, NonHumanPlan.CLAIM_MEDIUM);
         markBlackResult(context, context.getActualRoleIndex(1), respondingWolf);
         List<IntPair> responses = new ArrayList<>();
-        ConstNum.setRandomSeed(3L);
+        context.getRandom().reseedForTest(3L);
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         new OpeningBlackResultResponsePlanner(context)
                 .collectResponses(context.getPlayerSum(), responses);
 
         assertEquals(List.of(new IntPair(respondingWolf, 2)), responses);
         assertEquals(NonHumanPlan.STAY_HIDDEN, context.getNonHumanPlan(plannedMediumWolf));
-        assertEquals(List.of(14), ConstNum.stopRandomRecording());
+        assertEquals(List.of(14), context.getRandom().stopRecording());
     }
 
     private static void markBlackResult(GameContext context, int claimedSeer, int target)
@@ -130,8 +122,7 @@ class OpeningBlackResultResponsePlannerTest
 
     private static GameContext createContext()
     {
-        ConstNum.setRandomSeed(20260910L);
-        GameStatus status = new GameStatus();
+        GameStatus status = new GameStatus(new GameRandom(20260910L));
         status.startGame(peiyi.jianyi);
         return new GameContext(status, NonHumanConfiguration.from(peiyi.jianyi, 0));
     }

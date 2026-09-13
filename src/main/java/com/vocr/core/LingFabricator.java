@@ -138,7 +138,7 @@ class LingFabricator
             processLingOption(option, num, getLingProbability(ctx.getActualRole(num), false));
             return;
         }
-        int op = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(baip, heip)));
+        int op = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(baip, heip)));
         if (op == 1)
             ctx.recordSkillTarget(num, gd, ctx.getSkillTarget(num, gd) + n);
     }
@@ -163,8 +163,8 @@ class LingFabricator
 
     private void processLingOption(ArrayList<Integer> option, int num, int p)
     {
-        int op = option.get(ConstNum.randomInt(0, option.size() - 1));
-        if (!GameLogicUtils.probabilityJudge(p)) op = 1 - op;
+        int op = option.get(ctx.getRandom().randomInt(0, option.size() - 1));
+        if (!ctx.getRandom().probabilityJudge(p)) op = 1 - op;
         if (op == 1)
             ctx.recordSkillTarget(num, ctx.getGameDay(), ctx.getSkillTarget(num, ctx.getGameDay()) + ctx.getPlayerSum());
     }

@@ -138,7 +138,7 @@ class DayActionCoordinator
                             || plan == NonHumanPlan.CLAIM_HUNTER) continue;
                     int zhi = ctx.getActualRole(target);
                     int maolieIdx = zhi == 7 ? 0 : zhi - 7;
-                    if(GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(maolieIdx,1,coManager.getp1(zhi),coManager.getp2(zhi))))
+                    if(ctx.getRandom().probabilityJudge(probabilityCalculator.maolieco(maolieIdx,1,coManager.getp1(zhi),coManager.getp2(zhi))))
                     {
                         int lweight = 50+50*ctx.getMaos().size(),mweight = 50 + 50*ctx.getLies().size();
                         if((zhi == 7 && ctx.isWolfClaimedHunter()) || ctx.getClaimedRoleAskDay(3) != 0) lweight = 0;
@@ -146,7 +146,7 @@ class DayActionCoordinator
                         if(lweight + mweight == 0) ctx.clearNonHumanPlan(target);
                         else
                         {
-                            int role = 3 + 2 * GameLogicUtils.getEventIndexByProbability(
+                            int role = 3 + 2 * ctx.getRandom().weightedIndex(
                                     new ArrayList<>(List.of(lweight,mweight)));
                             NonHumanPlan responsePlan = NonHumanPlan.claimRole(role);
                             ctx.setNonHumanPlan(target, responsePlan);

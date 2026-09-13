@@ -97,7 +97,7 @@ class Fabricator
     private void preserveLegacyHunterRandomProgression(List<Integer> nightDeaths, int num)
     {
         if (ctx.isNonHumanMarked(num)) return;
-        selectFakeHunterTarget(num, nightDeaths, ConstNum::randomInt);
+        selectFakeHunterTarget(num, nightDeaths, ctx.getRandom()::randomInt);
     }
 
     private int selectFakeHunterTarget(int num, List<Integer> knownNightDeaths, RandomRange random)

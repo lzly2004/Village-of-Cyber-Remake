@@ -5,7 +5,6 @@ import com.vocr.domain.IntPair;
 import com.vocr.domain.Role;
 import com.vocr.domain.peiyi;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -15,13 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClaimResponsePlannerTest
 {
-    @AfterEach
-    void restoreRandomSource()
-    {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
-
     @Test
     void planResponsesForRole_shouldReturnTrueRoleAndOnlyHonorFirstRequest()
     {
@@ -29,14 +21,14 @@ class ClaimResponsePlannerTest
         ClaimResponsePlanner planner = new ClaimResponsePlanner(context, new ProbabilityCalculator());
         int seer = context.getActualRoleIndex(Role.zhan.ordinal());
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         List<IntPair> firstResponses = planner.planResponsesForRole(Role.zhan);
         List<IntPair> repeatedResponses = planner.planResponsesForRole(Role.zhan);
 
         assertEquals(List.of(new IntPair(seer, Role.zhan.ordinal())), firstResponses);
         assertTrue(repeatedResponses.isEmpty());
         assertEquals(context.getGameDay(), context.getClaimedRoleAskDay(Role.zhan.ordinal()));
-        assertTrue(ConstNum.stopRandomRecording().isEmpty());
+        assertTrue(context.getRandom().stopRecording().isEmpty());
     }
 
     @Test
@@ -50,7 +42,7 @@ class ClaimResponsePlannerTest
         context.setNonHumanPlan(wolf, NonHumanPlan.CLAIM_SEER);
         context.recordPlannedDivinationResult(wolf, plannedResult);
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         List<IntPair> responses = planner.planResponsesForPlayers(List.of(wolf, seer));
 
         assertEquals(List.of(
@@ -58,7 +50,7 @@ class ClaimResponsePlannerTest
                 new IntPair(seer, Role.zhan.ordinal())), responses);
         assertEquals(plannedResult, context.getSkillTarget(wolf, 1));
         assertEquals(0, context.getClaimedRole(wolf), "规划阶段不应执行实际 CO");
-        assertTrue(ConstNum.stopRandomRecording().isEmpty());
+        assertTrue(context.getRandom().stopRecording().isEmpty());
     }
 
     @Test
@@ -81,8 +73,7 @@ class ClaimResponsePlannerTest
 
     private static GameContext createContext()
     {
-        ConstNum.setRandomSeed(20260910L);
-        GameStatus status = new GameStatus();
+        GameStatus status = new GameStatus(new GameRandom(20260910L));
         status.startGame(peiyi.jianyi);
         return new GameContext(status, NonHumanConfiguration.from(peiyi.jianyi, 0));
     }

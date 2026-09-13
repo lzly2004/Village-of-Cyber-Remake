@@ -93,14 +93,14 @@ final class ClaimResponsePlanner
                     if (role == 3 && ctx.isWolfClaimedHunter()) break;
                     if (role == 5 && ctx.isWolfClaimedCat()) break;
                     int probability = probabilityCalculator.maolieco(0, 3, getP1(7), getP2(7));
-                    if (GameLogicUtils.probabilityJudge(probability))
+                    if (ctx.getRandom().probabilityJudge(probability))
                     {
                         responses.add(new IntPair(player, role));
                         ctx.markWolfClaimedRole(role);
                     }
                     break;
                 default:
-                    if (GameLogicUtils.probabilityJudge(probabilityCalculator.maolieco(
+                    if (ctx.getRandom().probabilityJudge(probabilityCalculator.maolieco(
                             ctx.getActualRole(player) - 7, 3,
                             getP1(ctx.getActualRole(player)), getP2(ctx.getActualRole(player)))))
                     {
@@ -109,7 +109,7 @@ final class ClaimResponsePlanner
                     break;
             }
         }
-        responses = GameLogicUtils.shuffleList(responses);
+        responses = ctx.getRandom().shuffledCopy(responses);
         if (claimedRole == Role.gong && responses.size() > 1)
             responses.remove(1);
         return responses;
@@ -145,7 +145,7 @@ final class ClaimResponsePlanner
                             break;
                         }
                         probability = probabilityCalculator.maolieco(0, 2, getP1(7), getP2(7));
-                        if (!GameLogicUtils.probabilityJudge(probability))
+                        if (!ctx.getRandom().probabilityJudge(probability))
                         {
                             responses.add(new IntPair(player, 6));
                             break;
@@ -169,7 +169,7 @@ final class ClaimResponsePlanner
                         option = 0;
                         // 如果猫又已明确出局，不能 CO 猫。
                         if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
-                            option = GameLogicUtils.getEventIndexByProbability(
+                            option = ctx.getRandom().weightedIndex(
                                     new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
                                             50 + 50 * ctx.getLies().size())));
                         responses.add(new IntPair(player, 3 + 2 * option));
@@ -180,7 +180,7 @@ final class ClaimResponsePlanner
                     case 11:
                         probability = probabilityCalculator.maolieco(ctx.getActualRole(player) - 7, 2,
                                 getP1(ctx.getActualRole(player)), getP2(ctx.getActualRole(player)));
-                        if (!GameLogicUtils.probabilityJudge(probability))
+                        if (!ctx.getRandom().probabilityJudge(probability))
                         {
                             responses.add(new IntPair(player, 6));
                             break;
@@ -188,7 +188,7 @@ final class ClaimResponsePlanner
                         option = 0;
                         // 如果猫又已明确出局，不能 CO 猫。
                         if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
-                            option = GameLogicUtils.getEventIndexByProbability(
+                            option = ctx.getRandom().weightedIndex(
                                     new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
                                             50 + 50 * ctx.getLies().size())));
                         responses.add(new IntPair(player, 3 + 2 * option));

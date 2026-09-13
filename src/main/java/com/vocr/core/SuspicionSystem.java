@@ -61,7 +61,7 @@ class SuspicionSystem
 
     public int getOne(int[] val)
     {
-        return getOne(val, bound -> ConstNum.randomInt(0, bound - 1));
+        return getOne(val, bound -> ctx.getRandom().randomInt(0, bound - 1));
     }
 
     int getOne(int[] val, IntUnaryOperator boundedRandom)
@@ -159,7 +159,7 @@ class SuspicionSystem
             for (int j = 1; j <= n; j++)
             {
                 if (ctx.isDead(j)) continue;
-                int p0 = ConstNum.randomInt(1, 100);
+                int p0 = ctx.getRandom().randomInt(1, 100);
                 if (i == j)
                     ctx.setSuspicionValue(i, j, -GameConstants.INF);
                 else
@@ -184,26 +184,26 @@ class SuspicionSystem
                         {
                             if (p0 <= 10) ctx.addSuspicionValue(i, j, -15);
                             else if (p0 <= 12) ctx.addSuspicionValue(i, j, 15);
-                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-3, 2));
+                            else ctx.addSuspicionValue(i, j, ctx.getRandom().randomInt(-3, 2));
                         }
                         else if (fr == -1)
                         {
                             if (p0 <= 5) ctx.addSuspicionValue(i, j, -15);
                             else if (p0 <= 10) ctx.addSuspicionValue(i, j, 15);
-                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 2));
+                            else ctx.addSuspicionValue(i, j, ctx.getRandom().randomInt(-2, 2));
                         }
                         else
                         {
                             if (p0 <= 2) ctx.addSuspicionValue(i, j, -15);
                             else if (p0 <= 12) ctx.addSuspicionValue(i, j, 15);
-                            else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 3));
+                            else ctx.addSuspicionValue(i, j, ctx.getRandom().randomInt(-2, 3));
                         }
                     }
                     else
                     {
                         if (p0 <= 5) ctx.addSuspicionValue(i, j, -15);
                         else if (p0 <= 10) ctx.addSuspicionValue(i, j, 15);
-                        else ctx.addSuspicionValue(i, j, ConstNum.randomInt(-2, 2));
+                        else ctx.addSuspicionValue(i, j, ctx.getRandom().randomInt(-2, 2));
                     }
                     int sv = ctx.getSuspicionValue(i, j);
                     if (sv > GameConstants.INFJ)

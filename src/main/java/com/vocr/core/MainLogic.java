@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class MainLogic implements MainLogicInterface
 {
@@ -41,6 +42,8 @@ public class MainLogic implements MainLogicInterface
     private GameRecorder recorder;
     private GameRecordManager gameRecordManager;
     private final Consumer<Event> eventSink;
+    private final Supplier<GameRandom> randomFactory;
+    private GameRandom random;
 
     /*
      * 参数取值表
@@ -65,8 +68,20 @@ public class MainLogic implements MainLogicInterface
     /** 正式运行时显式注入事件接收器与战绩管理器。 */
     public MainLogic(Consumer<Event> eventSink, GameRecordManager gameRecordManager)
     {
+        this(eventSink, gameRecordManager, GameRandom::new);
+    }
+
+    MainLogic(Consumer<Event> eventSink, GameRecordManager gameRecordManager, GameRandom random)
+    {
+        this(eventSink, gameRecordManager, () -> random);
+    }
+
+    private MainLogic(Consumer<Event> eventSink, GameRecordManager gameRecordManager,
+                      Supplier<GameRandom> randomFactory)
+    {
         this.eventSink = Objects.requireNonNull(eventSink, "事件接收器不能为空");
         this.gameRecordManager = gameRecordManager;
+        this.randomFactory = Objects.requireNonNull(randomFactory, "单局随机源工厂不能为空");
     }
     public GameContextView getGameContext()
     {//提供给UI类，封装后的游戏状态只读访问
@@ -92,7 +107,8 @@ public class MainLogic implements MainLogicInterface
         //返回值：游戏状态
         //函数体中有可能向UI类添加一系列事件
         this.gameRecordManager = Objects.requireNonNull(gameRecordManager, "战绩管理器不能为空");
-        gs         = new GameStatus();
+        random = Objects.requireNonNull(randomFactory.get(), "单局随机源不能为空");
+        gs         = new GameStatus(random);
         gs.startGame(p);
         if (gs.getPlayerSum() <= 0) {
             throw new IllegalStateException("游戏初始化失败: playerSum=" + gs.getPlayerSum());
@@ -102,7 +118,7 @@ public class MainLogic implements MainLogicInterface
                 throw new IllegalStateException("游戏初始化失败: 玩家" + i + "角色未分配");
             }
         }
-        int nonHumanAggression = ConstNum.randomInt(0, 5);
+        int nonHumanAggression = random.randomInt(0, 5);
         ctx = new GameContext(gs, NonHumanConfiguration.from(p, nonHumanAggression));
         suspicion = ctx.getSuspicion();
         seerDiviner = new SeerDiviner(ctx, suspicion);

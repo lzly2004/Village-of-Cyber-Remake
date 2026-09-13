@@ -3,9 +3,7 @@ package com.vocr.core;
 import com.vocr.domain.whyDie;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.RepeatedTest;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.ArrayList;
 
 class GameLogicUtilsTest {
 
@@ -49,37 +47,6 @@ class GameLogicUtilsTest {
         assertEquals(-1, GameLogicUtils.feiren(11), "背德者应为非人(妖狐阵营)");
     }
 
-    // ========== probabilityJudge() ==========
-
-    @RepeatedTest(100)
-    void probabilityJudge_100_shouldAlwaysReturnTrue() {
-        assertTrue(GameLogicUtils.probabilityJudge(100), "100%概率应始终返回true");
-    }
-
-    @RepeatedTest(100)
-    void probabilityJudge_0_shouldAlwaysReturnFalse() {
-        assertFalse(GameLogicUtils.probabilityJudge(0), "0%概率应始终返回false");
-    }
-
-    // ========== getEventIndexByProbability() ==========
-
-    @Test
-    void getEventIndexByProbability_singleItem_shouldReturn0() {
-        ArrayList<Integer> probs = new ArrayList<>();
-        probs.add(50);
-        int result = GameLogicUtils.getEventIndexByProbability(probs);
-        assertEquals(0, result, "单项应返回索引0");
-    }
-
-    @Test
-    void getEventIndexByProbability_zeroWeight_shouldThrow() {
-        ArrayList<Integer> probs = new ArrayList<>();
-        probs.add(0);
-        assertThrows(IllegalArgumentException.class,
-            () -> GameLogicUtils.getEventIndexByProbability(probs),
-            "零权重应抛IllegalArgumentException");
-    }
-
     // ========== whyDie.isDayDeath() ==========
 
     @Test
@@ -92,26 +59,4 @@ class GameLogicUtilsTest {
         assertFalse(whyDie.beiyao.isDayDeath(), "被咬应为夜晚死亡");
     }
 
-    @Test
-    void shuffleList_sameSeed_shouldProduceSameOrderAndChecksum() {
-        ArrayList<Integer> input = new ArrayList<>(java.util.List.of(1, 2, 3, 4, 5, 6));
-
-        ConstNum.setRandomSeed(20260904L);
-        ConstNum.startRandomRecording();
-        ArrayList<Integer> first = GameLogicUtils.shuffleList(input);
-        String firstChecksum = ConstNum.getRandomChecksum();
-
-        ConstNum.setRandomSeed(20260904L);
-        ConstNum.startRandomRecording();
-        ArrayList<Integer> second = GameLogicUtils.shuffleList(input);
-        String secondChecksum = ConstNum.getRandomChecksum();
-
-        assertEquals(first, second);
-        assertEquals(firstChecksum, secondChecksum);
-        assertEquals(java.util.List.of(1, 2, 3, 4, 5, 6), input, "洗牌不得修改调用方列表");
-        assertTrue(firstChecksum.matches("size=5 sha256=[0-9a-f]{64}"));
-
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
 }

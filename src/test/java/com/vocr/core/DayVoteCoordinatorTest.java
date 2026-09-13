@@ -3,7 +3,6 @@ package com.vocr.core;
 import com.vocr.domain.Role;
 import com.vocr.domain.peiyi;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -15,13 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DayVoteCoordinatorTest
 {
-    @AfterEach
-    void restoreRandomSource()
-    {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
-
     @Test
     void prepareVotablePlayers_shouldApplyRuleSpecificCandidateFilters()
     {
@@ -61,7 +53,7 @@ class DayVoteCoordinatorTest
         DayVoteCoordinator coordinator = new DayVoteCoordinator(
                 context, new VoteSelector(context, context.getSuspicion()), null);
 
-        ConstNum.startRandomRecording();
+        context.getRandom().startRecording();
         int executedPlayer = coordinator.conductVoting(
                 context.getPlayerSum(), context.getGameDay(), 2, List.of(target));
 
@@ -77,13 +69,12 @@ class DayVoteCoordinatorTest
             else
                 assertEquals(target, voteTarget);
         }
-        assertFalse(ConstNum.stopRandomRecording().isEmpty());
+        assertFalse(context.getRandom().stopRecording().isEmpty());
     }
 
     private static GameContext createContext()
     {
-        ConstNum.setRandomSeed(20260910L);
-        GameStatus status = new GameStatus();
+        GameStatus status = new GameStatus(new GameRandom(20260910L));
         status.startGame(peiyi.jianyi);
         return new GameContext(status, NonHumanConfiguration.from(peiyi.jianyi, 0));
     }

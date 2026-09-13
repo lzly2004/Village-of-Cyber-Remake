@@ -9,7 +9,13 @@ import java.util.ArrayList;
  */
 final class PendingEventQueue
 {
+    private final GameRandom random;
     private final ArrayList<Event> events = new ArrayList<>();
+
+    PendingEventQueue(GameRandom random)
+    {
+        this.random = java.util.Objects.requireNonNull(random, "单局随机源不能为空");
+    }
 
     void add(Event event)
     {
@@ -40,7 +46,7 @@ final class PendingEventQueue
 
     void shuffle()
     {
-        ArrayList<Event> shuffled = GameLogicUtils.shuffleList(events);
+        ArrayList<Event> shuffled = random.shuffledCopy(events);
         events.clear();
         events.addAll(shuffled);
     }

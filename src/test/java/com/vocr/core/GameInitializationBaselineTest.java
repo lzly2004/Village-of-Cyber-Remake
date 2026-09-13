@@ -10,7 +10,6 @@ import com.vocr.domain.whyDie;
 import com.vocr.config.GameConstants;
 import com.vocr.history.GameRecordManager;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,6 +35,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -80,12 +80,6 @@ class GameInitializationBaselineTest {
                 Arguments.of(peiyi.maoyou, 202L),
                 Arguments.of(peiyi.daxing, 303L)
         );
-    }
-
-    @AfterEach
-    void restoreRandomSource() {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
     }
 
     @ParameterizedTest(name = "{0} / seed={1}")
@@ -134,6 +128,21 @@ class GameInitializationBaselineTest {
     }
 
     @Test
+    void repeatedStart_shouldCreateAFreshRandomSourceForEachGame() {
+        List<Event> events = new ArrayList<>();
+        GameRecordManager records = new GameRecordManager(
+                tempDir.resolve("repeated-start-record.json").toString());
+        MainLogic logic = new MainLogic(events::add, records);
+
+        logic.start(peiyi.jianyi, records);
+        GameRandom firstRandom = ((GameContext) logic.getGameContext()).getRandom();
+        logic.start(peiyi.jianyi, records);
+        GameRandom secondRandom = ((GameContext) logic.getGameContext()).getRandom();
+
+        assertNotSame(firstRandom, secondRandom, "同一桌面控制器开始新对局时必须创建新的随机源");
+    }
+
+    @Test
     void curseKillInitialization_shouldRemainCompatible() {
         InitializationResult result = initialize(peiyi.yaoohu, 17L, "curse-golden");
         GameContext context = (GameContext) result.logic.getGameContext();
@@ -146,15 +155,15 @@ class GameInitializationBaselineTest {
     }
 
     private InitializationResult initialize(peiyi configuration, long seed, String label) {
-        ConstNum.setRandomSeed(seed);
-        ConstNum.startRandomRecording();
+        GameRandom random = new GameRandom(seed);
+        random.startRecording();
         List<Event> events = new ArrayList<>();
-        MainLogic logic = new MainLogic(events::add);
         GameRecordManager records = new GameRecordManager(
                 tempDir.resolve(configuration + "-" + label + "-record.json").toString());
+        MainLogic logic = new MainLogic(events::add, records, random);
         GameStatus status = logic.start(configuration, records);
-        ConstNum.stopRandomRecording();
-        return new InitializationResult(logic, status, List.copyOf(events), ConstNum.getRandomChecksum());
+        random.stopRecording();
+        return new InitializationResult(logic, status, List.copyOf(events), random.getRecordedChecksum());
     }
 
     private static int[] roles(int... counts) {

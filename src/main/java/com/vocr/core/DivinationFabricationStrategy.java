@@ -4,50 +4,50 @@ enum DivinationFabricationStrategy
 {
     WOLF(7) {
         @Override
-        public int adjustTarget(int option, int target, int targetRole, int n)
+        public int adjustTarget(int option, int target, int targetRole, int n, GameRandom random)
         {
             if (option == 1 && targetRole == 7
-                    && !GameLogicUtils.probabilityJudge(80))
+                    && !random.probabilityJudge(80))
                 return target - n;
             return target;
         }
     },
     MADMAN(8) {
         @Override
-        public int adjustTarget(int option, int target, int targetRole, int n)
+        public int adjustTarget(int option, int target, int targetRole, int n, GameRandom random)
         {
-            if (option == 0 && GameLogicUtils.probabilityJudge(15))
+            if (option == 0 && random.probabilityJudge(15))
                 return target + n;
             return target;
         }
     },
     FANATIC(9) {
         @Override
-        public int adjustTarget(int option, int target, int targetRole, int n)
+        public int adjustTarget(int option, int target, int targetRole, int n, GameRandom random)
         {
             if (option == 1 && targetRole == 7
-                    && !GameLogicUtils.probabilityJudge(90))
+                    && !random.probabilityJudge(90))
                 return target - n;
             return target;
         }
     },
     FOX(10) {
         @Override
-        public int adjustTarget(int option, int target, int targetRole, int n)
+        public int adjustTarget(int option, int target, int targetRole, int n, GameRandom random)
         {
-            if (option == 1 && GameLogicUtils.probabilityJudge(15))
+            if (option == 1 && random.probabilityJudge(15))
                 return target - n;
             return target;
         }
     },
     DEVIANT(11) {
         @Override
-        public int adjustTarget(int option, int target, int targetRole, int n)
+        public int adjustTarget(int option, int target, int targetRole, int n, GameRandom random)
         {
             int result = target;
             if (option == 1 && targetRole == 10)
                 result -= n;
-            if (option == 0 && GameLogicUtils.probabilityJudge(10))
+            if (option == 0 && random.probabilityJudge(10))
                 result += n;
             return result;
         }
@@ -60,7 +60,7 @@ enum DivinationFabricationStrategy
         this.roleCode = roleCode;
     }
 
-    public abstract int adjustTarget(int option, int target, int targetRole, int n);
+    public abstract int adjustTarget(int option, int target, int targetRole, int n, GameRandom random);
 
     public static DivinationFabricationStrategy forRole(int roleCode)
     {

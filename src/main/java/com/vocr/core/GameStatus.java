@@ -6,8 +6,11 @@ import com.vocr.domain.GameResult;
 import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;
 
+import java.util.Objects;
+
 final class GameStatus
 {//游戏状态封装类
+    private final GameRandom random;
     peiyi p;//游戏配役
     GameResult end;//当前游戏是否结束 GameResult.NONE/VILLAGE_WIN/WOLF_WIN/FOX_WIN
     int gameDay;//游戏进行到多少日目
@@ -15,7 +18,12 @@ final class GameStatus
     private int aliveCounter;//游戏中当前的存活人数计数
     GameCharacter[] gc;//游戏角色数组 int[CharecterSum+1]
     GameStatus()
+    {
+        this(new GameRandom());
+    }
+    GameStatus(GameRandom random)
     {//普通的构造函数。构造时赋初值-1，表示游戏还未开始
+        this.random = Objects.requireNonNull(random, "单局随机源不能为空");
         //初始化游戏状态的其他字段
         this.end = GameResult.NONE;
         this.gameDay = 1;
@@ -88,12 +96,12 @@ final class GameStatus
         for(int i=0;i<cnt-1;i++)
         {
             DebugLogger.log("当前随机交换玩家：" + i);
-            int rd = ConstNum.randomInt(i,cnt-1),tmp;
+            int rd = random.randomInt(i,cnt-1),tmp;
             tmp = characters[i];//随机交换
             characters[i] = characters[rd];
             characters[rd] = tmp;
 
-            int rd1 = ConstNum.randomInt(i,cnt-1);
+            int rd1 = random.randomInt(i,cnt-1);
             tmp = zysz[i];
             zysz[i] = zysz[rd1];
             zysz[rd1] = tmp;
@@ -122,6 +130,7 @@ final class GameStatus
 
     public int getAliveCounter() { return aliveCounter; }
     public int getDeathCounter() { return deathCounter; }
+    GameRandom getRandom() { return random; }
 
     void recordDeath(int player, whyDie reason, int day)
     {
@@ -134,7 +143,7 @@ final class GameStatus
         aliveCounter--;
         deathCounter++;
     }
-    private static int[] generateRandomCharacterArray()  //得到一个合法的大型村玩家编号数组
+    private int[] generateRandomCharacterArray()  //得到一个合法的大型村玩家编号数组
     {
         // 1. 定义核心常量
         final int MIN_VALUE = 1;
@@ -151,7 +160,7 @@ final class GameStatus
         // 从数组末尾往前遍历，每次随机选一个前面的位置，交换元素
         for (int i = numberPool.length - 1; i > 0; i--) {
             // 调用已有随机数方法：生成 0-i 闭区间的随机索引（对应 numberPool 未洗牌的前半部分）
-            int randomIndex = ConstNum.randomInt(0, i);
+            int randomIndex = random.randomInt(0, i);
 
             // 交换当前索引 i 和随机索引 randomIndex 的元素
             int temp = numberPool[i];

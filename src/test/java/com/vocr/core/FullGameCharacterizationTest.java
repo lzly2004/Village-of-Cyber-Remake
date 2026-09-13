@@ -9,7 +9,7 @@ import com.vocr.domain.peiyi;
 import com.vocr.history.GameRecord;
 import com.vocr.history.GameRecordManager;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,13 +45,6 @@ class FullGameCharacterizationTest
     @TempDir
     Path tempDir;
 
-    @AfterEach
-    void restoreRandomSource()
-    {
-        ConstNum.stopRandomRecording();
-        ConstNum.resetRandomSeed();
-    }
-
     Stream<Arguments> configurations()
     {
         return Stream.of(
@@ -69,19 +62,66 @@ class FullGameCharacterizationTest
     @MethodSource("configurations")
     void fixedPolicy_shouldReachStableCompleteGame(peiyi configuration, long seed)
     {
-        List<Event> events = new ArrayList<>();
-        GameRecordManager records = new GameRecordManager(
-                tempDir.resolve(configuration + "-record.json").toString());
-        MainLogic logic = new MainLogic(events::add, records);
+        SessionRun game = new SessionRun(configuration, seed, "single");
+        while (!game.isComplete()) game.advanceOneDay();
+        String digest = game.finishAndDigest();
+        System.out.printf("FULL_GAME %s seed=%d days=%d result=%s digest=%s random=%s%n",
+                configuration, seed, game.dayCount, game.context.getEndResult(), digest,
+                game.random.getRecordedChecksum());
 
-        ConstNum.setRandomSeed(seed);
-        ConstNum.startRandomRecording();
-        GameStatus status = logic.start(configuration, records);
-        GameContextView context = logic.getGameContext();
-        StringBuilder decisions = new StringBuilder();
+        assertEquals(EXPECTED_TRACES.get(configuration), digest, "完整对局行为轨迹发生变化");
+    }
 
-        int dayCount = 0;
-        while (context.getEndResult() == GameResult.NONE)
+    @Test
+    void interleavedGames_shouldKeepTheirCompleteRandomTrajectoriesIndependent()
+    {
+        SessionRun first = new SessionRun(peiyi.jianyi, 4201L, "interleaved-a");
+        SessionRun second = new SessionRun(peiyi.tongchang, 4202L, "interleaved-b");
+
+        while (!first.isComplete() || !second.isComplete())
+        {
+            if (!first.isComplete()) first.advanceOneDay();
+            if (!second.isComplete()) second.advanceOneDay();
+        }
+
+        assertEquals(EXPECTED_TRACES.get(first.configuration), first.finishAndDigest(),
+                "另一局的推进不得污染第一局随机轨迹");
+        assertEquals(EXPECTED_TRACES.get(second.configuration), second.finishAndDigest(),
+                "另一局的推进不得污染第二局随机轨迹");
+    }
+
+    private final class SessionRun
+    {
+        private final peiyi configuration;
+        private final long seed;
+        private final List<Event> events = new ArrayList<>();
+        private final GameRecordManager records;
+        private final GameRandom random;
+        private final MainLogic logic;
+        private final GameStatus status;
+        private final GameContextView context;
+        private final StringBuilder decisions = new StringBuilder();
+        private int dayCount;
+
+        private SessionRun(peiyi configuration, long seed, String label)
+        {
+            this.configuration = configuration;
+            this.seed = seed;
+            this.records = new GameRecordManager(
+                    tempDir.resolve(configuration + "-" + label + "-record.json").toString());
+            this.random = new GameRandom(seed);
+            this.logic = new MainLogic(events::add, records, random);
+            random.startRecording();
+            this.status = logic.start(configuration, records);
+            this.context = logic.getGameContext();
+        }
+
+        private boolean isComplete()
+        {
+            return context.getEndResult() != GameResult.NONE;
+        }
+
+        private void advanceOneDay()
         {
             if (dayCount >= GameConstants.MAX_GAME_DAYS - 2)
                 fail("固定策略未能在最大日期前结束对局: " + configuration);
@@ -90,18 +130,17 @@ class FullGameCharacterizationTest
             assertTrue(logic.shokei(2, List.of(target), false), "指定投票应完成当日流程");
             dayCount++;
         }
-        ConstNum.stopRandomRecording();
 
-        assertNotEquals(GameResult.NONE, context.getEndResult());
-        assertTrue(dayCount > 0);
-        assertEquals(status.getPlayerSum(), context.getAliveCounter() + context.getDeathCounter());
-        assertRecordedResult(records.getRecord(), configuration, context.getEndResult());
-
-        String digest = sha256(buildTrace(configuration, seed, dayCount, decisions, events, logic, context));
-        System.out.printf("FULL_GAME %s seed=%d days=%d result=%s digest=%s random=%s%n",
-                configuration, seed, dayCount, context.getEndResult(), digest, ConstNum.getRandomChecksum());
-
-        assertEquals(EXPECTED_TRACES.get(configuration), digest, "完整对局行为轨迹发生变化");
+        private String finishAndDigest()
+        {
+            random.stopRecording();
+            assertNotEquals(GameResult.NONE, context.getEndResult());
+            assertTrue(dayCount > 0);
+            assertEquals(status.getPlayerSum(), context.getAliveCounter() + context.getDeathCounter());
+            assertRecordedResult(records.getRecord(), configuration, context.getEndResult());
+            return sha256(buildTrace(
+                    configuration, seed, dayCount, decisions, events, logic, context, random));
+        }
     }
 
     private static int selectExecutionTarget(GameContextView context)
@@ -126,7 +165,7 @@ class FullGameCharacterizationTest
 
     private static String buildTrace(peiyi configuration, long seed, int dayCount,
                                      StringBuilder decisions, List<Event> events,
-                                     MainLogic logic, GameContextView context)
+                                     MainLogic logic, GameContextView context, GameRandom random)
     {
         StringBuilder trace = new StringBuilder(32_768);
         trace.append("game=").append(configuration).append('|').append(seed).append('|')
@@ -169,7 +208,7 @@ class FullGameCharacterizationTest
             if (record.startsWith("# Time:")) continue;
             trace.append("record=").append(normalizeNewlines(record)).append('\n');
         }
-        trace.append("random=").append(ConstNum.getRandomChecksum()).append('\n');
+        trace.append("random=").append(random.getRecordedChecksum()).append('\n');
         return trace.toString();
     }
 

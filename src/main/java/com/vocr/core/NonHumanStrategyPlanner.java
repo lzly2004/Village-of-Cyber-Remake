@@ -74,17 +74,17 @@ final class NonHumanStrategyPlanner
         DebugLogger.log("非人的初始工作：人狼上占");
         int aggression = ctx.getNonHumanAggression();
         int wolfCount = ctx.getInitialWolfCount();
-        int wolfSeerCount = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+        int wolfSeerCount = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                 10 - aggression, (11 - wolfCount) * 15, aggression + (wolfCount - 2) * 3)));
         int remainingWolfSeers = wolfSeerCount;
         while(remainingWolfSeers != 0)
         {
-            int wolfOrder = ConstNum.randomInt(1, wolfCount);
+            int wolfOrder = ctx.getRandom().randomInt(1, wolfCount);
             int wolf = ctx.getRlIndex(wolfOrder);
             if(ctx.isDead(wolf) || ctx.getPlannedDivinationResult(wolf) != 0) continue;
             remainingWolfSeers--;
             ctx.setNonHumanPlan(wolf, NonHumanPlan.CLAIM_SEER);
-            int option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+            int option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                     80 - 2 * aggression, 15, 5 + aggression, aggression)));
             int[] weight = new int[playerSum+1];
             for(int i=1;i<=playerSum;i++)
@@ -131,11 +131,11 @@ final class NonHumanStrategyPlanner
             else if(wolfSeerCount == 1) probability = aggression + 30;
             else probability = aggression + 10;
         }
-        if(GameLogicUtils.probabilityJudge(probability))
+        if(ctx.getRandom().probabilityJudge(probability))
         {
             while(true)
             {
-                int wolfOrder = ConstNum.randomInt(1, ctx.getInitialWolfCount());
+                int wolfOrder = ctx.getRandom().randomInt(1, ctx.getInitialWolfCount());
                 int wolf = ctx.getRlIndex(wolfOrder);
                 if(ctx.isDead(wolf) || ctx.getPlannedDivinationResult(wolf) != 0) continue;
                 ctx.setNonHumanPlan(wolf, NonHumanPlan.CLAIM_MEDIUM);
@@ -150,7 +150,7 @@ final class NonHumanStrategyPlanner
         List<Integer> strategyWeights = ctx.usesFanatic()
                 ? List.of(55, 35, 10)
                 : List.of(35, 60, 5);
-        int planOption = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(strategyWeights));
+        int planOption = ctx.getRandom().weightedIndex(new ArrayList<>(strategyWeights));
         int leader = ctx.getNonHumanLeader();
         if(planOption == 1)
             ctx.setNonHumanPlan(leader, NonHumanPlan.CLAIM_MEDIUM);
@@ -162,11 +162,11 @@ final class NonHumanStrategyPlanner
             if(!ctx.usesFanatic())
             {
                 int aggression = ctx.getNonHumanAggression();
-                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                int target, option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                         75 - aggression, 25 + aggression)));
                 while(true)
                 {
-                    target = ConstNum.randomInt(1,playerSum);
+                    target = ctx.getRandom().randomInt(1,playerSum);
                     DebugLogger.log("狂人占文对象：" + target);
                     if(target == ctx.getPreliminaryDivinationTarget(leader) || target == leader) continue;
                     ctx.recordPlannedDivinationResult(leader,
@@ -177,11 +177,11 @@ final class NonHumanStrategyPlanner
             else
             {
                 int aggression = ctx.getNonHumanAggression();
-                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                int target, option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                         70 - 2 * aggression, 20, aggression + 10, aggression)));
                 while(true)
                 {
-                    target = ConstNum.randomInt(1,playerSum);
+                    target = ctx.getRandom().randomInt(1,playerSum);
                     if(target == ctx.getPreliminaryDivinationTarget(leader) || target == leader) continue;
                     if(ctx.getActualRole(target) == 7 && option < 2) continue;
                     if(ctx.getActualRole(target) != 7 && option > 1) continue;
@@ -201,7 +201,7 @@ final class NonHumanStrategyPlanner
         if(ctx.getFox() > 0 && ctx.isAlive(ctx.getFox()))
         {
             int aggression = ctx.getNonHumanAggression();
-            int planOption = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+            int planOption = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                     5 + aggression, aggression, 95 - 2 * aggression)));
             if(planOption == 1)
                 ctx.setNonHumanPlan(ctx.getFox(), NonHumanPlan.CLAIM_MEDIUM);
@@ -210,11 +210,11 @@ final class NonHumanStrategyPlanner
             else
             {
                 ctx.setNonHumanPlan(ctx.getFox(), NonHumanPlan.CLAIM_SEER);
-                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                int target, option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                         90 - aggression, 10 + aggression)));
                 while (true)
                 {
-                    target = ConstNum.randomInt(1, playerSum);
+                    target = ctx.getRandom().randomInt(1, playerSum);
                     if (target == ctx.getPreliminaryDivinationTarget(ctx.getFox()) || target == ctx.getFox()) continue;
                     DebugLogger.log("妖狐占文对象：" + target);
                     ctx.recordPlannedDivinationResult(ctx.getFox(),
@@ -232,7 +232,7 @@ final class NonHumanStrategyPlanner
         if(ctx.getDeviant() > 0 && ctx.isAlive(ctx.getDeviant()))
         {
             int aggression = ctx.getNonHumanAggression();
-            int planOption = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+            int planOption = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                     50 + aggression, 5, 45 - aggression)));
             if(planOption == 1)
                 ctx.setNonHumanPlan(ctx.getDeviant(), NonHumanPlan.CLAIM_MEDIUM);
@@ -242,7 +242,7 @@ final class NonHumanStrategyPlanner
             {
                 DebugLogger.log("背德开始选择占文");
                 ctx.setNonHumanPlan(ctx.getDeviant(), NonHumanPlan.CLAIM_SEER);
-                int target, option = GameLogicUtils.getEventIndexByProbability(new ArrayList<>(List.of(
+                int target, option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
                         60 - aggression, 20, 20 + aggression, 0)));
                 if(option == 2)
                 {
@@ -252,7 +252,7 @@ final class NonHumanStrategyPlanner
                 else
                     while (true)
                     {
-                        target = ConstNum.randomInt(1, playerSum);
+                        target = ctx.getRandom().randomInt(1, playerSum);
                         DebugLogger.log("背德选择占文:"+target);
                         if (target == ctx.getPreliminaryDivinationTarget(ctx.getDeviant())
                                 || target == ctx.getDeviant())
