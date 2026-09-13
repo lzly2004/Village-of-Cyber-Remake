@@ -25,10 +25,9 @@ class GameSnapshotRecordWriterTest
     Path tempDir;
 
     @Test
-    void writer_shouldPreserveLegacyAndDailyStateFormats()
+    void writer_shouldPreserveDailyStateFormat()
     {
-        GameStatus status = createStatus();
-        GameContext context = createContext(status);
+        GameContext context = createContext(createStatus());
         int seer = context.getActualRoleIndex(Role.zhan.ordinal());
         context.registerClaim(seer, Role.zhan.ordinal());
         context.markNonHuman(seer);
@@ -37,24 +36,20 @@ class GameSnapshotRecordWriterTest
         List<String> records = new ArrayList<>();
         GameSnapshotRecordWriter writer = new GameSnapshotRecordWriter(records);
 
-        writer.writeStateSnapshot(1, status);
         writer.writeDailySnapshot(2, context);
 
         assertEquals(List.of(
-                expectedLegacyState(1, status),
                 "DAILY_SNAPSHOT|day=2|alive=" + context.getAliveCounter(),
                 expectedDailyState(2, context)), records);
     }
 
     @Test
-    void recorder_shouldKeepSnapshotMethodsInactiveBeforeStart()
+    void recorder_shouldKeepDailyAndVoteSnapshotsInactiveBeforeStart()
     {
-        GameStatus status = createStatus();
-        GameContext context = createContext(status);
+        GameContext context = createContext(createStatus());
         GameRecorder recorder = new GameRecorder(
                 "inactive-snapshot", new GameRecordManager(tempDir.resolve("record.json").toString()));
 
-        recorder.recordStateSnapshot(1, status);
         recorder.recordDailySnapshot(2, context);
         recorder.recordVoteData(2, context);
 
@@ -130,22 +125,6 @@ class GameSnapshotRecordWriterTest
         for (int skillDay = 2; skillDay <= 8; skillDay++)
             assertEquals(context.getSkillTarget(fakeHunter, skillDay),
                     roundTripped.getVisibleSkillTarget(fakeHunter, skillDay, 9));
-    }
-
-    private static String expectedLegacyState(int day, GameStatus status)
-    {
-        StringBuilder state = new StringBuilder("STATE|day=" + day + "|");
-        for (int player = 1; player <= status.getPlayerSum(); player++)
-        {
-            GameCharacter character = status.gc[player];
-            state.append("{").append(String.format(
-                    "%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d",
-                    player, character.number, character.actualRole,
-                    character.getClaimedRole(), character.getClaimedRoleOrder(),
-                    character.getDeathDay(), character.getDeathReason().ordinal(),
-                    character.nonHumanMarker ? 1 : 0)).append("}");
-        }
-        return state.toString();
     }
 
     private static String expectedDailyState(int day, GameContext context)

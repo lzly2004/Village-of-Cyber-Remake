@@ -18,18 +18,6 @@ final class GameSnapshotRecordWriter
         this.records = records;
     }
 
-    void writeStateSnapshot(int day, GameStatus status)
-    {
-        records.add(buildStateLine(day, status.getPlayerSum(), player -> {
-            GameCharacter character = status.gc[player];
-            return String.format("%d:n=%d,r=%d,cr=%d,cro=%d,dd=%d,wd=%d,nm=%d",
-                    player, character.number, character.actualRole,
-                    character.getClaimedRole(), character.getClaimedRoleOrder(),
-                    character.getDeathDay(), character.getDeathReason().ordinal(),
-                    character.nonHumanMarker ? 1 : 0);
-        }));
-    }
-
     void writeDailySnapshot(int day, GameContext ctx)
     {
         int playerSum = ctx.getPlayerSum();

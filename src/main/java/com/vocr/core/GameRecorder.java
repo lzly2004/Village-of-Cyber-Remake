@@ -236,12 +236,6 @@ public class GameRecorder
 
     // ==================== 状态快照 ====================
 
-    void recordStateSnapshot(int day, GameStatus gs)
-    {
-        if (!active) return;
-        snapshotWriter.writeStateSnapshot(day, gs);
-    }
-
     /**
      * 记录每日完整快照（包含存活/死亡状态、技能结果、投票明细）
      * 用于Replay系统的回放数据采集
