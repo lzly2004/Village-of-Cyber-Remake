@@ -7,7 +7,7 @@ import com.vocr.history.GameRecordManager;
 
 import java.util.function.BiConsumer;
 
-public class GameModule {
+class GameModule {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
     private final COManager coManager;

@@ -6,7 +6,7 @@ import com.vocr.domain.CharacterKanjiName;
 
 import com.vocr.config.GameConstants;
 
-public class VoteSelector
+class VoteSelector
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

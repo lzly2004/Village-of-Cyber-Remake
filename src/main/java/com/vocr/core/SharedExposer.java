@@ -8,7 +8,7 @@ import com.vocr.domain.whyDie;
 
 import com.vocr.config.GameConstants;
 
-public class SharedExposer
+class SharedExposer
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

@@ -10,7 +10,7 @@ import com.vocr.rules.RuleEngine;
 
 import java.util.ArrayList;
 
-public class SeerDiviner
+class SeerDiviner
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

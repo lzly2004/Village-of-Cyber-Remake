@@ -5,7 +5,7 @@ import com.vocr.logging.DebugLogger;
 import java.util.List;
 
 /** 协调非人开局策略，并将首日 CO 分派到普通或明确咒杀场景。 */
-public class NonHumanCoordinator
+class NonHumanCoordinator
 {
     private final NonHumanStrategyPlanner strategyPlanner;
     private final RegularClaimCoordinator regularClaimCoordinator;

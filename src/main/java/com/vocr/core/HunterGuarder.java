@@ -11,7 +11,7 @@ import com.vocr.rules.RuleEngine;
 import java.util.ArrayList;
 import java.util.function.IntUnaryOperator;
 
-public class HunterGuarder
+class HunterGuarder
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

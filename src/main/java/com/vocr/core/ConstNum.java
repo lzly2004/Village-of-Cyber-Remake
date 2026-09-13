@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ConstNum
+class ConstNum
 {
     //常量类，定义游戏常量以及静态方法
 

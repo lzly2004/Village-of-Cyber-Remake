@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.IntPredicate;
 
-public class GameLogicUtils
+class GameLogicUtils
 {
     public static int getEventIndexByProbability(ArrayList<Integer> probabilities)
     {

@@ -4,7 +4,7 @@ import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 
-public class ResultEventGenerator
+class ResultEventGenerator
 {
     private final GameContext ctx;
 

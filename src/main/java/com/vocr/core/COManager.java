@@ -14,7 +14,7 @@ import com.vocr.config.ProbabilityCalculator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class COManager
+class COManager
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

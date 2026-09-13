@@ -10,7 +10,7 @@ import com.vocr.domain.whyDie;
 
 import java.util.ArrayList;
 
-public class DielogicCarrier
+class DielogicCarrier
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

@@ -2,14 +2,20 @@ package com.vocr.architecture;
 
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaAccess;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ArchitectureBoundaryTest {
     private static final DescribedPredicate<JavaAccess<?>> DIRECT_PROCESS_OUTPUT =
@@ -51,6 +57,19 @@ class ArchitectureBoundaryTest {
                         "com.vocr.ui..")
                 .because("核心对局逻辑不应反向依赖启动层、界面或录像与资源实现")
                 .check(productionClasses);
+    }
+
+    @Test
+    void coreShouldExposeOnlyItsApplicationFacingApi() {
+        Set<String> publicCoreTypes = productionClasses.stream()
+                .filter(type -> type.getPackageName().equals("com.vocr.core"))
+                .filter(type -> !type.getName().contains("$"))
+                .filter(type -> type.getModifiers().contains(JavaModifier.PUBLIC))
+                .map(JavaClass::getSimpleName)
+                .collect(Collectors.toSet());
+
+        assertEquals(Set.of("MainLogic", "MainLogicInterface", "GameRecorder"), publicCoreTypes,
+                "核心包只应公开应用启动、界面调用和 Replay 保存所需的三个入口类型");
     }
 
     @Test

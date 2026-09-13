@@ -9,7 +9,7 @@ import com.vocr.config.GameConstants;
 import java.util.List;
 import java.util.Random;
 
-public class Fabricator
+class Fabricator
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

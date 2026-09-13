@@ -6,7 +6,7 @@ import com.vocr.domain.whyDie;
 
 import java.util.List;
 
-public class ResultPresenter
+class ResultPresenter
 {
     private final GameContext ctx;
     private final ResultEventGenerator eventGenerator;

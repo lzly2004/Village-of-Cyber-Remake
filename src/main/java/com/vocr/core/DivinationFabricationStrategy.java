@@ -1,6 +1,6 @@
 package com.vocr.core;
 
-public enum DivinationFabricationStrategy
+enum DivinationFabricationStrategy
 {
     WOLF(7) {
         @Override

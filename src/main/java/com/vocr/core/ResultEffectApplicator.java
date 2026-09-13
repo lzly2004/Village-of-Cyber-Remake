@@ -4,7 +4,7 @@ import com.vocr.domain.whyDie;
 
 import com.vocr.config.GameConstants;
 
-public class ResultEffectApplicator
+class ResultEffectApplicator
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

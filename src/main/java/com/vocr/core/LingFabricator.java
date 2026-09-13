@@ -7,7 +7,7 @@ import com.vocr.config.GameConstants;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LingFabricator
+class LingFabricator
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

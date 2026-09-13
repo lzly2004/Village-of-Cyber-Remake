@@ -12,7 +12,7 @@ import com.vocr.config.ProbabilityCalculator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DayActionCoordinator
+class DayActionCoordinator
 {
     private final GameModule module;
     private final GameContext ctx;

@@ -8,7 +8,7 @@ import com.vocr.rules.RuleEngine;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WolfBiter
+class WolfBiter
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

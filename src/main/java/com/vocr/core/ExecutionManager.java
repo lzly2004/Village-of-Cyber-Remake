@@ -14,7 +14,7 @@ import com.vocr.history.GameRecordManager;
 
 import java.util.List;
 
-public class ExecutionManager
+class ExecutionManager
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;

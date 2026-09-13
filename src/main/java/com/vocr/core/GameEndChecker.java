@@ -2,7 +2,7 @@ package com.vocr.core;
 
 import com.vocr.domain.GameResult;
 
-public class GameEndChecker
+class GameEndChecker
 {
     private final GameContext ctx;
     private GameResult cachedResult = GameResult.NONE;

@@ -3,7 +3,7 @@ package com.vocr.core;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ZhanFabricator
+class ZhanFabricator
 {
     private final GameContext ctx;
     private final SuspicionSystem suspicion;
