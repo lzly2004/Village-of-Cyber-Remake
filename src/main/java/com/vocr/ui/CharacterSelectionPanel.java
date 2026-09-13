@@ -20,7 +20,7 @@ class CharacterSelectionPanel {
     private static final int[] ROLE_FILTERS = {0, 1, 3};
 
     static void render(UI ui, VoteButtonPanel vp, VoteInfoRenderer vi,
-                       JPanel panel, List<Integer> chosenList, boolean[] flag,
+                       JPanel panel, List<Integer> selectedTargets,
                        SelectionType type, GameSceneVoteHandler handler) {
         UIHelpers.hideButtons(vp.fixedVoteBtn, vp.fixedUranaiBtn, vp.protectBtn);
         vi.infoText.setVisible(false);
@@ -72,7 +72,7 @@ class CharacterSelectionPanel {
             frameLabels.add(chooseLabel);
             chooseLabel.setBounds(handler.charGridX(i, 60, 74), handler.charGridY(i, 20, 128), 64, 98);
             panel.add(chooseLabel);
-            chooseLabel.setVisible(chosenList.contains(i));
+            chooseLabel.setVisible(selectedTargets.contains(i));
 
             if (type == SelectionType.VOTE) {
                 JLabel voteLabel = new JLabel(ui.resources.getImage("result2_all.png"));
@@ -88,7 +88,7 @@ class CharacterSelectionPanel {
             resultLabel.setBounds(handler.charGridX(i, 65, 74), handler.charGridY(i, 40, 148),
                     resultLabel.getIcon().getIconWidth(), resultLabel.getIcon().getIconHeight());
             panel.add(resultLabel);
-            resultLabel.setVisible(chosenList.contains(i));
+            resultLabel.setVisible(selectedTargets.contains(i));
 
             if (type != SelectionType.VOTE) {
                 String zbIconPrefix = (type == SelectionType.DIVINATION) ? "result1_" : "result3_";
@@ -101,7 +101,7 @@ class CharacterSelectionPanel {
                                     128 + zbLabel.getIcon().getIconHeight() * roleOrders.get(r)),
                             zbLabel.getIcon().getIconWidth(), zbLabel.getIcon().getIconHeight());
                     panel.add(zbLabel);
-                    zbLabel.setVisible(chosenList.contains(i));
+                    zbLabel.setVisible(selectedTargets.contains(i));
                 }
             }
 
@@ -141,22 +141,19 @@ class CharacterSelectionPanel {
                     switch (type) {
                         case VOTE:
                             ui.ctx.setSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), true);
-                            if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
-                            handler.updateFlagFromVoteTargets(flag);
+                            if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                             break;
                         case DIVINATION:
                             ui.ctx.setHiddenSeerScheduled(idx + 1, ui.ctx.getGameDay(), true);
                             for (int a = 0; a < trueNums.size(); a++)
                                 ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), true);
-                            flag[0] = true;
-                            if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
+                            if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                             break;
                         case GUARD:
                             ui.ctx.setHiddenHunterScheduled(idx + 1, ui.ctx.getGameDay(), true);
                             for (int a = 0; a < trueNums.size(); a++)
                                 ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), true);
-                            flag[0] = true;
-                            if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
+                            if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                             break;
                     }
                     resultLabels.get(idx).setVisible(true);
@@ -195,8 +192,7 @@ class CharacterSelectionPanel {
                             if (!ui.ctx.isAlive(idx + 1)) break;
                             ui.resources.playSound("click.wav");
                             ui.ctx.setClaimedRoleScheduled(roleNums.get(cur), idx + 1, ui.ctx.getGameDay(), true);
-                            flag[0] = true;
-                            if (!chosenList.contains(idx + 1)) chosenList.add(idx + 1);
+                            if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                             zbLabels.get(idx + cur * ui.ctx.getPlayerSum()).setVisible(true);
                             frameLabels.get(idx).setVisible(true);
                             frameLabels.get(idx).repaint();
@@ -229,23 +225,20 @@ class CharacterSelectionPanel {
                     int idx = targetLabels.indexOf(label);
                     if (!ui.ctx.isAlive(idx + 1)) break;
                     ui.resources.playSound("click.wav");
-                    chosenList.remove(Integer.valueOf(idx + 1));
+                    selectedTargets.remove(Integer.valueOf(idx + 1));
                     switch (type) {
                         case VOTE:
                             ui.ctx.setSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), false);
-                            handler.updateFlagFromVoteTargets(flag);
                             break;
                         case DIVINATION:
                             ui.ctx.setHiddenSeerScheduled(idx + 1, ui.ctx.getGameDay(), false);
                             for (int a = 0; a < trueNums.size(); a++)
                                 ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), false);
-                            handler.updateFlagFromScheduledTargets(trueNums, flag, true);
                             break;
                         case GUARD:
                             ui.ctx.setHiddenHunterScheduled(idx + 1, ui.ctx.getGameDay(), false);
                             for (int a = 0; a < trueNums.size(); a++)
                                 ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), false);
-                            handler.updateFlagFromScheduledTargets(trueNums, flag, false);
                             break;
                     }
                     if (type != SelectionType.VOTE) {

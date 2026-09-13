@@ -292,9 +292,12 @@ public class GameSceneVoteHandler implements SceneHandler {
         votePanel.catBtn.addActionListener(e -> handleRoleCo(Role.mao, GameStrings.MSG_NO_CAT));
 
         // --- 指定パネル ---
-        votePanel.fixedVoteBtn.addActionListener(e -> CharacterSelectionPanel.render(ui, votePanel, voteInfo, infoPanel, ui.voteChosen, ui.isVote, SelectionType.VOTE, this));
-        votePanel.fixedUranaiBtn.addActionListener(e -> CharacterSelectionPanel.render(ui, votePanel, voteInfo, infoZhanPanel, ui.zhanChosen, ui.isZhan, SelectionType.DIVINATION, this));
-        votePanel.protectBtn.addActionListener(e -> CharacterSelectionPanel.render(ui, votePanel, voteInfo, infoHuPanel, ui.huChosen, ui.isHu, SelectionType.GUARD, this));
+        votePanel.fixedVoteBtn.addActionListener(e -> CharacterSelectionPanel.render(
+                ui, votePanel, voteInfo, infoPanel, ui.selectedVoteTargets, SelectionType.VOTE, this));
+        votePanel.fixedUranaiBtn.addActionListener(e -> CharacterSelectionPanel.render(
+                ui, votePanel, voteInfo, infoZhanPanel, ui.selectedDivinationTargets, SelectionType.DIVINATION, this));
+        votePanel.protectBtn.addActionListener(e -> CharacterSelectionPanel.render(
+                ui, votePanel, voteInfo, infoHuPanel, ui.selectedGuardTargets, SelectionType.GUARD, this));
     }
 
     // ===================================================================
@@ -307,7 +310,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         ui.resources.playSound("click.wav");
         votePanel.voteBtn.setVisible(false); votePanel.pointBtn.setVisible(false); votePanel.avoidBtn.setVisible(false);
         votePanel.recordBtn.setVisible(false); votePanel.avoidBtn1.setVisible(false);
-        if (ui.isVote[0]) {
+        if (!ui.selectedVoteTargets.isEmpty()) {
             votePanel.readyVoteBtn.setVisible(true); votePanel.greyBtn.setVisible(false); votePanel.freeBtn.setVisible(false);
         } else {
             if (!greyResult.cxList.isEmpty()) votePanel.greyBtn.setVisible(true);
@@ -319,7 +322,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         JTextArea isSelectedVoteTargetText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, UIConstants.FONT_SIZE_VOTE, "");
         StringBuilder isSelectedVoteTargetResult = new StringBuilder("-指定内容-\n");
         int playerSum = ui.ctx.getPlayerSum() + 1;
-        if (ui.isVote[0]) {
+        if (!ui.selectedVoteTargets.isEmpty()) {
             isSelectedVoteTargetResult.append(GameStrings.SPECIFY_VOTE);
             for (int i = 1; i < playerSum; ++i) {
                 if (ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay()))
@@ -327,7 +330,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             }
             isSelectedVoteTargetResult.append("\n");
         }
-        if (ui.isZhan[0]) {
+        if (!ui.selectedDivinationTargets.isEmpty()) {
             isSelectedVoteTargetResult.append(GameStrings.SPECIFY_DIVINATION);
             for (int i = 1; i < playerSum; ++i) {
                 if (ui.ctx.getClaimedRole(i) == 1 && ui.ctx.isAlive(i)) {
@@ -349,7 +352,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             isSelectedVoteTargetResult.append("\n");
         }
         if (DebugLogger.getInstance().isEnabled()) {
-            DebugLogger.log("是否护卫" + ui.isHu[0]);
+            DebugLogger.log("是否护卫" + !ui.selectedGuardTargets.isEmpty());
             for (int i = 1; i < playerSum; ++i) {
                 for (int j = 1; j < playerSum; ++j) {
                     if (ui.ctx.isClaimedRoleScheduled(i, j, ui.ctx.getGameDay()))
@@ -358,7 +361,7 @@ public class GameSceneVoteHandler implements SceneHandler {
                 }
             }
         }
-        if (ui.isHu[0]) {
+        if (!ui.selectedGuardTargets.isEmpty()) {
             isSelectedVoteTargetResult.append(GameStrings.SPECIFY_GUARD);
             for (int i = 1; i < playerSum; ++i) {
                 if (ui.ctx.getClaimedRole(i) == 3 && ui.ctx.isAlive(i)) {
@@ -661,25 +664,4 @@ public class GameSceneVoteHandler implements SceneHandler {
         }
     }
 
-    void updateFlagFromVoteTargets(boolean[] flag) {
-        for (int y = 1; y <= this.ui.ctx.getPlayerSum(); ++y) {
-            if (this.ui.ctx.isSelectedVoteTarget(y, this.ui.ctx.getGameDay())) { flag[0] = true; return; }
-        }
-        flag[0] = false;
-    }
-
-    void updateFlagFromScheduledTargets(java.util.List<Integer> trueNums, boolean[] flag, boolean isSeer) {
-        for (int b = 0; b < trueNums.size(); ++b) {
-            for (int j = 1; j <= this.ui.ctx.getPlayerSum(); ++j) {
-                if (this.ui.ctx.isClaimedRoleScheduled(trueNums.get(b), j, this.ui.ctx.getGameDay())) {
-                    flag[0] = true; return;
-                }
-            }
-        }
-        for (int y = 1; y <= this.ui.ctx.getPlayerSum(); ++y) {
-            if (isSeer && this.ui.ctx.isHiddenSeerScheduled(y, this.ui.ctx.getGameDay())) { flag[0] = true; return; }
-            if (!isSeer && this.ui.ctx.isHiddenHunterScheduled(y, this.ui.ctx.getGameDay())) { flag[0] = true; return; }
-        }
-        flag[0] = false;
-    }
 }

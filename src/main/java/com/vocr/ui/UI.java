@@ -282,14 +282,10 @@ public class UI implements UIInterface
     String[][] skillTargetNames;//用于存技能使用对象对应的图标
     int[][] skillTargetOrder;//用于存技能使用的顺序
     int[][] claimedRolenum;//用于存职业编号//[人数+1][天数]用于发球
-    ArrayList<Integer> voteChosen = new ArrayList<>();//被指定投票了的
-    ArrayList<Integer> zhanChosen = new ArrayList<>();//被指定占卜了的
-    ArrayList<Integer> huChosen = new ArrayList<>();//被指定护卫了的
-    //三个是用于保存指定的信息，再次进入时不会消失
-    boolean[] isVote = {false};//是否指定投票
-    boolean[] isZhan = {false};//是否指定占卜
-    boolean[] isHu = {false};//是否指定护卫
-    //三个都用于投票时指定内容的显示
+    final List<Integer> selectedVoteTargets = new ArrayList<>();//被指定投票了的
+    final List<Integer> selectedDivinationTargets = new ArrayList<>();//被指定占卜了的
+    final List<Integer> selectedGuardTargets = new ArrayList<>();//被指定护卫了的
+    //用于保存当天的指定对象并控制指定内容显示，再次进入面板时不会消失
 
     // ==================== 第3步: 统一选择面板配置 ====================
 
