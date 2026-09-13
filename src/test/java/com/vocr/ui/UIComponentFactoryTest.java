@@ -31,4 +31,17 @@ class UIComponentFactoryTest {
         assertEquals("NONE / NONE", factory.getCharacterDisplayName(null));
         assertEquals("NONE / NONE", factory.getCharacterDisplayName(CharacterEnglishName.NONE));
     }
+
+    @Test
+    void executionResultTextShouldUseDisplayName() {
+        assertEquals("投票の結果、宿屋主人 フーゴーは処刑されました。",
+                String.format(com.vocr.ui.GameStrings.EXECUTED_FORMAT,
+                        factory.getCharacterDisplayName(CharacterEnglishName.Hugo)));
+        assertEquals("宿屋主人 フーゴー後追いで死亡した。",
+                String.format(com.vocr.ui.GameStrings.FOLLOW_DEATH_FORMAT,
+                        factory.getCharacterDisplayName(CharacterEnglishName.Hugo)));
+        assertEquals("宿屋主人 フーゴー猫の呪いによって死亡した。",
+                String.format(com.vocr.ui.GameStrings.CAT_CURSE_FORMAT,
+                        factory.getCharacterDisplayName(CharacterEnglishName.Hugo)));
+    }
 }

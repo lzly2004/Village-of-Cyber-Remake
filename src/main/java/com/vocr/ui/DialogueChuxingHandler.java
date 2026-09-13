@@ -34,11 +34,14 @@ public class DialogueChuxingHandler implements SceneHandler {
                 nextBtn.setVisible(true);
                 String resultText;
                 if (event.eventname() == EventName.cxs) {
-                    resultText = String.format(GameStrings.EXECUTED_FORMAT, event.ch1().name());
+                    resultText = String.format(GameStrings.EXECUTED_FORMAT,
+                            ui.uiComponentFactory.getCharacterDisplayName(event.ch1()));
                 } else if (event.eventname() == EventName.hzsw) {
-                    resultText = String.format(GameStrings.FOLLOW_DEATH_FORMAT, event.ch1().name());
+                    resultText = String.format(GameStrings.FOLLOW_DEATH_FORMAT,
+                            ui.uiComponentFactory.getCharacterDisplayName(event.ch1()));
                 } else if (event.eventname() == EventName.mzsw) {
-                    resultText = String.format(GameStrings.CAT_CURSE_FORMAT, event.ch1().name());
+                    resultText = String.format(GameStrings.CAT_CURSE_FORMAT,
+                            ui.uiComponentFactory.getCharacterDisplayName(event.ch1()));
                 } else {
                     resultText = "";
                 }
