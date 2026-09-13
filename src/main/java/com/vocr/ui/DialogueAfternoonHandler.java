@@ -9,10 +9,10 @@ import java.awt.*;
 public class DialogueAfternoonHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
-        Event event = ui.getEvents().poll();
+        Event event = ui.pollEvent();
         UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(ui, "haikei.png", event);
         UIHelpers.bindTypewriter(ds.dc().dialogText, ds.text(), ds.dc().nextBtn, () -> {
-            if (ui.getEvents().isEmpty()) {
+            if (!ui.hasPendingEvents()) {
                 ui.currentScene = UI.Scene.GAME_SCENE_VOTE;
             }
             ui.run();

@@ -11,7 +11,7 @@ public class DialogueChuxingHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
         ui.resources.playBgm("");
-        Event event = ui.getEvents().poll();
+        Event event = ui.pollEvent();
         ui.jPanel.removeAll();
         UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(ui, "haikei.png", event);
         ui.resizeComponents();
@@ -41,9 +41,9 @@ public class DialogueChuxingHandler implements SceneHandler {
                     resultText = "";
                 }
                 UIHelpers.bindTypewriter(dialogText, resultText, nextBtn, () -> {
-                    if (ui.getEvents().isEmpty() || (ui.getEvents().getFirst().eventname() != EventName.cxs
-                            && ui.getEvents().getFirst().eventname() != EventName.hzsw
-                            && ui.getEvents().getFirst().eventname() != EventName.mzsw)) {
+                    if (!ui.hasPendingEvents() || (ui.peekEvent().eventname() != EventName.cxs
+                            && ui.peekEvent().eventname() != EventName.hzsw
+                            && ui.peekEvent().eventname() != EventName.mzsw)) {
                         ui.currentScene = UI.Scene.GAME_SCENE_NIGHT;
                     }
                     ui.run();

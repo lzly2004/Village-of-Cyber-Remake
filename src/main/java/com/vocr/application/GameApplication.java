@@ -1,6 +1,7 @@
 package com.vocr.application;
 
 import com.vocr.core.MainLogicInterface;
+import com.vocr.domain.Event;
 import com.vocr.domain.GameContextView;
 
 import java.util.Objects;
@@ -14,10 +15,12 @@ import java.util.Objects;
 public final class GameApplication
 {
     private final MainLogicInterface gameLogic;
+    private final GameEventBuffer eventBuffer;
 
-    public GameApplication(MainLogicInterface gameLogic)
+    public GameApplication(MainLogicInterface gameLogic, GameEventBuffer eventBuffer)
     {
         this.gameLogic = Objects.requireNonNull(gameLogic, "主逻辑不能为空");
+        this.eventBuffer = Objects.requireNonNull(eventBuffer, "事件缓冲区不能为空");
     }
 
     public StartedGame startGame(StartGameCommand command)
@@ -27,5 +30,37 @@ public final class GameApplication
         GameContextView context = Objects.requireNonNull(
                 gameLogic.getGameContext(), "主逻辑开局后未提供游戏状态");
         return new StartedGame(context.getPeiyi(), context.getPlayerSum(), context.getGameDay());
+    }
+
+    public GameUpdate currentUpdate()
+    {
+        return new GameUpdate(eventBuffer.snapshot());
+    }
+
+    /** 桌面迁移期用于确认已展示的队首事件；Web 适配器后续改用事件游标。 */
+    public Event pollNextEvent()
+    {
+        return eventBuffer.poll();
+    }
+
+    public Event peekNextEvent()
+    {
+        return eventBuffer.peek();
+    }
+
+    public boolean hasPendingEvents()
+    {
+        return peekNextEvent() != null;
+    }
+
+    public void clearPendingEvents()
+    {
+        eventBuffer.clear();
+    }
+
+    /** 仅保留现有桌面调试兜底；正常领域事件必须由核心写入缓冲区。 */
+    public void publishDiagnosticEvent(Event event)
+    {
+        eventBuffer.publish(event);
     }
 }

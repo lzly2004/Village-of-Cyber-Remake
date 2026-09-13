@@ -11,7 +11,7 @@ import java.awt.*;
 public class DialogueDayHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
-        Event event = ui.getEvents().poll();
+        Event event = ui.pollEvent();
         if (event == null) {
             ui.currentScene = UI.Scene.GAME_SCENE_VOTE;
             ui.run();
@@ -38,7 +38,7 @@ public class DialogueDayHandler implements SceneHandler {
         }
         UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(ui, "haikei3.png", event);
         Timer typeTimer = UIHelpers.bindTypewriter(ds.dc().dialogText, ds.text(), ds.dc().nextBtn, () -> {
-            if (ui.getEvents().isEmpty()) {
+            if (!ui.hasPendingEvents()) {
                 ui.linkIcon.clear();
                 ui.currentScene = UI.Scene.GAME_SCENE_VOTE;
             }
@@ -53,7 +53,7 @@ public class DialogueDayHandler implements SceneHandler {
                 UIHelpers.renderLinkIconPair(ui, CharIcon);
                 if (event.eventname() == EventName.gprz11r) {
                     DebugLogger.log("共有认证rrrr");
-                    if (ui.getEvents().getFirst().eventname() == EventName.gprz11p) {
+                    if (ui.peekEvent().eventname() == EventName.gprz11p) {
                             DebugLogger.log("共有认证pppp");
                         ui.linkIcon.add(CharIcon[0]);
                         ui.specialEvent[0] = true;

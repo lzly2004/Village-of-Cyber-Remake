@@ -447,7 +447,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             isSelectingCo = false;
             DebugLogger.log(askList);
             ui.mainLogic.askCo(askList);
-            if (!ui.getEvents().isEmpty()) {
+            if (ui.hasPendingEvents()) {
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
                 ui.run();
             } else {
@@ -554,7 +554,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     private void handleRoleCo(Role role, String noRoleMsg) {
         ui.resources.playSound("click.wav");
         ui.mainLogic.askCo(role);
-        if (ui.getEvents().isEmpty()) {
+        if (!ui.hasPendingEvents()) {
             createTishi(noRoleMsg);
         } else {
             ui.currentScene = UI.Scene.DIALOGUE_DAY;

@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.application.GameApplication;
+import com.vocr.application.GameUpdate;
 import com.vocr.logging.DebugLogger;
 import com.vocr.core.MainLogicInterface;
 import com.vocr.resources.ResourcesInterface;
@@ -18,7 +19,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 import java.util.Objects;
@@ -33,12 +33,8 @@ import java.util.Objects;
 //一开始当成平时上课做的小作业随心所欲了
 //后面我想改的时候已经积重难返了（太多了）
 //希望以后我能吸取第一次开发项目的教训，重视这些问题
-public class UI implements UIInterface
+public class UI
 {
-    public LinkedList<Event> getEvents()
-    {
-        return events;
-    }
     public enum Scene  //定义界面枚举类型,当前处于什么界面
     {
         DIALOGUE_AFTERNOON(null, 0, 0),//下午
@@ -249,13 +245,41 @@ public class UI implements UIInterface
         run();
     }
 
-    private LinkedList<Event> events = new LinkedList<>();//作为事件队列
-
-    public void addEvent(Event event)
+    GameUpdate currentGameUpdate()
     {
-        events.add(event);
-        if(event != null && !events.isEmpty())DebugLogger.log("事件添加成功且不为空");
-    }//添加event
+        return gameApplication.currentUpdate();
+    }
+
+    Event pollEvent()
+    {
+        return gameApplication.pollNextEvent();
+    }
+
+    Event peekEvent()
+    {
+        return gameApplication.peekNextEvent();
+    }
+
+    boolean hasPendingEvents()
+    {
+        return gameApplication.hasPendingEvents();
+    }
+
+    int pendingEventCount()
+    {
+        return currentGameUpdate().events().size();
+    }
+
+    void clearPendingEvents()
+    {
+        gameApplication.clearPendingEvents();
+    }
+
+    void addDiagnosticEvent(Event event)
+    {
+        gameApplication.publishDiagnosticEvent(event);
+        DebugLogger.log("事件添加成功且不为空");
+    }
     public void testBtn()
     {
         //测试用按钮，显示信息

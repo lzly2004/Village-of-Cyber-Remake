@@ -13,7 +13,7 @@ public class EndGameHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
         UI.Scene scene = ui.currentScene;
-        Event event = ui.getEvents().poll();
+        Event event = ui.pollEvent();
         ImageIcon bgIcon;
         switch (scene) {
             case END_FOX:
@@ -71,7 +71,7 @@ public class EndGameHandler implements SceneHandler {
             for (EventName t : targets) {
                 if (event.eventname() == t) return event;
             }
-            event = ui.getEvents().poll();
+            event = ui.pollEvent();
             iterations++;
         }
         if (event == null) {

@@ -56,11 +56,11 @@ public class GameSceneHandler implements SceneHandler {
                 ui.skillTargetOrder = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];
                 ui.claimedRolenum = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];
                 if (DebugLogger.getInstance().isEnabled()) {
-                    DebugLogger.log("启动后事件数量: " + ui.getEvents().size());
-                    if (ui.getEvents().isEmpty()) {
+                    DebugLogger.log("启动后事件数量: " + ui.pendingEventCount());
+                    if (!ui.hasPendingEvents()) {
                         DebugLogger.log("events为空，添加测试事件");
                         Event testEvent = new Event(EventName.yjsw, CharacterEnglishName.Beatrice);
-                        ui.addEvent(testEvent);
+                        ui.addDiagnosticEvent(testEvent);
                     }
                 }
                 ui.currentScene = UI.Scene.GAME_SCENE_NIGHT;
@@ -83,7 +83,7 @@ public class GameSceneHandler implements SceneHandler {
         ui.selectedVoteTargets.clear();
         ui.selectedDivinationTargets.clear();
         ui.selectedGuardTargets.clear();
-        if (!ui.getEvents().isEmpty()) {
+        if (ui.hasPendingEvents()) {
             DebugLogger.log("事件不为空");
         }
         ui.jPanel.removeAll();

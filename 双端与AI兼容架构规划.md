@@ -230,7 +230,7 @@ Spring Boot 仍是账号、数据库迁移、复杂监控或团队规模扩大�
 
 这是双端代码改造中难度最高的阶段。先做可回退的垂直切片，再扩大覆盖范围：
 
-当前进度：已建立不依赖 Swing/HTTP 的 `GameApplication`，并将桌面端“开始对局”改为提交 `StartGameCommand`、接收无秘密的 `StartedGame` 摘要。事件队列和其余玩家操作仍沿用旧入口，尚不能宣称应用门面或安全视图已经完成。
+当前进度：已建立不依赖 Swing/HTTP 的 `GameApplication`，并将桌面端“开始对局”改为提交 `StartGameCommand`、接收无秘密的 `StartedGame` 摘要。领域事件已从 Swing 的可变 `LinkedList` 迁入单局 `GameEventBuffer`，应用层可发布不可变 `GameUpdate` 快照；现有 Swing 暂时按原展示顺序确认消费事件，未来 Web 使用独立事件游标。其余玩家操作仍沿用旧入口，尚不能宣称应用门面、安全视图或完整 revision 已经完成。
 
 1. 只定义业务阶段，不复制 `UI.Scene`；先覆盖“开始对局 → 读取事件 → 完成一种玩家操作”；
 2. 定义 `GameCommand/GameUpdate/LegalAction/PlayerViewSnapshot` 的最小集合，令更新同时携带合法候选项、业务结果和 `revision`；

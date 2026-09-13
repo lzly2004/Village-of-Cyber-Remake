@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,9 +23,9 @@ class GameApplicationTest
     @Test
     void startGame_shouldReturnSafeSummaryAndKeepEventsAvailableToCaller()
     {
-        List<Event> events = new ArrayList<>();
-        MainLogic logic = new MainLogic(events::add, records("start-record.json"));
-        GameApplication application = new GameApplication(logic);
+        GameEventBuffer events = new GameEventBuffer();
+        MainLogic logic = new MainLogic(events::publish, records("start-record.json"));
+        GameApplication application = new GameApplication(logic, events);
 
         StartedGame result = application.startGame(new StartGameCommand(peiyi.jianyi));
 
@@ -36,7 +34,12 @@ class GameApplicationTest
         assertEquals(logic.getGameContext().getGameDay(), result.gameDay());
         assertTrue(result.playerCount() > 0);
         assertTrue(result.gameDay() >= 2);
-        assertFalse(events.isEmpty(), "开局领域事件仍应交付给现有桌面事件队列");
+        GameUpdate update = application.currentUpdate();
+        assertFalse(update.events().isEmpty(), "开局领域事件应进入应用层更新");
+        Event first = update.events().getFirst();
+        assertEquals(first, application.pollNextEvent());
+        assertEquals(first, update.events().getFirst(), "已发布的更新快照不得随消费进度变化");
+        assertThrows(UnsupportedOperationException.class, () -> update.events().add(first));
     }
 
     @Test

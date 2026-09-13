@@ -18,7 +18,7 @@ public class StartSceneHandler implements SceneHandler {
         ui.selectedDivinationTargets.clear();
         ui.selectedGuardTargets.clear();
 
-        ui.getEvents().clear();
+        ui.clearPendingEvents();
         DebugLogger.log("事件成功清空");
 
         ui.jPanel.removeAll();
