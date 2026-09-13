@@ -28,8 +28,9 @@ public class GameSceneVoteHandler implements SceneHandler {
     private JLabel levellb, background;
     // === 共享状态（实例字段）===
     private List<Integer> askList;
-    private int[] round;
-    private boolean[] isVotehis, isCo;
+    private int currentRound;
+    private boolean isViewingVoteHistory;
+    private boolean isSelectingCo;
     private Runnable resetToAfternoon;
 
     @Override
@@ -173,13 +174,16 @@ public class GameSceneVoteHandler implements SceneHandler {
         ImageIcon levelIcon = ui.resources.getImage(ui.levelName);
         levellb = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 700, 600, levelIcon);
         levellb.setVisible(false); ui.jPanel.add(levellb);
-        isVotehis = new boolean[]{false};
-        votePanel.votehisBtn.addActionListener(e -> VoteHistoryBrowser.render(ui, votePanel, voteInfo, hisPanel, levellb, isVotehis, this));
+        isViewingVoteHistory = false;
+        votePanel.votehisBtn.addActionListener(e -> {
+            isViewingVoteHistory = true;
+            VoteHistoryBrowser.render(ui, votePanel, voteInfo, hisPanel, levellb, this);
+        });
 
         // --- 投票ボタン ---
         votePanel.voteBtn.addActionListener(e -> handleVoteButton());
 
-        round = new int[]{1};
+        currentRound = 1;
 
         // --- 灰投票 ---
         votePanel.greyBtn.addActionListener(e -> handleGreyVoteButton());
@@ -242,7 +246,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         infoCoPanel = PanelSimpleFactory.createSimplePanel(0, 0, true, false);
 
         askList = new ArrayList<>();
-        isCo = new boolean[]{false};
+        isSelectingCo = false;
 
         // --- 戻るボタン ---
         votePanel.returnBtn.addActionListener(e -> handleReturnButton());
@@ -253,13 +257,15 @@ public class GameSceneVoteHandler implements SceneHandler {
         // --- 再投票 ---
         votePanel.againBtn.addActionListener(e -> {
             ui.resources.playSound("click.wav");
-            boolean[] isReVote = {false};
+            boolean isReVote;
             if (ui.ctx.getEndResult() == GameResult.NONE) {
-                VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay() - 1), round[0], isReVote, this);
+                isReVote = VoteResultRenderer.renderPiao(
+                        ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay() - 1), currentRound, this);
             } else {
-                VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay()), round[0], isReVote, this);
+                isReVote = VoteResultRenderer.renderPiao(
+                        ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay()), currentRound, this);
             }
-            handleReVoteResultWithLimit(isReVote, round);
+            handleReVoteResultWithLimit(isReVote);
         });
 
         // --- 次へ ---
@@ -273,7 +279,10 @@ public class GameSceneVoteHandler implements SceneHandler {
         votePanel.readyVoteBtn.addActionListener(e -> handleReadyVoteButton());
 
         // --- CO询问 ---
-        votePanel.askCoBtn.addActionListener(e -> CoSelectionPanel.render(ui, votePanel, voteInfo, infoCoPanel, askList, isCo, this));
+        votePanel.askCoBtn.addActionListener(e -> {
+            isSelectingCo = true;
+            CoSelectionPanel.render(ui, votePanel, voteInfo, infoCoPanel, askList, this);
+        });
 
         // --- CO按钮 ---
         votePanel.reiBtn.addActionListener(e -> handleRoleCo(Role.ling, GameStrings.MSG_NO_MEDIUM));
@@ -397,13 +406,15 @@ public class GameSceneVoteHandler implements SceneHandler {
                 }
             }
         }
-        boolean[] isReVote = {false};
+        boolean isReVote;
         if (!greyResult.cxList.isEmpty()) DebugLogger.log("cxList不为空，且具体为" + greyResult.cxList);
         if (ui.mainLogic.shokei(1, greyResult.cxList, ui.isAvoid)) {
             int trueDay = ui.ctx.getEffectiveGameDay();
             greyResult.cxList.clear();
-            VoteResultRenderer.renderPiao(ui, String.format(GameStrings.VOTE_TITLE_GREY, trueDay) + greyText + "\n", round[0], isReVote, this);
-            handleReVoteResult(isReVote, round);
+            isReVote = VoteResultRenderer.renderPiao(
+                    ui, String.format(GameStrings.VOTE_TITLE_GREY, trueDay) + greyText + "\n",
+                    currentRound, this);
+            handleReVoteResult(isReVote);
         } else {
             greyResult.cxList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
@@ -414,7 +425,7 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     private void handleReturnButton()
     {
-        if (isVotehis[0]) { ui.run(); }
+        if (isViewingVoteHistory) { ui.run(); }
         ui.resources.playSound("click.wav");
         votePanel.voteBtn.setVisible(true); votePanel.pointBtn.setVisible(true); voteInfo.infoText.setVisible(true);
         ui.piaoText.setVisible(false); ui.piaoText1.setVisible(false);
@@ -429,8 +440,8 @@ public class GameSceneVoteHandler implements SceneHandler {
         votePanel.kyouyuBtn.setVisible(false); votePanel.catBtn.setVisible(false); votePanel.askCoBtn.setVisible(false);
         votePanel.greyBtn.setVisible(false); votePanel.freeBtn.setVisible(false); votePanel.readyVoteBtn.setVisible(false);
         votePanel.nextBtn.setVisible(false); votePanel.againBtn.setVisible(false);
-        if (!askList.isEmpty() && isCo[0]) {
-            isCo[0] = false;
+        if (!askList.isEmpty() && isSelectingCo) {
+            isSelectingCo = false;
             DebugLogger.log(askList);
             ui.mainLogic.askCo(askList);
             if (!ui.getEvents().isEmpty()) {
@@ -451,15 +462,17 @@ public class GameSceneVoteHandler implements SceneHandler {
         for (int i = 1; i <= ui.ctx.getPlayerSum(); ++i)
             if (ui.ctx.isAlive(i)) chuxingList.add(i);
         DebugLogger.log("自由投票" + chuxingList);
-        boolean[] isReVote = {false};
+        boolean isReVote;
         if (ui.mainLogic.shokei(0, chuxingList, ui.isAvoid)) {
             chuxingList.clear();
             if (ui.ctx.getEndResult() == GameResult.NONE) {
-                VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay() - 1), round[0], isReVote, this);
+                isReVote = VoteResultRenderer.renderPiao(
+                        ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay() - 1), currentRound, this);
             } else {
-                VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay()), round[0], isReVote, this);
+                isReVote = VoteResultRenderer.renderPiao(
+                        ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay()), currentRound, this);
             }
-            handleReVoteResult(isReVote, round);
+            handleReVoteResult(isReVote);
         } else {
             chuxingList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
@@ -479,16 +492,18 @@ public class GameSceneVoteHandler implements SceneHandler {
             }
         }
         DebugLogger.log("指定投票" + chuxingList);
-        boolean[] isReVote = {false};
+        boolean isReVote;
         if (ui.mainLogic.shokei(2, chuxingList, ui.isAvoid)) {
             int trueDay = ui.ctx.getEffectiveGameDay();
             StringBuilder isSelectedVoteTargetText = new StringBuilder();
             for (int i = 0; i < chuxingList.size(); ++i)
                 isSelectedVoteTargetText.append(ui.getJobText(chuxingList.get(i))).append(",");
             DebugLogger.log(isSelectedVoteTargetText);
-            VoteResultRenderer.renderPiao(ui, GameStrings.getVoteTitleDesign(trueDay, isSelectedVoteTargetText.toString()), round[0], isReVote, this);
+            isReVote = VoteResultRenderer.renderPiao(
+                    ui, GameStrings.getVoteTitleDesign(trueDay, isSelectedVoteTargetText.toString()),
+                    currentRound, this);
             chuxingList.clear();
-            handleReVoteResult(isReVote, round);
+            handleReVoteResult(isReVote);
         } else {
             chuxingList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
@@ -544,7 +559,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         }
     }
 
-    void createDoubt() {
+    private void createDoubt() {
         this.ui.piaoText.setVisible(true);
         this.ui.piaoText1.setVisible(true);
         StringBuilder leftPiao = new StringBuilder(GameStrings.DOUBT_TITLE);
@@ -602,22 +617,22 @@ public class GameSceneVoteHandler implements SceneHandler {
         piao.append("\n");
     }
 
-    void handleReVoteResult(boolean[] isReVote, int[] round) {
-        if (isReVote[0]) {
+    private void handleReVoteResult(boolean isReVote) {
+        if (isReVote) {
             votePanel.againBtn.setVisible(true);
             votePanel.nextBtn.setVisible(false);
-            round[0]++;
+            currentRound++;
         } else {
             votePanel.nextBtn.setVisible(true);
             votePanel.againBtn.setVisible(false);
         }
     }
 
-    void handleReVoteResultWithLimit(boolean[] isReVote, int[] round) {
-        if (isReVote[0]) {
+    private void handleReVoteResultWithLimit(boolean isReVote) {
+        if (isReVote) {
             votePanel.againBtn.setVisible(true);
             votePanel.nextBtn.setVisible(false);
-            if (round[0] < GameConstants.MAX_VOTE_ROUNDS) round[0]++;
+            if (currentRound < GameConstants.MAX_VOTE_ROUNDS) currentRound++;
         } else {
             votePanel.nextBtn.setVisible(true);
             votePanel.againBtn.setVisible(false);

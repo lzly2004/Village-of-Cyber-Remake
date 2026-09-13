@@ -13,7 +13,7 @@ import java.util.List;
  */
 class VoteResultRenderer {
 
-    static void renderPiao(UI ui, String str, int round, boolean[] isReVote, GameSceneVoteHandler handler) {
+    static boolean renderPiao(UI ui, String str, int round, GameSceneVoteHandler handler) {
         DebugLogger.log("***当前gameDay等于" + ui.ctx.getGameDay() + "***");
         ui.piaoText.setVisible(true);
         ui.piaoText1.setVisible(true);
@@ -33,13 +33,12 @@ class VoteResultRenderer {
         for (int i1 = 0; i1 < 10 - leftCnt; ++i1) leftPiao.append("\n");
         if (maxCnt == 1) {
             leftPiao.append(String.format(GameStrings.VOTE_RESULT_FORMAT, max, ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(maxPos.get(0)))));
-            isReVote[0] = false;
             ui.chuxingWho = maxPos.get(0);
         } else {
             leftPiao.append(GameStrings.VOTE_TIE);
-            isReVote[0] = true;
         }
         renderVoteResult(ui, handler, leftPiao, rightPiao, 900, 530);
+        return maxCnt != 1;
     }
 
     static void renderDayPiao(UI ui, int round, int gameDay, GameSceneVoteHandler handler) {

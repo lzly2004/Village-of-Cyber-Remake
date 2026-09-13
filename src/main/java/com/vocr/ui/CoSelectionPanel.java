@@ -15,9 +15,8 @@ import java.util.List;
 class CoSelectionPanel {
 
     static void render(UI ui, VoteButtonPanel vp, VoteInfoRenderer vi,
-                       JPanel infoCoPanel, List<Integer> askList, boolean[] isCo,
+                       JPanel infoCoPanel, List<Integer> askList,
                        GameSceneVoteHandler handler) {
-        isCo[0] = true;
         vp.reiBtn.setVisible(false); vp.kariBtn.setVisible(false); vp.uranaiBtn.setVisible(false);
         vp.kyouyuBtn.setVisible(false); vp.catBtn.setVisible(false); vp.askCoBtn.setVisible(false);
         infoCoPanel.setVisible(true);

@@ -12,9 +12,7 @@ import java.awt.*;
 class VoteHistoryBrowser {
 
     static void render(UI ui, VoteButtonPanel vp, VoteInfoRenderer vi,
-                       JPanel hisPanel, JLabel levellb, boolean[] isVotehis,
-                       GameSceneVoteHandler handler) {
-        isVotehis[0] = true;
+                       JPanel hisPanel, JLabel levellb, GameSceneVoteHandler handler) {
         ui.resources.playSound("click.wav");
         vp.doubtBtn.setVisible(false); vp.votehisBtn.setVisible(false); vi.infoText.setVisible(false);
         hisPanel.setVisible(true); hisPanel.removeAll();
