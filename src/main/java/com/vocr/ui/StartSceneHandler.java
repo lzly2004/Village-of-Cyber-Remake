@@ -1,5 +1,6 @@
 package com.vocr.ui;
 
+import com.vocr.resources.BgmTrack;
 import com.vocr.logging.DebugLogger;
 
 // StartSceneHandler.java - 新建文件
@@ -10,8 +11,6 @@ public class StartSceneHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
         ui.count = 0;
-        ui.name = "";
-        ui.text = "";
         ui.isAvoid = true;
         ui.isCo = false;
         ui.selectedVoteTargets.clear();
@@ -23,7 +22,7 @@ public class StartSceneHandler implements SceneHandler {
 
         ui.jPanel.removeAll();
 
-        ui.resources.playBgm("start_menu.wav");
+        ui.resources.playBgm(BgmTrack.START_MENU);
 
         JLabel titleLabel = LabelSimpleFactory.makeLabel(
                 LabelConst.Black_Label, 600, 200, 554, 138,
@@ -78,7 +77,7 @@ public class StartSceneHandler implements SceneHandler {
         );
         UIHelpers.setButtonListener(btnInfo, ui, () -> {
             ui.currentScene = UI.Scene.INFO_SCENE;
-            ui.resources.playBgm("Info.wav");
+            ui.resources.playBgm(BgmTrack.INFO);
             ui.run();
         });
         ui.jPanel.add(btnInfo);

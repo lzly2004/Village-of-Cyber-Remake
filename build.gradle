@@ -89,51 +89,19 @@ tasks.register('verifyProbabilityConfig') {
 
 tasks.register('verifyRuntimeAssets') {
     group = 'verification'
-    description = '校验代码依赖的音频存在、已拉取Git LFS且具有合法WAV文件头。'
+    description = '校验全部打包音频已拉取Git LFS且具有合法WAV文件头。'
     inputs.files(fileTree('src/main/resources') { include '**/*.wav' })
 
     doLast {
-        List<String> requiredAudio = [
-                'BGM/start_menu.wav',
-                'BGM/Info.wav',
-                'BGM/失败画面.wav',
-                'BGM/胜利画面.wav',
-                'BGM/replay_bgm.wav',
-                'BGM/纯音乐-优美旋律.wav',
-                'BGM/西江紫堂 - 灯り無き眼光.wav',
-                'BGM/Emotionally Unstable.wav',
-                'BGM/真甜呢丨先来一斤吧 - ラストボス02.wav',
-                'BGM/西江紫堂 - 黒き明日、清き闇.wav',
-                'BGM/西江紫堂 - BLOOD.wav',
-                'BGM/Death Impact.wav',
-                'BGM/永久色五色.wav',
-                'BGM/FELT LOVE.wav',
-                'BGM/Just Complex.wav',
-                'BGM/Peace of lost puzzle.wav',
-                'BGM/TEEK TEEK TEEK.wav',
-                'BGM/ダンジョン09.wav',
-                'BGM/ライアービジネス.wav',
-                'BGM/五月雨Vivaride.wav',
-                'BGM/真甜呢丨先来一斤吧 - ダンジョン14.wav',
-                'BGM/西江紫堂 - 五月雨Vivaride-Samidare bibaraido-.wav',
-                'sounds/click.wav',
-                'sounds/白天处刑音效.wav',
-                'sounds/平和音效.wav',
-                'sounds/夜间死亡音效.wav',
-                'sounds/村人胜利音效.wav',
-                'sounds/人狼胜利音效.wav',
-                'sounds/妖狐胜利音效.wav',
-                'sounds/入夜音效.wav',
-                'sounds/狼嚎音效.wav'
-        ]
-        List<File> requiredFiles = requiredAudio.collect { file("src/main/resources/${it}") }
-        List<File> missing = requiredFiles.findAll { !it.isFile() }
-        if (!missing.isEmpty()) {
-            String relativeFiles = missing.collect { rootDir.toPath().relativize(it.toPath()) }.join(', ')
-            throw new GradleException("代码引用的音频不存在：${relativeFiles}")
+        List<File> audioFiles = fileTree('src/main/resources') {
+            include 'BGM/*.wav'
+            include 'sounds/*.wav'
+        }.files.sort { it.path }
+        if (audioFiles.isEmpty()) {
+            throw new GradleException('没有找到任何待打包的WAV音频')
         }
 
-        List<File> pointers = requiredFiles.findAll { file ->
+        List<File> pointers = audioFiles.findAll { file ->
             byte[] prefix = new byte[(int) Math.min(file.length(), 128L)]
             file.withInputStream { stream -> stream.read(prefix) }
             new String(prefix, StandardCharsets.US_ASCII)
@@ -145,7 +113,7 @@ tasks.register('verifyRuntimeAssets') {
             throw new GradleException("以下音频仍是Git LFS指针，不能打包：${relativeFiles}。请先运行 git lfs pull。")
         }
 
-        List<File> invalidWav = requiredFiles.findAll { file ->
+        List<File> invalidWav = audioFiles.findAll { file ->
             byte[] header = new byte[12]
             int read = file.withInputStream { stream -> stream.read(header) }
             read != 12 || new String(header, 0, 4, StandardCharsets.US_ASCII) != 'RIFF'

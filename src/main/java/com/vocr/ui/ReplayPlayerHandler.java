@@ -1,5 +1,6 @@
 package com.vocr.ui;
 
+import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
 
 import com.vocr.logging.DebugLogger;
@@ -25,10 +26,10 @@ public class ReplayPlayerHandler implements SceneHandler {
         ui.jPanel.removeAll();
 
         // 确保播放复盘BGM（基于当前状态动态判断，避免从其他界面返回时不切换）
-        String currentBgm = ui.resources.getCurrentBgmName();
-        if (!"replay_bgm.wav".equals(currentBgm)) {
-            DebugLogger.info("[ReplayPlayerHandler] 切换BGM: 之前=" + currentBgm + ", 新=replay_bgm.wav");
-            boolean bgmOk = ui.resources.playBgm("replay_bgm.wav");
+        BgmTrack currentBgm = ui.resources.getCurrentBgm();
+        if (currentBgm != BgmTrack.REPLAY_PLAYER) {
+            DebugLogger.info("[ReplayPlayerHandler] 切换到复盘播放BGM，之前=" + currentBgm);
+            boolean bgmOk = ui.resources.playBgm(BgmTrack.REPLAY_PLAYER);
             if (!bgmOk) DebugLogger.warn("[ReplayPlayerHandler] 复盘BGM播放失败!");
         }
 
@@ -522,8 +523,8 @@ public class ReplayPlayerHandler implements SceneHandler {
             if (backBtn != null) {
                 backBtn.addActionListener(e -> {
                     ui.resources.playSound(SoundEffect.CLICK);
-                    DebugLogger.info("[ReplayPlayerHandler] 恢复BGM: 纯音乐-优美旋律.wav");
-                    ui.resources.playBgm("纯音乐-优美旋律.wav");
+                    DebugLogger.info("[ReplayPlayerHandler] 恢复复盘浏览BGM");
+                    ui.resources.playBgm(BgmTrack.REPLAY_BROWSER);
                     ui.transitionTo(UI.Scene.REPLAY_BROWSER_SCENE);
                 });
                 ui.jPanel.add(backBtn);
@@ -581,8 +582,8 @@ public class ReplayPlayerHandler implements SceneHandler {
             if (titleBtn != null) {
                 titleBtn.addActionListener(e -> {
                         ui.resources.playSound(SoundEffect.CLICK);
-                        DebugLogger.info("[ReplayPlayerHandler] 恢复BGM: 纯音乐-优美旋律.wav");
-                        ui.resources.playBgm("纯音乐-优美旋律.wav");
+                        DebugLogger.info("[ReplayPlayerHandler] 恢复复盘浏览BGM");
+                        ui.resources.playBgm(BgmTrack.REPLAY_BROWSER);
                         ui.transitionTo(UI.Scene.REPLAY_BROWSER_SCENE);
                 });
                 ui.jPanel.add(titleBtn);

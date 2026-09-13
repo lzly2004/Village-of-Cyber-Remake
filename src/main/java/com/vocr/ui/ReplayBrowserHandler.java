@@ -1,5 +1,6 @@
 package com.vocr.ui;
 
+import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
 
 import com.vocr.logging.DebugLogger;
@@ -59,8 +60,8 @@ public class ReplayBrowserHandler implements SceneHandler {
         ui.jPanel.removeAll();
 
         if (!browserBgmSwitched) {
-            DebugLogger.info("[ReplayBrowserHandler] 切换BGM: 纯音乐-优美旋律.wav");
-            ui.resources.playBgm("纯音乐-优美旋律.wav");
+            DebugLogger.info("[ReplayBrowserHandler] 切换到复盘浏览BGM");
+            ui.resources.playBgm(BgmTrack.REPLAY_BROWSER);
             browserBgmSwitched = true;
         }
 
@@ -101,7 +102,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         JButton btnTitle = createButton(ui, "PVBtitile.png", BTN_X, 550, BTN_W, BTN_H);
         UIHelpers.setButtonListener(btnTitle, ui, () -> {
             browserBgmSwitched = false;
-            ui.resources.playBgm("start_menu.wav");
+            ui.resources.playBgm(BgmTrack.START_MENU);
             ui.transitionTo(UI.Scene.START_SCENE);
         });
         ui.jPanel.add(btnTitle);

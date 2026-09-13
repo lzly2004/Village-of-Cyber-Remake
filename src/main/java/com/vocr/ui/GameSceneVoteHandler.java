@@ -1,5 +1,6 @@
 package com.vocr.ui;
 
+import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
 
 import com.vocr.logging.DebugLogger;
@@ -87,24 +88,16 @@ public class GameSceneVoteHandler implements SceneHandler {
     // ===================================================================
     private void createMusicButton()
     {
-        String[] bgmSongs;
-        String[] bgmTexts;
-        if ((ui.ctx.getAliveCounter() - 1) / 2 == 1) {
-            bgmSongs = new String[]{"真甜呢丨先来一斤吧 - ラストボス02.wav", "西江紫堂 - 黒き明日、清き闇.wav", "西江紫堂 - BLOOD.wav", "西江紫堂 - 灯り無き眼光.wav"};
-            bgmTexts = new String[4];
-        } else {
-            bgmSongs = new String[]{"Death Impact.wav", "永久色五色.wav", "Emotionally Unstable.wav", "FELT LOVE.wav", "Just Complex.wav", "Peace of lost puzzle.wav", "TEEK TEEK TEEK.wav", "ダンジョン09.wav", "ライアービジネス.wav", "五月雨Vivaride.wav", "村08.wav", "真甜呢丨先来一斤吧 - ダンジョン14.wav", "西江紫堂 - 五月雨Vivaride-Samidare bibaraido-.wav"};
-            bgmTexts = new String[]{"Death Impact.txt", "永久色五色.txt", "Emotionally Unstable.txt", "FELT LOVE.txt", "Just Complex.txt", "Peace of lost puzzle.txt", "TEEK TEEK TEEK.txt", "ダンジョン09.txt", "ライアービジネス.txt", "五月雨Vivaride.txt", "村08.txt", "真甜呢丨先来一斤吧 - ダンジョン14.txt", "西江紫堂 - 五月雨Vivaride-Samidare bibaraido-.txt"};
-        }
+        List<BgmTrack> playlist = (ui.ctx.getAliveCounter() - 1) / 2 == 1
+                ? BgmTrack.lateGamePlaylist()
+                : BgmTrack.normalGamePlaylist();
         ImageIcon musicBtnIcon = ui.resources.getImage("musicBtn.png");
         JButton btnMusic = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 15, 35,
                 UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT, musicBtnIcon);
         btnMusic.addActionListener(e -> {
-            int cur = ui.count % bgmSongs.length;
-            ui.name = bgmSongs[cur];
-            if (bgmTexts[cur] != null) ui.text = bgmTexts[cur];
+            BgmTrack selectedTrack = playlist.get(ui.count % playlist.size());
             ui.count++;
-            ui.resources.playBgm(ui.name);
+            ui.resources.playBgm(selectedTrack);
         });
         ui.jPanel.add(btnMusic);
     }

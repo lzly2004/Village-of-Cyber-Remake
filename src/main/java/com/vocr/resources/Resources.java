@@ -26,7 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class Resources implements ResourcesInterface {
     // 音频相关
     private Clip currentBgm;
-    private String currentBgmName;
+    private BgmTrack currentBgmTrack;
     // 台词资源：角色名 → 事件名 → 台词数据
     private Map<String, Map<String, LineData>> lineResource;
     // 台词参数占位符正则（<param=xxx>）
@@ -203,27 +203,14 @@ public class Resources implements ResourcesInterface {
 
  //音频相关方法
     @Override
-    public boolean playBgm(String bgmName) {
-        if (bgmName == null || bgmName.trim().isEmpty()) {
-            if (currentBgm != null) {
-                currentBgm.stop();
-                currentBgm.close();
-            }
-            currentBgmName = null;
-            return true; // 停止操作视为成功
-        }
-
-        // 停止并释放当前BGM
-        if (currentBgm != null) {
-            currentBgm.stop();
-            currentBgm.close();
-        }
+    public boolean playBgm(BgmTrack bgmTrack) {
+        Objects.requireNonNull(bgmTrack, "BGM不能为空");
+        stopBgm();
 
         try {
-            // 加载BGM文件（resources/BGM/目录）
-            URL bgmUrl = getClass().getResource("/BGM/" + bgmName);
+            URL bgmUrl = getClass().getResource(bgmTrack.resourcePath());
             if (bgmUrl == null) {
-                DebugLogger.error("BGM " + bgmName + " 未找到资源! 路径=/BGM/" + bgmName);
+                DebugLogger.error("BGM资源不存在: " + bgmTrack.resourcePath());
                 return false;
             }
             DebugLogger.info("[BGM] 找到资源: " + bgmUrl);
@@ -251,17 +238,28 @@ public class Resources implements ResourcesInterface {
             ais.close();
             currentBgm.loop(Clip.LOOP_CONTINUOUSLY); // 循环播放
             currentBgm.start();
-            currentBgmName = bgmName;
-            DebugLogger.info("[BGM] 播放成功: " + bgmName);
+            currentBgmTrack = bgmTrack;
+            DebugLogger.info("[BGM] 播放成功: " + bgmTrack);
             return true;
         } catch (Exception e) {
-            DebugLogger.warn("BGM " + bgmName + " 播放失败", e);
+            DebugLogger.warn("BGM " + bgmTrack + " 播放失败", e);
             return false;
         }
     }
 
-    public String getCurrentBgmName() {
-        return currentBgmName;
+    @Override
+    public void stopBgm() {
+        if (currentBgm != null) {
+            currentBgm.stop();
+            currentBgm.close();
+            currentBgm = null;
+        }
+        currentBgmTrack = null;
+    }
+
+    @Override
+    public BgmTrack getCurrentBgm() {
+        return currentBgmTrack;
     }
 
     @Override

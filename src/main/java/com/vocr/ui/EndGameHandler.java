@@ -1,5 +1,6 @@
 package com.vocr.ui;
 
+import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
 
 import com.vocr.logging.DebugLogger;
@@ -20,18 +21,18 @@ public class EndGameHandler implements SceneHandler {
         switch (scene) {
             case END_FOX:
                 event = seekEvent(ui, event, EventName.yhsl);
-                ui.resources.playBgm("失败画面.wav");
+                ui.resources.playBgm(BgmTrack.DEFEAT_SCREEN);
                 bgIcon = ui.resources.getImage("endFox.png");
                 break;
             case END_WOLF:
                 event = seekEvent(ui, event, EventName.krsl, EventName.rlsl);
-                ui.resources.playBgm("失败画面.wav");
+                ui.resources.playBgm(BgmTrack.DEFEAT_SCREEN);
                 bgIcon = ui.resources.getImage("endWolf.png");
                 break;
             case END_VILLAGE:
             default:
                 event = seekEvent(ui, event, EventName.crsl);
-                ui.resources.playBgm("胜利画面.wav");
+                ui.resources.playBgm(BgmTrack.VICTORY_SCREEN);
                 bgIcon = ui.resources.getImage("endVillage.png");
                 break;
         }

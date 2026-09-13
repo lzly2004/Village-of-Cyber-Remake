@@ -1,5 +1,6 @@
 package com.vocr.ui;
 
+import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
 
 import com.vocr.application.StartGameCommand;
@@ -95,7 +96,7 @@ public class GameSceneHandler implements SceneHandler {
         ui.jPanel.add(label);
         ui.resizeComponents();
         ui.getJFrame().setVisible(true);
-        ui.resources.playBgm("");
+        ui.resources.stopBgm();
         ui.resources.playSound(SoundEffect.NIGHTFALL);
         Timer timer = new Timer(UIConstants.NIGHT_SCREEN_DURATION_MS, new ActionListener() {
             @Override

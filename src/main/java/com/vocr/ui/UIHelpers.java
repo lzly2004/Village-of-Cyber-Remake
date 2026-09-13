@@ -1,5 +1,6 @@
 package com.vocr.ui;
 
+import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
 
 import com.vocr.domain.CharacterEnglishName;
@@ -112,9 +113,9 @@ public class UIHelpers {
     /** 白天阶段BGM选择：存活人数≤3时切换紧张BGM */
     public static void playDayPhaseBgm(UI ui) {
         if ((ui.ctx.getAliveCounter() - 1) / 2 == 1) {
-            ui.resources.playBgm("西江紫堂 - 灯り無き眼光.wav");
+            ui.resources.playBgm(BgmTrack.LIGHTLESS_GAZE);
         } else {
-            ui.resources.playBgm("Emotionally Unstable.wav");
+            ui.resources.playBgm(BgmTrack.EMOTIONALLY_UNSTABLE);
         }
     }
 

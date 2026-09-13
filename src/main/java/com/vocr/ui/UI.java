@@ -309,8 +309,6 @@ public class UI
     boolean[] specialEvent ={false};//是不是特殊事件，也就是三个连续的事件组，有特殊显示方式
 
     int count = 0;//切歌计数
-    String name = "";//歌名
-    String text = "";//文本
     boolean isAvoid = true;//是否回避，默认开启
     boolean isCo = false;//是否询问co
     int[][] skillTargetPeople;//用于存技能使用对象

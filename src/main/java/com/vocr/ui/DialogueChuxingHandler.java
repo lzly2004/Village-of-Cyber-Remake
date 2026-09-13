@@ -12,7 +12,7 @@ import java.awt.*;
 public class DialogueChuxingHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
-        ui.resources.playBgm("");
+        ui.resources.stopBgm();
         Event event = ui.pollEvent();
         ui.jPanel.removeAll();
         UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(ui, "haikei.png", event);
