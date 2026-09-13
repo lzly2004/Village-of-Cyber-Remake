@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.SelectionType;
 
@@ -137,7 +139,7 @@ class CharacterSelectionPanel {
                     if (!label.getBounds().contains(cx, cy)) continue;
                     int idx = targetLabels.indexOf(label);
                     if (!ui.ctx.isAlive(idx + 1)) break;
-                    ui.resources.playSound("click.wav");
+                    ui.resources.playSound(SoundEffect.CLICK);
                     switch (type) {
                         case VOTE:
                             ui.ctx.setSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), true);
@@ -190,7 +192,7 @@ class CharacterSelectionPanel {
                             if (!label.getBounds().contains(cx, cy)) continue;
                             int idx = targetLabels.indexOf(label);
                             if (!ui.ctx.isAlive(idx + 1)) break;
-                            ui.resources.playSound("click.wav");
+                            ui.resources.playSound(SoundEffect.CLICK);
                             ui.ctx.setClaimedRoleScheduled(roleNums.get(cur), idx + 1, ui.ctx.getGameDay(), true);
                             if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                             zbLabels.get(idx + cur * ui.ctx.getPlayerSum()).setVisible(true);
@@ -224,7 +226,7 @@ class CharacterSelectionPanel {
                     if (!label.getBounds().contains(cx, cy)) continue;
                     int idx = targetLabels.indexOf(label);
                     if (!ui.ctx.isAlive(idx + 1)) break;
-                    ui.resources.playSound("click.wav");
+                    ui.resources.playSound(SoundEffect.CLICK);
                     selectedTargets.remove(Integer.valueOf(idx + 1));
                     switch (type) {
                         case VOTE:

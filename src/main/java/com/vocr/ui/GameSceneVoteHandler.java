@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.logging.DebugLogger;
 
 import com.vocr.domain.GameContextView;
@@ -162,7 +164,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     {
         // --- 疑いボタン ---
         votePanel.doubtBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             votePanel.doubtBtn.setVisible(false); votePanel.votehisBtn.setVisible(false); voteInfo.infoText.setVisible(false);
             createDoubt();
         });
@@ -190,7 +192,7 @@ public class GameSceneVoteHandler implements SceneHandler {
 
         // --- 履歴チェック ---
         votePanel.recordBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             if (ui.ctx.getGameDay() == 2) {
                 createTishi(GameStrings.MSG_NO_DOUBT_YET);
             } else {
@@ -203,13 +205,13 @@ public class GameSceneVoteHandler implements SceneHandler {
 
         // --- 回避切替 ---
         votePanel.avoidBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             votePanel.avoidBtn1.setVisible(true); votePanel.avoidBtn.setVisible(false);
             ui.isAvoid = false;
             ui.resizeComponents();
         });
         votePanel.avoidBtn1.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             votePanel.avoidBtn1.setVisible(false); votePanel.avoidBtn.setVisible(true);
             ui.isAvoid = true;
             ui.resizeComponents();
@@ -217,7 +219,7 @@ public class GameSceneVoteHandler implements SceneHandler {
 
         // --- 指定/CO ---
         votePanel.pointBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             votePanel.voteBtn.setVisible(false); votePanel.pointBtn.setVisible(false); votePanel.avoidBtn.setVisible(false);
             votePanel.recordBtn.setVisible(false); votePanel.avoidBtn1.setVisible(false);
             votePanel.coBtn.setVisible(true); votePanel.ppBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
@@ -225,7 +227,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         });
 
         votePanel.coBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             votePanel.coBtn.setVisible(false); votePanel.ppBtn.setVisible(false);
             votePanel.reiBtn.setVisible(true); votePanel.kariBtn.setVisible(true); votePanel.askCoBtn.setVisible(true);
             votePanel.uranaiBtn.setVisible(true); votePanel.kyouyuBtn.setVisible(true); votePanel.catBtn.setVisible(true);
@@ -233,7 +235,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         });
 
         votePanel.ppBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             votePanel.coBtn.setVisible(false); votePanel.ppBtn.setVisible(false); votePanel.returnBtn.setVisible(false);
             votePanel.fixedVoteBtn.setVisible(true); votePanel.fixedUranaiBtn.setVisible(true); votePanel.protectBtn.setVisible(true);
             ui.resizeComponents();
@@ -256,7 +258,7 @@ public class GameSceneVoteHandler implements SceneHandler {
 
         // --- 再投票 ---
         votePanel.againBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             boolean isReVote;
             if (ui.ctx.getEndResult() == GameResult.NONE) {
                 isReVote = VoteResultRenderer.renderPiao(
@@ -270,7 +272,7 @@ public class GameSceneVoteHandler implements SceneHandler {
 
         // --- 次へ ---
         votePanel.nextBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             ui.currentScene = UI.Scene.DIALOGUE_CHUXING;
             ui.run();
         });
@@ -307,7 +309,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     private void handleVoteButton()
     {
         voteInfo.infoText.setVisible(false);
-        ui.resources.playSound("click.wav");
+        ui.resources.playSound(SoundEffect.CLICK);
         votePanel.voteBtn.setVisible(false); votePanel.pointBtn.setVisible(false); votePanel.avoidBtn.setVisible(false);
         votePanel.recordBtn.setVisible(false); votePanel.avoidBtn1.setVisible(false);
         if (!ui.selectedVoteTargets.isEmpty()) {
@@ -429,7 +431,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     private void handleReturnButton()
     {
         if (isViewingVoteHistory) { ui.run(); }
-        ui.resources.playSound("click.wav");
+        ui.resources.playSound(SoundEffect.CLICK);
         votePanel.voteBtn.setVisible(true); votePanel.pointBtn.setVisible(true); voteInfo.infoText.setVisible(true);
         ui.piaoText.setVisible(false); ui.piaoText1.setVisible(false);
         if (ui.isAvoid) { votePanel.avoidBtn.setVisible(true); votePanel.avoidBtn1.setVisible(false); }
@@ -460,7 +462,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     private void handleFreeVoteButton()
     {
         votePanel.freeBtn.setVisible(false); votePanel.greyBtn.setVisible(false); votePanel.returnBtn.setVisible(false);
-        ui.resources.playSound("click.wav"); votePanel.scrollPane1.setVisible(false);
+        ui.resources.playSound(SoundEffect.CLICK); votePanel.scrollPane1.setVisible(false);
         List<Integer> chuxingList = new ArrayList<>();
         for (int i = 1; i <= ui.ctx.getPlayerSum(); ++i)
             if (ui.ctx.isAlive(i)) chuxingList.add(i);
@@ -552,7 +554,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     }
 
     private void handleRoleCo(Role role, String noRoleMsg) {
-        ui.resources.playSound("click.wav");
+        ui.resources.playSound(SoundEffect.CLICK);
         ui.mainLogic.askCo(role);
         if (!ui.hasPendingEvents()) {
             createTishi(noRoleMsg);

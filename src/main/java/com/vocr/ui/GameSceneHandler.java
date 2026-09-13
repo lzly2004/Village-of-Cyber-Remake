@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.application.StartGameCommand;
 import com.vocr.application.StartedGame;
 import com.vocr.logging.DebugLogger;
@@ -46,7 +48,7 @@ public class GameSceneHandler implements SceneHandler {
             ui.jPanel.add(btn1);
             btn1.addActionListener(e -> {
                 ui.levelName = "game" + j + "-1.png";
-                ui.resources.playSound("click.wav");
+                ui.resources.playSound(SoundEffect.CLICK);
                 StartedGame startedGame = ui.gameApplication.startGame(
                         new StartGameCommand(peiyi.values()[j]));
                 ui.ctx = ui.mainLogic.getGameContext();
@@ -94,7 +96,7 @@ public class GameSceneHandler implements SceneHandler {
         ui.resizeComponents();
         ui.getJFrame().setVisible(true);
         ui.resources.playBgm("");
-        ui.resources.playSound("入夜音效.wav");
+        ui.resources.playSound(SoundEffect.NIGHTFALL);
         Timer timer = new Timer(UIConstants.NIGHT_SCREEN_DURATION_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -139,7 +141,7 @@ public class GameSceneHandler implements SceneHandler {
         dc.dialogPanel.add(dc.nextBtn);
         dc.dialogPanel.add(dc.dialogText);
         dc.dialogPanel.add(dc.back);
-        ui.resources.playSound("狼嚎音效.wav");
+        ui.resources.playSound(SoundEffect.WOLF_HOWL);
         Timer timer = new Timer(UIConstants.HOWL_TRANSITION_MS, e -> {
             if (ui.currentScene != UI.Scene.GAME_SCENE_DAY) return;
             dc.dialogPanel.setVisible(true);

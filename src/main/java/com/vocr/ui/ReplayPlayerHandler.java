@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.logging.DebugLogger;
 
 import com.vocr.domain.whyDie;
@@ -82,7 +84,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
         JButton backBtn = createButton(ui, "PVBreturn.png", 530, 580, 194, 126);
         backBtn.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             ui.transitionTo(UI.Scene.REPLAY_BROWSER_SCENE);
         });
         ui.jPanel.add(backBtn);
@@ -464,14 +466,14 @@ public class ReplayPlayerHandler implements SceneHandler {
         if (isShowingVote) {
             voteCurrentRound = 0;
         }
-        ui.resources.playSound("click.wav");
+        ui.resources.playSound(SoundEffect.CLICK);
         ui.run();
     }
 
     private void showVotePrevRound(UI ui) {
         if (voteCurrentRound > 0) {
             voteCurrentRound--;
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             ui.run();
         }
     }
@@ -486,7 +488,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         }
         if (snap != null && voteCurrentRound < snap.voteRounds.size() - 1) {
             voteCurrentRound++;
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             ui.run();
         }
     }
@@ -508,7 +510,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             JButton nextBtn = createButton(ui, "PVBnext.png", btnX, 250, btnW, btnH);
             if (nextBtn != null) {
                 nextBtn.addActionListener(e -> {
-                    ui.resources.playSound("click.wav");
+                    ui.resources.playSound(SoundEffect.CLICK);
                     if (voteCurrentRound != 0) return;
                     ui.replayDay++;
                     ui.run();
@@ -519,7 +521,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             JButton backBtn = createButton(ui, "PVBreturn.png", btnX, 400, btnW, btnH);
             if (backBtn != null) {
                 backBtn.addActionListener(e -> {
-                    ui.resources.playSound("click.wav");
+                    ui.resources.playSound(SoundEffect.CLICK);
                     DebugLogger.info("[ReplayPlayerHandler] 恢复BGM: 纯音乐-优美旋律.wav");
                     ui.resources.playBgm("纯音乐-优美旋律.wav");
                     ui.transitionTo(UI.Scene.REPLAY_BROWSER_SCENE);
@@ -567,7 +569,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             JButton prevBtn = createButton(ui, "PVBreturn.png", btnX, 250, btnW, btnH);
             if (prevBtn != null) {
                 prevBtn.addActionListener(e -> {
-                    ui.resources.playSound("click.wav");
+                    ui.resources.playSound(SoundEffect.CLICK);
                     if (voteCurrentRound != 0) return;
                     ui.replayDay--;
                     ui.run();
@@ -578,7 +580,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             JButton titleBtn = createButton(ui, "PVBtitile.png", btnX, 550, btnW, btnH);
             if (titleBtn != null) {
                 titleBtn.addActionListener(e -> {
-                        ui.resources.playSound("click.wav");
+                        ui.resources.playSound(SoundEffect.CLICK);
                         DebugLogger.info("[ReplayPlayerHandler] 恢复BGM: 纯音乐-优美旋律.wav");
                         ui.resources.playBgm("纯音乐-优美旋律.wav");
                         ui.transitionTo(UI.Scene.REPLAY_BROWSER_SCENE);
@@ -589,7 +591,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             JButton nextBtn = createButton(ui, "PVBnext.png", btnX, 250, btnW, btnH);
             if (nextBtn != null) {
                 nextBtn.addActionListener(e -> {
-                    ui.resources.playSound("click.wav");
+                    ui.resources.playSound(SoundEffect.CLICK);
                     if (voteCurrentRound != 0) return;
                     ui.replayDay++;
                     ui.run();
@@ -600,7 +602,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             JButton prevBtn = createButton(ui, "PVBreturn.png", btnX, 400, btnW, btnH);
             if (prevBtn != null) {
                 prevBtn.addActionListener(e -> {
-                    ui.resources.playSound("click.wav");
+                    ui.resources.playSound(SoundEffect.CLICK);
                     if (voteCurrentRound != 0) return;
                     ui.replayDay--;
                     ui.run();

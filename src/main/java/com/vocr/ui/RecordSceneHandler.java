@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.logging.DebugLogger;
 
 import com.vocr.history.GameRecord;
@@ -86,7 +88,7 @@ public class RecordSceneHandler implements SceneHandler {
 
         // 次へ
         addButton(ui, "PVBnext.png", btnX, 250, btnW, btnH, ev -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             ui.recordPage = (ui.recordPage + 1) % 8;
             ui.run();
         });
@@ -94,7 +96,7 @@ public class RecordSceneHandler implements SceneHandler {
         // 戻る（总览页隐藏）
         if (page > 0) {
             addButton(ui, "PVBreturn.png", btnX, 400, btnW, btnH, ev -> {
-                ui.resources.playSound("click.wav");
+                ui.resources.playSound(SoundEffect.CLICK);
                 ui.recordPage = 0;
                 ui.run();
             });

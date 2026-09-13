@@ -15,9 +15,9 @@ public interface ResourcesInterface
     //默认返回值true，播放失败返回false
     String getCurrentBgmName();
     //返回当前正在播放的BGM文件名
-    boolean playSound(String soundName);
-    //参数：音频名称
-    //提供给UI类，调用后播放一段音效，不可暂停，一次性播放不会循环
+    boolean playSound(SoundEffect soundEffect);
+    //参数：固定用途音效
+    //提供给UI类，调用后播放对应语义的音效，不可暂停，一次性播放不会循环
     //默认返回值true，播放失败返回false
     String getEventText(Event event);
     //参数：事件

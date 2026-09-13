@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.config.GameConstants;
 
 import javax.swing.*;
@@ -13,7 +15,7 @@ class VoteHistoryBrowser {
 
     static void render(UI ui, VoteButtonPanel vp, VoteInfoRenderer vi,
                        JPanel hisPanel, JLabel levellb, GameSceneVoteHandler handler) {
-        ui.resources.playSound("click.wav");
+        ui.resources.playSound(SoundEffect.CLICK);
         vp.doubtBtn.setVisible(false); vp.votehisBtn.setVisible(false); vi.infoText.setVisible(false);
         hisPanel.setVisible(true); hisPanel.removeAll();
         ui.jPanel.setComponentZOrder(levellb, 0); levellb.setVisible(true);

@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.logging.DebugLogger;
 import com.vocr.core.GameRecorder;
 
@@ -158,7 +160,7 @@ public class ReplayBrowserHandler implements SceneHandler {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
-                        ui.resources.playSound("click.wav");
+                        ui.resources.playSound(SoundEffect.CLICK);
                         ui.currentReplaySave = save;
                         ui.replayDay = 1;
                         DebugLogger.info("[ReplayBrowserHandler] 点击存档进入复盘: slot=" + slotIndex);
@@ -216,7 +218,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         ui.replayManager.saveToSlot(slotIndex, save);
         recorder.endGame(recorder.isActive() ? 0 : 0, 0);
         recorder.setActive(false);
-        ui.resources.playSound("click.wav");
+        ui.resources.playSound(SoundEffect.CLICK);
         ui.run();
         DebugLogger.info("[ReplayBrowserHandler] 已保存到槽位: " + slotIndex);
     }

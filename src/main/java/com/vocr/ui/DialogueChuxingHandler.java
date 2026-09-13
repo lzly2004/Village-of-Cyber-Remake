@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
@@ -52,7 +54,7 @@ public class DialogueChuxingHandler implements SceneHandler {
                 ((Timer) e1.getSource()).stop();
             });
             timer.start();
-            ui.resources.playSound("白天处刑音效.wav");
+            ui.resources.playSound(SoundEffect.DAY_EXECUTION);
             Chara.setVisible(false);
             if (CharIcon.length >= 2) {
                 JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,

@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.logging.DebugLogger;
 
 import com.vocr.domain.CharacterEnglishName;
@@ -40,9 +42,9 @@ public class EndGameHandler implements SceneHandler {
         Timer typeTimer = UIHelpers.bindTypewriter(dc.dialogText, ui.resources.getEventText(event), dc.nextBtn, () -> {
             dc.dialogPanel.setVisible(false);
             switch (scene) {
-                case END_VILLAGE: ui.resources.playSound("村人胜利音效.wav"); break;
-                case END_WOLF:    ui.resources.playSound("人狼胜利音效.wav"); break;
-                case END_FOX:     ui.resources.playSound("妖狐胜利音效.wav"); break;
+                case END_VILLAGE: ui.resources.playSound(SoundEffect.VILLAGE_VICTORY); break;
+                case END_WOLF:    ui.resources.playSound(SoundEffect.WOLF_VICTORY); break;
+                case END_FOX:     ui.resources.playSound(SoundEffect.FOX_VICTORY); break;
             }
             Timer t = new Timer(UIConstants.ENDING_DISPLAY_MS, e1 -> {
                 ui.currentScene = UI.Scene.END_ANIME;

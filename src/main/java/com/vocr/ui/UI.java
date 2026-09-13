@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.application.GameApplication;
 import com.vocr.application.GameUpdate;
 import com.vocr.logging.DebugLogger;
@@ -240,7 +242,7 @@ public class UI
 
     /** 播放点击音效并跳转到指定场景 */
     public void transitionTo(Scene scene) {
-        resources.playSound("click.wav");
+        resources.playSound(SoundEffect.CLICK);
         currentScene = scene;
         run();
     }

@@ -265,11 +265,12 @@ public class Resources implements ResourcesInterface {
     }
 
     @Override
-    public boolean playSound(String soundName) {
+    public boolean playSound(SoundEffect soundEffect) {
+        Objects.requireNonNull(soundEffect, "音效不能为空");
         try {
-            URL soundUrl = getClass().getResource("/sounds/" + soundName);
+            URL soundUrl = getClass().getResource(soundEffect.resourcePath());
             if (soundUrl == null) {
-                DebugLogger.error("未找到音效文件：" + soundName);
+                DebugLogger.error("未找到音效文件：" + soundEffect.resourcePath());
                 return false;
             }
 
@@ -300,7 +301,7 @@ public class Resources implements ResourcesInterface {
             }
             return true;
         } catch (Exception e) {
-            DebugLogger.warn("音效 " + soundName + " 播放失败", e);
+            DebugLogger.warn("音效 " + soundEffect + " 播放失败", e);
             return false;
         }
     }

@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.domain.GameContextView;
 
 import javax.swing.*;
@@ -20,7 +22,7 @@ class CoSelectionPanel {
         vp.reiBtn.setVisible(false); vp.kariBtn.setVisible(false); vp.uranaiBtn.setVisible(false);
         vp.kyouyuBtn.setVisible(false); vp.catBtn.setVisible(false); vp.askCoBtn.setVisible(false);
         infoCoPanel.setVisible(true);
-        ui.resources.playSound("click.wav");
+        ui.resources.playSound(SoundEffect.CLICK);
         vi.infoText.setVisible(false);
         vp.fixedVoteBtn.setVisible(false); vp.fixedUranaiBtn.setVisible(false); vp.protectBtn.setVisible(false);
         vp.returnBtn.setVisible(true);
@@ -108,7 +110,7 @@ class CoSelectionPanel {
                     if (labelRect.contains(btnCenterX, btnCenterY)) {
                         int index = targetLabels.indexOf(label);
                         if (!ui.ctx.isAlive(index + 1)) break;
-                        ui.resources.playSound("click.wav");
+                        ui.resources.playSound(SoundEffect.CLICK);
                         if (!askList.contains(index + 1)) askList.add(index + 1);
                         resultLabels.get(index).setVisible(true);
                         frameLabels.get(index).setVisible(true);
@@ -139,7 +141,7 @@ class CoSelectionPanel {
                     if (labelRect.contains(btnCenterX, btnCenterY)) {
                         int index = targetLabels.indexOf(label);
                         if (!ui.ctx.isAlive(index + 1)) break;
-                        ui.resources.playSound("click.wav");
+                        ui.resources.playSound(SoundEffect.CLICK);
                         if (askList.contains(index + 1)) {
                             int uu = askList.indexOf(index + 1);
                             askList.remove(uu);

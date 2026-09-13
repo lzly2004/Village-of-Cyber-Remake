@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 
@@ -10,7 +12,7 @@ public class DialogueDayDeathHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
         if (ui.peekEvent().eventname() == EventName.wsw) {
-            ui.resources.playSound("平和音效.wav");
+            ui.resources.playSound(SoundEffect.PEACEFUL_NIGHT);
             DialogueBox.Components dc = DialogueBox.setup(ui, "haikei3.png");
             ui.pollEvent();
             UIHelpers.bindTypewriter(dc.dialogText, GameStrings.NO_SACRIFICE, dc.nextBtn, () -> {
@@ -49,7 +51,7 @@ public class DialogueDayDeathHandler implements SceneHandler {
                         CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
                 ui.diaPanel.add(Chara);
                 Timer t1 = new Timer(UIConstants.TRANSITION_SHORT_MS, e -> {
-                    ui.resources.playSound("夜间死亡音效.wav");
+                    ui.resources.playSound(SoundEffect.NIGHT_DEATH);
                     Chara.setVisible(false);
                     if (CharIcon.length >= 2) {
                         JLabel Chara2 = LabelSimpleFactory.makeLabel(LabelConst.Text_Label,

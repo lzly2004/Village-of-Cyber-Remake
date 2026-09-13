@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.SoundEffect;
+
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
@@ -29,7 +31,7 @@ public class UIHelpers {
 
     public static void setButtonListener(JButton button, UI ui, Runnable action) {
         button.addActionListener(e -> {
-            ui.resources.playSound("click.wav");
+            ui.resources.playSound(SoundEffect.CLICK);
             action.run();
         });
     }
