@@ -175,8 +175,8 @@ public class ReplaySave {
     /**
      * 返回在指定复盘日期已经可见的技能记录。
      *
-     * v3 优先读取不晚于 visibleDay + 1 的最新完整历史，以包含当天白天发生的
-     * 晚 CO 回填；旧录像没有完整历史时，退回原来的“技能日次日 st”读取方式。
+     * v3 优先读取不晚于 visibleDay + 1 的最新完整历史，使技能日当夜写入的记录
+     * 能从次日快照稳定还原；旧录像没有完整历史时，退回原来的“技能日次日 st”读取方式。
      */
     public int getVisibleSkillTarget(int playerIndex, int skillDay, int visibleDay)
     {

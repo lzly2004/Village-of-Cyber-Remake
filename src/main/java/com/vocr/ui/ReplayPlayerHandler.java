@@ -2,7 +2,6 @@ package com.vocr.ui;
 
 import com.vocr.logging.DebugLogger;
 
-import com.vocr.domain.CharacterKanjiName;
 import com.vocr.domain.whyDie;
 
 import com.vocr.replay.DaySnapshot;
@@ -10,13 +9,8 @@ import com.vocr.replay.DaySnapshot;
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\ReplayPlayerHandler.java
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class ReplayPlayerHandler implements SceneHandler {
-    private static final int AVATAR_SIZE = 70;
-    private static final int AVATAR_GAP = 10;
-    private static final int AVATAR_START_X = 50;
-    private static final int AVATAR_START_Y = 10;
     private boolean isShowingVote = false;
     private int voteCurrentRound = 0;
 
@@ -114,18 +108,6 @@ public class ReplayPlayerHandler implements SceneHandler {
 
     
 
-    private String getStatusIcon(int deathReason, int actualRole) {
-        switch (deathReason) {
-            case 1: return "占"; // 占い師結果関連
-            case 2: return "霊"; // 霊能者結果関連
-            case 3: return "吊"; // 処刑
-            default:
-                if (actualRole == 7) return "狼";
-                if (actualRole == 10) return "狐";
-                return "×";
-        }
-    }
-
     private DaySnapshot getSnapshot(UI ui, int day) {
         if (ui.currentReplaySave == null || ui.currentReplaySave.daySnapshots.isEmpty())
             return null;
@@ -150,23 +132,6 @@ public class ReplayPlayerHandler implements SceneHandler {
         return (first != null && first.players != null) ? first.players.length : 0;
     }
 
-    private String getActualRoleName(int actualRole) {
-        switch (actualRole) {
-            case 1: return "占卜师";
-            case 2: return "灵媒师";
-            case 3: return "猎人";
-            case 4: return "共有者";
-            case 5: return "猫又";
-            case 6: return "村人";
-            case 7: return "人狼";
-            case 8: return "狂人";
-            case 9: return "狂信者";
-            case 10: return "妖狐";
-            case 11: return "背德者";
-            default: return "不明";
-        }
-    }
-
     private JButton createButton(UI ui, String imageName, int x, int y, int w, int h) {
         ImageIcon img = ui.resources.getImage(imageName);
         if (img == null) {
@@ -178,21 +143,6 @@ public class ReplayPlayerHandler implements SceneHandler {
         return ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);
     }
 
-    private JButton addButton(UI ui, String text, int x, int y, int w, int h, ActionListener listener) {
-        ImageIcon btnImg = ui.resources.getImage("avg_button2.png");
-        if (btnImg == null) {
-            DebugLogger.warn("[ReplayPlayerHandler] 按钮背景图未找到: avg_button2.png");
-            return null;
-        }
-        JButton btn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, btnImg);
-        btn.setText(text);
-        btn.setHorizontalTextPosition(SwingConstants.CENTER);
-        btn.setFont(new Font("Dialog", Font.BOLD, 18));
-        btn.setForeground(Color.WHITE);
-        btn.addActionListener(listener);
-        return btn;
-    }
-    
     private void renderAvatarBar(UI ui, int day) {
         DaySnapshot snapshot = getSnapshot(ui, day + 1);
         if (snapshot == null) snapshot = getSnapshot(ui, day);
@@ -435,134 +385,18 @@ public class ReplayPlayerHandler implements SceneHandler {
     }
 
     private void renderNormalInfoPanel(UI ui, int day, int playerSum, ImageIcon boardIcon) {
+        String result = ReplayTextFormatter.buildNormalInfo(ui.currentReplaySave, day, playerSum);
+        DebugLogger.info("[ReplayPlayerHandler] infoArea: day=" + day
+                + ", playerSum=" + playerSum + ", resultLen=" + result.length());
 
-            StringBuilder zhanbu = new StringBuilder();
-            StringBuilder lingneng = new StringBuilder();
-            StringBuilder chuxing = new StringBuilder();
-            StringBuilder shiti = new StringBuilder();
-            StringBuilder lieren = new StringBuilder();
-
-            DebugLogger.info("[ReplayPlayerHandler] infoArea: day=" + day + ", playerSum=" + playerSum);
-
-            DaySnapshot firstSnap = getSnapshot(ui, day + 1);
-            if (firstSnap == null) firstSnap = getSnapshot(ui, day);
-            DebugLogger.info("[ReplayPlayerHandler] infoArea: firstSnap=" + (firstSnap != null ? "存在(p=" + firstSnap.players.length + ")" : "null"));
-
-            if (firstSnap != null && firstSnap.players != null) {
-                StringBuilder mapLog = new StringBuilder("[ReplayPlayerHandler] [CHAR-MAP] 全部映射:");
-                for (int mi = 0; mi < firstSnap.players.length; mi++) {
-                    DaySnapshot.PlayerStatus mps = firstSnap.players[mi];
-                    if (mps != null) mapLog.append(" p").append(mi+1).append("=").append(mps.characterNumber).append("(").append(getShortName(mps.characterNumber)).append(")");
-                }
-                DebugLogger.info(mapLog.toString());
-            }
-            if (firstSnap != null && firstSnap.players != null) {
-                for (int i = 0; i < playerSum; i++) {
-                    DaySnapshot.PlayerStatus ps = firstSnap.players[i];
-                    if (ps == null) continue;
-                    switch (ps.claimedRole) {
-                        case 1: appendSeerResults(ui, zhanbu, ps, i, playerSum, day); break;
-                        case 2: appendSeerResults(ui, lingneng, ps, i, playerSum, day); break;
-                        case 3: appendHunterResults(ui, lieren, ps, i, playerSum, day); break;
-                    }
-                }
-            }
-
-            for (int d = 1; d < day; d++) {
-                DaySnapshot snap = getSnapshot(ui, d + 1);
-                if (snap == null || snap.players == null) continue;
-
-                int shitiCnt = 0;
-                java.util.List<Integer> shitiNum = new java.util.ArrayList<>();
-                boolean hasChuxing = false;
-
-                for (int i = 0; i < playerSum; i++) {
-                    DaySnapshot.PlayerStatus ps = snap.players[i];
-                    if (ps == null) continue;
-
-                    switch (ps.deathReason) {
-                        case 1:
-                            if (ps.actualRole == 10) {
-                                int deviantIdx = findRoleIndexInSnapshot(snap, 11, playerSum);
-                                if (deviantIdx >= 0 && snap.players[deviantIdx] != null 
-                                        && snap.players[deviantIdx].deathDay > 0 
-                                        && ps.deathDay == d && snap.players[deviantIdx].deathDay < ps.deathDay) {
-                                    chuxing.append(getShortName(ps.characterNumber));
-                                    hasChuxing = true;
-                                }
-                            } else if (ps.actualRole == 5) {
-                            } else {
-                                if (ps.deathDay == d) {
-                                    chuxing.append(getShortName(ps.characterNumber));
-                                    hasChuxing = true;
-                                }
-                            }
-                            break;
-                        case 2:
-                            if (ps.deathDay == d) {
-                                String cat = findRoleInSnapshot(snap, 5, playerSum);
-                                if (!cat.isEmpty()) chuxing.append(cat).append("+");
-                                chuxing.append(getShortName(ps.characterNumber)).append("(猫呪)");
-                                hasChuxing = true;
-                            }
-                            break;
-                        case 3:
-                            if (ps.deathDay == d) {
-                                String fox = findRoleInSnapshot(snap, 10, playerSum);
-                                if (!fox.isEmpty()) chuxing.append(fox).append("+");
-                                chuxing.append(getShortName(ps.characterNumber)).append("(後追)");
-                                hasChuxing = true;
-                            }
-                            break;
-                        default:
-                            if (ps.deathReason >= 4 && ps.deathDay == d) {
-                                shitiCnt++;
-                                shitiNum.add(ps.characterNumber);
-                            }
-                            break;
-                    }
-
-                    if (i == playerSum - 1 && shitiCnt == 0) {
-                        shiti.append(GameStrings.PEACE_ARROW);
-                    }
-                }
-
-                if (hasChuxing) chuxing.append("\u2192");
-
-                if (shitiCnt == 1) {
-                    shiti.append(getShortName(shitiNum.get(0))).append("\u2192");
-                } else if (shitiCnt > 1) {
-                    for (int l = 0; l < shitiNum.size(); l++) {
-                        shiti.append(getShortName(shitiNum.get(l))).append("+");
-                    }
-                    shiti.setLength(shiti.length() - 1);
-                    shiti.append("\u2192");
-                }
-            }
-
-            if (shiti.length() > 2) shiti.setLength(shiti.length() - 1);
-            if (chuxing.length() > 2) chuxing.setLength(chuxing.length() - 1);
-
-            DebugLogger.info("[ReplayPlayerHandler] infoArea: z=" + zhanbu.length() + " l=" + lingneng.length() + " c=" + chuxing.length() + " s=" + shiti.length() + " h=" + lieren.length());
-
-            StringBuilder result = new StringBuilder();
-            result.append(GameStrings.SECTION_SEER).append(zhanbu)
-                  .append(GameStrings.SECTION_MEDIUM).append(lingneng)
-                  .append(GameStrings.SECTION_EXECUTION).append(chuxing)
-                  .append("\n[死体]\n").append(shiti)
-                  .append("\n[護衛先]\n").append(lieren);
-
-            DebugLogger.info("[ReplayPlayerHandler] infoArea: resultLen=" + result.length());
-
-            JTextArea infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, result.toString());
-            JScrollPane scrollPane = new JScrollPane(infoText);
-            UIHelpers.configureScrollPane(scrollPane);
-            int panelW = boardIcon != null ? 200 + boardIcon.getIconWidth() - 80 : 500;
-            int panelH = boardIcon != null ? 50 + boardIcon.getIconHeight() - 60 : 300;
-            scrollPane.setBounds(40, 228, panelW, panelH);
-            ui.jPanel.add(scrollPane);
-            ui.jPanel.setComponentZOrder(scrollPane, 0);
-            DebugLogger.info("[ReplayPlayerHandler] infoArea: done");
+        JTextArea infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, result);
+        JScrollPane scrollPane = new JScrollPane(infoText);
+        UIHelpers.configureScrollPane(scrollPane);
+        int panelW = boardIcon != null ? 200 + boardIcon.getIconWidth() - 80 : 500;
+        int panelH = boardIcon != null ? 50 + boardIcon.getIconHeight() - 60 : 300;
+        scrollPane.setBounds(40, 228, panelW, panelH);
+        ui.jPanel.add(scrollPane);
+        ui.jPanel.setComponentZOrder(scrollPane, 0);
     }
 
     private void renderRolePanel(UI ui, int playerSum, ImageIcon boardIcon) {
@@ -575,31 +409,9 @@ public class ReplayPlayerHandler implements SceneHandler {
             return;
         }
 
-        StringBuilder result = new StringBuilder();
-        result.append("一役職一\n");
+        String result = ReplayTextFormatter.buildRoleInfo(lastSnap, playerSum);
 
-        java.util.Map<Integer, java.util.List<String>> roleMap = new java.util.LinkedHashMap<>();
-        for (int i = 0; i < playerSum; i++) {
-            DaySnapshot.PlayerStatus ps = lastSnap.players[i];
-            if (ps == null || ps.characterNumber == 0) continue;
-            int role = ps.actualRole;
-            String charName = getShortName(ps.characterNumber);
-            roleMap.computeIfAbsent(role, k -> new java.util.ArrayList<>()).add(charName);
-        }
-
-        int[] roleOrder = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-        for (int role : roleOrder) {
-            java.util.List<String> chars = roleMap.get(role);
-            if (chars == null || chars.isEmpty()) continue;
-            result.append("[").append(getActualRoleName(role)).append("]\n");
-            for (int j = 0; j < chars.size(); j++) {
-                result.append(chars.get(j));
-                if (j < chars.size() - 1) result.append("　");
-            }
-            result.append("\n");
-        }
-
-        JTextArea roleText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 22, result.toString());
+        JTextArea roleText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 22, result);
         JScrollPane scrollPane = new JScrollPane(roleText);
         UIHelpers.configureScrollPane(scrollPane);
         int panelW = boardIcon != null ? 200 + boardIcon.getIconWidth() - 80 : 500;
@@ -613,23 +425,6 @@ public class ReplayPlayerHandler implements SceneHandler {
 
     private void renderVoteResultPanel(UI ui, int day, int playerSum, ImageIcon boardIcon) {
         DaySnapshot snapshot = getSnapshot(ui, day);
-        DebugLogger.info("[ReplayPlayerHandler] [VOTE-DEBUG] day=" + day + ", snapshot=" + (snapshot != null ? "非null" : "NULL"));
-        if (snapshot != null) {
-            DebugLogger.info("[ReplayPlayerHandler] [VOTE-DEBUG] voteRounds.size=" + snapshot.voteRounds.size());
-            if (!snapshot.voteRounds.isEmpty()) {
-                DaySnapshot.VoteRound vr = snapshot.voteRounds.get(voteCurrentRound);
-                DebugLogger.info("[ReplayPlayerHandler] [VOTE-DEBUG] currentRound=" + voteCurrentRound + ", vr.votes=" + (vr.votes != null ? vr.votes.length : "NULL"));
-                if (vr.votes != null && vr.votes.length > 0) {
-                    StringBuilder sampleData = new StringBuilder();
-                    int limit = Math.min(3, vr.votes.length);
-                    for (int i = 0; i < limit; i++) {
-                        sampleData.append("[").append(vr.votes[i][0]).append("->").append(vr.votes[i][1]).append("] ");
-                    }
-                    DebugLogger.info("[ReplayPlayerHandler] [VOTE-DEBUG] 抽样数据: " + sampleData);
-                }
-            }
-        }
-
         if (snapshot == null || snapshot.voteRounds.isEmpty()) {
             DebugLogger.warn("[ReplayPlayerHandler] [VOTE-ERROR] 无投票数据! snapshot=" + (snapshot == null ? "null" : "有但voteRounds空"));
             isShowingVote = false;
@@ -638,88 +433,12 @@ public class ReplayPlayerHandler implements SceneHandler {
             return;
         }
 
-        if (voteCurrentRound >= snapshot.voteRounds.size()) {
-            voteCurrentRound = snapshot.voteRounds.size() - 1;
-        }
+        ReplayTextFormatter.VoteText voteText = ReplayTextFormatter.buildVoteInfo(
+                snapshot, day, voteCurrentRound, playerSum);
+        voteCurrentRound = voteText.roundIndex();
 
-        DaySnapshot.VoteRound vr = snapshot.voteRounds.get(voteCurrentRound);
-
-        StringBuilder leftPiao = new StringBuilder();
-        StringBuilder rightPiao = new StringBuilder("\n\n");
-        int leftCnt = 0;
-
-        StringBuilder extraText = new StringBuilder();
-        if (snapshot.dailyVotingRule >= 0) {
-            switch (snapshot.dailyVotingRule) {
-                case 0: extraText.append(GameStrings.VOTE_FREE); break;
-                case 1:
-                    extraText.append(GameStrings.VOTE_GREY);
-                    for (int playerIdx : snapshot.greyTargetCharNums) {
-                        int charNum = getCharNumByTarget(snapshot, playerIdx);
-                        DebugLogger.info("[VOTE-GREY] playerIdx=" + playerIdx + " -> charNum=" + charNum + " -> " + getShortName(charNum));
-                        extraText.append(getShortName(charNum));
-                    }
-                    break;
-                case 2:
-                    extraText.append(GameStrings.VOTE_DESIGNATED);
-                    for (int charNum : snapshot.designatedTargetCharNums) {
-                        DebugLogger.info("[VOTE-DESIGN] charNum=" + charNum + " -> " + getShortName(charNum));
-                        extraText.append(getShortName(charNum)).append(",");
-                    }
-                    if (!snapshot.designatedTargetCharNums.isEmpty()) extraText.setLength(extraText.length() - 1);
-                    break;
-            }
-        }
-
-        String title = GameStrings.getVoteHistoryTitle(day, vr.round, extraText.toString());
-        DebugLogger.info("[ReplayPlayerHandler] [VOTE-TITLE] day=" + day + ", displayRound=" + vr.round + ", dataRound=" + vr.round + ", totalRounds=" + snapshot.voteRounds.size());
-        leftPiao.append(title);
-
-        if (vr.votes != null) {
-            java.util.LinkedHashMap<Integer, Integer> dedupedVotes = new java.util.LinkedHashMap<>();
-            int[] voterTargetMap = new int[playerSum + 1];
-            int[] voteCount = new int[playerSum + 1];
-            for (int[] vote : vr.votes) {
-                if (vote == null || vote.length < 2) continue;
-                int voterIdx = vote[0];
-                int targetIdx = vote[1];
-                if (voterIdx >= 1 && voterIdx <= playerSum && targetIdx >= 1) {
-                    voterTargetMap[voterIdx] = targetIdx;
-                    voteCount[targetIdx]++;
-                }
-            }
-            int totalValidVotes = 0;
-            for (int c : voteCount) totalValidVotes += c;
-            DebugLogger.info("[ReplayPlayerHandler] [VOTE-DATA] 投票记录=" + vr.votes.length + ", 有效投票=" + totalValidVotes + ", 存活=" + snapshot.aliveCount);
-
-            for (int i = 1; i <= playerSum; i++) {
-                if (snapshot.players == null || i > snapshot.players.length || snapshot.players[i - 1] == null) continue;
-                DaySnapshot.PlayerStatus ps = snapshot.players[i - 1];
-                boolean isVotingPlayer = (ps.deathDay == 0 || ps.deathDay >= day);
-                if (!isVotingPlayer && ps.deathDay != day) continue;
-
-                String voterName = getShortName(ps.characterNumber);
-                int targetIdx = voterTargetMap[i];
-                String targetName;
-                int count;
-
-                if (targetIdx >= 1 && targetIdx <= playerSum) {
-                    DaySnapshot.PlayerStatus targetPs = targetIdx <= snapshot.players.length ? snapshot.players[targetIdx - 1] : null;
-                    targetName = (targetPs != null) ? getShortName(targetPs.characterNumber) : ("?" + targetIdx);
-                    count = voteCount[i];
-                } else if (targetIdx == 0) {
-                    targetName = "棄権";
-                    count = voteCount[i];
-                } else {
-                    continue;
-                }
-                String line = String.format(GameStrings.VOTE_LINE_FORMAT, voterName, count, targetName);
-                if (leftCnt >= 10) rightPiao.append(line);
-                else { leftPiao.append(line); leftCnt++; }
-            }
-        }
-
-        JTextArea piaoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 20, leftPiao.toString());
+        JTextArea piaoText = TextareaSimpleFactory.createBoldTitleTextArea(
+                Color.BLACK, 20, voteText.leftColumn());
         JScrollPane scrollPane = new JScrollPane(piaoText);
         UIHelpers.configureScrollPane(scrollPane);
         int panelW = boardIcon != null ? 200 + boardIcon.getIconWidth() - 80 : 500;
@@ -728,7 +447,8 @@ public class ReplayPlayerHandler implements SceneHandler {
         ui.jPanel.add(scrollPane);
         ui.jPanel.setComponentZOrder(scrollPane, 1);
 
-        JTextArea piaoText1 = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 20, rightPiao.toString());
+        JTextArea piaoText1 = TextareaSimpleFactory.createBoldTitleTextArea(
+                Color.BLACK, 20, voteText.rightColumn());
         JScrollPane scrollPane1 = new JScrollPane(piaoText1);
         UIHelpers.configureScrollPane(scrollPane1);
         scrollPane1.setBounds(40 + panelW * 2 / 3, 228, panelW / 3, panelH);
@@ -778,104 +498,6 @@ public class ReplayPlayerHandler implements SceneHandler {
         ui.jPanel.add(infoText);
     }
 
-    private String safeCharName(int charNum) {
-        if (charNum <= 0 || charNum >= CharacterKanjiName.values().length) {
-            DebugLogger.warn("[ReplayPlayerHandler] characterNumber越界: " + charNum + ", 范围[1," + (CharacterKanjiName.values().length - 1) + "]");
-            return "?" + charNum;
-        }
-        return CharacterKanjiName.values()[charNum].name();
-    }
-
-    private String getShortName(int charNum) {
-        if (charNum <= 0 || charNum >= CharacterKanjiName.values().length) {
-            return "?" + charNum;
-        }
-        return CharacterKanjiName.values()[charNum].getShortName();
-    }
-
-    private String findRoleInSnapshot(DaySnapshot snap, int targetRole, int playerSum) {
-        int idx = findRoleIndexInSnapshot(snap, targetRole, playerSum);
-        if (idx == -1) return "";
-        return getShortName(snap.players[idx].characterNumber);
-    }
-
-    private int findRoleIndexInSnapshot(DaySnapshot snap, int targetRole, int playerSum) {
-        if (snap == null || snap.players == null) return -1;
-        for (int i = 0; i < playerSum; i++) {
-            DaySnapshot.PlayerStatus ps = snap.players[i];
-            if (ps != null && ps.actualRole == targetRole) return i;
-        }
-        return -1;
-    }
-
-    private void appendSkillResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus ps,
-                                   int idx, int playerSum, int startDay, int endDay,
-                                   boolean useSafeName, boolean showBallResult, int dayOffset) {
-        sb.append(useSafeName ? safeCharName(ps.characterNumber) : getShortName(ps.characterNumber)).append(" : ");
-        boolean markedExposed = false;
-        for (int d = startDay; d < endDay; d++) {
-            DaySnapshot snap = getSnapshot(ui, d + dayOffset);
-            if (snap == null || snap.players == null || idx >= snap.players.length) continue;
-            DaySnapshot.PlayerStatus p = snap.players[idx];
-            if (p == null) continue;
-            if (p.deathDay > 0 && d >= p.deathDay) break;
-            int target = ui.currentReplaySave.getVisibleSkillTarget(p.playerIndex, d, endDay);
-            if (target != 0) {
-                int effectiveTarget = target;
-                boolean isBlack = false;
-                if (target > playerSum) {
-                    effectiveTarget = target - playerSum;
-                    isBlack = true;
-                }
-                String targetName = useSafeName ? safeCharName(getCharNumByTarget(snap, effectiveTarget))
-                        : getShortName(getCharNumByTarget(snap, effectiveTarget));
-                if (showBallResult) {
-                    sb.append(targetName).append(isBlack ? "\u25cf\u2192" : "\u25cb\u2192");
-                } else {
-                    sb.append(targetName).append("\u2192");
-                }
-            }
-            DaySnapshot currentSnap = getSnapshot(ui, d);
-            if (!markedExposed && currentSnap != null && currentSnap.players != null 
-                    && idx < currentSnap.players.length) {
-                DaySnapshot.PlayerStatus currentPs = currentSnap.players[idx];
-                if (currentPs != null && currentPs.nonHumanMarked) {
-                    markedExposed = true;
-                }
-            }
-        }
-        if (!markedExposed) {
-            DaySnapshot endSnap = getSnapshot(ui, endDay);
-            if (endSnap != null && endSnap.players != null && idx < endSnap.players.length) {
-                DaySnapshot.PlayerStatus endPs = endSnap.players[idx];
-                if (endPs != null && endPs.nonHumanMarked) {
-                    markedExposed = true;
-                }
-            }
-        }
-        if (markedExposed) sb.append(GameStrings.MARKER_EXPOSED).append("\u2192");
-        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '\u2192') sb.setLength(sb.length() - 1);
-        sb.append("\n");
-    }
-
-    private void appendSeerResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus basePs,
-                                   int idx, int playerSum, int currentDay) {
-        appendSkillResults(ui, sb, basePs, idx, playerSum, 1, currentDay, false, true, 1);
-    }
-
-    private void appendHunterResults(UI ui, StringBuilder sb, DaySnapshot.PlayerStatus ps,
-                                     int idx, int playerSum, int currentDay) {
-        appendSkillResults(ui, sb, ps, idx, playerSum, 2, currentDay, false, false, 1);
-    }
-
-    private int getCharNumByTarget(DaySnapshot snap, int targetPlayerIdx) {
-        if (snap != null && snap.players != null && targetPlayerIdx >= 1 && targetPlayerIdx <= snap.players.length) {
-            DaySnapshot.PlayerStatus ps = snap.players[targetPlayerIdx - 1];
-            if (ps != null && ps.characterNumber != 0) return ps.characterNumber;
-        }
-        return targetPlayerIdx;
-    }
-    
     private void renderButtons(UI ui, int day) {
         int totalDays = ui.currentReplaySave.totalDays;
         int btnX = 1050;
