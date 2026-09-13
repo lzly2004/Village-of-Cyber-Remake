@@ -2468,7 +2468,7 @@
     "gyzs13": {"default":"静かに！共有者の方針を言うぞ。\nとりあえず今日は他の占い師を伏せておこうと思う。異論はあるかな？"},
     "zs14": {"default":"<param=targetName>を占ったら死んでおる…！\nそうか、これが呪殺か。"},
     "zspz15": {"default":"狩人ＣＯ！"},
-    "szsm16": {"default":"param=targetName>を占っていたのだが…\n狐だったかな？"},
+    "szsm16": {"default":"<param=targetName>を占っていたのだが…\n狐だったかな？"},
     "wz17": {"default":"わしに占える者はもうおらん。\n英断を期待している。"},
     "lnco18": {"default":"霊能ＣＯだ。\n老いぼれに相応しい仕事かもしれんな。"},
     "ljgh19b": {"default":"霊能CO　<param=targetName>は人狼だった。\nいいぞ、そのまま狼共を蹴散らすんだ！"},

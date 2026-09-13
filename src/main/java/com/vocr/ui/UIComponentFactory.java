@@ -47,6 +47,22 @@ public class UIComponentFactory
         return String.format("%s %s/%s", kanjiName, katakanaName, englishName.name());
     }
 
+    /**
+     * 获取人物的显示名(日文汉字或平假名 片假名)，不含英文名。
+     * 对话框名牌统一使用该格式。
+     */
+    public String getCharacterDisplayName(CharacterEnglishName englishName)
+    {
+        if (englishName == null || englishName == CharacterEnglishName.NONE)
+            return "NONE / NONE";
+
+        int idx = englishName.ordinal();
+        // 三种枚举按相同顺序定义，ordinal一一对应
+        String kanjiName = CharacterKanjiName.values()[idx].name();
+        String katakanaName = CharacterKatakanaName.values()[idx].name();
+        return String.format("%s %s", kanjiName, katakanaName);
+    }
+
     public String getClaimedRoleIconName(int claimedRole, int claimedRoleOrder)
     {
         StringBuilder sb = new StringBuilder("yaku");
