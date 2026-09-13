@@ -2,7 +2,6 @@ package com.vocr.core;
 
 import com.vocr.logging.DebugLogger;
 
-import com.vocr.domain.Event;
 import com.vocr.domain.peiyi;
 
 import com.vocr.config.PathConfig;
@@ -24,16 +23,16 @@ import java.util.Map;
 /**
  * 游戏录像/回归测试录制器 — 第0步核心基础设施。
  *
- * 录制一局完整游戏的所有关键事件和状态,用于:
+ * 录制一局完整游戏的初始化信息、每日状态、投票和终局记录,用于:
  *   1. 重构前后行为对比(回归测试)
  *   2. 游戏回放/复盘
  *   3. Bug复现
  *
  * 使用方式:
  *   GameRecorder recorder = new GameRecorder("baseline/peiyi_1_seed_42");
- *   recorder.startGame(peiyi, seed, playerCount);
- *   // ... 游戏进行中,在关键节点调用 recorder.recordXxx() ...
- *   recorder.endGame(endResult);
+ *   recorder.startGame(peiyi, seed, playerCount, gameStatus);
+ *   // ... 游戏进行中调用每日快照和投票记录方法 ...
+ *   recorder.endGame(endResult, gameDay);
  *   recorder.save(); // 保存到文件
  */
 public class GameRecorder
@@ -125,113 +124,6 @@ public class GameRecorder
         };
         records.add("END|result=" + resultStr + "|day=" + gameDay);
         DebugLogger.info("[GameRecorder] 游戏结束: " + resultStr + " at day " + gameDay);
-    }
-
-    // ==================== 关键事件录制 ====================
-
-    public void recordEvent(String category, String details)
-    {
-        if (!active) return;
-        records.add("EVENT|" + category + "|" + details);
-    }
-
-    public void recordNightStart(int day, int aliveCount)
-    {
-        if (!active) return;
-        records.add("NIGHT_START|day=" + day + "|alive=" + aliveCount);
-    }
-
-    public void recordNightDeaths(int day, List<Integer> dieBody, String causes)
-    {
-        if (!active) return;
-        StringBuilder sb = new StringBuilder("NIGHT_DEATHS|day=" + day + "|");
-        for (int i = 0; i < dieBody.size(); i++)
-        {
-            if (i > 0) sb.append(",");
-            sb.append(dieBody.get(i));
-        }
-        sb.append("|causes=").append(causes);
-        records.add(sb.toString());
-    }
-
-    public void recordDayStart(int day, int aliveCount)
-    {
-        if (!active) return;
-        records.add("DAY_START|day=" + day + "|alive=" + aliveCount);
-    }
-
-    public void recordSkillUse(int day, int actorNumber, int actorActualRole,
-                               int claimedRole, int target, String result)
-    {
-        if (!active) return;
-        records.add(String.format("SKILL|day=%d|actor=%d|actualRole=%d|claimedRole=%d|target=%d|result=%s",
-                day, actorNumber, actorActualRole, claimedRole, target, result));
-    }
-
-    public void recordSeerResult(int day, int seerNumber, int target, boolean isBlack)
-    {
-        if (!active) return;
-        records.add(String.format("SEER|day=%d|seer=%d|target=%d|result=%s",
-                day, seerNumber, target, isBlack ? "BLACK" : "WHITE"));
-    }
-
-    public void recordMediumResult(int day, int mediumNumber, int executedTarget, boolean isBlack)
-    {
-        if (!active) return;
-        records.add(String.format("MEDIUM|day=%d|medium=%d|executed=%d|result=%s",
-                day, mediumNumber, executedTarget, isBlack ? "BLACK" : "WHITE"));
-    }
-
-    public void recordWolfBite(int day, int wolfNumber, int target)
-    {
-        if (!active) return;
-        records.add(String.format("WOLF_BITE|day=%d|wolf=%d|target=%d", day, wolfNumber, target));
-    }
-
-    public void recordHunterGuard(int day, int hunterNumber, int target)
-    {
-        if (!active) return;
-        records.add(String.format("HUNTER_GUARD|day=%d|hunter=%d|target=%d", day, hunterNumber, target));
-    }
-
-    public void recordVoteResult(int day, int round, String voteMethod,
-                                  int executedPlayer, int voteCount, boolean isTie)
-    {
-        if (!active) return;
-        records.add(String.format("VOTE|day=%d|round=%d|method=%s|executed=%d|votes=%d|tie=%s",
-                day, round, voteMethod, executedPlayer, voteCount, isTie ? "true" : "false"));
-    }
-
-    public void recordCoClaim(int day, int playerNumber, int claimedRole, int claimedRoleOrder)
-    {
-        if (!active) return;
-        records.add(String.format("CO|day=%d|player=%d|claimedRole=%d|order=%d",
-                day, playerNumber, claimedRole, claimedRoleOrder));
-    }
-
-    public void recordAvoidCo(int day, int playerNumber, String avoidType)
-    {
-        if (!active) return;
-        records.add(String.format("AVOID_CO|day=%d|player=%d|type=%s", day, playerNumber, avoidType));
-    }
-
-    public void recordNonHumanMarker(int day, int playerNumber, String reason)
-    {
-        if (!active) return;
-        records.add(String.format("MARKER|day=%d|player=%d|reason=%s", day, playerNumber, reason));
-    }
-
-    // ==================== 游戏事件录制(Event队列) ====================
-
-    public void recordGameEvent(int day, Event evt)
-    {
-        if (!active || evt == null) return;
-        records.add(String.format("GAME_EVENT|day=%d|event=%s|ch1=%s|ch2=%s|ch3=%s",
-                day,
-                evt.eventname() != null ? evt.eventname().name() : "null",
-                evt.ch1() != null ? evt.ch1().name() : "null",
-                evt.ch2() != null ? evt.ch2().name() : "null",
-                evt.ch3() != null ? evt.ch3().name() : "null"));
     }
 
     // ==================== 状态快照 ====================
