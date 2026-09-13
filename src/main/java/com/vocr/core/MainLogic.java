@@ -77,16 +77,17 @@ public class MainLogic implements MainLogicInterface
         return recorder;
     }
     // 接口要求的单参数版本
-    public GameStatus start(peiyi p)
+    @Override
+    public void start(peiyi p)
     {
         if (gameRecordManager == null) {
             throw new IllegalStateException("未配置战绩管理器");
         }
-        return start(p, gameRecordManager);
+        start(p, gameRecordManager);
     }
-    public GameStatus start(peiyi p, GameRecordManager gameRecordManager)
+    GameStatus start(peiyi p, GameRecordManager gameRecordManager)
     {
-        //提供给UI类，开始一局游戏
+        //供包内初始化与特征测试使用
         //参数：配役p
         //返回值：游戏状态
         //函数体中有可能向UI类添加一系列事件

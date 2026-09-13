@@ -9,10 +9,9 @@ public interface MainLogicInterface
 {
     GameContextView getGameContext();//提供给UI类，封装后的游戏状态只读访问
     GameRecorder getRecorder();//提供给Replay系统，获取当前对局的录制器
-    GameStatus start(peiyi p);
+    void start(peiyi p);
     //提供给UI类，开始一局游戏
     //参数：配役p
-    //返回值：游戏状态
     //函数体中有可能向UI类添加一系列事件
     boolean shokei(int cxMethod, List<Integer> chuxingList,boolean huibi);
     //提供给UI类，主逻辑现在进行投票判定

@@ -6,24 +6,22 @@ import com.vocr.domain.GameResult;
 import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;
 
-public class GameStatus
+final class GameStatus
 {//游戏状态封装类
-    public peiyi p;//游戏配役
-    public boolean isInGame;//当前是否在游戏中
-    public GameResult end;//当前游戏是否结束 GameResult.NONE/VILLAGE_WIN/WOLF_WIN/FOX_WIN
-    public int gameDay;//游戏进行到多少日目
+    peiyi p;//游戏配役
+    GameResult end;//当前游戏是否结束 GameResult.NONE/VILLAGE_WIN/WOLF_WIN/FOX_WIN
+    int gameDay;//游戏进行到多少日目
     private int deathCounter;//游戏中当前的死亡人数计数
     private int aliveCounter;//游戏中当前的存活人数计数
     GameCharacter[] gc;//游戏角色数组 int[CharecterSum+1]
-    public GameStatus()
+    GameStatus()
     {//普通的构造函数。构造时赋初值-1，表示游戏还未开始
         //初始化游戏状态的其他字段
-        this.isInGame = true;
         this.end = GameResult.NONE;
         this.gameDay = 1;
         this.deathCounter = 0;
     }
-    public void startGame(peiyi p)  //开始一局游戏
+    void startGame(peiyi p)  //开始一局游戏
     {
         //游戏初始化，参数：游戏配役编号
         //...

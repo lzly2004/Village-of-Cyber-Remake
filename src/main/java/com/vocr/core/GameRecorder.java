@@ -58,7 +58,7 @@ public class GameRecorder
 
     // ==================== 游戏生命周期 ====================
 
-    public void startGame(peiyi p, long seed, int playerCount, GameStatus gs)
+    void startGame(peiyi p, long seed, int playerCount, GameStatus gs)
     {
         this.active = true;
         this.records.clear();
@@ -236,7 +236,7 @@ public class GameRecorder
 
     // ==================== 状态快照 ====================
 
-    public void recordStateSnapshot(int day, GameStatus gs)
+    void recordStateSnapshot(int day, GameStatus gs)
     {
         if (!active) return;
         snapshotWriter.writeStateSnapshot(day, gs);
