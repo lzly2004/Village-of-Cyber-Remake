@@ -20,10 +20,6 @@ Thumbs.db
 # Native库
 src/main/java/com/vocr/*.dll
 
-# 回归测试基线
-baseline/
-baseline_new/
-
 # 临时输出
 *.log
 

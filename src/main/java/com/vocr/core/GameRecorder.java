@@ -4,15 +4,11 @@ import com.vocr.logging.DebugLogger;
 
 import com.vocr.domain.peiyi;
 
-import com.vocr.config.PathConfig;
 import com.vocr.history.GameRecord;
 import com.vocr.history.GameRecordManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,16 +20,16 @@ import java.util.Map;
  * 游戏录像/回归测试录制器 — 第0步核心基础设施。
  *
  * 录制一局完整游戏的初始化信息、每日状态、投票和终局记录,用于:
- *   1. 重构前后行为对比(回归测试)
+ *   1. 重构前后行为对比(内存轨迹摘要测试)
  *   2. 游戏回放/复盘
  *   3. Bug复现
  *
  * 使用方式:
- *   GameRecorder recorder = new GameRecorder("baseline/peiyi_1_seed_42");
+ *   GameRecorder recorder = new GameRecorder("replay_peiyi_1");
  *   recorder.startGame(peiyi, seed, playerCount, gameStatus);
  *   // ... 游戏进行中调用每日快照和投票记录方法 ...
  *   recorder.endGame(endResult, gameDay);
- *   recorder.save(); // 保存到文件
+ *   List<String> records = recorder.getRecords();
  */
 public class GameRecorder
 {
@@ -41,7 +37,6 @@ public class GameRecorder
     private final List<String> records;      // 结构化记录
     private final GameSnapshotRecordWriter snapshotWriter;
     private boolean active = false;          // 是否正在录制
-    private int gameDurationDays = 0;
     private final GameRecordManager gameRecordManager;
 
     private static final DateTimeFormatter DT_FMT =
@@ -114,7 +109,6 @@ public class GameRecorder
     public void endGame(int endResult, int gameDay)
     {
         this.active = false;
-        this.gameDurationDays = gameDay;
         String resultStr = switch (endResult) {
             case 0 -> "UNFINISHED";
             case 1 -> "VILLAGE_WIN";
@@ -147,41 +141,9 @@ public class GameRecorder
         snapshotWriter.writeVoteData(day, ctx);
     }
 
-    // ==================== 保存 ====================
-
-    public void save(String filePath)
-    {
-        records.add("# ==========================================");
-        records.add("# End of recording: " + runLabel);
-        records.add("# Duration: " + gameDurationDays + " days");
-        records.add("# Saved: " + LocalDateTime.now().format(DT_FMT));
-        records.add("# ==========================================");
-
-        try
-        {
-            java.io.File dir = new java.io.File(filePath).getParentFile();
-            if (dir != null && !dir.exists()) dir.mkdirs();
-
-            try (PrintWriter pw = new PrintWriter(new FileWriter(filePath)))
-            {
-                for (String line : records)
-                    pw.println(line);
-            }
-            DebugLogger.info("[GameRecorder] 录制文件已保存: " + filePath +
-                    " (" + records.size() + " 条记录)");
-        }
-        catch (IOException e)
-        {
-            DebugLogger.error("[GameRecorder] 保存录制文件失败: " + e.getMessage());
-        }
-    }
-
-    public void save() { save(PathConfig.baselineFile(runLabel)); }
-
     // ==================== 获取器 ====================
 
     public List<String> getRecords() { return new ArrayList<>(records); }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
-    public String getRunLabel() { return runLabel; }
 }
