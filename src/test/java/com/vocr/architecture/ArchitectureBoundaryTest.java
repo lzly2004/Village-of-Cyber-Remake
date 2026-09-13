@@ -7,6 +7,8 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
+import com.vocr.core.MainLogicInterface;
+import com.vocr.domain.peiyi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -56,6 +58,29 @@ class ArchitectureBoundaryTest {
                         "com.vocr.resources..",
                         "com.vocr.ui..")
                 .because("核心对局逻辑不应反向依赖启动层、界面或录像与资源实现")
+                .check(productionClasses);
+    }
+
+    @Test
+    void applicationShouldRemainIndependentFromPresentationAndInfrastructureImplementations() {
+        noClasses()
+                .that().resideInAPackage("com.vocr.application..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "com.vocr.app..",
+                        "com.vocr.history..",
+                        "com.vocr.replay..",
+                        "com.vocr.resources..",
+                        "com.vocr.ui..")
+                .because("应用用例应能被桌面端、Web端和测试共同调用")
+                .check(productionClasses);
+    }
+
+    @Test
+    void uiShouldStartGamesThroughApplicationLayer() {
+        noClasses()
+                .that().resideInAPackage("com.vocr.ui..")
+                .should().callMethod(MainLogicInterface.class, "start", peiyi.class)
+                .because("开局用例已经迁移到平台无关应用层，UI不应再次绕过该入口")
                 .check(productionClasses);
     }
 
@@ -140,6 +165,7 @@ class ArchitectureBoundaryTest {
         noClasses()
                 .that().resideInAnyPackage(
                         "com.vocr.config..",
+                        "com.vocr.application..",
                         "com.vocr.core..",
                         "com.vocr.domain..",
                         "com.vocr.history..",

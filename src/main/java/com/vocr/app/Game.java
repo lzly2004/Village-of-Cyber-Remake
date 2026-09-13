@@ -1,5 +1,6 @@
 package com.vocr.app;
 
+import com.vocr.application.GameApplication;
 import com.vocr.logging.DebugLogger;
 import com.vocr.core.MainLogic;
 import com.vocr.history.GameRecordManager;
@@ -15,6 +16,7 @@ public class Game
     UI ui;
     Resources resources;
     MainLogic mainlogic;
+    GameApplication gameApplication;
     ReplayManager replayManager;
     GameRecordManager gameRecordManager;
     private Game()
@@ -24,7 +26,9 @@ public class Game
         this.gameRecordManager = new GameRecordManager();
         this.ui = new UI(resources, replayManager, gameRecordManager);
         this.mainlogic = new MainLogic(ui::addEvent, gameRecordManager);
+        this.gameApplication = new GameApplication(mainlogic);
         this.ui.attachMainLogic(mainlogic);
+        this.ui.attachGameApplication(gameApplication);
     }
     public static Game getInstance()
     {

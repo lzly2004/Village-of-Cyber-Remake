@@ -1,5 +1,6 @@
 package com.vocr.ui;
 
+import com.vocr.application.GameApplication;
 import com.vocr.logging.DebugLogger;
 import com.vocr.core.MainLogicInterface;
 import com.vocr.resources.ResourcesInterface;
@@ -146,6 +147,7 @@ public class UI implements UIInterface
     GameContextView ctx;//封装后的游戏状态只读访问
     final ResourcesInterface resources;//资源接口
     MainLogicInterface mainLogic;//主逻辑接口
+    GameApplication gameApplication;//逐步承接平台无关的业务操作
     final ReplayManager replayManager;//回放管理器
     final GameRecordManager gameRecordManager;//战绩管理器
     UIComponentFactory uiComponentFactory;
@@ -159,6 +161,10 @@ public class UI implements UIInterface
 
     public void attachMainLogic(MainLogicInterface mainLogic) {
         this.mainLogic = Objects.requireNonNull(mainLogic, "主逻辑不能为空");
+    }
+
+    public void attachGameApplication(GameApplication gameApplication) {
+        this.gameApplication = Objects.requireNonNull(gameApplication, "对局应用入口不能为空");
     }
 
     /** 获取玩家职业图标文本（便捷转发） */
@@ -221,6 +227,9 @@ public class UI implements UIInterface
     {
         if (mainLogic == null) {
             throw new IllegalStateException("UI 尚未关联主逻辑");
+        }
+        if (gameApplication == null) {
+            throw new IllegalStateException("UI 尚未关联对局应用入口");
         }
         ctx = mainLogic.getGameContext();
 

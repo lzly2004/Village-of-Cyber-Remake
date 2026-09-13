@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.application.StartGameCommand;
+import com.vocr.application.StartedGame;
 import com.vocr.logging.DebugLogger;
 
 import com.vocr.domain.CharacterEnglishName;
@@ -45,9 +47,10 @@ public class GameSceneHandler implements SceneHandler {
             btn1.addActionListener(e -> {
                 ui.levelName = "game" + j + "-1.png";
                 ui.resources.playSound("click.wav");
-                ui.mainLogic.start(peiyi.values()[j]);
+                StartedGame startedGame = ui.gameApplication.startGame(
+                        new StartGameCommand(peiyi.values()[j]));
                 ui.ctx = ui.mainLogic.getGameContext();
-                int playerSum = ui.ctx.getPlayerSum();
+                int playerSum = startedGame.playerCount();
                 ui.skillTargetPeople = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];
                 ui.skillTargetNames = new String[playerSum + 1][GameConstants.MAX_GAME_DAYS];
                 ui.skillTargetOrder = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];
