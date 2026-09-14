@@ -17,9 +17,21 @@ import java.util.List;
  */
 class CharacterSelectionPanel {
 
-    private static final String[] FRAME_ICONS = {"frameSBlue.png", "frameSRed.png", "frameOrange.png"};
-    private static final String[] RESULT_ALL_ICONS = {"result2_all.png", "result1_all.png", "result3_all.png"};
-    private static final String[] DRAG_ALL_ICONS = {"touhyou.png", "uranaiAll.png", "goeiAll.png"};
+    private static final UiImage[] FRAME_ICONS = {
+            UiImage.SELECTION_FRAME_VOTE,
+            UiImage.SELECTION_FRAME_DIVINATION,
+            UiImage.SELECTION_FRAME_GUARD
+    };
+    private static final UiImage[] RESULT_ALL_ICONS = {
+            UiImage.VOTE_RESULT_ALL,
+            UiImage.DIVINATION_RESULT_ALL,
+            UiImage.GUARD_RESULT_ALL
+    };
+    private static final UiImage[] DRAG_ALL_ICONS = {
+            UiImage.VOTE_DRAG,
+            UiImage.DIVINATION_DRAG,
+            UiImage.GUARD_DRAG
+    };
     private static final int[] ROLE_FILTERS = {0, 1, 3};
 
     static void render(UI ui, VoteButtonPanel vp, VoteInfoRenderer vi,
@@ -36,9 +48,9 @@ class CharacterSelectionPanel {
         int n = ui.ctx.getPlayerSum() + 1;
 
         int typeIdx = type.ordinal();
-        String frameIconName = FRAME_ICONS[typeIdx];
-        String resultAllIconName = RESULT_ALL_ICONS[typeIdx];
-        String dragAllIconName = DRAG_ALL_ICONS[typeIdx];
+        UiImage frameIcon = FRAME_ICONS[typeIdx];
+        UiImage resultAllIcon = RESULT_ALL_ICONS[typeIdx];
+        UiImage dragAllIcon = DRAG_ALL_ICONS[typeIdx];
         int claimedRoleFilter = ROLE_FILTERS[typeIdx];
 
         List<Integer> roleNums = new ArrayList<>();
@@ -71,7 +83,7 @@ class CharacterSelectionPanel {
                 panel.add(crLabel);
             }
 
-            JLabel chooseLabel = new JLabel(ui.resources.getImage(frameIconName));
+            JLabel chooseLabel = new JLabel(ui.resources.getImage(frameIcon));
             frameLabels.add(chooseLabel);
             chooseLabel.setBounds(handler.charGridX(i, 60, 74), handler.charGridY(i, 20, 128), 64, 98);
             panel.add(chooseLabel);
@@ -86,7 +98,7 @@ class CharacterSelectionPanel {
                 voteLabel.setVisible(ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay()));
             }
 
-            JLabel resultLabel = new JLabel(ui.resources.getImage(resultAllIconName));
+            JLabel resultLabel = new JLabel(ui.resources.getImage(resultAllIcon));
             resultLabels.add(resultLabel);
             resultLabel.setBounds(handler.charGridX(i, 65, 74), handler.charGridY(i, 40, 148),
                     resultLabel.getIcon().getIconWidth(), resultLabel.getIcon().getIconHeight());
@@ -124,10 +136,9 @@ class CharacterSelectionPanel {
         panel.add(LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 200 + vi.boardIcon.getIconWidth(), 50 + vi.boardIcon.getIconHeight(), vi.boardIcon));
 
+        ImageIcon dragIcon = ui.resources.getImage(dragAllIcon);
         JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button, 250, 350,
-                ui.resources.getImage(dragAllIconName).getIconWidth() / 2,
-                ui.resources.getImage(dragAllIconName).getIconHeight() / 2,
-                ui.resources.getImage(dragAllIconName));
+                dragIcon.getIconWidth() / 2, dragIcon.getIconHeight() / 2, dragIcon);
         dragBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseReleased(java.awt.event.MouseEvent e) {

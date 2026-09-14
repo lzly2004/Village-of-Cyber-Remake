@@ -228,7 +228,14 @@ public class UIHelpers {
     }
 
     public static JLabel createIconLabel(UI ui, String imageName, int x, int y) {
-        ImageIcon icon = ui.resources.getImage(imageName);
+        return createIconLabel(ui.resources.getImage(imageName), x, y);
+    }
+
+    public static JLabel createIconLabel(UI ui, UiImage image, int x, int y) {
+        return createIconLabel(ui.resources.getImage(image), x, y);
+    }
+
+    private static JLabel createIconLabel(ImageIcon icon, int x, int y) {
         if (icon == null) return null;
         JLabel label = new JLabel(icon);
         label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());

@@ -50,11 +50,42 @@ public enum UiImage {
     RECORD_WOLF_WINS("SE_WinNumber2.png"),
     RECORD_FOX_WINS("SE_WinNumber3.png"),
 
+    SELECTION_FRAME_VOTE("frameSBlue.png"),
+    SELECTION_FRAME_DIVINATION("frameSRed.png"),
+    SELECTION_FRAME_GUARD("frameOrange.png"),
     VOTE_RESULT_ALL("result2_all.png"),
+    DIVINATION_RESULT_ALL("result1_all.png"),
+    GUARD_RESULT_ALL("result3_all.png"),
+    VOTE_DRAG("touhyou.png"),
     DIVINATION_DRAG("uranaiAll.png"),
+    GUARD_DRAG("goeiAll.png"),
     DELETE("delete.png"),
     HISTORY_BACK("rirekiBack.png"),
-    HISTORY_NEXT("rirekiNext.png");
+    HISTORY_NEXT("rirekiNext.png"),
+
+    VOTE_CONFIRM("goTohyo.png"),
+    VOTE_INFO("check.png"),
+    DESIGNATION_MENU("shiji.png"),
+    AVOID_DISABLE("关闭回避.png"),
+    AVOID_ENABLE("开启回避.png"),
+    GAME_MENU("IntroTitle.png"),
+    VOTE_GREY("tohyoGrey.png"),
+    VOTE_FREE("tohyoFree.png"),
+    SUSPICION_INFO("checkUtagai.png"),
+    VOTE_HISTORY("checkTohyo.png"),
+    CLAIM_MENU("doCO.png"),
+    POWER_PLAY("doShitei.png"),
+    ACTION_RETURN("return.png"),
+    NEXT_DAY("nextDay.png"),
+    DESIGNATED_VOTE("tohyoShitei.png"),
+    ASK_CLAIM("询问CO.png"),
+    CLAIM_MEDIUM("reiCO.png"),
+    CLAIM_HUNTER("kariCO.png"),
+    CLAIM_SEER("uranaiCO.png"),
+    CLAIM_SHARED("kyouyuCO.png"),
+    CLAIM_CAT("catCO.png"),
+    DESIGNATED_DIVINATION("shiteiUranai.png"),
+    DESIGNATED_GUARD("shiteiGoei.png");
 
     private static final String IMAGE_DIRECTORY = "/images/";
 

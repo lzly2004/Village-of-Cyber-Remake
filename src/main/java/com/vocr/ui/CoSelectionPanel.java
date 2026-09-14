@@ -54,18 +54,21 @@ class CoSelectionPanel {
                         ui.ctx.getClaimedRoleOrder(i), 60 + 74 * charIndex, baseY);
                 if (claimedRoleLabel != null) infoCoPanel.add(claimedRoleLabel);
             }
-            JLabel chooseLabel = UIHelpers.createIconLabel(ui, "frameSRed.png", 60 + 74 * charIndex, baseY);
+            JLabel chooseLabel = UIHelpers.createIconLabel(
+                    ui, UiImage.SELECTION_FRAME_DIVINATION, 60 + 74 * charIndex, baseY);
             frameLabels.add(chooseLabel);
             infoCoPanel.add(chooseLabel);
             chooseLabel.setVisible(false);
 
-            JLabel voteLabel = UIHelpers.createIconLabel(ui, "result2_all.png", 60 + 5 + 74 * charIndex, baseY);
+            JLabel voteLabel = UIHelpers.createIconLabel(
+                    ui, UiImage.VOTE_RESULT_ALL, 60 + 5 + 74 * charIndex, baseY);
             infoCoPanel.add(voteLabel);
             infoCoPanel.setComponentZOrder(voteLabel, 0);
             voteLabel.setVisible(false);
             if (ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay())) voteLabel.setVisible(true);
 
-            JLabel voteAllLabel = UIHelpers.createIconLabel(ui, "result1_all.png", 60 + 5 + 74 * charIndex, baseY + 20);
+            JLabel voteAllLabel = UIHelpers.createIconLabel(
+                    ui, UiImage.DIVINATION_RESULT_ALL, 60 + 5 + 74 * charIndex, baseY + 20);
             infoCoPanel.add(voteAllLabel);
             resultLabels.add(voteAllLabel);
             voteAllLabel.setVisible(false);

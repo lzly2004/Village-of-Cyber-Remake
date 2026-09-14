@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.UiImage;
+
 import javax.swing.*;
 
 /**
@@ -16,33 +18,38 @@ class VoteButtonPanel {
     JScrollPane scrollPane1;
 
     void create(UI ui) {
-        voteBtn = createVisibleButton(ui, 1060, 720 - 40 - 126, "goTohyo.png");
-        recordBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 2 - 10, "check.png");
-        pointBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 3 - 20, "shiji.png");
-        avoidBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 4 - 30, "关闭回避.png");
-        avoidBtn1 = createHiddenButton(ui, 1060, 720 - 40 - 126 * 4 - 30, "开启回避.png");
-        menuBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 5 - 40, "IntroTitle.png");
+        voteBtn = createVisibleButton(ui, 1060, 720 - 40 - 126, UiImage.VOTE_CONFIRM);
+        recordBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 2 - 10, UiImage.VOTE_INFO);
+        pointBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 3 - 20, UiImage.DESIGNATION_MENU);
+        avoidBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 4 - 30, UiImage.AVOID_DISABLE);
+        avoidBtn1 = createHiddenButton(ui, 1060, 720 - 40 - 126 * 4 - 30, UiImage.AVOID_ENABLE);
+        menuBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 5 - 40, UiImage.GAME_MENU);
         menuBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
 
-        greyBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, "tohyoGrey.png");
-        freeBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, "tohyoFree.png");
-        doubtBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, "checkUtagai.png");
-        votehisBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, "checkTohyo.png");
-        coBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, "doCO.png");
-        ppBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, "doShitei.png");
-        returnBtn = createHiddenButton(ui, 1060, 720 - 40 - 126, "return.png");
-        nextBtn = createHiddenButton(ui, 1060, 720 - 40 - 126, "nextDay.png");
-        againBtn = createHiddenButton(ui, 1060, 720 - 40 - 126, "goTohyo.png");
-        readyVoteBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, "tohyoShitei.png");
-        askCoBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 4 - 30, "询问CO.png");
-        reiBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, "reiCO.png");
-        kariBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, "kariCO.png");
-        uranaiBtn = createHiddenButton(ui, 1060 - 194 - 30, 720 - 40 - 126 * 3 - 20, "uranaiCO.png");
-        kyouyuBtn = createHiddenButton(ui, 1060 - 194 - 30, 720 - 40 - 126 * 2 - 10, "kyouyuCO.png");
-        catBtn = createHiddenButton(ui, 1060 - 194 - 30, 720 - 40 - 126, "catCO.png");
-        fixedVoteBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, "tohyoShitei.png");
-        fixedUranaiBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, "shiteiUranai.png");
-        protectBtn = createHiddenButton(ui, 1060, 720 - 40 - 126, "shiteiGoei.png");
+        greyBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, UiImage.VOTE_GREY);
+        freeBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, UiImage.VOTE_FREE);
+        doubtBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, UiImage.SUSPICION_INFO);
+        votehisBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, UiImage.VOTE_HISTORY);
+        coBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, UiImage.CLAIM_MENU);
+        ppBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, UiImage.POWER_PLAY);
+        returnBtn = createHiddenButton(ui, 1060, 720 - 40 - 126, UiImage.ACTION_RETURN);
+        nextBtn = createHiddenButton(ui, 1060, 720 - 40 - 126, UiImage.NEXT_DAY);
+        againBtn = createHiddenButton(ui, 1060, 720 - 40 - 126, UiImage.VOTE_CONFIRM);
+        readyVoteBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, UiImage.DESIGNATED_VOTE);
+        askCoBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 4 - 30, UiImage.ASK_CLAIM);
+        reiBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 3 - 20, UiImage.CLAIM_MEDIUM);
+        kariBtn = createHiddenButton(ui, 1060, 720 - 40 - 126 * 2 - 10, UiImage.CLAIM_HUNTER);
+        uranaiBtn = createHiddenButton(
+                ui, 1060 - 194 - 30, 720 - 40 - 126 * 3 - 20, UiImage.CLAIM_SEER);
+        kyouyuBtn = createHiddenButton(
+                ui, 1060 - 194 - 30, 720 - 40 - 126 * 2 - 10, UiImage.CLAIM_SHARED);
+        catBtn = createHiddenButton(ui, 1060 - 194 - 30, 720 - 40 - 126, UiImage.CLAIM_CAT);
+        fixedVoteBtn = createHiddenButton(
+                ui, 1060, 720 - 40 - 126 * 3 - 20, UiImage.DESIGNATED_VOTE);
+        fixedUranaiBtn = createHiddenButton(
+                ui, 1060, 720 - 40 - 126 * 2 - 10, UiImage.DESIGNATED_DIVINATION);
+        protectBtn = createHiddenButton(
+                ui, 1060, 720 - 40 - 126, UiImage.DESIGNATED_GUARD);
 
         if (ui.isAvoid) { avoidBtn.setVisible(true); avoidBtn1.setVisible(false); }
         else { avoidBtn1.setVisible(true); avoidBtn.setVisible(false); }
@@ -51,14 +58,16 @@ class VoteButtonPanel {
         if (!scrollPane1.isAncestorOf(ui.jPanel)) ui.jPanel.add(scrollPane1);
     }
 
-    private JButton createVisibleButton(UI ui, int x, int y, String imageName) {
-        JButton btn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, ui.resources.getImage(imageName));
+    private JButton createVisibleButton(UI ui, int x, int y, UiImage image) {
+        JButton btn = ButtonSimpleFactory.makeButton(
+                ButtonConst.Simple_Button, x, y, ui.resources.getImage(image));
         ui.jPanel.add(btn);
         return btn;
     }
 
-    private JButton createHiddenButton(UI ui, int x, int y, String imageName) {
-        JButton btn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, ui.resources.getImage(imageName));
+    private JButton createHiddenButton(UI ui, int x, int y, UiImage image) {
+        JButton btn = ButtonSimpleFactory.makeButton(
+                ButtonConst.Simple_Button, x, y, ui.resources.getImage(image));
         btn.setVisible(false);
         ui.jPanel.add(btn);
         return btn;
