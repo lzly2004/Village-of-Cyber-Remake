@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
+import com.vocr.resources.UiImage;
 import com.vocr.logging.DebugLogger;
 
 // StartSceneHandler.java - 新建文件
@@ -26,7 +27,7 @@ public class StartSceneHandler implements SceneHandler {
 
         JLabel titleLabel = LabelSimpleFactory.makeLabel(
                 LabelConst.Black_Label, 600, 200, 554, 138,
-                ui.resources.getImage("titleLogo.png")
+                ui.resources.getImage(UiImage.TITLE_LOGO)
         );
         ui.jPanel.add(titleLabel);
 
@@ -39,21 +40,21 @@ public class StartSceneHandler implements SceneHandler {
 
         JButton btnStart = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x, y, width, height,
-                ui.resources.getImage("startButton.png")
+                ui.resources.getImage(UiImage.START_BUTTON)
         );
         UIHelpers.setButtonSceneTransitionNoSound(btnStart, ui, UI.Scene.GAME_SCENE_SELECT);
         ui.jPanel.add(btnStart);
 
         JButton btnContinue = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x + x_div, y, width, height,
-                ui.resources.getImage("continueButton.png")
+                ui.resources.getImage(UiImage.CONTINUE_BUTTON)
         );
         UIHelpers.setButtonListener(btnContinue, ui, () -> {});
         ui.jPanel.add(btnContinue);
 
         JButton btnSave = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x, y + y_div, width, height,
-                ui.resources.getImage("replayButton.png")
+                ui.resources.getImage(UiImage.REPLAY_BUTTON)
         );
         UIHelpers.setButtonListener(btnSave, ui, () -> {
             ui.replayPage = 0;
@@ -63,7 +64,7 @@ public class StartSceneHandler implements SceneHandler {
 
         JButton btnRecord = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x + x_div, y + y_div, width, height,
-                ui.resources.getImage("recordButton.png")
+                ui.resources.getImage(UiImage.RECORD_BUTTON)
         );
         UIHelpers.setButtonListener(btnRecord, ui, () -> {
             ui.recordPage = 0;
@@ -73,7 +74,7 @@ public class StartSceneHandler implements SceneHandler {
 
         JButton btnInfo = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x, y + y_div * 2, width, height,
-                ui.resources.getImage("infoButton.png")
+                ui.resources.getImage(UiImage.INFO_BUTTON)
         );
         UIHelpers.setButtonListener(btnInfo, ui, () -> {
             ui.currentScene = UI.Scene.INFO_SCENE;
@@ -84,7 +85,7 @@ public class StartSceneHandler implements SceneHandler {
 
         JButton btnCollections = ButtonSimpleFactory.makeButton(
                 ButtonConst.Simple_Button, x + x_div, y + y_div * 2, width, height,
-                ui.resources.getImage("collectionsButton.png")
+                ui.resources.getImage(UiImage.COLLECTIONS_BUTTON)
         );
         UIHelpers.setButtonListener(btnCollections, ui, () -> {});
         ui.jPanel.add(btnCollections);

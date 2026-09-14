@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.domain.GameContextView;
 
@@ -93,7 +94,7 @@ class CoSelectionPanel {
         JLabel infoBoard = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 200 + vi.boardIcon.getIconWidth(), 50 + vi.boardIcon.getIconHeight(), vi.boardIcon);
 
-        ImageIcon dragIcon = ui.resources.getImage("uranaiAll.png");
+        ImageIcon dragIcon = ui.resources.getImage(UiImage.DIVINATION_DRAG);
         JButton dragBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button, 250, 350,
                 dragIcon.getIconWidth() / 2, dragIcon.getIconHeight() / 2, dragIcon);
         dragBtn.addMouseListener(new MouseAdapter() {
@@ -124,7 +125,7 @@ class CoSelectionPanel {
         });
         infoCoPanel.add(dragBtn);
 
-        dragIcon = ui.resources.getImage("delete.png");
+        dragIcon = ui.resources.getImage(UiImage.DELETE);
         JButton dragBtn_delete = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button, 800, 350,
                 dragIcon.getIconWidth() / 2, dragIcon.getIconHeight() / 2, dragIcon);
         dragBtn_delete.addMouseListener(new MouseAdapter() {

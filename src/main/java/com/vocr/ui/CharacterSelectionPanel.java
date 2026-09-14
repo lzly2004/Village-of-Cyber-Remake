@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.SelectionType;
@@ -77,7 +78,7 @@ class CharacterSelectionPanel {
             chooseLabel.setVisible(selectedTargets.contains(i));
 
             if (type == SelectionType.VOTE) {
-                JLabel voteLabel = new JLabel(ui.resources.getImage("result2_all.png"));
+                JLabel voteLabel = new JLabel(ui.resources.getImage(UiImage.VOTE_RESULT_ALL));
                 voteLabel.setBounds(handler.charGridX(i, 65, 74), handler.charGridY(i, 20, 128),
                         voteLabel.getIcon().getIconWidth(), voteLabel.getIcon().getIconHeight());
                 panel.add(voteLabel);
@@ -211,9 +212,9 @@ class CharacterSelectionPanel {
 
         JButton delBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,
                 (type == SelectionType.VOTE) ? 500 : 800, 350,
-                ui.resources.getImage("delete.png").getIconWidth() / 2,
-                ui.resources.getImage("delete.png").getIconHeight() / 2,
-                ui.resources.getImage("delete.png"));
+                ui.resources.getImage(UiImage.DELETE).getIconWidth() / 2,
+                ui.resources.getImage(UiImage.DELETE).getIconHeight() / 2,
+                ui.resources.getImage(UiImage.DELETE));
         delBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseReleased(java.awt.event.MouseEvent e) {

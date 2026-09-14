@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.resources.UiImage;
+
 // InfoSceneHandler.java - 信息界面场景处理器
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +27,7 @@ public class InfoSceneHandler implements SceneHandler {
 
     private void renderMain(UI ui) {
         ui.jPanel.removeAll();
-        ImageIcon btnNext = ui.resources.getImage("avg_button2.png");
+        ImageIcon btnNext = ui.resources.getImage(UiImage.INFO_NEXT);
         JButton btn_next[] = new JButton[6];
         for (int i = 1; i <= 5; i++) {
             final int j = i;
@@ -37,10 +39,10 @@ public class InfoSceneHandler implements SceneHandler {
         }
         JLabel backgroundLabel = UIHelpers.createBackgroundLabel(ui, "PVBG.png");
         JLabel backgroundLabel_2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
-                ui.resources.getImage("avg1_resized(3).png"));
+                ui.resources.getImage(UiImage.INFO_PANEL));
         JButton btnMenu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
                 UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT,
-                ui.resources.getImage("PVBtitile.png"));
+                ui.resources.getImage(UiImage.TITLE_RETURN));
         btnMenu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(btnMenu);
         ui.jPanel.add(backgroundLabel_2);
@@ -55,14 +57,14 @@ public class InfoSceneHandler implements SceneHandler {
         ui.jPanel.removeAll();
         JLabel bg = UIHelpers.createBackgroundLabel(ui, "PVBG.png");
         JLabel bg2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
-                ui.resources.getImage("avg1_resized(3).png"));
+                ui.resources.getImage(UiImage.INFO_PANEL));
         JButton menu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
                 UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT,
-                ui.resources.getImage("PVBtitile.png"));
+                ui.resources.getImage(UiImage.TITLE_RETURN));
         menu.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         JButton back = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 400,
                 UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT,
-                ui.resources.getImage("PVBreturn.png"));
+                ui.resources.getImage(UiImage.NAVIGATION_RETURN));
         back.addActionListener(e -> ui.transitionTo(backTarget));
         return new InfoBackground(ui, bg, bg2, menu, back);
     }
@@ -94,7 +96,7 @@ public class InfoSceneHandler implements SceneHandler {
         JButton btn_next[] = new JButton[subSum + 1];
         for (int i = 1; i <= subSum; i++) {
             final int currentIndex = i;
-            btnNext[i] = ui.resources.getImage("avg_button2.png");
+            btnNext[i] = ui.resources.getImage(UiImage.INFO_NEXT);
             btn_next[i] = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                     80, 70 * i + 10, 222, 50,
                     ui.resources.getHelpText("Info" + scene.FirstInfoNum() + "-" + i + ".txt"), btnNext[i]);

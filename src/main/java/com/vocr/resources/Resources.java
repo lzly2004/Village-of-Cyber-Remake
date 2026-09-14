@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,6 +28,7 @@ public class Resources implements ResourcesInterface {
     // 音频相关
     private Clip currentBgm;
     private BgmTrack currentBgmTrack;
+    private final Map<UiImage, ImageIcon> fixedImageCache = new EnumMap<>(UiImage.class);
     // 台词资源：角色名 → 事件名 → 台词数据
     private Map<String, Map<String, LineData>> lineResource;
     // 台词参数占位符正则（<param=xxx>）
@@ -134,35 +136,62 @@ public class Resources implements ResourcesInterface {
     }
 
     private ImageIcon getGlobalDefaultImage() {
-        // 全局default不是ImageLineData，直接取"all"对应的字符串
+        // 全局 default 属于数据驱动映射；配置存在时继续尊重配置内容。
         Object defaultObj = eventImageMapping.get("default");
-        String defaultImageName = "frame.png";
-
-        if (defaultObj instanceof Map<?, ?>) {
-            Map<?, ?> defaultMap = (Map<?, ?>) defaultObj;
-            // 直接取"all"字段的值
-            if (defaultMap.containsKey("all") && defaultMap.get("all") instanceof String) {
-                defaultImageName = (String) defaultMap.get("all");
+        if (defaultObj instanceof Map<?, ?> defaultMap) {
+            Object imageName = defaultMap.get("all");
+            if (imageName instanceof String configuredImageName) {
+                return getImage(configuredImageName);
             }
         }
-        return getImage(defaultImageName);
+        return getImage(UiImage.FALLBACK);
     }
 
     //基础资源加载方法
     @Override
+    public ImageIcon getImage(UiImage image) {
+        Objects.requireNonNull(image, "固定图片不能为空");
+        ImageIcon cached = fixedImageCache.get(image);
+        if (cached != null) {
+            return cached;
+        }
+        ImageIcon loaded = loadImage(image.resourcePath());
+        fixedImageCache.put(image, loaded);
+        return loaded;
+    }
+
+    @Override
     public ImageIcon getImage(String imageName) {
+        if (imageName == null || imageName.isBlank()) {
+            DebugLogger.error("图片名称为空，使用兜底图片");
+            return getImage(UiImage.FALLBACK);
+        }
+        return loadImage("/images/" + imageName);
+    }
+
+    private ImageIcon loadImage(String resourcePath) {
         try {
-            // 拼接路径：/image/ + 图片名（适配resources/image目录）
-            URL imageUrl = getClass().getResource("/images/" + imageName);
+            URL imageUrl = getClass().getResource(resourcePath);
             if (imageUrl == null) {
-                DebugLogger.error("未找到图片" + imageName);
-                return getImage("frame.png");
+                return fallbackImage(resourcePath, "未找到图片: " + resourcePath, null);
             }
             return new ImageIcon(imageUrl);
         } catch (Exception e) {
-            DebugLogger.warn("图片" + imageName + "加载失败，使用兜底图片", e);
-            return getImage("frame.png");
+            return fallbackImage(resourcePath, "图片加载失败: " + resourcePath, e);
         }
+    }
+
+    private ImageIcon fallbackImage(String failedPath, String message, Exception cause) {
+        if (cause == null) {
+            DebugLogger.error(message);
+        } else {
+            DebugLogger.warn(message + "，使用兜底图片", cause);
+        }
+        if (UiImage.FALLBACK.resourcePath().equals(failedPath)) {
+            DebugLogger.error("兜底图片自身不可用，将返回空图标");
+            return new ImageIcon();
+        }
+        return getImage(UiImage.FALLBACK);
     }
 
     private void loadLineResource() {

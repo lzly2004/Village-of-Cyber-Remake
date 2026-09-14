@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.ResourcesInterface;
+import com.vocr.resources.UiImage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +31,7 @@ public class DialogueBox
         Components c = new Components();
         c.background = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT, bgIcon);
-        ImageIcon backIcon = resources.getImage("messageframe.png");
+        ImageIcon backIcon = resources.getImage(UiImage.MESSAGE_FRAME);
         c.dialogPanel = PanelSimpleFactory.createSimplePanel(260, 450,
                 backIcon.getIconWidth(), backIcon.getIconHeight(), false, true);
         c.back = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,

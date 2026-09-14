@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.logging.DebugLogger;
 
@@ -24,12 +25,12 @@ public class RecordSceneHandler implements SceneHandler {
             ui.jPanel.add(errorMsg);
             JButton fallbackBtn = ButtonSimpleFactory.makeButton(
                     ButtonConst.Simple_Button, 530, 450, 194, 126,
-                    ui.resources.getImage("PVBtitile.png")
+                    ui.resources.getImage(UiImage.TITLE_RETURN)
             );
             fallbackBtn.addActionListener(ev -> ui.transitionTo(UI.Scene.START_SCENE));
             ui.jPanel.add(fallbackBtn);
             // 背景图片（放在最后，确保在最底层）
-            ImageIcon fallbackBg = ui.resources.getImage("title_base_resized.png");
+            ImageIcon fallbackBg = ui.resources.getImage(UiImage.TITLE_BACKGROUND);
             if (fallbackBg != null) {
                 JLabel errorBg = LabelSimpleFactory.makeLabel(
                         LabelConst.Simple_Label, 0, 0,
@@ -106,7 +107,7 @@ public class RecordSceneHandler implements SceneHandler {
         addButton(ui, "PVBtitile.png", btnX, 550, btnW, btnH, ev -> ui.transitionTo(UI.Scene.START_SCENE));
 
         // 背景图片（放在最后，确保在最底层）
-        ImageIcon bgImg = ui.resources.getImage("title_base_resized.png");
+        ImageIcon bgImg = ui.resources.getImage(UiImage.TITLE_BACKGROUND);
         if (bgImg != null) {
             JLabel background = LabelSimpleFactory.makeLabel(
                     LabelConst.Simple_Label, 0, 0,

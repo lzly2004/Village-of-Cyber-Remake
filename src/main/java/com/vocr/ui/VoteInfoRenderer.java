@@ -2,6 +2,7 @@ package com.vocr.ui;
 
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.whyDie;
+import com.vocr.resources.UiImage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ class VoteInfoRenderer {
 
     void render(UI ui) {
         JLabel data = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 880, 10,
-                ui.resources.getImage("hiduke.png"));
+                ui.resources.getImage(UiImage.CALENDAR));
         JTextArea dataText = TextareaSimpleFactory.createBoldTitleTextArea(Color.WHITE, 20,
                 "    " + ui.ctx.getGameDay() + "日目\n 生存者:" + ui.ctx.getAliveCounter()
                         + "\n 死亡者:" + ui.ctx.getDeathCounter()
@@ -105,7 +106,7 @@ class VoteInfoRenderer {
                 .append(GameStrings.SECTION_MEDIUM).append(lingneng)
                 .append(GameStrings.SECTION_EXECUTION).append(chuxing)
                 .append("\n[死体]\n").append(shiti).append("\n[護衛先]\n").append(lieren);
-        boardIcon = ui.resources.getImage("frame #19252.png");
+        boardIcon = ui.resources.getImage(UiImage.REVIEW_BOARD);
         board = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 198,
                 200 + boardIcon.getIconWidth(), 50 + boardIcon.getIconHeight(), boardIcon);
         infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, result.toString());

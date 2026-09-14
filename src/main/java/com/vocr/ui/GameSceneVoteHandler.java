@@ -2,6 +2,7 @@ package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.logging.DebugLogger;
 
@@ -91,7 +92,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         List<BgmTrack> playlist = (ui.ctx.getAliveCounter() - 1) / 2 == 1
                 ? BgmTrack.lateGamePlaylist()
                 : BgmTrack.normalGamePlaylist();
-        ImageIcon musicBtnIcon = ui.resources.getImage("musicBtn.png");
+        ImageIcon musicBtnIcon = ui.resources.getImage(UiImage.MUSIC_BUTTON);
         JButton btnMusic = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 15, 35,
                 UIConstants.RETURN_WIDTH, UIConstants.RETURN_HEIGHT, musicBtnIcon);
         btnMusic.addActionListener(e -> {

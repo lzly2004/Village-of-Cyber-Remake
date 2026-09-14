@@ -2,6 +2,7 @@ package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.application.StartGameCommand;
 import com.vocr.application.StartedGame;
@@ -73,7 +74,7 @@ public class GameSceneHandler implements SceneHandler {
         JButton backBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                 1050, 560,
                 UIConstants.RETURN_WIDTH * 6 / 10, UIConstants.RETURN_HEIGHT * 6 / 10,
-                ui.resources.getImage("PVBtitile.png"));
+                ui.resources.getImage(UiImage.TITLE_RETURN));
         backBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(backBtn);
         UIHelpers.addBackground(ui, "title_base_resized.png");
@@ -92,7 +93,7 @@ public class GameSceneHandler implements SceneHandler {
         ui.jPanel.removeAll();
         JLabel label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT,
-                ui.resources.getImage("komorebi000night01.png"));
+                ui.resources.getImage(UiImage.NIGHT_BACKGROUND));
         ui.jPanel.add(label);
         ui.resizeComponents();
         ui.getJFrame().setVisible(true);

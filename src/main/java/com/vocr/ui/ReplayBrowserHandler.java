@@ -2,6 +2,7 @@ package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.logging.DebugLogger;
 import com.vocr.core.GameRecorder;
@@ -131,7 +132,7 @@ public class ReplayBrowserHandler implements SceneHandler {
 
         JLabel cardBg = LabelSimpleFactory.makeLabel(
                 LabelConst.Simple_Label, 12, 0, w - 12, h,
-                ui.resources.getImage("avg1_resized(3).png")
+                ui.resources.getImage(UiImage.INFO_PANEL)
         );
         slotPanel.add(cardBg);
 

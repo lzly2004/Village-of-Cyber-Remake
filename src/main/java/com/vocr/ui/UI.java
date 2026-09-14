@@ -7,6 +7,7 @@ import com.vocr.application.GameUpdate;
 import com.vocr.logging.DebugLogger;
 import com.vocr.core.MainLogicInterface;
 import com.vocr.resources.ResourcesInterface;
+import com.vocr.resources.UiImage;
 
 import com.vocr.domain.Event;
 import com.vocr.domain.GameContextView;
@@ -210,7 +211,7 @@ public class UI
         jFrame.setSize(UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setLocationRelativeTo(null);
-        ImageIcon frameIcon = new ImageIcon("src/main/resources/images/Icon2.png");
+        ImageIcon frameIcon = resources.getImage(UiImage.WINDOW_ICON);
         jFrame.setIconImage(frameIcon.getImage());
         jPanel = PanelSimpleFactory.createSimplePanel(UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT, true, false);
         diaPanel = PanelSimpleFactory.createSimplePanel(UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT, false, false);

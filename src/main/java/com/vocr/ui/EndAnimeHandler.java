@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.logging.DebugLogger;
+import com.vocr.resources.UiImage;
 
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.GameResult;
@@ -16,7 +17,7 @@ public class EndAnimeHandler implements SceneHandler {
         JButton nextBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                 1130, 720 - UIConstants.RETURN_HEIGHT,
                 UIConstants.RETURN_WIDTH * 6 / 10, UIConstants.RETURN_HEIGHT * 6 / 10,
-                ui.resources.getImage("PVBtitile.png"));
+                ui.resources.getImage(UiImage.TITLE_RETURN));
         nextBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(nextBtn);
         for (int i = 1; i <= ui.ctx.getPlayerSum(); i++) {

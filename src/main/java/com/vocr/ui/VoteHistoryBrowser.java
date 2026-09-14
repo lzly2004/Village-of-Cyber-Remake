@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.config.GameConstants;
 
@@ -26,19 +27,19 @@ class VoteHistoryBrowser {
             if (roundMax == 0) continue;
             int dayPosition = displayedDay++;
             JButton backResult = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
-                    720 - 40 - 126 * 3 - 20, ui.resources.getImage("rirekiBack.png"));
+                    720 - 40 - 126 * 3 - 20, ui.resources.getImage(UiImage.HISTORY_BACK));
             backResult.setVisible(false); ui.jPanel.add(backResult);
             ui.jPanel.setComponentZOrder(backResult, 0);
             JButton nextResult = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
-                    720 - 40 - 126 * 2 - 10, ui.resources.getImage("rirekiNext.png"));
+                    720 - 40 - 126 * 2 - 10, ui.resources.getImage(UiImage.HISTORY_NEXT));
             nextResult.setVisible(false); ui.jPanel.add(nextResult);
             ui.jPanel.setComponentZOrder(nextResult, 0);
             JButton backResult1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
-                    720 - 40 - 126 * 3 - 20, ui.resources.getImage("rirekiBack.png"));
+                    720 - 40 - 126 * 3 - 20, ui.resources.getImage(UiImage.HISTORY_BACK));
             backResult1.setVisible(false); ui.jPanel.add(backResult1);
             ui.jPanel.setComponentZOrder(backResult1, 0);
             JButton nextResult1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
-                    720 - 40 - 126 * 2 - 10, ui.resources.getImage("rirekiNext.png"));
+                    720 - 40 - 126 * 2 - 10, ui.resources.getImage(UiImage.HISTORY_NEXT));
             nextResult1.setVisible(false); ui.jPanel.add(nextResult1);
             ui.jPanel.setComponentZOrder(nextResult1, 0);
             nextResult.addActionListener(e1 -> {

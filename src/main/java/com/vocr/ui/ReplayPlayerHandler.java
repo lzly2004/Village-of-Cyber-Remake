@@ -2,6 +2,7 @@ package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.logging.DebugLogger;
 
@@ -95,7 +96,7 @@ public class ReplayPlayerHandler implements SceneHandler {
     }
 
     private JLabel addBackground(UI ui) {
-        ImageIcon bgImg = ui.resources.getImage("PVBG.png");
+        ImageIcon bgImg = ui.resources.getImage(UiImage.REPLAY_BACKGROUND);
         if (bgImg != null) {
             JLabel background = LabelSimpleFactory.makeLabel(
                     LabelConst.Simple_Label, 0, 0,
@@ -344,7 +345,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         ui.jPanel.add(dataText);
         DebugLogger.info("[ReplayPlayerHandler] 已添加数据文本 (890, 25)");
 
-        ImageIcon dataBgImg = ui.resources.getImage("hiduke.png");
+        ImageIcon dataBgImg = ui.resources.getImage(UiImage.CALENDAR);
         if (dataBgImg == null) {
             DebugLogger.warn("[ReplayPlayerHandler] 日历背景图未找到: hiduke.png");
         } else {
@@ -362,7 +363,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             int playerSum = getPlayerSumFromSave(ui);
             if (playerSum <= 0) { renderEmptyInfoPanel(ui); return; }
 
-            ImageIcon boardIcon = ui.resources.getImage("frame #19252.png");
+            ImageIcon boardIcon = ui.resources.getImage(UiImage.REVIEW_BOARD);
             if (boardIcon != null) {
                 JLabel board = LabelSimpleFactory.makeLabel(
                         LabelConst.Simple_Label, 0, 198,
