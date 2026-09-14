@@ -80,7 +80,7 @@ public class ReplayBrowserHandler implements SceneHandler {
             renderSlot(ui, manager, slotIndex, SLOT_X, y, SLOT_WIDTH, SLOT_HEIGHT);
         }
 
-        JButton btnNext = createButton(ui, "PVBnext.png", BTN_X, 250, BTN_W, BTN_H);
+        JButton btnNext = createButton(ui, UiImage.NAVIGATION_NEXT, BTN_X, 250, BTN_W, BTN_H);
         if (page < 2) {
             UIHelpers.setButtonListener(btnNext, ui, () -> {
                 ui.replayPage++;
@@ -92,7 +92,7 @@ public class ReplayBrowserHandler implements SceneHandler {
         ui.jPanel.add(btnNext);
 
         if (page > 0) {
-            JButton btnBack = createButton(ui, "PVBreturn.png", BTN_X, 400, BTN_W, BTN_H);
+            JButton btnBack = createButton(ui, UiImage.NAVIGATION_RETURN, BTN_X, 400, BTN_W, BTN_H);
             UIHelpers.setButtonListener(btnBack, ui, () -> {
                 ui.replayPage--;
                 ui.run();
@@ -100,7 +100,7 @@ public class ReplayBrowserHandler implements SceneHandler {
             ui.jPanel.add(btnBack);
         }
 
-        JButton btnTitle = createButton(ui, "PVBtitile.png", BTN_X, 550, BTN_W, BTN_H);
+        JButton btnTitle = createButton(ui, UiImage.TITLE_RETURN, BTN_X, 550, BTN_W, BTN_H);
         UIHelpers.setButtonListener(btnTitle, ui, () -> {
             browserBgmSwitched = false;
             ui.resources.playBgm(BgmTrack.START_MENU);
@@ -254,8 +254,8 @@ public class ReplayBrowserHandler implements SceneHandler {
         }
     }
 
-    private JButton createButton(UI ui, String imageName, int x, int y, int w, int h) {
-        ImageIcon img = ui.resources.getImage(imageName);
+    private JButton createButton(UI ui, UiImage image, int x, int y, int w, int h) {
+        ImageIcon img = ui.resources.getImage(image);
         return ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, x, y, w, h, img);
     }
 

@@ -95,15 +95,15 @@ public class EndAnimeHandler implements SceneHandler {
             if (textLabel != null) ui.jPanel.add(textLabel);
             ui.jPanel.add(label);
         }
-        String winIconText = "";
+        UiImage winIcon = UiImage.FALLBACK;
         String winText = "";
         switch (ui.ctx.getEndResult()) {
-            case VILLAGE_WIN: winIconText = "Icon1_0.png"; winText = GameStrings.WIN_VILLAGER; break;
-            case WOLF_WIN: winIconText = "Icon2.png";   winText = GameStrings.WIN_WOLF; break;
-            case FOX_WIN: winIconText = "Icon4.png";   winText = GameStrings.WIN_FOX; break;
+            case VILLAGE_WIN: winIcon = UiImage.END_VILLAGE_ICON; winText = GameStrings.WIN_VILLAGER; break;
+            case WOLF_WIN: winIcon = UiImage.END_WOLF_ICON; winText = GameStrings.WIN_WOLF; break;
+            case FOX_WIN: winIcon = UiImage.END_FOX_ICON; winText = GameStrings.WIN_FOX; break;
         }
         JLabel winLabel = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 50, 25, 40, 40,
-                ui.resources.getImage(winIconText));
+                ui.resources.getImage(winIcon));
         ui.jPanel.add(winLabel);
         JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, winText);
         infoLabel.setBounds(100, 29, 200, 100);

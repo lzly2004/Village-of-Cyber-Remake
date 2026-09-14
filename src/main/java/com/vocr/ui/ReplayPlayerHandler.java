@@ -84,7 +84,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         errorText.setOpaque(false);
         ui.jPanel.add(errorText);
 
-        JButton backBtn = createButton(ui, "PVBreturn.png", 530, 580, 194, 126);
+        JButton backBtn = createButton(ui, UiImage.NAVIGATION_RETURN, 530, 580, 194, 126);
         backBtn.addActionListener(e -> {
             ui.resources.playSound(SoundEffect.CLICK);
             ui.transitionTo(UI.Scene.REPLAY_BROWSER_SCENE);
@@ -136,11 +136,11 @@ public class ReplayPlayerHandler implements SceneHandler {
         return (first != null && first.players != null) ? first.players.length : 0;
     }
 
-    private JButton createButton(UI ui, String imageName, int x, int y, int w, int h) {
-        ImageIcon img = ui.resources.getImage(imageName);
+    private JButton createButton(UI ui, UiImage image, int x, int y, int w, int h) {
+        ImageIcon img = ui.resources.getImage(image);
         if (img == null) {
-            DebugLogger.warn("[ReplayPlayerHandler] 按钮图片未找到: " + imageName);
-            JButton fallbackBtn = new JButton(imageName);
+            DebugLogger.warn("[ReplayPlayerHandler] 按钮图片未找到: " + image);
+            JButton fallbackBtn = new JButton(image.name());
             fallbackBtn.setBounds(x, y, w, h);
             return fallbackBtn;
         }
@@ -509,7 +509,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         int btnH = 126;
 
         if (day == 2) {
-            JButton nextBtn = createButton(ui, "PVBnext.png", btnX, 250, btnW, btnH);
+            JButton nextBtn = createButton(ui, UiImage.NAVIGATION_NEXT, btnX, 250, btnW, btnH);
             if (nextBtn != null) {
                 nextBtn.addActionListener(e -> {
                     ui.resources.playSound(SoundEffect.CLICK);
@@ -520,7 +520,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 ui.jPanel.add(nextBtn);
             }
 
-            JButton backBtn = createButton(ui, "PVBreturn.png", btnX, 400, btnW, btnH);
+            JButton backBtn = createButton(ui, UiImage.NAVIGATION_RETURN, btnX, 400, btnW, btnH);
             if (backBtn != null) {
                 backBtn.addActionListener(e -> {
                     ui.resources.playSound(SoundEffect.CLICK);
@@ -533,7 +533,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
             if (!isShowingVote) {
                 DebugLogger.info("[ReplayPlayerHandler] [BTN-DEBUG] day=2, 准备创建PVtohyo按钮, isShowingVote=" + isShowingVote);
-                JButton voteBtn = createButton(ui, "PVtohyo.png", btnX, 550, btnW, btnH);
+                JButton voteBtn = createButton(ui, UiImage.REPLAY_VOTE, btnX, 550, btnW, btnH);
                 if (voteBtn != null) {
                     voteBtn.addActionListener(e -> toggleShowVote(ui));
                     ui.jPanel.add(voteBtn);
@@ -542,7 +542,8 @@ public class ReplayPlayerHandler implements SceneHandler {
                     DebugLogger.warn("[ReplayPlayerHandler] [BTN-ERROR] day=2, PVtohyo按钮创建失败!");
                 }
             } else {
-                JButton backInfoBtn = createButton(ui, "PVBreturn.png", btnX, 550, btnW, btnH);
+                JButton backInfoBtn = createButton(
+                        ui, UiImage.NAVIGATION_RETURN, btnX, 550, btnW, btnH);
                 if (backInfoBtn != null) {
                     backInfoBtn.addActionListener(e -> toggleShowVote(ui));
                     ui.jPanel.add(backInfoBtn);
@@ -552,7 +553,8 @@ public class ReplayPlayerHandler implements SceneHandler {
                 int maxRound2 = snap2 != null ? snap2.voteRounds.size() - 1 : 0;
 
                 if (voteCurrentRound > 0) {
-                    JButton prevVoteBtn2 = createButton(ui, "PVRirekiBack.png", 1060, 10, btnW / 2, btnH / 2);
+                    JButton prevVoteBtn2 = createButton(
+                            ui, UiImage.REPLAY_HISTORY_BACK, 1060, 10, btnW / 2, btnH / 2);
                     if (prevVoteBtn2 != null) {
                         prevVoteBtn2.addActionListener(e -> showVotePrevRound(ui));
                         ui.jPanel.add(prevVoteBtn2);
@@ -560,7 +562,8 @@ public class ReplayPlayerHandler implements SceneHandler {
                 }
 
                 if (voteCurrentRound < maxRound2) {
-                    JButton nextVoteBtn2 = createButton(ui, "PVRirekiNext.png", 1060 + btnW / 2 + 5, 10, btnW / 2, btnH / 2);
+                    JButton nextVoteBtn2 = createButton(ui, UiImage.REPLAY_HISTORY_NEXT,
+                            1060 + btnW / 2 + 5, 10, btnW / 2, btnH / 2);
                     if (nextVoteBtn2 != null) {
                         nextVoteBtn2.addActionListener(e -> showVoteNextRound(ui));
                         ui.jPanel.add(nextVoteBtn2);
@@ -568,7 +571,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 }
             }
         } else if (day >= totalDays) {
-            JButton prevBtn = createButton(ui, "PVBreturn.png", btnX, 250, btnW, btnH);
+            JButton prevBtn = createButton(ui, UiImage.NAVIGATION_RETURN, btnX, 250, btnW, btnH);
             if (prevBtn != null) {
                 prevBtn.addActionListener(e -> {
                     ui.resources.playSound(SoundEffect.CLICK);
@@ -579,7 +582,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 ui.jPanel.add(prevBtn);
             }
 
-            JButton titleBtn = createButton(ui, "PVBtitile.png", btnX, 550, btnW, btnH);
+            JButton titleBtn = createButton(ui, UiImage.TITLE_RETURN, btnX, 550, btnW, btnH);
             if (titleBtn != null) {
                 titleBtn.addActionListener(e -> {
                         ui.resources.playSound(SoundEffect.CLICK);
@@ -590,7 +593,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 ui.jPanel.add(titleBtn);
             }
         } else {
-            JButton nextBtn = createButton(ui, "PVBnext.png", btnX, 250, btnW, btnH);
+            JButton nextBtn = createButton(ui, UiImage.NAVIGATION_NEXT, btnX, 250, btnW, btnH);
             if (nextBtn != null) {
                 nextBtn.addActionListener(e -> {
                     ui.resources.playSound(SoundEffect.CLICK);
@@ -601,7 +604,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 ui.jPanel.add(nextBtn);
             }
 
-            JButton prevBtn = createButton(ui, "PVBreturn.png", btnX, 400, btnW, btnH);
+            JButton prevBtn = createButton(ui, UiImage.NAVIGATION_RETURN, btnX, 400, btnW, btnH);
             if (prevBtn != null) {
                 prevBtn.addActionListener(e -> {
                     ui.resources.playSound(SoundEffect.CLICK);
@@ -614,7 +617,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
             if (!isShowingVote) {
                 DebugLogger.info("[ReplayPlayerHandler] [BTN-DEBUG] day>2, 准备创建PVtohyo按钮, isShowingVote=" + isShowingVote);
-                JButton voteBtn = createButton(ui, "PVtohyo.png", btnX, 550, btnW, btnH);
+                JButton voteBtn = createButton(ui, UiImage.REPLAY_VOTE, btnX, 550, btnW, btnH);
                 if (voteBtn != null) {
                     voteBtn.addActionListener(e -> toggleShowVote(ui));
                     ui.jPanel.add(voteBtn);
@@ -623,7 +626,8 @@ public class ReplayPlayerHandler implements SceneHandler {
                     DebugLogger.warn("[ReplayPlayerHandler] [BTN-ERROR] day>2, PVtohyo按钮创建失败!");
                 }
             } else {
-                JButton backInfoBtn = createButton(ui, "PVBreturn.png", btnX, 550, btnW, btnH);
+                JButton backInfoBtn = createButton(
+                        ui, UiImage.NAVIGATION_RETURN, btnX, 550, btnW, btnH);
                 if (backInfoBtn != null) {
                     backInfoBtn.addActionListener(e -> toggleShowVote(ui));
                     ui.jPanel.add(backInfoBtn);
@@ -635,7 +639,8 @@ public class ReplayPlayerHandler implements SceneHandler {
 
                 if (voteCurrentRound > 0) {
                     DebugLogger.info("[ReplayPlayerHandler] [BTN-NAV] 显示前结果按钮");
-                    JButton prevVoteBtn = createButton(ui, "PVRirekiBack.png", 1060, 10, btnW / 2, btnH / 2);
+                    JButton prevVoteBtn = createButton(
+                            ui, UiImage.REPLAY_HISTORY_BACK, 1060, 10, btnW / 2, btnH / 2);
                     DebugLogger.info("[ReplayPlayerHandler] [BTN-CREATE] prevVoteBtn=" + (prevVoteBtn != null ? "非null" : "NULL") + ", pos=(1160,10," + (btnW/2) + "," + (btnH/2) + ")");
                     if (prevVoteBtn != null) {
                         prevVoteBtn.addActionListener(e -> showVotePrevRound(ui));
@@ -654,7 +659,8 @@ public class ReplayPlayerHandler implements SceneHandler {
                     int nextBtnY = 10;
                     int nextBtnW = btnW / 2;
                     int nextBtnH = btnH / 2;
-                    JButton nextVoteBtn = createButton(ui, "PVRirekiNext.png", nextBtnX, nextBtnY, nextBtnW, nextBtnH);
+                    JButton nextVoteBtn = createButton(
+                            ui, UiImage.REPLAY_HISTORY_NEXT, nextBtnX, nextBtnY, nextBtnW, nextBtnH);
                     DebugLogger.info("[ReplayPlayerHandler] [BTN-CREATE] nextVoteBtn=" + (nextVoteBtn != null ? "非null" : "NULL") + ", pos=(" + nextBtnX + "," + nextBtnY + "," + nextBtnW + "," + nextBtnH + ")");
                     DebugLogger.info("[ReplayPlayerHandler] [BTN-CREATE] screenSize=" + ui.getJFrame().getWidth() + "x" + ui.getJFrame().getHeight());
                     if (nextVoteBtn != null) {
