@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
@@ -15,7 +16,8 @@ public class DialogueChuxingHandler implements SceneHandler {
         ui.resources.stopBgm();
         Event event = ui.pollEvent();
         ui.jPanel.removeAll();
-        UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(ui, "haikei.png", event);
+        UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(
+                ui, UiImage.DIALOGUE_AFTERNOON_BACKGROUND, event);
         ui.resizeComponents();
         JPanel dialogPanel = ds.dc().dialogPanel;
         JTextArea dialogText = ds.dc().dialogText;

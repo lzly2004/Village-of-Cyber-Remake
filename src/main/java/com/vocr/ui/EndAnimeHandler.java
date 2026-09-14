@@ -108,7 +108,7 @@ public class EndAnimeHandler implements SceneHandler {
         JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, winText);
         infoLabel.setBounds(100, 29, 200, 100);
         ui.jPanel.add(infoLabel);
-        UIHelpers.addBackground(ui, "frame #19252.png");
+        UIHelpers.addBackground(ui, UiImage.REVIEW_BOARD);
         ui.resizeComponents();
         ui.getJFrame().setVisible(true);
     }

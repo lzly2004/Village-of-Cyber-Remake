@@ -81,7 +81,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     // ===================================================================
     private void createBackground()
     {
-        background = UIHelpers.createBackgroundLabel(ui, "komorebi002yuu.png");
+        background = UIHelpers.createBackgroundLabel(ui, UiImage.DAY_BACKGROUND);
     }
 
     // ===================================================================

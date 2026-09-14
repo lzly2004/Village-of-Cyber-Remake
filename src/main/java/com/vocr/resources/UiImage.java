@@ -21,6 +21,10 @@ public enum UiImage {
     REPLAY_BACKGROUND("PVBG.png"),
 
     MESSAGE_FRAME("messageframe.png"),
+    DIALOGUE_AFTERNOON_BACKGROUND("haikei.png"),
+    DIALOGUE_DAY_BACKGROUND("haikei3.png"),
+    GAME_SETUP_DIALOGUE_BACKGROUND("komorebi002.png"),
+    DAY_BACKGROUND("komorebi002yuu.png"),
     NIGHT_BACKGROUND("komorebi000night01.png"),
     MUSIC_BUTTON("musicBtn.png"),
     CALENDAR("hiduke.png"),

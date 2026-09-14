@@ -77,7 +77,7 @@ public class GameSceneHandler implements SceneHandler {
                 ui.resources.getImage(UiImage.TITLE_RETURN));
         backBtn.addActionListener(e -> ui.transitionTo(UI.Scene.START_SCENE));
         ui.jPanel.add(backBtn);
-        UIHelpers.addBackground(ui, "title_base_resized.png");
+        UIHelpers.addBackground(ui, UiImage.TITLE_BACKGROUND);
         ui.getJFrame().setVisible(true);
         ui.resizeComponents();
     }
@@ -131,7 +131,8 @@ public class GameSceneHandler implements SceneHandler {
             return;
         }
         ui.jPanel.removeAll();
-        DialogueBox.Components dc = DialogueBox.create(ui.resources, "komorebi002.png");
+        DialogueBox.Components dc = DialogueBox.create(
+                ui.resources, UiImage.GAME_SETUP_DIALOGUE_BACKGROUND);
         ui.jPanel.add(dc.dialogPanel);
         String dayText = GameStrings.getDayStart(ui.ctx.getGameDay());
         dc.dialogPanel.setVisible(false);

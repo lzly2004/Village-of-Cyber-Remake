@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
@@ -13,7 +14,7 @@ public class DialogueDayDeathHandler implements SceneHandler {
     public void render(UI ui) {
         if (ui.peekEvent().eventname() == EventName.wsw) {
             ui.resources.playSound(SoundEffect.PEACEFUL_NIGHT);
-            DialogueBox.Components dc = DialogueBox.setup(ui, "haikei3.png");
+            DialogueBox.Components dc = DialogueBox.setup(ui, UiImage.DIALOGUE_DAY_BACKGROUND);
             ui.pollEvent();
             UIHelpers.bindTypewriter(dc.dialogText, GameStrings.NO_SACRIFICE, dc.nextBtn, () -> {
                 UIHelpers.playDayPhaseBgm(ui);
@@ -30,7 +31,8 @@ public class DialogueDayDeathHandler implements SceneHandler {
                 return;
             }
             ui.jPanel.removeAll();
-            UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(ui, "haikei3.png", event);
+            UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(
+                    ui, UiImage.DIALOGUE_DAY_BACKGROUND, event);
             ds.dc().nextBtn.setVisible(false);
             ds.dc().nextBtn.setEnabled(false);
             Timer typeTimer = UIHelpers.bindTypewriter(ds.dc().dialogText, ds.text(), ds.dc().nextBtn, () -> {

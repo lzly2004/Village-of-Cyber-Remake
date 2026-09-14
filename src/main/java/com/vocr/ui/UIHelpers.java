@@ -2,6 +2,7 @@ package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.UiImage;
 
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
@@ -49,16 +50,16 @@ public class UIHelpers {
     }
 
     /** 创建窗口全屏背景标签，若图片不存在返回null */
-    public static JLabel createBackgroundLabel(UI ui, String imageName) {
-        ImageIcon img = ui.resources.getImage(imageName);
+    public static JLabel createBackgroundLabel(UI ui, UiImage image) {
+        ImageIcon img = ui.resources.getImage(image);
         if (img == null) return null;
         return LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 0, 0,
                 UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT, img);
     }
 
     /** 创建并添加窗口全屏背景到ui.jPanel，若图片不存在则不添加 */
-    public static void addBackground(UI ui, String imageName) {
-        JLabel bg = createBackgroundLabel(ui, imageName);
+    public static void addBackground(UI ui, UiImage image) {
+        JLabel bg = createBackgroundLabel(ui, image);
         if (bg != null) ui.jPanel.add(bg);
     }
 
@@ -148,7 +149,7 @@ public class UIHelpers {
 
     public record DialogueSetup(DialogueBox.Components dc, String text, ImageIcon[] charIcon) {}
 
-    public static DialogueSetup prepareDialogueEvent(UI ui, String bgImage, Event event) {
+    public static DialogueSetup prepareDialogueEvent(UI ui, UiImage bgImage, Event event) {
         DialogueBox.Components dc = DialogueBox.setup(ui, bgImage);
         JLabel nameLabel = LabelSimpleFactory.makeLabel(LabelConst.Text_Label, 40, 10, 1000, 30,
                 ui.uiComponentFactory.getCharacterFullName(event.ch1()));

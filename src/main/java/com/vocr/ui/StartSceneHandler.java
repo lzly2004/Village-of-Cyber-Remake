@@ -90,7 +90,7 @@ public class StartSceneHandler implements SceneHandler {
         UIHelpers.setButtonListener(btnCollections, ui, () -> {});
         ui.jPanel.add(btnCollections);
 
-        UIHelpers.addBackground(ui, "title_base_resized.png");
+        UIHelpers.addBackground(ui, UiImage.TITLE_BACKGROUND);
 
         UIHelpers.finishRender(ui);
     }

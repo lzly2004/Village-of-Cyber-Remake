@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.logging.DebugLogger;
+import com.vocr.resources.UiImage;
 
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
@@ -36,7 +37,8 @@ public class DialogueDayHandler implements SceneHandler {
                 DebugLogger.log("进入了isConnect");
             ui.linkIcon.remove(0);
         }
-        UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(ui, "haikei3.png", event);
+        UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(
+                ui, UiImage.DIALOGUE_DAY_BACKGROUND, event);
         Timer typeTimer = UIHelpers.bindTypewriter(ds.dc().dialogText, ds.text(), ds.dc().nextBtn, () -> {
             if (!ui.hasPendingEvents()) {
                 ui.linkIcon.clear();

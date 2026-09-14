@@ -21,9 +21,9 @@ public class DialogueBox
         public JButton nextBtn;
     }
 
-    public static Components create(ResourcesInterface resources, String bgImageName)
+    public static Components create(ResourcesInterface resources, UiImage background)
     {
-        return createWithIcon(resources, resources.getImage(bgImageName));
+        return createWithIcon(resources, resources.getImage(background));
     }
 
     public static Components createWithIcon(ResourcesInterface resources, ImageIcon bgIcon)
@@ -43,9 +43,9 @@ public class DialogueBox
         return c;
     }
 
-    public static Components setup(UI ui, String bgImageName)
+    public static Components setup(UI ui, UiImage background)
     {
-        return setupWithIcon(ui, ui.resources.getImage(bgImageName));
+        return setupWithIcon(ui, ui.resources.getImage(background));
     }
 
     public static Components setupWithIcon(UI ui, ImageIcon bgIcon)

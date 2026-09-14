@@ -37,7 +37,7 @@ public class InfoSceneHandler implements SceneHandler {
             btn_next[i].addActionListener(e -> ui.transitionTo(UI.Scene.valueOf("INFO_SCENE_" + j)));
             ui.jPanel.add(btn_next[i]);
         }
-        JLabel backgroundLabel = UIHelpers.createBackgroundLabel(ui, "PVBG.png");
+        JLabel backgroundLabel = UIHelpers.createBackgroundLabel(ui, UiImage.REPLAY_BACKGROUND);
         JLabel backgroundLabel_2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage(UiImage.INFO_PANEL));
         JButton btnMenu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
@@ -55,7 +55,7 @@ public class InfoSceneHandler implements SceneHandler {
 
     private InfoBackground createInfoBackground(UI ui, UI.Scene backTarget) {
         ui.jPanel.removeAll();
-        JLabel bg = UIHelpers.createBackgroundLabel(ui, "PVBG.png");
+        JLabel bg = UIHelpers.createBackgroundLabel(ui, UiImage.REPLAY_BACKGROUND);
         JLabel bg2 = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 10, 10, 980, 660,
                 ui.resources.getImage(UiImage.INFO_PANEL));
         JButton menu = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1050, 560,
