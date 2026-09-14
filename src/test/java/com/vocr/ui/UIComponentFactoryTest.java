@@ -33,7 +33,7 @@ class UIComponentFactoryTest {
     }
 
     @Test
-    void executionResultTextShouldUseDisplayName() {
+    void displayNameShouldFitExecutionResultText() {
         assertEquals("投票の結果、宿屋主人 フーゴーは処刑されました。",
                 String.format(com.vocr.ui.GameStrings.EXECUTED_FORMAT,
                         factory.getCharacterDisplayName(CharacterEnglishName.Hugo)));

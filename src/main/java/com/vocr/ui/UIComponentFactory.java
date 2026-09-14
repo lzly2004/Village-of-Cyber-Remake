@@ -48,8 +48,8 @@ public class UIComponentFactory
     }
 
     /**
-     * 获取人物的显示名(日文汉字或平假名 片假名)，不含英文名。
-     * 对话框名牌统一使用该格式。
+     * 获取人物的日文显示名(日文汉字或平假名 + 空格 + 片假名)，不含英文名。
+     * 用于不应显示英文名的界面正文。
      */
     public String getCharacterDisplayName(CharacterEnglishName englishName)
     {
