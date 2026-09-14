@@ -9,8 +9,8 @@ import java.util.Objects;
 /**
  * 平台无关的对局应用入口。
  *
- * 当前先迁移开局用例；后续业务操作按垂直切片逐步加入，Swing 与 Web 均不得绕过这里
- * 复制一份规则流程。
+ * 开局、CO 询问与投票/处刑已经按垂直切片迁入；后续业务操作继续逐步加入，
+ * Swing 与 Web 均不得绕过这里复制一份规则流程。
  */
 public final class GameApplication
 {
