@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
 
 import com.vocr.domain.GameContextView;
@@ -43,7 +44,7 @@ class CoSelectionPanel {
         List<JLabel> zbLabels = new ArrayList<>();
         int playerSum = ui.ctx.getPlayerSum();
         for (int i = 1; i <= playerSum; i++) {
-            ImageIcon characterImage = ui.resources.getImage(ui.uiComponentFactory.getCharImageName(
+            ImageIcon characterImage = ui.resources.getImage(ImageNames.characterStatusPortrait(
                     ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i)));
             int charIndex = UIHelpers.calculateRowIndex(i, playerSum);
             boolean isFirstRow = UIHelpers.isFirstRow(i, playerSum);
@@ -75,7 +76,8 @@ class CoSelectionPanel {
 
             if (i < zhanbuNum.size() + 1) {
                 for (int i2 = 1; i2 <= playerSum; ++i2) {
-                    JLabel zbLabel = UIHelpers.createIconLabel(ui, "result1_" + zhanbuOrder.get(i - 1) + "white.png",
+                    JLabel zbLabel = UIHelpers.createIconLabel(
+                            ui, ImageNames.skillResultIcon(1, zhanbuOrder.get(i - 1), false),
                             60 + 5 + 74 * UIHelpers.calculateRowIndex(i2, playerSum),
                             (UIHelpers.isFirstRow(i2, playerSum) ? 20 : 128) + 16 * zhanbuOrder.get(i - 1));
                     zbLabels.add(zbLabel);

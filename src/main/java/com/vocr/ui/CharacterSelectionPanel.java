@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
 
 import com.vocr.domain.GameContextView;
@@ -76,7 +77,8 @@ class CharacterSelectionPanel {
             String imageName = handler.charImageName(i);
 
             if (ui.ctx.getClaimedRole(i) > 0 && ui.ctx.getClaimedRole(i) < 6) {
-                String crName = ui.uiComponentFactory.getClaimedRoleIconName(ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i));
+                String crName = ImageNames.claimedRoleIcon(
+                        ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i));
                 JLabel crLabel = new JLabel(ui.resources.getImage(crName));
                 crLabel.setBounds(handler.charGridX(i, 60, 74), handler.charGridY(i, 20, 128),
                         crLabel.getIcon().getIconWidth(), crLabel.getIcon().getIconHeight());
@@ -106,10 +108,9 @@ class CharacterSelectionPanel {
             resultLabel.setVisible(selectedTargets.contains(i));
 
             if (type != SelectionType.VOTE) {
-                String zbIconPrefix = (type == SelectionType.DIVINATION) ? "result1_" : "result3_";
-                String zbSuffix = (type == SelectionType.DIVINATION) ? "white.png" : ".png";
                 for (int r = 0; r < roleNums.size(); r++) {
-                    JLabel zbLabel = new JLabel(ui.resources.getImage(zbIconPrefix + roleOrders.get(r) + zbSuffix));
+                    JLabel zbLabel = new JLabel(ui.resources.getImage(
+                            ImageNames.selectionResultIcon(type, roleOrders.get(r))));
                     zbLabels.add(zbLabel);
                     zbLabel.setBounds(handler.charGridX(i, 65 + zbLabel.getIcon().getIconWidth(), 74),
                             handler.charGridY(i, 20 + zbLabel.getIcon().getIconHeight() * roleOrders.get(r),
@@ -183,15 +184,16 @@ class CharacterSelectionPanel {
         panel.setComponentZOrder(dragBtn, 0);
 
         if (type != SelectionType.VOTE) {
-            String perIconPrefix = (type == SelectionType.DIVINATION) ? "uranai" : "goei";
             for (int r = 0; r < roleNums.size(); r++) {
                 final int cur = r;
+                ImageIcon roleDragIcon = ui.resources.getImage(
+                        ImageNames.claimedRoleActionIcon(type, roleOrders.get(r)));
                 JButton perBtn = ButtonSimpleFactory.makeButton(ButtonConst.Draggable_Button,
                         roleOrders.get(r) * (type == SelectionType.DIVINATION ? 100 : 150)
                                 + (type == SelectionType.DIVINATION ? 150 : 250), 350,
-                        ui.resources.getImage(perIconPrefix + roleOrders.get(r) + ".png").getIconWidth() / 2,
-                        ui.resources.getImage(perIconPrefix + roleOrders.get(r) + ".png").getIconHeight() / 2,
-                        ui.resources.getImage(perIconPrefix + roleOrders.get(r) + ".png"));
+                        roleDragIcon.getIconWidth() / 2,
+                        roleDragIcon.getIconHeight() / 2,
+                        roleDragIcon);
                 perBtn.addMouseListener(new java.awt.event.MouseAdapter() {
                     @Override
                     public void mouseReleased(java.awt.event.MouseEvent e) {

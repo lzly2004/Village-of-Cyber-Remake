@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.UiImage;
 
@@ -46,10 +47,10 @@ public class GameSceneHandler implements SceneHandler {
             final int j = i;
             btn1 = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button,
                     x + (i / 5) * x_div, y + (i - 1) % 4 * y_div, width, height,
-                    ui.resources.getImage("game" + i + ".png"));
+                    ui.resources.getImage(ImageNames.gameSetupButton(i)));
             ui.jPanel.add(btn1);
             btn1.addActionListener(e -> {
-                ui.levelName = "game" + j + "-1.png";
+                ui.levelName = ImageNames.gameSetupTitle(j);
                 ui.resources.playSound(SoundEffect.CLICK);
                 StartedGame startedGame = ui.gameApplication.startGame(
                         new StartGameCommand(peiyi.values()[j]));

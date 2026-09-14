@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.UiImage;
 
@@ -602,7 +603,8 @@ public class GameSceneVoteHandler implements SceneHandler {
     }
 
     String charImageName(int i) {
-        return ui.uiComponentFactory.getCharImageName(ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i));
+        return ImageNames.characterStatusPortrait(
+                ui.ctx.getCharacterNumber(i), ui.ctx.isAlive(i));
     }
 
     private void appendVotePanel(StringBuilder piao, int i, java.util.List<String> cmps) {

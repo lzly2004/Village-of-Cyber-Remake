@@ -1,7 +1,5 @@
 package com.vocr.ui;
 
-import com.vocr.domain.whyDie;
-
 /**
  * 游戏UI字符串常量 — 第1步重构核心。
  * 集中管理 UI.java 中散布的日语提示文本、格式模板、面板标题等。
@@ -150,45 +148,4 @@ public final class GameStrings
     public static String getVoteTitleRedo(int day) { return String.format(VOTE_TITLE_REDO, day); }
     public static String getVoteTitleDesign(int day, String targetText) { return String.format(VOTE_TITLE_DESIGN, day, targetText); }
     public static String getVoteHistoryTitle(int day, int round, String extra) { return String.format(VOTE_HISTORY_TITLE, day, round, extra); }
-
-    /**
-     * 获取角色头像图片后缀（复盘/结算界面用）
-     * 对应 ReplayPlayerHandler 和 EndAnimeHandler 中的 switch case 逻辑
-     */
-    public static String getRoleImageSuffix(int actualRole) {
-        return switch (actualRole) {
-            case 5 -> "cs";   // 猫又
-            case 10 -> "fs";  // 妖狐
-            case 11 -> "hs";  // 共有者
-            case 7 -> "ws";   // 狼人
-            case 8, 9 -> "ks"; // 狂人、狂灵
-            default -> "s";   // 村民
-        };
-    }
-
-    public static String buildCharacterImageName(int characterNumber, whyDie deathReason, int actualRole, boolean useRoleSuffix) {
-        StringBuilder imageName = new StringBuilder();
-        if (characterNumber <= 9) imageName.append("0");
-        imageName.append(characterNumber);
-        if (deathReason == whyDie.NONE) {
-            if (useRoleSuffix) imageName.append(getRoleImageSuffix(actualRole));
-        } else {
-            imageName.append("gs");
-        }
-        imageName.append(".png");
-        return imageName.toString();
-    }
-
-    public static String buildCharacterImageNameSimple(int characterNumber, whyDie deathReason) {
-        StringBuilder imageName = new StringBuilder();
-        if (characterNumber <= 9) imageName.append("0");
-        imageName.append(characterNumber);
-        if (deathReason != whyDie.NONE) imageName.append("g");
-        imageName.append("s.png");
-        return imageName.toString();
-    }
-
-    public static String buildCharacterTextName(int characterNumber) {
-        return characterNumber + "job.png";
-    }
 }

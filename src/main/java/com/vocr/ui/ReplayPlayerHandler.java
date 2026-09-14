@@ -1,12 +1,11 @@
 package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.UiImage;
 
 import com.vocr.logging.DebugLogger;
-
-import com.vocr.domain.whyDie;
 
 import com.vocr.replay.DaySnapshot;
 
@@ -165,46 +164,11 @@ public class ReplayPlayerHandler implements SceneHandler {
                 int playerIndex = i + 1;
                 boolean isFirstRow = (playerIndex <= (playerSum + 1) / 2);
                 
-                StringBuilder xName = new StringBuilder();
-                StringBuilder imageName = new StringBuilder();
-                
-                if (ps.characterNumber <= 9) imageName.append("0");
-                imageName.append(ps.characterNumber);
                 boolean isDead = ps.deathDay > 0 && ps.deathDay < day;
 
                 // 复盘模式：根据实际身份显示不同颜色头像（对齐结算界面规则）
-                imageName.append(GameStrings.getRoleImageSuffix(ps.actualRole));
-
-                // 死亡图标照常显示（与生死状态无关）
-                if (isDead) {
-                    xName.append(whyDie.getDeathIconName(ps.deathReason));
-                }
-                imageName.append(".png");
-                String textName = GameStrings.buildCharacterTextName(ps.characterNumber);
-                
-                // 构建CO职业图标名称
-                String claimedRoleIconName = ui.uiComponentFactory.getClaimedRoleIconName(ps.claimedRole, ps.claimedRoleOrder);
-                
-                // 构建技能目标标记名称
-                StringBuilder skillTargetName = new StringBuilder("result");
-                if (ps.claimedRole > 0 && ps.claimedRole < 6 && ps.claimedRole <= 3) {
-                    skillTargetName.append(ps.claimedRole).append("_").append(ps.claimedRoleOrder);
-                    if (ps.skillTarget != 0) {
-                        if (ps.claimedRole != 3) { // 非猎人
-                            if (ps.skillTarget >= playerSum + 1) {
-                                skillTargetName.append("black.png"); // 黑色结果
-                            } else {
-                                skillTargetName.append("white.png"); // 白色结果
-                            }
-                        } else { // 猎人
-                            skillTargetName.append(".png");
-                        }
-                    } else {
-                        DebugLogger.info(String.format(
-                                "[ReplayPlayerHandler] 不显示CO图标: player=%d, role=%d, comingOutDay=%d, currentDay=%d",
-                                i+1, ps.claimedRole, ps.comingOutDay, day));
-                    }
-                }
+                String imageName = ImageNames.characterRolePortrait(
+                        ps.characterNumber, ps.actualRole);
                 
                 // === 1. 添加CO职业图标 ===
                 if (ps.claimedRole > 0 && ps.claimedRole < 6) {
@@ -231,7 +195,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 }
                 
                 // === 3. 添加头像和角色名 ===
-                ImageIcon characterImage = ui.resources.getImage(imageName.toString());
+                ImageIcon characterImage = ui.resources.getImage(imageName);
                 if (characterImage == null) {
                     DebugLogger.warn("[ReplayPlayerHandler] 头像图片未找到: " + imageName);
                     continue;
@@ -293,8 +257,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                 if (targetPlayer <= 0 || targetPlayer > playerSum) continue;
 
                 int displayOrder = ps.claimedRoleOrder > 0 ? ps.claimedRoleOrder : 1;
-                String imgName = "result" + displayRole + "_" + displayOrder;
-                imgName += isBlack ? "black.png" : "white.png";
+                String imgName = ImageNames.skillResultIcon(displayRole, displayOrder, isBlack);
 
                 ImageIcon stIcon = ui.resources.getImage(imgName);
                 if (stIcon == null) {

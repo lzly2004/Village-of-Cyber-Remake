@@ -2,6 +2,7 @@ package com.vocr.ui;
 
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.whyDie;
+import com.vocr.resources.ImageNames;
 
 import javax.swing.*;
 
@@ -25,29 +26,25 @@ class PlayerStatusRenderer {
             int charNumber = ui.ctx.getCharacterNumber(i);
             whyDie deathReason = ui.ctx.getDeathReason(i);
 
-            StringBuilder skillTargetName = new StringBuilder("result");
             if (ui.ctx.getClaimedRole(i) > 0 && ui.ctx.getClaimedRole(i) < 6) {
                 if (ui.ctx.getClaimedRole(i) <= 3) {
-                    skillTargetName.append(ui.ctx.getClaimedRole(i)).append("_")
-                            .append(ui.ctx.getClaimedRoleOrder(i));
                     int lastSkillTarget = ui.ctx.getSkillTarget(i, ui.ctx.getGameDay() - 1);
                     if (lastSkillTarget != 0) {
                         ui.claimedRolenum[i][ui.ctx.getGameDay()] = ui.ctx.getClaimedRole(i);
                         ui.skillTargetOrder[i][ui.ctx.getGameDay()] = ui.ctx.getClaimedRoleOrder(i);
+                        boolean isBlack = lastSkillTarget >= playerSum + 1;
                         if (ui.ctx.getClaimedRole(i) != 3) {
-                            if (lastSkillTarget >= playerSum + 1) {
-                                skillTargetName.append("black.png");
+                            if (isBlack) {
                                 ui.skillTargetPeople[i][ui.ctx.getGameDay()] = (lastSkillTarget - playerSum);
                             } else {
-                                skillTargetName.append("white.png");
                                 ui.skillTargetPeople[i][ui.ctx.getGameDay()] = (lastSkillTarget);
                             }
                         } else {
-                            skillTargetName.append(".png");
-                            ui.skillTargetPeople[i][ui.ctx.getGameDay()] = (lastSkillTarget >= playerSum + 1)
+                            ui.skillTargetPeople[i][ui.ctx.getGameDay()] = isBlack
                                     ? (lastSkillTarget - playerSum) : lastSkillTarget;
                         }
-                        ui.skillTargetNames[i][ui.ctx.getGameDay()] = skillTargetName.toString();
+                        ui.skillTargetNames[i][ui.ctx.getGameDay()] = ImageNames.skillResultIcon(
+                                ui.ctx.getClaimedRole(i), ui.ctx.getClaimedRoleOrder(i), isBlack);
                     }
                 }
                 int roleX = STATUS_START_X + STATUS_ITEM_WIDTH * charIndex;

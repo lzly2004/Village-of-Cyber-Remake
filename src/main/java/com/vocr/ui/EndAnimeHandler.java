@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.logging.DebugLogger;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
 
 import com.vocr.domain.GameContextView;
@@ -56,9 +57,8 @@ public class EndAnimeHandler implements SceneHandler {
             DebugLogger.log(infoText);
             JTextArea infoLabel = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 16,
                     infoText.toString());
-            StringBuilder xName = new StringBuilder();
-            String imageName = GameStrings.buildCharacterImageName(ui.ctx.getCharacterNumber(i), ui.ctx.getDeathReason(i), ui.ctx.getActualRole(i), true);
-            xName.append(ui.ctx.getDeathReason(i).getDeathIconName());
+            String imageName = ImageNames.characterResultPortrait(
+                    ui.ctx.getCharacterNumber(i), ui.ctx.getDeathReason(i), ui.ctx.getActualRole(i));
             int charNumber = ui.ctx.getCharacterNumber(i);
             ImageIcon characterImage = ui.resources.getImage(imageName.toString());
             if (characterImage == null) continue;
@@ -69,7 +69,7 @@ public class EndAnimeHandler implements SceneHandler {
             boolean isFirstRow = UIHelpers.isFirstRow(i, playerSum);
             int spacing = charWidth + 40;
 
-            if (!xName.isEmpty()) {
+            if (ui.ctx.getDeathReason(i) != whyDie.NONE) {
                 int deathX = 22 + spacing * charIndex;
                 int deathY = isFirstRow ? 110 : (260 + charHeight);
                 JLabel deathLabel = UIHelpers.createDeathMarker(ui, ui.ctx.getDeathReason(i), deathX, deathY);

@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.BgmTrack;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.UiImage;
 
@@ -183,7 +184,7 @@ public class UIHelpers {
 
     public static JLabel createClaimedRoleIcon(UI ui, int claimedRole, int claimedRoleOrder, int x, int y) {
         if (claimedRole <= 0 || claimedRole >= 6) return null;
-        String iconName = ui.uiComponentFactory.getClaimedRoleIconName(claimedRole, claimedRoleOrder);
+        String iconName = ImageNames.claimedRoleIcon(claimedRole, claimedRoleOrder);
         ImageIcon icon = ui.resources.getImage(iconName);
         if (icon == null) return null;
         JLabel label = new JLabel(icon);
@@ -192,7 +193,7 @@ public class UIHelpers {
     }
 
     public static JLabel createDeathMarker(UI ui, whyDie deathReason, int x, int y) {
-        String iconName = deathReason.getDeathIconName();
+        String iconName = ImageNames.deathMarker(deathReason);
         if (iconName.isEmpty()) return null;
         ImageIcon icon = ui.resources.getImage(iconName);
         if (icon == null) return null;
@@ -208,8 +209,8 @@ public class UIHelpers {
     public static JLabel createPlayerAvatar(UI ui, int charNumber, whyDie deathReason,
             int actualRole, boolean showActualRole, int x, int y) {
         String imageName = showActualRole
-                ? GameStrings.buildCharacterImageName(charNumber, deathReason, actualRole, true)
-                : GameStrings.buildCharacterImageNameSimple(charNumber, deathReason);
+                ? ImageNames.characterResultPortrait(charNumber, deathReason, actualRole)
+                : ImageNames.characterStatusPortrait(charNumber, deathReason == whyDie.NONE);
         ImageIcon icon = ui.resources.getImage(imageName);
         if (icon == null) return null;
         JLabel label = new JLabel(icon);
@@ -218,7 +219,7 @@ public class UIHelpers {
     }
 
     public static JLabel createCharacterText(UI ui, int charNumber, int x, int baseY, boolean isTextLabel) {
-        String textName = GameStrings.buildCharacterTextName(charNumber);
+        String textName = ImageNames.characterText(charNumber);
         ImageIcon icon = ui.resources.getImage(textName);
         if (icon == null) return null;
         int textWidth = icon.getIconWidth();

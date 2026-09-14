@@ -5,9 +5,6 @@ import com.vocr.domain.CharacterKanjiName;
 import com.vocr.domain.CharacterKatakanaName;
 import com.vocr.domain.whyDie;
 
-import javax.swing.*;
-import java.awt.*;
-
 public class UIComponentFactory
 {
     private static final String[] ZY_NAMES = {"", "占い師", "霊能者", "狩人", "共有者", "猫又",
@@ -63,22 +60,4 @@ public class UIComponentFactory
         return String.format("%s %s", kanjiName, katakanaName);
     }
 
-    public String getClaimedRoleIconName(int claimedRole, int claimedRoleOrder)
-    {
-        StringBuilder sb = new StringBuilder("yaku");
-        if (claimedRole <= 3) sb.append(claimedRole).append("_").append(claimedRoleOrder);
-        else sb.append(claimedRole);
-        sb.append(".png");
-        return sb.toString();
-    }
-
-    public String getCharImageName(int characterNumber, boolean isAlive)
-    {
-        StringBuilder sb = new StringBuilder();
-        if (characterNumber <= 9) sb.append("0");
-        sb.append(characterNumber);
-        if (!isAlive) sb.append("g");
-        sb.append("s.png");
-        return sb.toString();
-    }
 }

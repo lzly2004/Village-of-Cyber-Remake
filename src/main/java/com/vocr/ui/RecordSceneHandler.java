@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
 
 import com.vocr.logging.DebugLogger;
@@ -53,7 +54,7 @@ public class RecordSceneHandler implements SceneHandler {
         int page = ui.recordPage; // 0=総合, 1~7=各配役村
 
         // ====== 左上角：标题 ======
-        String titleImageName = (page == 0) ? "gameTitle0.png" : "gameTitle" + page + ".png";
+        String titleImageName = ImageNames.recordTitle(page);
         addImageLabel(ui, titleImageName, 30, 20, 200, 60);
 
         // ====== 左侧：数据面板 ======

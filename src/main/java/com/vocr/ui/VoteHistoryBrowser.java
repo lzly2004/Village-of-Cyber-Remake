@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
+import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
 
 import com.vocr.config.GameConstants;
@@ -62,7 +63,7 @@ class VoteHistoryBrowser {
                 backResult1.setVisible(false); nextResult1.setVisible(true);
                 backResult.setVisible(true);
             });
-            ImageIcon dayIcon = ui.resources.getImage(gameday + "day.png");
+            ImageIcon dayIcon = ui.resources.getImage(ImageNames.voteDay(gameday));
             JButton dayBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, dayIcon);
             dayBtn.setSize(dayIcon.getIconWidth(), dayIcon.getIconHeight());
             dayBtn.addActionListener(e1 -> {
