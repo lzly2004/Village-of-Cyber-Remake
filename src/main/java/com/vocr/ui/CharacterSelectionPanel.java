@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.application.SetAllTargetSelectionCommand;
+import com.vocr.application.SetClaimedRoleTargetSelectionCommand;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
@@ -56,15 +58,10 @@ class CharacterSelectionPanel {
 
         List<Integer> roleNums = new ArrayList<>();
         List<Integer> roleOrders = new ArrayList<>();
-        List<Integer> trueNums = new ArrayList<>();
         for (int i = 1; i <= n - 1; i++) {
             if (ui.ctx.getClaimedRole(i) == claimedRoleFilter && ui.ctx.isAlive(i)) {
                 roleNums.add(i);
                 roleOrders.add(ui.ctx.getClaimedRoleOrder(i));
-            }
-            if ((ui.ctx.getActualRole(i) == claimedRoleFilter || ui.ctx.getClaimedRole(i) == claimedRoleFilter)
-                    && ui.ctx.isAlive(i)) {
-                trueNums.add(i);
             }
         }
 
@@ -153,24 +150,9 @@ class CharacterSelectionPanel {
                     int idx = targetLabels.indexOf(label);
                     if (!ui.ctx.isAlive(idx + 1)) break;
                     ui.resources.playSound(SoundEffect.CLICK);
-                    switch (type) {
-                        case VOTE:
-                            ui.ctx.setSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), true);
-                            if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
-                            break;
-                        case DIVINATION:
-                            ui.ctx.setHiddenSeerScheduled(idx + 1, ui.ctx.getGameDay(), true);
-                            for (int a = 0; a < trueNums.size(); a++)
-                                ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), true);
-                            if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
-                            break;
-                        case GUARD:
-                            ui.ctx.setHiddenHunterScheduled(idx + 1, ui.ctx.getGameDay(), true);
-                            for (int a = 0; a < trueNums.size(); a++)
-                                ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), true);
-                            if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
-                            break;
-                    }
+                    ui.gameApplication.setTargetSelection(
+                            new SetAllTargetSelectionCommand(type, idx + 1, true));
+                    if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                     resultLabels.get(idx).setVisible(true);
                     frameLabels.get(idx).setVisible(true);
                     frameLabels.get(idx).repaint();
@@ -207,7 +189,9 @@ class CharacterSelectionPanel {
                             int idx = targetLabels.indexOf(label);
                             if (!ui.ctx.isAlive(idx + 1)) break;
                             ui.resources.playSound(SoundEffect.CLICK);
-                            ui.ctx.setClaimedRoleScheduled(roleNums.get(cur), idx + 1, ui.ctx.getGameDay(), true);
+                            ui.gameApplication.setTargetSelection(
+                                    new SetClaimedRoleTargetSelectionCommand(
+                                            type, roleNums.get(cur), idx + 1, true));
                             if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                             zbLabels.get(idx + cur * ui.ctx.getPlayerSum()).setVisible(true);
                             frameLabels.get(idx).setVisible(true);
@@ -241,22 +225,9 @@ class CharacterSelectionPanel {
                     int idx = targetLabels.indexOf(label);
                     if (!ui.ctx.isAlive(idx + 1)) break;
                     ui.resources.playSound(SoundEffect.CLICK);
+                    ui.gameApplication.setTargetSelection(
+                            new SetAllTargetSelectionCommand(type, idx + 1, false));
                     selectedTargets.remove(Integer.valueOf(idx + 1));
-                    switch (type) {
-                        case VOTE:
-                            ui.ctx.setSelectedVoteTarget(idx + 1, ui.ctx.getGameDay(), false);
-                            break;
-                        case DIVINATION:
-                            ui.ctx.setHiddenSeerScheduled(idx + 1, ui.ctx.getGameDay(), false);
-                            for (int a = 0; a < trueNums.size(); a++)
-                                ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), false);
-                            break;
-                        case GUARD:
-                            ui.ctx.setHiddenHunterScheduled(idx + 1, ui.ctx.getGameDay(), false);
-                            for (int a = 0; a < trueNums.size(); a++)
-                                ui.ctx.setClaimedRoleScheduled(trueNums.get(a), idx + 1, ui.ctx.getGameDay(), false);
-                            break;
-                    }
                     if (type != SelectionType.VOTE) {
                         for (int u = 0; u < roleNums.size(); u++)
                             zbLabels.get(idx + u * (ui.ctx.getPlayerSum())).setVisible(false);

@@ -8,6 +8,7 @@ import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.vocr.core.MainLogicInterface;
+import com.vocr.domain.GameContextView;
 import com.vocr.domain.Role;
 import com.vocr.domain.peiyi;
 import org.junit.jupiter.api.BeforeAll;
@@ -107,6 +108,38 @@ class ArchitectureBoundaryTest {
                 .should().callMethod(
                         MainLogicInterface.class, "shokei", int.class, List.class, boolean.class)
                 .because("投票与处刑用例已经迁移到平台无关应用层")
+                .check(productionClasses);
+    }
+
+    @Test
+    void uiShouldChangeTargetSelectionsThroughApplicationLayer() {
+        noClasses()
+                .that().resideInAPackage("com.vocr.ui..")
+                .should().callMethod(
+                        GameContextView.class, "setSelectedVoteTarget",
+                        int.class, int.class, boolean.class)
+                .because("指定投票目标必须由应用层校验并写入")
+                .check(productionClasses);
+        noClasses()
+                .that().resideInAPackage("com.vocr.ui..")
+                .should().callMethod(
+                        GameContextView.class, "setClaimedRoleScheduled",
+                        int.class, int.class, int.class, boolean.class)
+                .because("已 CO 角色的技能预约必须由应用层统一展开")
+                .check(productionClasses);
+        noClasses()
+                .that().resideInAPackage("com.vocr.ui..")
+                .should().callMethod(
+                        GameContextView.class, "setHiddenSeerScheduled",
+                        int.class, int.class, boolean.class)
+                .because("潜伏占卜预约必须由应用层统一展开")
+                .check(productionClasses);
+        noClasses()
+                .that().resideInAPackage("com.vocr.ui..")
+                .should().callMethod(
+                        GameContextView.class, "setHiddenHunterScheduled",
+                        int.class, int.class, boolean.class)
+                .because("潜伏猎人预约必须由应用层统一展开")
                 .check(productionClasses);
     }
 

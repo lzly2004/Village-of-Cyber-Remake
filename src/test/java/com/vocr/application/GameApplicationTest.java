@@ -6,6 +6,7 @@ import com.vocr.core.MainLogicInterface;
 import com.vocr.domain.Event;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.Role;
+import com.vocr.domain.SelectionType;
 import com.vocr.domain.peiyi;
 import com.vocr.history.GameRecordManager;
 
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -150,6 +152,88 @@ class GameApplicationTest
         assertNull(logic.voteCandidates);
     }
 
+    @Test
+    void allTargetSelection_shouldPreserveVoteAndSkillExpansionSemantics()
+    {
+        TrackingLogic logic = new TrackingLogic();
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+
+        GameUpdate voteUpdate = application.setTargetSelection(
+                new SetAllTargetSelectionCommand(SelectionType.VOTE, 6, true));
+        assertEquals(List.of("setSelectedVoteTarget:[6, 4, true]"), logic.selectionWrites);
+        assertEquals(application.currentUpdate(), voteUpdate);
+
+        logic.selectionWrites.clear();
+        logic.actualRoles[2] = Role.zhan.ordinal();
+        logic.claimedRoles[3] = Role.zhan.ordinal();
+        logic.claimedRoles[5] = Role.zhan.ordinal();
+        logic.deadPlayers.add(5);
+        application.setTargetSelection(
+                new SetAllTargetSelectionCommand(SelectionType.DIVINATION, 6, true));
+        assertEquals(List.of(
+                "setHiddenSeerScheduled:[6, 4, true]",
+                "setClaimedRoleScheduled:[2, 6, 4, true]",
+                "setClaimedRoleScheduled:[3, 6, 4, true]"), logic.selectionWrites);
+
+        logic.selectionWrites.clear();
+        logic.actualRoles[2] = Role.lie.ordinal();
+        logic.claimedRoles[3] = Role.lie.ordinal();
+        logic.claimedRoles[5] = Role.lie.ordinal();
+        application.setTargetSelection(
+                new SetAllTargetSelectionCommand(SelectionType.GUARD, 6, false));
+        assertEquals(List.of(
+                "setHiddenHunterScheduled:[6, 4, false]",
+                "setClaimedRoleScheduled:[2, 6, 4, false]",
+                "setClaimedRoleScheduled:[3, 6, 4, false]"), logic.selectionWrites);
+    }
+
+    @Test
+    void claimedRoleTargetSelection_shouldValidateActorAndTargetBeforeWriting()
+    {
+        TrackingLogic logic = new TrackingLogic();
+        logic.claimedRoles[3] = Role.zhan.ordinal();
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+
+        application.setTargetSelection(new SetClaimedRoleTargetSelectionCommand(
+                SelectionType.DIVINATION, 3, 6, true));
+        assertEquals(List.of("setClaimedRoleScheduled:[3, 6, 4, true]"), logic.selectionWrites);
+
+        assertThrows(NullPointerException.class,
+                () -> new SetAllTargetSelectionCommand(null, 1, true));
+        assertThrows(IllegalArgumentException.class,
+                () -> new SetAllTargetSelectionCommand(SelectionType.VOTE, 0, true));
+        assertThrows(NullPointerException.class,
+                () -> new SetClaimedRoleTargetSelectionCommand(null, 1, 2, true));
+        assertThrows(IllegalArgumentException.class,
+                () -> new SetClaimedRoleTargetSelectionCommand(
+                        SelectionType.VOTE, 1, 2, true));
+        assertThrows(IllegalArgumentException.class,
+                () -> new SetClaimedRoleTargetSelectionCommand(
+                        SelectionType.GUARD, 0, 2, true));
+        assertThrows(IllegalArgumentException.class,
+                () -> new SetClaimedRoleTargetSelectionCommand(
+                        SelectionType.GUARD, 1, 0, true));
+
+        assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
+                new SetAllTargetSelectionCommand(SelectionType.VOTE, 11, true)));
+        assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
+                new SetClaimedRoleTargetSelectionCommand(
+                        SelectionType.DIVINATION, 11, 6, true)));
+        assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
+                new SetClaimedRoleTargetSelectionCommand(
+                        SelectionType.DIVINATION, 3, 11, true)));
+
+        logic.deadPlayers.add(6);
+        assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
+                new SetClaimedRoleTargetSelectionCommand(
+                        SelectionType.DIVINATION, 3, 6, true)));
+        logic.deadPlayers.clear();
+        logic.claimedRoles[3] = Role.lie.ordinal();
+        assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
+                new SetClaimedRoleTargetSelectionCommand(
+                        SelectionType.DIVINATION, 3, 6, true)));
+    }
+
     private GameRecordManager records(String fileName)
     {
         return new GameRecordManager(tempDir.resolve(fileName).toString());
@@ -158,14 +242,29 @@ class GameApplicationTest
     private static final class TrackingLogic implements MainLogicInterface
     {
         private final Set<Integer> deadPlayers = new HashSet<>();
+        private final int[] actualRoles = new int[11];
+        private final int[] claimedRoles = new int[11];
+        private final List<String> selectionWrites = new ArrayList<>();
         private final GameContextView context = (GameContextView) Proxy.newProxyInstance(
                 GameContextView.class.getClassLoader(),
                 new Class<?>[]{GameContextView.class},
                 (proxy, method, arguments) -> {
-                    if (method.getName().equals("getPlayerSum")) return 10;
-                    if (method.getName().equals("isAlive"))
-                        return !deadPlayers.contains((Integer) arguments[0]);
-                    throw new UnsupportedOperationException(method.getName());
+                    return switch (method.getName())
+                    {
+                        case "getPlayerSum" -> 10;
+                        case "getGameDay" -> 4;
+                        case "isAlive" -> !deadPlayers.contains((Integer) arguments[0]);
+                        case "getActualRole" -> actualRoles[(Integer) arguments[0]];
+                        case "getClaimedRole" -> claimedRoles[(Integer) arguments[0]];
+                        case "setSelectedVoteTarget", "setClaimedRoleScheduled",
+                                "setHiddenSeerScheduled", "setHiddenHunterScheduled" ->
+                        {
+                            selectionWrites.add(
+                                    method.getName() + ":" + Arrays.toString(arguments));
+                            yield null;
+                        }
+                        default -> throw new UnsupportedOperationException(method.getName());
+                    };
                 });
         private Role askedRole;
         private List<Integer> askedPlayers;

@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * 游戏上下文访问接口 —— UI层通过此接口查询游戏状态。
- * 以只读查询为主，仅保留投票和技能预约所需的写操作。
+ * 以只读查询为主；迁移期保留的投票和技能预约写操作只允许应用层调用。
  * 由 GameContext（Phase 2创建）实现。
  */
 public interface GameContextView
@@ -62,7 +62,7 @@ public interface GameContextView
     boolean isHiddenSeerScheduled(int target, int day);
     boolean isHiddenHunterScheduled(int target, int day);
 
-    // === UI层写操作（投票/技能预约）===
+    // === 应用层写操作（投票/技能预约，迁移期保留）===
     void setSelectedVoteTarget(int player, int day, boolean value);
     void setClaimedRoleScheduled(int player, int target, int day, boolean value);
     void setHiddenSeerScheduled(int target, int day, boolean value);

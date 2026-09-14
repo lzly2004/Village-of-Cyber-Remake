@@ -3,13 +3,15 @@ package com.vocr.application;
 import com.vocr.core.MainLogicInterface;
 import com.vocr.domain.Event;
 import com.vocr.domain.GameContextView;
+import com.vocr.domain.Role;
+import com.vocr.domain.SelectionType;
 
 import java.util.Objects;
 
 /**
  * 平台无关的对局应用入口。
  *
- * 开局、CO 询问与投票/处刑已经按垂直切片迁入；后续业务操作继续逐步加入，
+ * 开局、CO 询问、目标预约与投票/处刑已经按垂直切片迁入；后续业务操作继续逐步加入，
  * Swing 与 Web 均不得绕过这里复制一份规则流程。
  */
 public final class GameApplication
@@ -73,6 +75,72 @@ public final class GameApplication
         boolean voteCompleted = gameLogic.shokei(
                 command.method().legacyCode(), command.candidates(), command.avoidanceEnabled());
         return new VoteExecutionResult(voteCompleted, currentUpdate());
+    }
+
+    public GameUpdate setTargetSelection(SetAllTargetSelectionCommand command)
+    {
+        Objects.requireNonNull(command, "全体目标命令不能为空");
+        GameContextView context = requireStartedContext();
+        requireAlivePlayer(context, command.target(), "目标玩家");
+        int day = context.getGameDay();
+
+        if (command.type() == SelectionType.VOTE)
+        {
+            context.setSelectedVoteTarget(command.target(), day, command.selected());
+            return currentUpdate();
+        }
+
+        Role scheduledRole = scheduledRole(command.type());
+        if (command.type() == SelectionType.DIVINATION)
+            context.setHiddenSeerScheduled(command.target(), day, command.selected());
+        else
+            context.setHiddenHunterScheduled(command.target(), day, command.selected());
+
+        for (int player = 1; player <= context.getPlayerSum(); player++)
+        {
+            if (context.isAlive(player)
+                    && (context.getActualRole(player) == scheduledRole.ordinal()
+                    || context.getClaimedRole(player) == scheduledRole.ordinal()))
+            {
+                context.setClaimedRoleScheduled(
+                        player, command.target(), day, command.selected());
+            }
+        }
+        return currentUpdate();
+    }
+
+    public GameUpdate setTargetSelection(SetClaimedRoleTargetSelectionCommand command)
+    {
+        Objects.requireNonNull(command, "CO 目标命令不能为空");
+        GameContextView context = requireStartedContext();
+        requireAlivePlayer(context, command.claimedPlayer(), "CO 玩家");
+        requireAlivePlayer(context, command.target(), "目标玩家");
+        Role scheduledRole = scheduledRole(command.type());
+        if (context.getClaimedRole(command.claimedPlayer()) != scheduledRole.ordinal())
+            throw new IllegalArgumentException(
+                    "玩家未声称该技能职业: " + command.claimedPlayer());
+
+        context.setClaimedRoleScheduled(
+                command.claimedPlayer(), command.target(), context.getGameDay(), command.selected());
+        return currentUpdate();
+    }
+
+    private static Role scheduledRole(SelectionType type)
+    {
+        return switch (type)
+        {
+            case DIVINATION -> Role.zhan;
+            case GUARD -> Role.lie;
+            case VOTE -> throw new IllegalArgumentException("指定投票不包含技能职业");
+        };
+    }
+
+    private static void requireAlivePlayer(GameContextView context, int player, String description)
+    {
+        if (player > context.getPlayerSum())
+            throw new IllegalArgumentException(description + "编号超出当前对局范围: " + player);
+        if (!context.isAlive(player))
+            throw new IllegalArgumentException(description + "必须存活: " + player);
     }
 
     public GameUpdate currentUpdate()
