@@ -172,13 +172,11 @@ public class UI
     /** 获取主窗口 */
     public JFrame getJFrame() { return jFrame; }
 
-    private DialogueBox dialogueBox;//对话框封装逻辑
     private Map<Scene, SceneHandler> sceneHandlers = new HashMap<>();//场景处理器注册表
     // 在UI类中添加这个方法
     public void init()
     {
         uiComponentFactory = new UIComponentFactory();
-        dialogueBox = new DialogueBox(jPanel);//对话框封装逻辑初始化
         sceneHandlers.put(Scene.START_SCENE, new StartSceneHandler());//注册开始场景处理器
         // 注册所有信息界面场景处理器
         InfoSceneHandler infoHandler = new InfoSceneHandler();

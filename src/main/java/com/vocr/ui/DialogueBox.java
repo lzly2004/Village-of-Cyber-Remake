@@ -8,10 +8,6 @@ import java.awt.*;
 
 public class DialogueBox
 {
-    DialogueBox(JPanel jPanel)
-    {
-    }
-
     public static class Components
     {
         public JLabel background;

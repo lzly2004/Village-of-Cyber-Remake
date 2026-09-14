@@ -1,6 +1,8 @@
 package com.vocr.ui;
 
 import com.vocr.domain.CharacterEnglishName;
+import com.vocr.domain.CharacterKanjiName;
+import com.vocr.domain.CharacterKatakanaName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,6 +15,17 @@ class UIComponentFactoryTest {
     void displayNameShouldUseKanjiAndKatakanaWithoutEnglishName() {
         assertEquals("宿屋主人 フーゴー", factory.getCharacterDisplayName(CharacterEnglishName.Hugo));
         assertEquals("修道士 ライヒアルト", factory.getCharacterDisplayName(CharacterEnglishName.Reichard));
+    }
+
+    @Test
+    void parallelCharacterNameEnumsShouldKeepTheirSharedIndexRange() {
+        assertEquals(45, CharacterEnglishName.values().length);
+        assertEquals(CharacterEnglishName.values().length, CharacterKanjiName.values().length);
+        assertEquals(CharacterEnglishName.values().length, CharacterKatakanaName.values().length);
+        assertEquals(CharacterKanjiName.青年,
+                CharacterKanjiName.values()[CharacterEnglishName.Abel.ordinal()]);
+        assertEquals(CharacterKatakanaName.ヘルムート,
+                CharacterKatakanaName.values()[CharacterEnglishName.Helmut.ordinal()]);
     }
 
     @Test

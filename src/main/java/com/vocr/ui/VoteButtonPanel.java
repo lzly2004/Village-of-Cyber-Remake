@@ -55,7 +55,7 @@ class VoteButtonPanel {
         else { avoidBtn1.setVisible(true); avoidBtn.setVisible(false); }
 
         scrollPane1 = new JScrollPane();
-        if (!scrollPane1.isAncestorOf(ui.jPanel)) ui.jPanel.add(scrollPane1);
+        ui.jPanel.add(scrollPane1);
     }
 
     private JButton createVisibleButton(UI ui, int x, int y, UiImage image) {

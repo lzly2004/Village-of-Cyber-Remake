@@ -3,9 +3,9 @@ package com.vocr.ui;
 import javax.swing.*;
 import java.awt.*;
 
-public class LabelSimpleFactory
+final class LabelSimpleFactory
 {
-    public static JLabel makeLabel(int kind, String text,ImageIcon icon)
+    static JLabel makeLabel(int kind, String text,ImageIcon icon)
     {
         switch (kind)
         {
@@ -15,40 +15,40 @@ public class LabelSimpleFactory
         }
         return null;
     }
-    public static JLabel makeLabel(int kind, ImageIcon icon)
+    static JLabel makeLabel(int kind, ImageIcon icon)
     {
       return makeLabel(kind,null,icon);
     }
-    public static JLabel makeLabel(int kind, String text)
+    static JLabel makeLabel(int kind, String text)
     {
        return makeLabel(kind,text,null);
     }
-    public static JLabel createSimpleLabel(String text,ImageIcon icon)
+    private static JLabel createSimpleLabel(String text,ImageIcon icon)
     {
         return createLabel(text, icon, LabelConst.Simple_Label);
     }
-    public static JLabel createTextLabel(String text,ImageIcon icon)
+    private static JLabel createTextLabel(String text,ImageIcon icon)
     {
         return createLabel(text, icon, LabelConst.Text_Label);
     }
-    public static JLabel createBlackLabel(String text,ImageIcon icon)
+    private static JLabel createBlackLabel(String text,ImageIcon icon)
     {
         return createLabel(text, icon, LabelConst.Black_Label);
     }
 
-    public static JLabel makeLabel(int kind,int x,int y,int width,int height,ImageIcon icon)
+    static JLabel makeLabel(int kind,int x,int y,int width,int height,ImageIcon icon)
     {
         return makeLabel(kind,x,y,width,height,null,icon);
     }
-    public static JLabel makeLabel(int kind,int x,int y,int width,int height,String text)
+    static JLabel makeLabel(int kind,int x,int y,int width,int height,String text)
     {
         return makeLabel(kind,x,y,width,height,text,null);
     }
-    public static JLabel makeLabel(int kind,int x,int y,ImageIcon icon)
+    static JLabel makeLabel(int kind,int x,int y,ImageIcon icon)
     {
         return makeLabel(kind,x,y,icon.getIconWidth(),icon.getIconHeight(),null,icon);
     }
-    public static JLabel makeLabel(int kind,int x,int y,int width,int height,String text,ImageIcon icon)
+    static JLabel makeLabel(int kind,int x,int y,int width,int height,String text,ImageIcon icon)
     {
         switch (kind)
         {
@@ -58,15 +58,15 @@ public class LabelSimpleFactory
         }
         return null;
     }
-    public static JLabel createSimpleBoundedLabel(int x,int y,int width,int height,String text,ImageIcon icon)
+    private static JLabel createSimpleBoundedLabel(int x,int y,int width,int height,String text,ImageIcon icon)
     {
         return createBoundedLabel(x,y,width,height,text,icon,LabelConst.Simple_Label);
     }
-    public static JLabel createTextBoundedLabel(int x,int y,int width,int height,String text,ImageIcon icon)
+    private static JLabel createTextBoundedLabel(int x,int y,int width,int height,String text,ImageIcon icon)
     {
         return createBoundedLabel(x,y,width,height,text,icon,LabelConst.Text_Label);
     }
-    public static JLabel createBlackBoundedLabel(int x,int y,int width,int height,String text,ImageIcon icon)
+    private static JLabel createBlackBoundedLabel(int x,int y,int width,int height,String text,ImageIcon icon)
     {
         return createBoundedLabel(x,y,width,height,text,icon,LabelConst.Black_Label);
     }

@@ -7,7 +7,6 @@ import com.vocr.resources.UiImage;
 
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
-import com.vocr.domain.EventName;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.whyDie;
 
@@ -27,6 +26,8 @@ public class UIHelpers {
     /** 按指定尺寸平滑缩放 Swing 图标。 */
     public static ImageIcon scaleIcon(ImageIcon originalIcon, int width, int height) {
         if (originalIcon == null) return null;
+        if (originalIcon.getIconWidth() == width && originalIcon.getIconHeight() == height)
+            return originalIcon;
         Image scaledImage = originalIcon.getImage().getScaledInstance(
                 width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
@@ -69,31 +70,19 @@ public class UIHelpers {
         for (JButton b : buttons) b.setVisible(false);
     }
 
-    /** 对话角色立绘定位：根据事件类型决定左侧/居中，并标记是否需要加入linkIcon */
-    public static JLabel createCharacterLabel(Event event, ImageIcon[] CharIcon,
-                                              boolean[] shouldAddToLinkIcon) {
-        JLabel Chara;
-        switch (event.eventname()) {
-            case gyfo1:
-            case qfjc5:
-            case zjgh8b:
-            case zjgb8:
-            case gprz11p:
-            case zcrh12:
-                Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, 300,
-                        UIConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
-                        CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
-                shouldAddToLinkIcon[0] = true;
-                break;
-            default:
-                Chara = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label,
-                        (UIConstants.WINDOW_WIDTH - CharIcon[0].getIconWidth()) / 2,
-                        UIConstants.WINDOW_HEIGHT - CharIcon[0].getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
-                        CharIcon[0].getIconWidth(), CharIcon[0].getIconHeight(), CharIcon[0]);
-                shouldAddToLinkIcon[0] = false;
-                break;
-        }
-        return Chara;
+    private record CharacterLabelResult(JLabel label, boolean addToLinkIcon) {}
+
+    /** 对话角色立绘定位：特定双人事件放在左侧，并缓存供下一角色配对。 */
+    private static CharacterLabelResult createCharacterLabel(Event event, ImageIcon icon) {
+        boolean addToLinkIcon = switch (event.eventname()) {
+            case gyfo1, qfjc5, zjgh8b, zjgb8, gprz11p, zcrh12 -> true;
+            default -> false;
+        };
+        int x = addToLinkIcon ? 300 : (UIConstants.WINDOW_WIDTH - icon.getIconWidth()) / 2;
+        JLabel label = LabelSimpleFactory.makeLabel(LabelConst.Simple_Label, x,
+                UIConstants.WINDOW_HEIGHT - icon.getIconHeight() - UIConstants.CHAR_ICON_BOTTOM_MARGIN,
+                icon.getIconWidth(), icon.getIconHeight(), icon);
+        return new CharacterLabelResult(label, addToLinkIcon);
     }
 
     /** 连接事件角色对显示：当前事件角色(右)+linkIcon中缓存的上一事件角色(左) */
@@ -159,10 +148,9 @@ public class UIHelpers {
     }
 
     public static void renderDialogueCharacter(UI ui, Event event, ImageIcon[] CharIcon) {
-        boolean[] shouldAdd = {false};
-        JLabel Chara = createCharacterLabel(event, CharIcon, shouldAdd);
-        if (shouldAdd[0]) ui.linkIcon.add(CharIcon[0]);
-        ui.diaPanel.add(Chara);
+        CharacterLabelResult result = createCharacterLabel(event, CharIcon[0]);
+        if (result.addToLinkIcon()) ui.linkIcon.add(CharIcon[0]);
+        ui.diaPanel.add(result.label());
         ui.resizeComponents();
     }
 
@@ -186,20 +174,14 @@ public class UIHelpers {
         if (claimedRole <= 0 || claimedRole >= 6) return null;
         String iconName = ImageNames.claimedRoleIcon(claimedRole, claimedRoleOrder);
         ImageIcon icon = ui.resources.getImage(iconName);
-        if (icon == null) return null;
-        JLabel label = new JLabel(icon);
-        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
-        return label;
+        return createIconLabel(icon, x, y);
     }
 
     public static JLabel createDeathMarker(UI ui, whyDie deathReason, int x, int y) {
         String iconName = ImageNames.deathMarker(deathReason);
         if (iconName.isEmpty()) return null;
         ImageIcon icon = ui.resources.getImage(iconName);
-        if (icon == null) return null;
-        JLabel label = new JLabel(icon);
-        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
-        return label;
+        return createIconLabel(icon, x, y);
     }
 
     public static JLabel createDeathMarker(UI ui, int deathReason, int x, int y) {
@@ -212,10 +194,7 @@ public class UIHelpers {
                 ? ImageNames.characterResultPortrait(charNumber, deathReason, actualRole)
                 : ImageNames.characterStatusPortrait(charNumber, deathReason == whyDie.NONE);
         ImageIcon icon = ui.resources.getImage(imageName);
-        if (icon == null) return null;
-        JLabel label = new JLabel(icon);
-        label.setBounds(x, y, icon.getIconWidth(), icon.getIconHeight());
-        return label;
+        return createIconLabel(icon, x, y);
     }
 
     public static JLabel createCharacterText(UI ui, int charNumber, int x, int baseY, boolean isTextLabel) {

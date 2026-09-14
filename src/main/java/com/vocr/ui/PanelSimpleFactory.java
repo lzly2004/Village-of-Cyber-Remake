@@ -1,23 +1,11 @@
 package com.vocr.ui;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
 
-public class PanelSimpleFactory
+final class PanelSimpleFactory
 {
-    public static JPanel makePanel(int kind,int width,int height,boolean isOpaque,boolean isWhiteBk)//暂时放在这里，没来得及添加参数
-    {
-        switch (kind)
-        {
-            case PanelConst.Simple_Panel ->
-            {
-                return createSimplePanel(width,height,isOpaque,isWhiteBk);
-            }
-        }
-        return null;
-    }
-    public static JPanel createSimplePanel(int width,int height,boolean isOpaque,boolean isWhiteBk)    //创建一个普通按钮
+    static JPanel createSimplePanel(
+            int width, int height, boolean isOpaque, boolean transparentBackground)
     {
        JPanel jPanel =  new JPanel();
        jPanel.setLayout(null);
@@ -25,39 +13,20 @@ public class PanelSimpleFactory
        {
            jPanel.setSize(width,height);
        }
-       if(isWhiteBk)
+       if(transparentBackground)
            jPanel.setBackground(UIConstants.COLOR_TRANSPARENT);
        jPanel.setOpaque(isOpaque);
        return jPanel;
     }
 
-    //扩展：可以设置位置和长宽
-    public static JPanel makePanel(int kind,int x,int y,int width,int height,boolean isOpaque,boolean isWhiteBk)//暂时放在这里，没来得及添加参数
+    /** 创建使用绝对布局且带边界的面板。 */
+    static JPanel createSimplePanel(
+            int x, int y, int width, int height,
+            boolean isOpaque, boolean transparentBackground)
     {
-        switch (kind)
-        {
-            case PanelConst.Simple_Panel ->
-            {
-                return createSimplePanel(x,y,width,height,isOpaque,isWhiteBk);
-            }
-        }
-        return null;
-    }
-    public static JPanel createSimplePanel(int x,int y,int width,int height,boolean isOpaque,boolean isWhiteBk)    //创建一个普通按钮
-    {
-        JPanel jPanel =  new JPanel();
-        jPanel.setLayout(null);
+        JPanel jPanel = createSimplePanel(width, height, isOpaque, transparentBackground);
         if(width > 0 && height > 0)
-        {
             jPanel.setBounds(x,y,width,height);
-        }
-        if(isWhiteBk)
-            jPanel.setBackground(UIConstants.COLOR_TRANSPARENT);
-        jPanel.setOpaque(isOpaque);
         return jPanel;
     }
-}
-final class PanelConst//按钮常量类
-{
-    static final int Simple_Panel = 0;//普通面板
 }

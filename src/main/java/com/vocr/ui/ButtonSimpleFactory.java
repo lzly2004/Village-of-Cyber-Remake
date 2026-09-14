@@ -5,17 +5,17 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class ButtonSimpleFactory
+final class ButtonSimpleFactory
 {
-    public static JButton makeButton(int kind,ImageIcon icon)//暂时放在这里，没来得及添加参数
+    static JButton makeButton(int kind,ImageIcon icon)
     {
         return makeButton(kind,null,icon);
     }
-    public static JButton makeButton(int kind,String text)//暂时放在这里，没来得及添加参数
+    static JButton makeButton(int kind,String text)
     {
         return makeButton(kind,text,null);
     }
-    public static JButton makeButton(int kind,String text,ImageIcon icon)//暂时放在这里，没来得及添加参数
+    static JButton makeButton(int kind,String text,ImageIcon icon)
     {
         switch(kind)
         {
@@ -30,7 +30,7 @@ public class ButtonSimpleFactory
         }
         return null;
     }
-    public static void setButton(JButton btn)   //设置按钮为普通按钮基础设置
+    private static void setButton(JButton btn)   //设置按钮为普通按钮基础设置
     {
         btn.setOpaque(false);
         btn.setBorderPainted(false);
@@ -39,7 +39,7 @@ public class ButtonSimpleFactory
         btn.setFont(new Font(UIConstants.FONT_FAMILY, Font.BOLD, UIConstants.FONT_SIZE_BUTTON));
         btn.setFocusPainted(false);
     }
-    public static JButton createDraggableButton(String text,ImageIcon icon) //创建一个拖动button:指定的时候使用
+    private static JButton createDraggableButton(String text,ImageIcon icon) //创建一个拖动button:指定的时候使用
     {
         JButton draggableBtn = createSimpleButton(text,icon);
         addDragListeners(draggableBtn);
@@ -95,7 +95,7 @@ public class ButtonSimpleFactory
             }
         });
     }
-    public static JButton createSimpleButton(String text,ImageIcon icon)    //创建一个普通按钮
+    private static JButton createSimpleButton(String text,ImageIcon icon)    //创建一个普通按钮
     {
         JButton btn = new JButton();
         if(icon != null)
@@ -107,15 +107,15 @@ public class ButtonSimpleFactory
     }
 
     //扩展：返回带图片的，确定坐标与大小的图标
-    public static JButton makeButton(int kind,int x,int y,int width,int height,ImageIcon icon)//暂时放在这里，没来得及添加参数
+    static JButton makeButton(int kind,int x,int y,int width,int height,ImageIcon icon)
     {
        return  makeButton(kind,x,y,width,height,null,icon);
     }
-    public static JButton makeButton(int kind,int x,int y,ImageIcon icon)//暂时放在这里，没来得及添加参数
+    static JButton makeButton(int kind,int x,int y,ImageIcon icon)
     {
         return  makeButton(kind,x,y,icon.getIconWidth(),icon.getIconHeight(),null,icon);
     }
-    public static JButton makeButton(int kind,int x,int y,int width,int height,String text,ImageIcon icon)//暂时放在这里，没来得及添加参数
+    static JButton makeButton(int kind,int x,int y,int width,int height,String text,ImageIcon icon)
     {
         switch(kind)
         {
@@ -130,13 +130,13 @@ public class ButtonSimpleFactory
         }
         return null;
     }
-    public static JButton createDraggableBoundedButton(int x,int y,int width,int height,String text,ImageIcon icon) //创建一个拖动button:指定的时候使用
+    private static JButton createDraggableBoundedButton(int x,int y,int width,int height,String text,ImageIcon icon) //创建一个拖动button:指定的时候使用
     {
         JButton draggableBtn = createSimpleBoundedButton(x,y,width,height,text,icon);
         addDragListeners(draggableBtn);
         return draggableBtn;
     }
-    public static JButton createSimpleBoundedButton(int x,int y,int width,int height,String text,ImageIcon icon)    //创建一个普通按钮
+    private static JButton createSimpleBoundedButton(int x,int y,int width,int height,String text,ImageIcon icon)    //创建一个普通按钮
     {
         JButton btn = new JButton();
         btn.setBounds(x,y,width,height);
