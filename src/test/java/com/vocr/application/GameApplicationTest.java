@@ -15,10 +15,13 @@ import org.junit.jupiter.api.io.TempDir;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -94,6 +97,59 @@ class GameApplicationTest
                 new AskClaimByPlayersCommand(List.of(11))));
     }
 
+    @Test
+    void executeVote_shouldTranslateMethodAndReturnCoreCompletionState()
+    {
+        TrackingLogic logic = new TrackingLogic();
+        logic.voteCompleted = true;
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+
+        List<Integer> candidates = new ArrayList<>(List.of(2, 4));
+        ExecuteVoteCommand command = new ExecuteVoteCommand(
+                VotingMethod.DESIGNATED, candidates, true);
+        candidates.add(6);
+        VoteExecutionResult result = application.executeVote(command);
+
+        assertEquals(2, logic.votingMethod);
+        assertEquals(List.of(2, 4), logic.voteCandidates);
+        assertTrue(logic.avoidanceEnabled);
+        assertTrue(result.voteCompleted());
+        assertEquals(application.currentUpdate(), result.update());
+        assertThrows(UnsupportedOperationException.class, () -> command.candidates().add(6));
+
+        logic.voteCompleted = false;
+        VoteExecutionResult interrupted = application.executeVote(
+                new ExecuteVoteCommand(VotingMethod.FREE, List.of(1), true));
+        assertFalse(interrupted.voteCompleted(), "回避 CO 时必须保留核心的未完成状态");
+        assertEquals(0, logic.votingMethod);
+    }
+
+    @Test
+    void executeVote_shouldRejectInvalidCandidatesBeforeCallingCore()
+    {
+        assertThrows(NullPointerException.class,
+                () -> new ExecuteVoteCommand(null, List.of(1), false));
+        assertThrows(NullPointerException.class,
+                () -> new ExecuteVoteCommand(VotingMethod.FREE, null, false));
+        assertThrows(IllegalArgumentException.class,
+                () -> new ExecuteVoteCommand(VotingMethod.FREE, List.of(), false));
+        assertThrows(IllegalArgumentException.class,
+                () -> new ExecuteVoteCommand(VotingMethod.FREE, List.of(0), false));
+        assertThrows(IllegalArgumentException.class,
+                () -> new ExecuteVoteCommand(VotingMethod.FREE, List.of(1, 1), false));
+
+        TrackingLogic logic = new TrackingLogic();
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+        assertThrows(IllegalArgumentException.class, () -> application.executeVote(
+                new ExecuteVoteCommand(VotingMethod.FREE, List.of(11), false)));
+        assertNull(logic.voteCandidates);
+
+        logic.deadPlayers.add(4);
+        assertThrows(IllegalArgumentException.class, () -> application.executeVote(
+                new ExecuteVoteCommand(VotingMethod.DESIGNATED, List.of(4), false)));
+        assertNull(logic.voteCandidates);
+    }
+
     private GameRecordManager records(String fileName)
     {
         return new GameRecordManager(tempDir.resolve(fileName).toString());
@@ -101,20 +157,32 @@ class GameApplicationTest
 
     private static final class TrackingLogic implements MainLogicInterface
     {
+        private final Set<Integer> deadPlayers = new HashSet<>();
         private final GameContextView context = (GameContextView) Proxy.newProxyInstance(
                 GameContextView.class.getClassLoader(),
                 new Class<?>[]{GameContextView.class},
                 (proxy, method, arguments) -> {
                     if (method.getName().equals("getPlayerSum")) return 10;
+                    if (method.getName().equals("isAlive"))
+                        return !deadPlayers.contains((Integer) arguments[0]);
                     throw new UnsupportedOperationException(method.getName());
                 });
         private Role askedRole;
         private List<Integer> askedPlayers;
+        private int votingMethod = -1;
+        private List<Integer> voteCandidates;
+        private boolean avoidanceEnabled;
+        private boolean voteCompleted;
 
         @Override public GameContextView getGameContext() { return context; }
         @Override public GameRecorder getRecorder() { return null; }
         @Override public void start(peiyi configuration) { }
-        @Override public boolean shokei(int method, List<Integer> players, boolean avoid) { return false; }
+        @Override public boolean shokei(int method, List<Integer> players, boolean avoid) {
+            votingMethod = method;
+            voteCandidates = List.copyOf(players);
+            avoidanceEnabled = avoid;
+            return voteCompleted;
+        }
         @Override public void askCo(Role role) { askedRole = role; }
         @Override public void askCo(List<Integer> players) { askedPlayers = List.copyOf(players); }
     }

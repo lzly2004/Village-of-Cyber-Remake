@@ -2,7 +2,10 @@ package com.vocr.ui;
 
 import com.vocr.application.AskClaimByPlayersCommand;
 import com.vocr.application.AskClaimByRoleCommand;
+import com.vocr.application.ExecuteVoteCommand;
 import com.vocr.application.GameUpdate;
+import com.vocr.application.VoteExecutionResult;
+import com.vocr.application.VotingMethod;
 import com.vocr.resources.BgmTrack;
 import com.vocr.resources.ImageNames;
 import com.vocr.resources.SoundEffect;
@@ -411,7 +414,9 @@ public class GameSceneVoteHandler implements SceneHandler {
         }
         boolean isReVote;
         if (!greyResult.cxList.isEmpty()) DebugLogger.log("cxList不为空，且具体为" + greyResult.cxList);
-        if (ui.mainLogic.shokei(1, greyResult.cxList, ui.isAvoid)) {
+        VoteExecutionResult result = ui.gameApplication.executeVote(
+                new ExecuteVoteCommand(VotingMethod.GREY, greyResult.cxList, ui.isAvoid));
+        if (result.voteCompleted()) {
             int trueDay = ui.ctx.getEffectiveGameDay();
             greyResult.cxList.clear();
             isReVote = VoteResultRenderer.renderPiao(
@@ -467,7 +472,9 @@ public class GameSceneVoteHandler implements SceneHandler {
             if (ui.ctx.isAlive(i)) chuxingList.add(i);
         DebugLogger.log("自由投票" + chuxingList);
         boolean isReVote;
-        if (ui.mainLogic.shokei(0, chuxingList, ui.isAvoid)) {
+        VoteExecutionResult result = ui.gameApplication.executeVote(
+                new ExecuteVoteCommand(VotingMethod.FREE, chuxingList, ui.isAvoid));
+        if (result.voteCompleted()) {
             chuxingList.clear();
             if (ui.ctx.getEndResult() == GameResult.NONE) {
                 isReVote = VoteResultRenderer.renderPiao(
@@ -497,7 +504,9 @@ public class GameSceneVoteHandler implements SceneHandler {
         }
         DebugLogger.log("指定投票" + chuxingList);
         boolean isReVote;
-        if (ui.mainLogic.shokei(2, chuxingList, ui.isAvoid)) {
+        VoteExecutionResult result = ui.gameApplication.executeVote(
+                new ExecuteVoteCommand(VotingMethod.DESIGNATED, chuxingList, ui.isAvoid));
+        if (result.voteCompleted()) {
             int trueDay = ui.ctx.getEffectiveGameDay();
             StringBuilder isSelectedVoteTargetText = new StringBuilder();
             for (int i = 0; i < chuxingList.size(); ++i)

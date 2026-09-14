@@ -59,6 +59,22 @@ public final class GameApplication
         return context;
     }
 
+    public VoteExecutionResult executeVote(ExecuteVoteCommand command)
+    {
+        Objects.requireNonNull(command, "投票命令不能为空");
+        GameContextView context = requireStartedContext();
+        if (command.candidates().stream().anyMatch(player -> player > context.getPlayerSum()))
+            throw new IllegalArgumentException(
+                    "投票候补编号超出当前对局范围: " + command.candidates());
+        if (command.candidates().stream().anyMatch(player -> !context.isAlive(player)))
+            throw new IllegalArgumentException(
+                    "投票候补必须全部存活: " + command.candidates());
+
+        boolean voteCompleted = gameLogic.shokei(
+                command.method().legacyCode(), command.candidates(), command.avoidanceEnabled());
+        return new VoteExecutionResult(voteCompleted, currentUpdate());
+    }
+
     public GameUpdate currentUpdate()
     {
         return new GameUpdate(eventBuffer.snapshot());

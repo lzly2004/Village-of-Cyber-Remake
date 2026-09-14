@@ -101,6 +101,16 @@ class ArchitectureBoundaryTest {
     }
 
     @Test
+    void uiShouldExecuteVotesThroughApplicationLayer() {
+        noClasses()
+                .that().resideInAPackage("com.vocr.ui..")
+                .should().callMethod(
+                        MainLogicInterface.class, "shokei", int.class, List.class, boolean.class)
+                .because("投票与处刑用例已经迁移到平台无关应用层")
+                .check(productionClasses);
+    }
+
+    @Test
     void coreShouldExposeOnlyItsApplicationFacingApi() {
         Set<String> publicCoreTypes = productionClasses.stream()
                 .filter(type -> type.getPackageName().equals("com.vocr.core"))
