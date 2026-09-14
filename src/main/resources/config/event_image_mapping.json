@@ -1500,7 +1500,7 @@
     "gycx6": {"default":"20k.png",
       "special":{"Kaja":"20n.png"}
     },
-    "zco7": {"default":"20w2.png"},
+    "zco7": {"default":"20w.png"},
     "jhdh8b": {"default":"20o2.png",
       "special":{"Kaja":"20o.png"}
     },
@@ -1840,7 +1840,7 @@
     "gycx6": {"default":"24n.png",
       "special":{"Milli":"24n.png"}
     },
-    "zco7": {"default":"24w4.png"},
+    "zco7": {"default":"24w2.png"},
     "jhdh8b": {"default":"24d.png",
       "special":{"Milli":"24o1.png"}
     },

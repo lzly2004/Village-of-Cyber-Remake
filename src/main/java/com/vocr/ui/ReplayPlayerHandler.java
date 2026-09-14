@@ -310,7 +310,7 @@ public class ReplayPlayerHandler implements SceneHandler {
 
         ImageIcon dataBgImg = ui.resources.getImage(UiImage.CALENDAR);
         if (dataBgImg == null) {
-            DebugLogger.warn("[ReplayPlayerHandler] 日历背景图未找到: hiduke.png");
+            DebugLogger.warn("[ReplayPlayerHandler] 日历背景图未找到");
         } else {
             JLabel dataBg = LabelSimpleFactory.makeLabel(
                     LabelConst.Simple_Label, 880, 10,
@@ -495,14 +495,14 @@ public class ReplayPlayerHandler implements SceneHandler {
             }
 
             if (!isShowingVote) {
-                DebugLogger.info("[ReplayPlayerHandler] [BTN-DEBUG] day=2, 准备创建PVtohyo按钮, isShowingVote=" + isShowingVote);
+                DebugLogger.info("[ReplayPlayerHandler] [BTN-DEBUG] day=2, 准备创建投票入口按钮, isShowingVote=" + isShowingVote);
                 JButton voteBtn = createButton(ui, UiImage.REPLAY_VOTE, btnX, 550, btnW, btnH);
                 if (voteBtn != null) {
                     voteBtn.addActionListener(e -> toggleShowVote(ui));
                     ui.jPanel.add(voteBtn);
-                    DebugLogger.info("[ReplayPlayerHandler] 添加投票入口(day=2): PVtohyo.png");
+                    DebugLogger.info("[ReplayPlayerHandler] 添加第2日投票入口");
                 } else {
-                    DebugLogger.warn("[ReplayPlayerHandler] [BTN-ERROR] day=2, PVtohyo按钮创建失败!");
+                    DebugLogger.warn("[ReplayPlayerHandler] [BTN-ERROR] day=2, 投票入口按钮创建失败!");
                 }
             } else {
                 JButton backInfoBtn = createButton(
@@ -579,14 +579,14 @@ public class ReplayPlayerHandler implements SceneHandler {
             }
 
             if (!isShowingVote) {
-                DebugLogger.info("[ReplayPlayerHandler] [BTN-DEBUG] day>2, 准备创建PVtohyo按钮, isShowingVote=" + isShowingVote);
+                DebugLogger.info("[ReplayPlayerHandler] [BTN-DEBUG] day>2, 准备创建投票入口按钮, isShowingVote=" + isShowingVote);
                 JButton voteBtn = createButton(ui, UiImage.REPLAY_VOTE, btnX, 550, btnW, btnH);
                 if (voteBtn != null) {
                     voteBtn.addActionListener(e -> toggleShowVote(ui));
                     ui.jPanel.add(voteBtn);
-                    DebugLogger.info("[ReplayPlayerHandler] 添加投票入口按钮: PVtohyo.png");
+                    DebugLogger.info("[ReplayPlayerHandler] 添加投票入口按钮");
                 } else {
-                    DebugLogger.warn("[ReplayPlayerHandler] [BTN-ERROR] day>2, PVtohyo按钮创建失败!");
+                    DebugLogger.warn("[ReplayPlayerHandler] [BTN-ERROR] day>2, 投票入口按钮创建失败!");
                 }
             } else {
                 JButton backInfoBtn = createButton(
@@ -631,7 +631,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                         ui.jPanel.add(nextVoteBtn);
                         DebugLogger.info("[ReplayPlayerHandler] [BTN-ADDED] 次结果按钮已添加到jPanel, 组件数=" + ui.jPanel.getComponentCount());
                     } else {
-                        DebugLogger.error("[ReplayPlayerHandler] [BTN-ERROR] 次结果按钮创建失败(返回null)! 可能原因: PVRirekiNext.png不存在");
+                        DebugLogger.error("[ReplayPlayerHandler] [BTN-ERROR] 次结果按钮创建失败(返回null)");
                     }
                 } else {
                     DebugLogger.info("[ReplayPlayerHandler] [BTN-NAV] 隐藏次结果按钮(voteCurrentRound=" + voteCurrentRound + ">= maxRound=" + maxRound + ")");
