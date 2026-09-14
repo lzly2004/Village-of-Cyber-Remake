@@ -1,5 +1,8 @@
 package com.vocr.ui;
 
+import com.vocr.application.AskClaimByPlayersCommand;
+import com.vocr.application.AskClaimByRoleCommand;
+import com.vocr.application.GameUpdate;
 import com.vocr.resources.BgmTrack;
 import com.vocr.resources.ImageNames;
 import com.vocr.resources.SoundEffect;
@@ -443,8 +446,9 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (!askList.isEmpty() && isSelectingCo) {
             isSelectingCo = false;
             DebugLogger.log(askList);
-            ui.mainLogic.askCo(askList);
-            if (ui.hasPendingEvents()) {
+            GameUpdate update = ui.gameApplication.requestClaims(
+                    new AskClaimByPlayersCommand(askList));
+            if (!update.events().isEmpty()) {
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
                 ui.run();
             } else {
@@ -550,8 +554,8 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     private void handleRoleCo(Role role, String noRoleMsg) {
         ui.resources.playSound(SoundEffect.CLICK);
-        ui.mainLogic.askCo(role);
-        if (!ui.hasPendingEvents()) {
+        GameUpdate update = ui.gameApplication.requestClaims(new AskClaimByRoleCommand(role));
+        if (update.events().isEmpty()) {
             createTishi(noRoleMsg);
         } else {
             ui.currentScene = UI.Scene.DIALOGUE_DAY;

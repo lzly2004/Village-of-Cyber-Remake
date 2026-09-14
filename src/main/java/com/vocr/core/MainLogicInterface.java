@@ -21,11 +21,11 @@ public interface MainLogicInterface
     //false:没有进行投票(存在回避co)
     //huibi:true开启回避 false关闭回避
     void askCo(Role azhiye);
-    //提供给UI类，调用后主逻辑处理询问某一职业co的逻辑，这一步有可能会添加一些事件给UI类
+    //提供给应用层，调用后主逻辑处理询问某一职业co的逻辑，这一步有可能会发布一系列事件
     //参数：被询问co的职业。
     //无返回值，在函数体运行时添加对应的事件
     void askCo(List<Integer> askList);
-    //提供给UI类，调用后主逻辑处理询问co的逻辑，这一步有可能会添加一些事件给UI类
+    //提供给应用层，调用后主逻辑处理询问co的逻辑，这一步有可能会发布一系列事件
     //参数：被询问co的角色编号。
     //无返回值，在函数体运行时添加对应的事件
 }

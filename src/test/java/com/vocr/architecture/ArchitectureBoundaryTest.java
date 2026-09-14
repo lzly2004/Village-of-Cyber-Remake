@@ -8,10 +8,12 @@ import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.vocr.core.MainLogicInterface;
+import com.vocr.domain.Role;
 import com.vocr.domain.peiyi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,6 +83,20 @@ class ArchitectureBoundaryTest {
                 .that().resideInAPackage("com.vocr.ui..")
                 .should().callMethod(MainLogicInterface.class, "start", peiyi.class)
                 .because("开局用例已经迁移到平台无关应用层，UI不应再次绕过该入口")
+                .check(productionClasses);
+    }
+
+    @Test
+    void uiShouldRequestClaimsThroughApplicationLayer() {
+        noClasses()
+                .that().resideInAPackage("com.vocr.ui..")
+                .should().callMethod(MainLogicInterface.class, "askCo", Role.class)
+                .because("CO 询问用例已经迁移到平台无关应用层")
+                .check(productionClasses);
+        noClasses()
+                .that().resideInAPackage("com.vocr.ui..")
+                .should().callMethod(MainLogicInterface.class, "askCo", List.class)
+                .because("按玩家询问 CO 也必须复用同一应用入口")
                 .check(productionClasses);
     }
 

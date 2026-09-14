@@ -32,6 +32,33 @@ public final class GameApplication
         return new StartedGame(context.getPeiyi(), context.getPlayerSum(), context.getGameDay());
     }
 
+    public GameUpdate requestClaims(AskClaimByRoleCommand command)
+    {
+        Objects.requireNonNull(command, "按职业询问命令不能为空");
+        requireStartedContext();
+        gameLogic.askCo(command.role());
+        return currentUpdate();
+    }
+
+    public GameUpdate requestClaims(AskClaimByPlayersCommand command)
+    {
+        Objects.requireNonNull(command, "按玩家询问命令不能为空");
+        GameContextView context = requireStartedContext();
+        if (command.players().stream().anyMatch(player -> player > context.getPlayerSum()))
+            throw new IllegalArgumentException(
+                    "询问玩家编号超出当前对局范围: " + command.players());
+        gameLogic.askCo(command.players());
+        return currentUpdate();
+    }
+
+    private GameContextView requireStartedContext()
+    {
+        GameContextView context = gameLogic.getGameContext();
+        if (context == null)
+            throw new IllegalStateException("尚未开始对局");
+        return context;
+    }
+
     public GameUpdate currentUpdate()
     {
         return new GameUpdate(eventBuffer.snapshot());
