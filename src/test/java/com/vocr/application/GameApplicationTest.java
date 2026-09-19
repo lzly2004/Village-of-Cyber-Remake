@@ -3,7 +3,9 @@ package com.vocr.application;
 import com.vocr.core.MainLogic;
 import com.vocr.core.GameRecorder;
 import com.vocr.core.MainLogicInterface;
+import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
+import com.vocr.domain.EventName;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.Role;
 import com.vocr.domain.SelectionType;
@@ -52,6 +54,11 @@ class GameApplicationTest
         assertEquals(first, application.pollNextEvent());
         assertEquals(first, update.events().getFirst(), "已发布的更新快照不得随消费进度变化");
         assertThrows(UnsupportedOperationException.class, () -> update.events().add(first));
+
+        GameUpdate completeHistory = application.currentUpdate(0);
+        assertEquals(update.events(), completeHistory.events());
+        assertEquals(update.nextEventCursor(), completeHistory.nextEventCursor());
+        assertTrue(application.currentUpdate(completeHistory.nextEventCursor()).events().isEmpty());
     }
 
     @Test
@@ -59,6 +66,33 @@ class GameApplicationTest
     {
         assertThrows(NullPointerException.class, () -> new StartGameCommand(null));
         assertThrows(IllegalArgumentException.class, () -> new StartGameCommand(peiyi.NONE));
+    }
+
+    @Test
+    void eventCursor_shouldReadRepeatablyWithoutAffectingDesktopQueue()
+    {
+        GameEventBuffer events = new GameEventBuffer();
+        GameApplication application = new GameApplication(new TrackingLogic(), events);
+        Event first = new Event(EventName.zco7, CharacterEnglishName.Abel);
+        Event second = new Event(EventName.lnco18, CharacterEnglishName.Erich);
+
+        application.publishDiagnosticEvent(first);
+        long cursorAfterFirst = application.currentUpdate(0).nextEventCursor();
+        application.publishDiagnosticEvent(second);
+
+        GameUpdate unread = application.currentUpdate(cursorAfterFirst);
+        assertEquals(List.of(second), unread.events());
+        assertEquals(unread, application.currentUpdate(cursorAfterFirst),
+                "同一游标必须可重复读取，便于网络重试");
+        assertEquals(first, application.pollNextEvent(), "游标读取不得消费桌面待展示事件");
+        application.clearPendingEvents();
+        assertFalse(application.hasPendingEvents());
+        assertEquals(List.of(first, second), application.currentUpdate(0).events(),
+                "桌面确认或清空事件不得破坏网页续读历史");
+
+        assertThrows(IllegalArgumentException.class, () -> application.currentUpdate(-1));
+        assertThrows(IllegalArgumentException.class,
+                () -> application.currentUpdate(unread.nextEventCursor() + 1));
     }
 
     @Test

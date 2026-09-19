@@ -28,6 +28,7 @@ public final class GameApplication
     public StartedGame startGame(StartGameCommand command)
     {
         Objects.requireNonNull(command, "开局命令不能为空");
+        eventBuffer.reset();
         gameLogic.start(command.configuration());
         GameContextView context = Objects.requireNonNull(
                 gameLogic.getGameContext(), "主逻辑开局后未提供游戏状态");
@@ -145,7 +146,21 @@ public final class GameApplication
 
     public GameUpdate currentUpdate()
     {
-        return new GameUpdate(eventBuffer.snapshot());
+        return toUpdate(eventBuffer.pendingSnapshot());
+    }
+
+    /**
+     * 返回指定游标之后发布的全部事件。读取不会影响桌面端的待展示队列；返回的下一游标
+     * 可用于后续轮询，重复使用同一游标会得到相同结果。
+     */
+    public GameUpdate currentUpdate(long eventCursor)
+    {
+        return toUpdate(eventBuffer.snapshotAfter(eventCursor));
+    }
+
+    private static GameUpdate toUpdate(EventBatch batch)
+    {
+        return new GameUpdate(batch.nextCursor(), batch.events());
     }
 
     /** 桌面迁移期用于确认已展示的队首事件；Web 适配器后续改用事件游标。 */
