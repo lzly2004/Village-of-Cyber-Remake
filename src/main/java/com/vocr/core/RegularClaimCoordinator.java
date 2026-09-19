@@ -94,8 +94,10 @@ final class RegularClaimCoordinator
         while(ctx.getZhans().size() > 3)
         {
             ctx.shuffleZhans();
-            int removed = ctx.getZhans().get(0);
-            if(removed == ctx.getActualRoleIndex(1)) continue;
+            int removed = ctx.getZhans().stream()
+                    .filter(player -> player != ctx.getActualRoleIndex(1))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("占卜师 CO 候补无法裁剪"));
             ctx.recordSkillTarget(removed, 1, 0);
             ctx.clearNonHumanPlan(removed);
             ctx.removeClaimCandidate(1, removed);
@@ -157,40 +159,11 @@ final class RegularClaimCoordinator
             }
         }
 
-        // 统计实际要上占/灵的数量
-        int rezhan = 0, reling = 0;
-        for(int i=0;i<context.blackResponses.size();i++)
-        {
-            if(context.blackResponses.get(i).second() == 1)
-                rezhan++;
-            else if(context.blackResponses.get(i).second() == 2)
-                reling++;
-        }
-
         // 裁剪占CO（最多4人）
-        while(ctx.getZhans().size() + rezhan > 4 && !context.blackResponses.isEmpty())
-        {
-            context.blackResponses = ctx.getRandom().shuffledCopy(context.blackResponses);
-            if(context.blackResponses.get(0).second() == 1
-                    && context.blackResponses.get(0).first() != ctx.getActualRoleIndex(1))
-            {
-                ctx.clearNonHumanPlan(context.blackResponses.get(0).first());
-                ctx.recordSkillTarget(context.blackResponses.get(0).first(), 1, 0);
-                context.blackResponses.remove(0);
-            }
-        }
+        trimBlackResponsesToLimit(context, Role.zhan, ctx.getZhans().size(), 4);
 
         // 裁剪灵CO（最多3人）
-        while(ctx.getLings().size() + reling > 3 && !context.blackResponses.isEmpty())
-        {
-            context.blackResponses = ctx.getRandom().shuffledCopy(context.blackResponses);
-            if(context.blackResponses.get(0).second() == 2
-                    && context.blackResponses.get(0).first() != ctx.getActualRoleIndex(2))
-            {
-                ctx.clearNonHumanPlan(context.blackResponses.get(0).first());
-                context.blackResponses.remove(0);
-            }
-        }
+        trimBlackResponsesToLimit(context, Role.ling, ctx.getLings().size(), 3);
 
         // 处理剩余响应
         for(int i=0;i<context.blackResponses.size();i++)
@@ -209,6 +182,40 @@ final class RegularClaimCoordinator
                 context.hasCatClaim = true;
             }
         }
+    }
+
+    private void trimBlackResponsesToLimit(
+            RegularClaimContext context, Role role, int currentClaims, int maximumClaims)
+    {
+        int roleNumber = role.ordinal();
+        while(currentClaims + countResponsesForRole(context, roleNumber) > maximumClaims)
+        {
+            context.blackResponses = ctx.getRandom().shuffledCopy(context.blackResponses);
+            int removableIndex = -1;
+            for(int i=0;i<context.blackResponses.size();i++)
+            {
+                IntPair response = context.blackResponses.get(i);
+                if(response.second() == roleNumber
+                        && response.first() != ctx.getActualRoleIndex(roleNumber))
+                {
+                    removableIndex = i;
+                    break;
+                }
+            }
+            if(removableIndex < 0) return;
+
+            IntPair removed = context.blackResponses.remove(removableIndex);
+            ctx.clearNonHumanPlan(removed.first());
+            if(role == Role.zhan)
+                ctx.recordSkillTarget(removed.first(), 1, 0);
+        }
+    }
+
+    private static long countResponsesForRole(RegularClaimContext context, int roleNumber)
+    {
+        return context.blackResponses.stream()
+                .filter(response -> response.second() == roleNumber)
+                .count();
     }
 
     private void handleRemainingCOForUnclaimed(RegularClaimContext context)

@@ -19,6 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -140,6 +142,18 @@ class GameInitializationBaselineTest {
         GameRandom secondRandom = ((GameContext) logic.getGameContext()).getRandom();
 
         assertNotSame(firstRandom, secondRandom, "同一桌面控制器开始新对局时必须创建新的随机源");
+    }
+
+    @Test
+    void blackResponseTrimming_shouldTerminateForKnownDeadlockSeed() {
+        InitializationResult result = assertTimeoutPreemptively(
+                Duration.ofSeconds(5),
+                () -> initialize(peiyi.tongchang, 37L, "black-response-deadlock"));
+        GameContextView context = result.logic.getGameContext();
+
+        assertTrue(context.getGameDay() >= 2);
+        assertTrue(context.getZhans().size() <= 5);
+        assertTrue(context.getLings().size() <= 4);
     }
 
     @Test
