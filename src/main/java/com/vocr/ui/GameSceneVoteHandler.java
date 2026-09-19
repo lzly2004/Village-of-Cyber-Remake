@@ -33,7 +33,9 @@ public class GameSceneVoteHandler implements SceneHandler {
     // === 提取的类（阶段二：Extract Class）===
     VoteButtonPanel votePanel = new VoteButtonPanel();
     VoteInfoRenderer voteInfo = new VoteInfoRenderer();
-    private GreyListCalculator.Result greyResult;
+    private List<Integer> freeVoteCandidates = List.of();
+    private List<Integer> greyVoteCandidates = List.of();
+    private List<Integer> designatedVoteCandidates = List.of();
     // === 保留在Handler中的UI组件 ===
     private JPanel hisPanel, infoPanel, infoZhanPanel, infoHuPanel, infoCoPanel;
     private JLabel levellb, background;
@@ -66,8 +68,8 @@ public class GameSceneVoteHandler implements SceneHandler {
         // ========== 阶段5：按钮创建 ==========
         createAllButtons();
 
-        // ========== 阶段6：灰名单计算 ==========
-        computeGreyList();
+        // ========== 阶段6：读取应用层权威投票候选 ==========
+        refreshLegalVoteActions();
 
         // ========== 阶段7：重置回调 ==========
         createResetToAfternoon();
@@ -134,11 +136,17 @@ public class GameSceneVoteHandler implements SceneHandler {
     }
 
     // ===================================================================
-    // 阶段6提取：灰名单计算
+    // 阶段6：应用层权威投票候选
     // ===================================================================
-    private void computeGreyList()
+    private void refreshLegalVoteActions()
     {
-        greyResult = GreyListCalculator.compute(ui.ctx);
+        GameUpdate update = ui.currentGameUpdate();
+        freeVoteCandidates = update.legalVote(VotingMethod.FREE)
+                .map(action -> action.candidates()).orElseGet(List::of);
+        greyVoteCandidates = update.legalVote(VotingMethod.GREY)
+                .map(action -> action.candidates()).orElseGet(List::of);
+        designatedVoteCandidates = update.legalVote(VotingMethod.DESIGNATED)
+                .map(action -> action.candidates()).orElseGet(List::of);
     }
 
     // ===================================================================
@@ -309,6 +317,7 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     private void handleVoteButton()
     {
+        refreshLegalVoteActions();
         voteInfo.infoText.setVisible(false);
         ui.resources.playSound(SoundEffect.CLICK);
         votePanel.voteBtn.setVisible(false); votePanel.pointBtn.setVisible(false); votePanel.avoidBtn.setVisible(false);
@@ -316,10 +325,10 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (!ui.selectedVoteTargets.isEmpty()) {
             votePanel.readyVoteBtn.setVisible(true); votePanel.greyBtn.setVisible(false); votePanel.freeBtn.setVisible(false);
         } else {
-            if (!greyResult.cxList.isEmpty()) votePanel.greyBtn.setVisible(true);
+            if (!greyVoteCandidates.isEmpty()) votePanel.greyBtn.setVisible(true);
             votePanel.freeBtn.setVisible(true); votePanel.readyVoteBtn.setVisible(false);
         }
-        if (greyResult.cxList.isEmpty()) votePanel.greyBtn.setVisible(false);
+        if (greyVoteCandidates.isEmpty()) votePanel.greyBtn.setVisible(false);
         votePanel.returnBtn.setVisible(true); votePanel.scrollPane1.setVisible(true);
 
         JTextArea isSelectedVoteTargetText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, UIConstants.FONT_SIZE_VOTE, "");
@@ -400,31 +409,20 @@ public class GameSceneVoteHandler implements SceneHandler {
         votePanel.freeBtn.setVisible(false); votePanel.greyBtn.setVisible(false); votePanel.returnBtn.setVisible(false);
         votePanel.scrollPane1.setVisible(false);
         StringBuilder greyText = new StringBuilder();
-        for (int i = 0; i < greyResult.cxList.size(); ++i)
-            greyText.append(ui.getJobText(greyResult.cxList.get(i)));
-        List<Integer> beiZhan = new ArrayList<>();
-        for (int j = 1; j < ui.ctx.getGameDay(); ++j) {
-            for (int k = 1; k <= ui.ctx.getPlayerSum(); ++k) {
-                if (ui.ctx.getClaimedRole(k) == 1) {
-                    int num = ui.ctx.getSkillTarget(k, j);
-                    if (num > ui.ctx.getPlayerSum()) num -= ui.ctx.getPlayerSum();
-                    if (!beiZhan.contains(num)) { beiZhan.add(num); DebugLogger.log(num); }
-                }
-            }
-        }
+        for (int candidate : greyVoteCandidates)
+            greyText.append(ui.getJobText(candidate));
         boolean isReVote;
-        if (!greyResult.cxList.isEmpty()) DebugLogger.log("cxList不为空，且具体为" + greyResult.cxList);
+        if (!greyVoteCandidates.isEmpty())
+            DebugLogger.log("cxList不为空，且具体为" + greyVoteCandidates);
         VoteExecutionResult result = ui.gameApplication.executeVote(
-                new ExecuteVoteCommand(VotingMethod.GREY, greyResult.cxList, ui.isAvoid));
+                new ExecuteVoteCommand(VotingMethod.GREY, greyVoteCandidates, ui.isAvoid));
         if (result.voteCompleted()) {
             int trueDay = ui.ctx.getEffectiveGameDay();
-            greyResult.cxList.clear();
             isReVote = VoteResultRenderer.renderPiao(
                     ui, String.format(GameStrings.VOTE_TITLE_GREY, trueDay) + greyText + "\n",
                     currentRound, this);
             handleReVoteResult(isReVote);
         } else {
-            greyResult.cxList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
             votePanel.scrollPane1.setVisible(true);
             resetToAfternoon.run();
@@ -467,15 +465,12 @@ public class GameSceneVoteHandler implements SceneHandler {
     {
         votePanel.freeBtn.setVisible(false); votePanel.greyBtn.setVisible(false); votePanel.returnBtn.setVisible(false);
         ui.resources.playSound(SoundEffect.CLICK); votePanel.scrollPane1.setVisible(false);
-        List<Integer> chuxingList = new ArrayList<>();
-        for (int i = 1; i <= ui.ctx.getPlayerSum(); ++i)
-            if (ui.ctx.isAlive(i)) chuxingList.add(i);
+        List<Integer> chuxingList = freeVoteCandidates;
         DebugLogger.log("自由投票" + chuxingList);
         boolean isReVote;
         VoteExecutionResult result = ui.gameApplication.executeVote(
                 new ExecuteVoteCommand(VotingMethod.FREE, chuxingList, ui.isAvoid));
         if (result.voteCompleted()) {
-            chuxingList.clear();
             if (ui.ctx.getEndResult() == GameResult.NONE) {
                 isReVote = VoteResultRenderer.renderPiao(
                         ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay() - 1), currentRound, this);
@@ -485,7 +480,6 @@ public class GameSceneVoteHandler implements SceneHandler {
             }
             handleReVoteResult(isReVote);
         } else {
-            chuxingList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
             votePanel.scrollPane1.setVisible(true);
             resetToAfternoon.run();
@@ -495,13 +489,9 @@ public class GameSceneVoteHandler implements SceneHandler {
     private void handleReadyVoteButton()
     {
         votePanel.readyVoteBtn.setVisible(false); votePanel.returnBtn.setVisible(false); votePanel.scrollPane1.setVisible(false);
-        List<Integer> chuxingList = new ArrayList<>();
-        for (int i = 1; i <= ui.ctx.getPlayerSum(); ++i) {
-            if (ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay()) && ui.ctx.isAlive(i)) {
-                chuxingList.add(i);
-                DebugLogger.log("指定了" + i);
-            }
-        }
+        List<Integer> chuxingList = designatedVoteCandidates;
+        for (int candidate : chuxingList)
+            DebugLogger.log("指定了" + candidate);
         DebugLogger.log("指定投票" + chuxingList);
         boolean isReVote;
         VoteExecutionResult result = ui.gameApplication.executeVote(
@@ -515,10 +505,8 @@ public class GameSceneVoteHandler implements SceneHandler {
             isReVote = VoteResultRenderer.renderPiao(
                     ui, GameStrings.getVoteTitleDesign(trueDay, isSelectedVoteTargetText.toString()),
                     currentRound, this);
-            chuxingList.clear();
             handleReVoteResult(isReVote);
         } else {
-            chuxingList.clear();
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
             votePanel.scrollPane1.setVisible(true);
             resetToAfternoon.run();

@@ -7,6 +7,7 @@ import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
 import com.vocr.domain.GameContextView;
+import com.vocr.domain.GameResult;
 import com.vocr.domain.Role;
 import com.vocr.domain.SelectionType;
 import com.vocr.domain.peiyi;
@@ -182,6 +183,7 @@ class GameApplicationTest
         GameApplication application = new GameApplication(logic, new GameEventBuffer());
 
         List<Integer> candidates = new ArrayList<>(List.of(2, 4));
+        logic.selectedVoteTargets.addAll(candidates);
         ExecuteVoteCommand command = new ExecuteVoteCommand(
                 VotingMethod.DESIGNATED, candidates, true);
         candidates.add(6);
@@ -196,9 +198,46 @@ class GameApplicationTest
 
         logic.voteCompleted = false;
         VoteExecutionResult interrupted = application.executeVote(
-                new ExecuteVoteCommand(VotingMethod.FREE, List.of(1), true));
+                new ExecuteVoteCommand(
+                        VotingMethod.FREE, List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), true));
         assertFalse(interrupted.voteCompleted(), "回避 CO 时必须保留核心的未完成状态");
         assertEquals(0, logic.votingMethod);
+    }
+
+    @Test
+    void gameUpdate_shouldPublishAndEnforceAuthoritativeVoteCandidates()
+    {
+        TrackingLogic logic = new TrackingLogic();
+        logic.claimedRoles[2] = Role.zhan.ordinal();
+        logic.skillTargets[2][1] = 13;
+        logic.claimedRoles[4] = Role.wu.ordinal();
+        logic.deadPlayers.add(10);
+        logic.selectedVoteTargets.addAll(List.of(4, 6));
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+
+        GameUpdate update = application.currentUpdate(0);
+
+        assertEquals(BusinessPhase.DAY_DECISION, update.phase());
+        assertEquals(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9),
+                update.legalVote(VotingMethod.FREE).orElseThrow().candidates());
+        assertEquals(List.of(1, 4, 5, 6, 7, 8, 9),
+                update.legalVote(VotingMethod.GREY).orElseThrow().candidates());
+        assertEquals(List.of(4, 6),
+                update.legalVote(VotingMethod.DESIGNATED).orElseThrow().candidates());
+        assertThrows(UnsupportedOperationException.class,
+                () -> update.legalVoteActions().add(
+                        new LegalVoteAction(VotingMethod.FREE, List.of(1))));
+        assertThrows(IllegalArgumentException.class, () -> application.executeVote(
+                new ExecuteVoteCommand(VotingMethod.FREE, List.of(1, 2), false)));
+        assertNull(logic.voteCandidates);
+
+        logic.endResult = GameResult.WOLF_WIN;
+        GameUpdate finished = application.currentUpdate(0);
+        assertEquals(BusinessPhase.FINISHED, finished.phase());
+        assertTrue(finished.legalVoteActions().isEmpty());
+        assertThrows(IllegalStateException.class, () -> application.executeVote(
+                new ExecuteVoteCommand(
+                        VotingMethod.FREE, List.of(1, 2, 3, 4, 5, 6, 7, 8, 9), false)));
     }
 
     @Test
@@ -319,7 +358,10 @@ class GameApplicationTest
         private final Set<Integer> deadPlayers = new HashSet<>();
         private final int[] actualRoles = new int[11];
         private final int[] claimedRoles = new int[11];
+        private final int[][] skillTargets = new int[11][16];
+        private final Set<Integer> selectedVoteTargets = new HashSet<>();
         private final List<String> selectionWrites = new ArrayList<>();
+        private GameResult endResult = GameResult.NONE;
         private final GameContextView context = (GameContextView) Proxy.newProxyInstance(
                 GameContextView.class.getClassLoader(),
                 new Class<?>[]{GameContextView.class},
@@ -332,7 +374,7 @@ class GameApplicationTest
                         case "getAliveCounter" -> 10 - deadPlayers.size();
                         case "getDeathCounter" -> deadPlayers.size();
                         case "getPeiyi" -> peiyi.jianyi;
-                        case "getEndResult" -> com.vocr.domain.GameResult.NONE;
+                        case "getEndResult" -> endResult;
                         case "getCharacterNumber" -> (Integer) arguments[0];
                         case "getDeathReason" -> deadPlayers.contains((Integer) arguments[0])
                                 ? com.vocr.domain.whyDie.chuxing
@@ -340,11 +382,22 @@ class GameApplicationTest
                         case "getDeathDay" -> deadPlayers.contains((Integer) arguments[0]) ? 3 : 0;
                         case "getActualRole" -> actualRoles[(Integer) arguments[0]];
                         case "getClaimedRole" -> claimedRoles[(Integer) arguments[0]];
+                        case "getSkillTarget" -> skillTargets[(Integer) arguments[0]][(Integer) arguments[1]];
+                        case "isSelectedVoteTarget" -> selectedVoteTargets.contains((Integer) arguments[0]);
                         case "getClaimedRoleOrder" -> claimedRoles[(Integer) arguments[0]] == 0
                                 ? 0 : (Integer) arguments[0];
                         case "getComingOutDay" -> claimedRoles[(Integer) arguments[0]] == 0 ? 0 : 2;
-                        case "setSelectedVoteTarget", "setClaimedRoleScheduled",
-                                "setHiddenSeerScheduled", "setHiddenHunterScheduled" ->
+                        case "setSelectedVoteTarget" ->
+                        {
+                            int player = (Integer) arguments[0];
+                            if ((Boolean) arguments[2]) selectedVoteTargets.add(player);
+                            else selectedVoteTargets.remove(player);
+                            selectionWrites.add(
+                                    method.getName() + ":" + Arrays.toString(arguments));
+                            yield null;
+                        }
+                        case "setClaimedRoleScheduled", "setHiddenSeerScheduled",
+                                "setHiddenHunterScheduled" ->
                         {
                             selectionWrites.add(
                                     method.getName() + ":" + Arrays.toString(arguments));

@@ -3,9 +3,11 @@ package com.vocr.application;
 import com.vocr.core.MainLogicInterface;
 import com.vocr.domain.Event;
 import com.vocr.domain.GameContextView;
+import com.vocr.domain.GameResult;
 import com.vocr.domain.Role;
 import com.vocr.domain.SelectionType;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -66,12 +68,22 @@ public final class GameApplication
     {
         Objects.requireNonNull(command, "投票命令不能为空");
         GameContextView context = requireStartedContext();
+        if (context.getEndResult() != GameResult.NONE)
+            throw new IllegalStateException("对局已经结束，不能继续投票");
         if (command.candidates().stream().anyMatch(player -> player > context.getPlayerSum()))
             throw new IllegalArgumentException(
                     "投票候补编号超出当前对局范围: " + command.candidates());
         if (command.candidates().stream().anyMatch(player -> !context.isAlive(player)))
             throw new IllegalArgumentException(
                     "投票候补必须全部存活: " + command.candidates());
+        LegalVoteAction legalAction = VoteCandidateProjector.project(context).stream()
+                .filter(action -> action.method() == command.method())
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "当前没有该投票动作: " + command.method()));
+        if (!legalAction.candidates().equals(command.candidates()))
+            throw new IllegalArgumentException(
+                    "投票候补与当前合法动作不一致: " + command.candidates());
 
         boolean voteCompleted = gameLogic.shokei(
                 command.method().legacyCode(), command.candidates(), command.avoidanceEnabled());
@@ -160,8 +172,16 @@ public final class GameApplication
 
     private GameUpdate toUpdate(EventBatch batch)
     {
+        GameContextView context = requireStartedContext();
+        BusinessPhase phase = context.getEndResult() == GameResult.NONE
+                ? BusinessPhase.DAY_DECISION
+                : BusinessPhase.FINISHED;
         return new GameUpdate(
-                PlayerViewProjector.project(requireStartedContext()),
+                phase,
+                PlayerViewProjector.project(context),
+                phase == BusinessPhase.DAY_DECISION
+                        ? VoteCandidateProjector.project(context)
+                        : List.of(),
                 batch.nextCursor(),
                 batch.events());
     }
