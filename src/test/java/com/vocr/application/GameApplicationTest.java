@@ -163,6 +163,8 @@ class GameApplicationTest
         assertThrows(NullPointerException.class, () -> new AskClaimByPlayersCommand(null));
         assertThrows(IllegalArgumentException.class, () -> new AskClaimByPlayersCommand(List.of()));
         assertThrows(IllegalArgumentException.class, () -> new AskClaimByPlayersCommand(List.of(0)));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AskClaimByPlayersCommand(List.of(1, 1)));
 
         List<Integer> players = new ArrayList<>(List.of(1, 3));
         AskClaimByPlayersCommand command = new AskClaimByPlayersCommand(players);
@@ -170,9 +172,14 @@ class GameApplicationTest
         assertEquals(List.of(1, 3), command.players());
         assertThrows(UnsupportedOperationException.class, () -> command.players().add(5));
 
-        GameApplication application = new GameApplication(new TrackingLogic(), new GameEventBuffer());
+        TrackingLogic logic = new TrackingLogic();
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
         assertThrows(IllegalArgumentException.class, () -> application.requestClaims(
                 new AskClaimByPlayersCommand(List.of(11))));
+        logic.deadPlayers.add(4);
+        assertThrows(IllegalArgumentException.class, () -> application.requestClaims(
+                new AskClaimByPlayersCommand(List.of(4))));
+        assertNull(logic.askedPlayers);
     }
 
     @Test
@@ -224,9 +231,23 @@ class GameApplicationTest
                 update.legalVote(VotingMethod.GREY).orElseThrow().candidates());
         assertEquals(List.of(4, 6),
                 update.legalVote(VotingMethod.DESIGNATED).orElseThrow().candidates());
+        assertEquals(List.of(Role.zhan, Role.ling, Role.lie, Role.gong, Role.mao),
+                update.claimInquiry().roles());
+        assertEquals(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9),
+                update.claimInquiry().players());
+        LegalTargetSelection divination = update
+                .legalTargetSelection(SelectionType.DIVINATION).orElseThrow();
+        assertEquals(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9), divination.targets());
+        assertEquals(List.of(new ClaimedRoleActor(2, 2)), divination.claimedActors());
+        assertTrue(update.legalTargetSelection(SelectionType.GUARD)
+                .orElseThrow().claimedActors().isEmpty());
         assertThrows(UnsupportedOperationException.class,
                 () -> update.legalVoteActions().add(
                         new LegalVoteAction(VotingMethod.FREE, List.of(1))));
+        assertThrows(UnsupportedOperationException.class,
+                () -> update.claimInquiry().players().add(10));
+        assertThrows(UnsupportedOperationException.class,
+                () -> divination.targets().add(10));
         assertThrows(IllegalArgumentException.class, () -> application.executeVote(
                 new ExecuteVoteCommand(VotingMethod.FREE, List.of(1, 2), false)));
         assertNull(logic.voteCandidates);
@@ -235,9 +256,15 @@ class GameApplicationTest
         GameUpdate finished = application.currentUpdate(0);
         assertEquals(BusinessPhase.FINISHED, finished.phase());
         assertTrue(finished.legalVoteActions().isEmpty());
+        assertFalse(finished.claimInquiry().available());
+        assertTrue(finished.legalTargetSelections().isEmpty());
         assertThrows(IllegalStateException.class, () -> application.executeVote(
                 new ExecuteVoteCommand(
                         VotingMethod.FREE, List.of(1, 2, 3, 4, 5, 6, 7, 8, 9), false)));
+        assertThrows(IllegalStateException.class, () -> application.requestClaims(
+                new AskClaimByRoleCommand(Role.zhan)));
+        assertThrows(IllegalStateException.class, () -> application.setTargetSelection(
+                new SetAllTargetSelectionCommand(SelectionType.VOTE, 1, true)));
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.application.ClaimedRoleActor;
+import com.vocr.application.LegalTargetSelection;
 import com.vocr.application.SetAllTargetSelectionCommand;
 import com.vocr.application.SetClaimedRoleTargetSelectionCommand;
 import com.vocr.resources.SoundEffect;
@@ -35,8 +37,6 @@ class CharacterSelectionPanel {
             UiImage.DIVINATION_DRAG,
             UiImage.GUARD_DRAG
     };
-    private static final int[] ROLE_FILTERS = {0, 1, 3};
-
     static void render(UI ui, VoteButtonPanel vp, VoteInfoRenderer vi,
                        JPanel panel, List<Integer> selectedTargets,
                        SelectionType type, GameSceneVoteHandler handler) {
@@ -54,15 +54,15 @@ class CharacterSelectionPanel {
         UiImage frameIcon = FRAME_ICONS[typeIdx];
         UiImage resultAllIcon = RESULT_ALL_ICONS[typeIdx];
         UiImage dragAllIcon = DRAG_ALL_ICONS[typeIdx];
-        int claimedRoleFilter = ROLE_FILTERS[typeIdx];
+        LegalTargetSelection legalAction = ui.currentGameUpdate().legalTargetSelection(type)
+                .orElseThrow(() -> new IllegalStateException("当前没有目标预约动作: " + type));
+        List<Integer> targetCandidates = legalAction.targets();
 
         List<Integer> roleNums = new ArrayList<>();
         List<Integer> roleOrders = new ArrayList<>();
-        for (int i = 1; i <= n - 1; i++) {
-            if (ui.ctx.getClaimedRole(i) == claimedRoleFilter && ui.ctx.isAlive(i)) {
-                roleNums.add(i);
-                roleOrders.add(ui.ctx.getClaimedRoleOrder(i));
-            }
+        for (ClaimedRoleActor actor : legalAction.claimedActors()) {
+            roleNums.add(actor.playerNumber());
+            roleOrders.add(actor.claimedRoleOrder());
         }
 
         List<JLabel> targetLabels = new ArrayList<>();
@@ -148,7 +148,7 @@ class CharacterSelectionPanel {
                     if (label.getParent() != parent || !label.isVisible()) continue;
                     if (!label.getBounds().contains(cx, cy)) continue;
                     int idx = targetLabels.indexOf(label);
-                    if (!ui.ctx.isAlive(idx + 1)) break;
+                    if (!targetCandidates.contains(idx + 1)) break;
                     ui.resources.playSound(SoundEffect.CLICK);
                     ui.gameApplication.setTargetSelection(
                             new SetAllTargetSelectionCommand(type, idx + 1, true));
@@ -187,7 +187,7 @@ class CharacterSelectionPanel {
                             if (label.getParent() != parent || !label.isVisible()) continue;
                             if (!label.getBounds().contains(cx, cy)) continue;
                             int idx = targetLabels.indexOf(label);
-                            if (!ui.ctx.isAlive(idx + 1)) break;
+                            if (!targetCandidates.contains(idx + 1)) break;
                             ui.resources.playSound(SoundEffect.CLICK);
                             ui.gameApplication.setTargetSelection(
                                     new SetClaimedRoleTargetSelectionCommand(
@@ -223,7 +223,7 @@ class CharacterSelectionPanel {
                     if (label.getParent() != parent || !label.isVisible()) continue;
                     if (!label.getBounds().contains(cx, cy)) continue;
                     int idx = targetLabels.indexOf(label);
-                    if (!ui.ctx.isAlive(idx + 1)) break;
+                    if (!targetCandidates.contains(idx + 1)) break;
                     ui.resources.playSound(SoundEffect.CLICK);
                     ui.gameApplication.setTargetSelection(
                             new SetAllTargetSelectionCommand(type, idx + 1, false));

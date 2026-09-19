@@ -1,10 +1,14 @@
 package com.vocr.ui;
 
+import com.vocr.application.ClaimInquiryOptions;
+import com.vocr.application.ClaimedRoleActor;
+import com.vocr.application.GameUpdate;
+import com.vocr.application.LegalTargetSelection;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
 
-import com.vocr.domain.GameContextView;
+import com.vocr.domain.SelectionType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,13 +34,17 @@ class CoSelectionPanel {
         vp.returnBtn.setVisible(true);
         infoCoPanel.removeAll();
 
+        GameUpdate update = ui.currentGameUpdate();
+        ClaimInquiryOptions claimOptions = update.claimInquiry();
+        List<Integer> claimCandidates = claimOptions.players();
+        LegalTargetSelection divination = update
+                .legalTargetSelection(SelectionType.DIVINATION)
+                .orElseThrow(() -> new IllegalStateException("当前没有占卜目标预约动作"));
         List<Integer> zhanbuNum = new ArrayList<>();
         List<Integer> zhanbuOrder = new ArrayList<>();
-        for (int i = 1; i <= ui.ctx.getPlayerSum(); i++) {
-            if (ui.ctx.getClaimedRole(i) == 1 && ui.ctx.isAlive(i)) {
-                zhanbuNum.add(i);
-                zhanbuOrder.add(ui.ctx.getClaimedRoleOrder(i));
-            }
+        for (ClaimedRoleActor actor : divination.claimedActors()) {
+            zhanbuNum.add(actor.playerNumber());
+            zhanbuOrder.add(actor.claimedRoleOrder());
         }
         List<JLabel> targetLabels = new ArrayList<>();
         List<JLabel> frameLabels = new ArrayList<>();
@@ -115,7 +123,7 @@ class CoSelectionPanel {
                     Rectangle labelRect = label.getBounds();
                     if (labelRect.contains(btnCenterX, btnCenterY)) {
                         int index = targetLabels.indexOf(label);
-                        if (!ui.ctx.isAlive(index + 1)) break;
+                        if (!claimCandidates.contains(index + 1)) break;
                         ui.resources.playSound(SoundEffect.CLICK);
                         if (!askList.contains(index + 1)) askList.add(index + 1);
                         resultLabels.get(index).setVisible(true);
@@ -146,7 +154,7 @@ class CoSelectionPanel {
                     Rectangle labelRect = label.getBounds();
                     if (labelRect.contains(btnCenterX, btnCenterY)) {
                         int index = targetLabels.indexOf(label);
-                        if (!ui.ctx.isAlive(index + 1)) break;
+                        if (!claimCandidates.contains(index + 1)) break;
                         ui.resources.playSound(SoundEffect.CLICK);
                         if (askList.contains(index + 1)) {
                             int uu = askList.indexOf(index + 1);

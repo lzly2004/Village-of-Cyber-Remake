@@ -40,7 +40,10 @@ public final class GameApplication
     public GameUpdate requestClaims(AskClaimByRoleCommand command)
     {
         Objects.requireNonNull(command, "按职业询问命令不能为空");
-        requireStartedContext();
+        GameContextView context = requireStartedContext();
+        requireDayDecision(context, "询问 CO");
+        if (!LegalActionProjector.claimInquiry(context).roles().contains(command.role()))
+            throw new IllegalArgumentException("当前不能询问该职业 CO: " + command.role());
         gameLogic.askCo(command.role());
         return currentUpdate();
     }
@@ -49,9 +52,14 @@ public final class GameApplication
     {
         Objects.requireNonNull(command, "按玩家询问命令不能为空");
         GameContextView context = requireStartedContext();
+        requireDayDecision(context, "询问 CO");
         if (command.players().stream().anyMatch(player -> player > context.getPlayerSum()))
             throw new IllegalArgumentException(
                     "询问玩家编号超出当前对局范围: " + command.players());
+        List<Integer> legalPlayers = LegalActionProjector.claimInquiry(context).players();
+        if (!legalPlayers.containsAll(command.players()))
+            throw new IllegalArgumentException(
+                    "询问对象必须全部来自当前合法候选: " + command.players());
         gameLogic.askCo(command.players());
         return currentUpdate();
     }
@@ -94,7 +102,11 @@ public final class GameApplication
     {
         Objects.requireNonNull(command, "全体目标命令不能为空");
         GameContextView context = requireStartedContext();
+        requireDayDecision(context, "预约目标");
         requireAlivePlayer(context, command.target(), "目标玩家");
+        LegalTargetSelection legalAction = legalTargetSelection(context, command.type());
+        if (!legalAction.targets().contains(command.target()))
+            throw new IllegalArgumentException("目标不在当前合法候选中: " + command.target());
         int day = context.getGameDay();
 
         if (command.type() == SelectionType.VOTE)
@@ -126,8 +138,16 @@ public final class GameApplication
     {
         Objects.requireNonNull(command, "CO 目标命令不能为空");
         GameContextView context = requireStartedContext();
+        requireDayDecision(context, "预约目标");
         requireAlivePlayer(context, command.claimedPlayer(), "CO 玩家");
         requireAlivePlayer(context, command.target(), "目标玩家");
+        LegalTargetSelection legalAction = legalTargetSelection(context, command.type());
+        if (!legalAction.targets().contains(command.target()))
+            throw new IllegalArgumentException("目标不在当前合法候选中: " + command.target());
+        if (legalAction.claimedActors().stream()
+                .noneMatch(actor -> actor.playerNumber() == command.claimedPlayer()))
+            throw new IllegalArgumentException(
+                    "玩家不是当前合法的 CO 技能行动者: " + command.claimedPlayer());
         Role scheduledRole = scheduledRole(command.type());
         if (context.getClaimedRole(command.claimedPlayer()) != scheduledRole.ordinal())
             throw new IllegalArgumentException(
@@ -156,6 +176,22 @@ public final class GameApplication
             throw new IllegalArgumentException(description + "必须存活: " + player);
     }
 
+    private static void requireDayDecision(GameContextView context, String action)
+    {
+        if (context.getEndResult() != GameResult.NONE)
+            throw new IllegalStateException("对局已经结束，不能继续" + action);
+    }
+
+    private static LegalTargetSelection legalTargetSelection(
+            GameContextView context, SelectionType type)
+    {
+        return LegalActionProjector.targetSelections(context).stream()
+                .filter(action -> action.type() == type)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "当前没有该目标预约动作: " + type));
+    }
+
     public GameUpdate currentUpdate()
     {
         return toUpdate(eventBuffer.pendingSnapshot());
@@ -176,11 +212,18 @@ public final class GameApplication
         BusinessPhase phase = context.getEndResult() == GameResult.NONE
                 ? BusinessPhase.DAY_DECISION
                 : BusinessPhase.FINISHED;
+        boolean decisionPhase = phase == BusinessPhase.DAY_DECISION;
         return new GameUpdate(
                 phase,
                 PlayerViewProjector.project(context),
-                phase == BusinessPhase.DAY_DECISION
+                decisionPhase
                         ? VoteCandidateProjector.project(context)
+                        : List.of(),
+                decisionPhase
+                        ? LegalActionProjector.claimInquiry(context)
+                        : ClaimInquiryOptions.unavailable(),
+                decisionPhase
+                        ? LegalActionProjector.targetSelections(context)
                         : List.of(),
                 batch.nextCursor(),
                 batch.events());
