@@ -16,12 +16,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.lang.reflect.Proxy;
+import java.lang.reflect.RecordComponent;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -50,6 +52,8 @@ class GameApplicationTest
         assertTrue(result.gameDay() >= 2);
         GameUpdate update = application.currentUpdate();
         assertFalse(update.events().isEmpty(), "开局领域事件应进入应用层更新");
+        assertEquals(peiyi.jianyi, update.view().configuration());
+        assertEquals(result.playerCount(), update.view().players().size());
         Event first = update.events().getFirst();
         assertEquals(first, application.pollNextEvent());
         assertEquals(first, update.events().getFirst(), "已发布的更新快照不得随消费进度变化");
@@ -93,6 +97,43 @@ class GameApplicationTest
         assertThrows(IllegalArgumentException.class, () -> application.currentUpdate(-1));
         assertThrows(IllegalArgumentException.class,
                 () -> application.currentUpdate(unread.nextEventCursor() + 1));
+    }
+
+    @Test
+    void playerView_shouldExposeOnlyExplicitlyWhitelistedPublicState()
+    {
+        TrackingLogic logic = new TrackingLogic();
+        logic.actualRoles[2] = Role.renlang.ordinal();
+        logic.actualRoles[4] = Role.zhan.ordinal();
+        logic.claimedRoles[2] = Role.zhan.ordinal();
+        logic.deadPlayers.add(4);
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+
+        PlayerViewSnapshot view = application.currentUpdate(0).view();
+
+        assertEquals(peiyi.jianyi, view.configuration());
+        assertEquals(4, view.gameDay());
+        assertEquals(9, view.aliveCount());
+        assertEquals(1, view.deathCount());
+        assertEquals(10, view.players().size());
+        assertEquals(Role.zhan, view.players().get(1).claimedRole());
+        assertFalse(view.players().get(3).alive());
+
+        Set<String> snapshotFields = Arrays.stream(PlayerViewSnapshot.class.getRecordComponents())
+                .map(RecordComponent::getName)
+                .collect(Collectors.toSet());
+        assertEquals(Set.of(
+                "configuration", "gameDay", "aliveCount", "deathCount", "result", "players"),
+                snapshotFields);
+        Set<String> playerFields = Arrays.stream(VisiblePlayer.class.getRecordComponents())
+                .map(RecordComponent::getName)
+                .collect(Collectors.toSet());
+        assertEquals(Set.of(
+                "playerNumber", "character", "alive", "deathReason", "deathDay",
+                "claimedRole", "claimedRoleOrder", "comingOutDay"), playerFields);
+        assertFalse(playerFields.contains("actualRole"));
+        assertFalse(playerFields.contains("suspicion"));
+        assertFalse(playerFields.contains("nonHumanPlan"));
     }
 
     @Test
@@ -288,8 +329,20 @@ class GameApplicationTest
                         case "getPlayerSum" -> 10;
                         case "getGameDay" -> 4;
                         case "isAlive" -> !deadPlayers.contains((Integer) arguments[0]);
+                        case "getAliveCounter" -> 10 - deadPlayers.size();
+                        case "getDeathCounter" -> deadPlayers.size();
+                        case "getPeiyi" -> peiyi.jianyi;
+                        case "getEndResult" -> com.vocr.domain.GameResult.NONE;
+                        case "getCharacterNumber" -> (Integer) arguments[0];
+                        case "getDeathReason" -> deadPlayers.contains((Integer) arguments[0])
+                                ? com.vocr.domain.whyDie.chuxing
+                                : com.vocr.domain.whyDie.NONE;
+                        case "getDeathDay" -> deadPlayers.contains((Integer) arguments[0]) ? 3 : 0;
                         case "getActualRole" -> actualRoles[(Integer) arguments[0]];
                         case "getClaimedRole" -> claimedRoles[(Integer) arguments[0]];
+                        case "getClaimedRoleOrder" -> claimedRoles[(Integer) arguments[0]] == 0
+                                ? 0 : (Integer) arguments[0];
+                        case "getComingOutDay" -> claimedRoles[(Integer) arguments[0]] == 0 ? 0 : 2;
                         case "setSelectedVoteTarget", "setClaimedRoleScheduled",
                                 "setHiddenSeerScheduled", "setHiddenHunterScheduled" ->
                         {

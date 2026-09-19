@@ -158,9 +158,12 @@ public final class GameApplication
         return toUpdate(eventBuffer.snapshotAfter(eventCursor));
     }
 
-    private static GameUpdate toUpdate(EventBatch batch)
+    private GameUpdate toUpdate(EventBatch batch)
     {
-        return new GameUpdate(batch.nextCursor(), batch.events());
+        return new GameUpdate(
+                PlayerViewProjector.project(requireStartedContext()),
+                batch.nextCursor(),
+                batch.events());
     }
 
     /** 桌面迁移期用于确认已展示的队首事件；Web 适配器后续改用事件游标。 */
