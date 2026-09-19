@@ -53,6 +53,8 @@ class GameApplicationTest
         assertTrue(result.gameDay() >= 2);
         GameUpdate update = application.currentUpdate();
         assertFalse(update.events().isEmpty(), "开局领域事件应进入应用层更新");
+        assertEquals(0, update.eventCursor());
+        assertEquals(update.events().size(), update.nextEventCursor());
         assertEquals(peiyi.jianyi, update.view().configuration());
         assertEquals(result.playerCount(), update.view().players().size());
         Event first = update.events().getFirst();
@@ -87,9 +89,15 @@ class GameApplicationTest
 
         GameUpdate unread = application.currentUpdate(cursorAfterFirst);
         assertEquals(List.of(second), unread.events());
+        assertEquals(cursorAfterFirst, unread.eventCursor());
+        assertEquals(1, unread.nextEventCursor() - unread.eventCursor());
         assertEquals(unread, application.currentUpdate(cursorAfterFirst),
                 "同一游标必须可重复读取，便于网络重试");
         assertEquals(first, application.pollNextEvent(), "游标读取不得消费桌面待展示事件");
+        GameUpdate pendingSuffix = application.currentUpdate();
+        assertEquals(List.of(second), pendingSuffix.events());
+        assertEquals(cursorAfterFirst, pendingSuffix.eventCursor(),
+                "桌面待展示事件必须携带自身窗口起点，不能冒充完整历史");
         application.clearPendingEvents();
         assertFalse(application.hasPendingEvents());
         assertEquals(List.of(first, second), application.currentUpdate(0).events(),
@@ -98,6 +106,26 @@ class GameApplicationTest
         assertThrows(IllegalArgumentException.class, () -> application.currentUpdate(-1));
         assertThrows(IllegalArgumentException.class,
                 () -> application.currentUpdate(unread.nextEventCursor() + 1));
+    }
+
+    @Test
+    void commandResult_shouldContainOnlyEventsPublishedByThatCommand()
+    {
+        GameEventBuffer events = new GameEventBuffer();
+        TrackingLogic logic = new TrackingLogic();
+        GameApplication application = new GameApplication(logic, events);
+        Event earlier = new Event(EventName.zco7, CharacterEnglishName.Abel);
+        Event commandEvent = new Event(EventName.lnco18, CharacterEnglishName.Erich);
+        application.publishDiagnosticEvent(earlier);
+        logic.onAskRole = () -> events.publish(commandEvent);
+
+        GameUpdate result = application.requestClaims(new AskClaimByRoleCommand(Role.zhan));
+
+        assertEquals(List.of(commandEvent), result.events());
+        assertEquals(1, result.eventCursor());
+        assertEquals(2, result.nextEventCursor());
+        assertEquals(List.of(earlier, commandEvent), application.currentUpdate().events(),
+                "命令返回窗口不能消费桌面待展示队列");
     }
 
     @Test
@@ -439,6 +467,7 @@ class GameApplicationTest
         private List<Integer> voteCandidates;
         private boolean avoidanceEnabled;
         private boolean voteCompleted;
+        private Runnable onAskRole = () -> { };
 
         @Override public GameContextView getGameContext() { return context; }
         @Override public GameRecorder getRecorder() { return null; }
@@ -449,7 +478,10 @@ class GameApplicationTest
             avoidanceEnabled = avoid;
             return voteCompleted;
         }
-        @Override public void askCo(Role role) { askedRole = role; }
+        @Override public void askCo(Role role) {
+            askedRole = role;
+            onAskRole.run();
+        }
         @Override public void askCo(List<Integer> players) { askedPlayers = List.copyOf(players); }
     }
 }

@@ -44,8 +44,9 @@ public final class GameApplication
         requireDayDecision(context, "询问 CO");
         if (!LegalActionProjector.claimInquiry(context).roles().contains(command.role()))
             throw new IllegalArgumentException("当前不能询问该职业 CO: " + command.role());
+        long eventCursor = eventBuffer.currentCursor();
         gameLogic.askCo(command.role());
-        return currentUpdate();
+        return currentUpdate(eventCursor);
     }
 
     public GameUpdate requestClaims(AskClaimByPlayersCommand command)
@@ -60,8 +61,9 @@ public final class GameApplication
         if (!legalPlayers.containsAll(command.players()))
             throw new IllegalArgumentException(
                     "询问对象必须全部来自当前合法候选: " + command.players());
+        long eventCursor = eventBuffer.currentCursor();
         gameLogic.askCo(command.players());
-        return currentUpdate();
+        return currentUpdate(eventCursor);
     }
 
     private GameContextView requireStartedContext()
@@ -93,9 +95,10 @@ public final class GameApplication
             throw new IllegalArgumentException(
                     "投票候补与当前合法动作不一致: " + command.candidates());
 
+        long eventCursor = eventBuffer.currentCursor();
         boolean voteCompleted = gameLogic.shokei(
                 command.method().legacyCode(), command.candidates(), command.avoidanceEnabled());
-        return new VoteExecutionResult(voteCompleted, currentUpdate());
+        return new VoteExecutionResult(voteCompleted, currentUpdate(eventCursor));
     }
 
     public GameUpdate setTargetSelection(SetAllTargetSelectionCommand command)
@@ -108,11 +111,12 @@ public final class GameApplication
         if (!legalAction.targets().contains(command.target()))
             throw new IllegalArgumentException("目标不在当前合法候选中: " + command.target());
         int day = context.getGameDay();
+        long eventCursor = eventBuffer.currentCursor();
 
         if (command.type() == SelectionType.VOTE)
         {
             context.setSelectedVoteTarget(command.target(), day, command.selected());
-            return currentUpdate();
+            return currentUpdate(eventCursor);
         }
 
         Role scheduledRole = scheduledRole(command.type());
@@ -131,7 +135,7 @@ public final class GameApplication
                         player, command.target(), day, command.selected());
             }
         }
-        return currentUpdate();
+        return currentUpdate(eventCursor);
     }
 
     public GameUpdate setTargetSelection(SetClaimedRoleTargetSelectionCommand command)
@@ -153,9 +157,10 @@ public final class GameApplication
             throw new IllegalArgumentException(
                     "玩家未声称该技能职业: " + command.claimedPlayer());
 
+        long eventCursor = eventBuffer.currentCursor();
         context.setClaimedRoleScheduled(
                 command.claimedPlayer(), command.target(), context.getGameDay(), command.selected());
-        return currentUpdate();
+        return currentUpdate(eventCursor);
     }
 
     private static Role scheduledRole(SelectionType type)
@@ -192,14 +197,19 @@ public final class GameApplication
                         "当前没有该目标预约动作: " + type));
     }
 
+    /**
+     * 返回桌面端尚未确认展示的事件后缀。该窗口可能晚于本局事件起点；需要可靠续读的
+     * 调用方必须保存并传入自己的事件游标。
+     */
     public GameUpdate currentUpdate()
     {
         return toUpdate(eventBuffer.pendingSnapshot());
     }
 
     /**
-     * 返回指定游标之后发布的全部事件。读取不会影响桌面端的待展示队列；返回的下一游标
-     * 可用于后续轮询，重复使用同一游标会得到相同结果。
+     * 返回指定游标之后发布的全部事件。读取不会影响桌面端的待展示队列；更新中的
+     * {@code eventCursor} 与 {@code nextEventCursor} 明确标识事件窗口，重复使用同一游标
+     * 会得到相同结果。
      */
     public GameUpdate currentUpdate(long eventCursor)
     {
@@ -225,6 +235,7 @@ public final class GameApplication
                 decisionPhase
                         ? LegalActionProjector.targetSelections(context)
                         : List.of(),
+                batch.cursor(),
                 batch.nextCursor(),
                 batch.events());
     }

@@ -19,6 +19,7 @@ public record GameUpdate(
         List<LegalVoteAction> legalVoteActions,
         ClaimInquiryOptions claimInquiry,
         List<LegalTargetSelection> legalTargetSelections,
+        long eventCursor,
         long nextEventCursor,
         List<Event> events)
 {
@@ -43,9 +44,11 @@ public record GameUpdate(
         if (legalTargetSelections.stream().map(LegalTargetSelection::type).distinct().count()
                 != legalTargetSelections.size())
             throw new IllegalArgumentException("同一目标预约类型不能重复");
-        if (nextEventCursor < 0)
-            throw new IllegalArgumentException("下一事件游标不能为负数");
+        if (eventCursor < 0 || nextEventCursor < eventCursor)
+            throw new IllegalArgumentException("事件游标窗口无效");
         events = List.copyOf(events);
+        if (nextEventCursor - eventCursor != events.size())
+            throw new IllegalArgumentException("事件数量与游标窗口不一致");
     }
 
     public Optional<LegalVoteAction> legalVote(VotingMethod method)

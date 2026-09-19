@@ -23,7 +23,9 @@ public final class GameEventBuffer
 
     synchronized EventBatch pendingSnapshot()
     {
-        return new EventBatch(publishedEvents.size(), new ArrayList<>(pendingEvents));
+        long nextCursor = publishedEvents.size();
+        long cursor = nextCursor - pendingEvents.size();
+        return new EventBatch(cursor, nextCursor, new ArrayList<>(pendingEvents));
     }
 
     synchronized EventBatch snapshotAfter(long cursor)
@@ -32,7 +34,14 @@ public final class GameEventBuffer
             throw new IllegalArgumentException("事件游标超出当前对局范围: " + cursor);
         int start = Math.toIntExact(cursor);
         return new EventBatch(
-                publishedEvents.size(), publishedEvents.subList(start, publishedEvents.size()));
+                cursor,
+                publishedEvents.size(),
+                publishedEvents.subList(start, publishedEvents.size()));
+    }
+
+    synchronized long currentCursor()
+    {
+        return publishedEvents.size();
     }
 
     synchronized Event poll()
