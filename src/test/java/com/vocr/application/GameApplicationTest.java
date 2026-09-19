@@ -253,6 +253,9 @@ class GameApplicationTest
         GameUpdate update = application.currentUpdate(0);
 
         assertEquals(BusinessPhase.DAY_DECISION, update.phase());
+        assertTrue(update.revealedRoles().isEmpty(), "进行中的对局不能泄露真实职业");
+        assertThrows(IllegalStateException.class,
+                () -> SettlementRevealProjector.project(logic.context));
         assertEquals(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9),
                 update.legalVote(VotingMethod.FREE).orElseThrow().candidates());
         assertEquals(List.of(1, 4, 5, 6, 7, 8, 9),
@@ -280,12 +283,18 @@ class GameApplicationTest
                 new ExecuteVoteCommand(VotingMethod.FREE, List.of(1, 2), false)));
         assertNull(logic.voteCandidates);
 
+        Arrays.fill(logic.actualRoles, Role.wu.ordinal());
+        logic.actualRoles[2] = Role.renlang.ordinal();
         logic.endResult = GameResult.WOLF_WIN;
         GameUpdate finished = application.currentUpdate(0);
         assertEquals(BusinessPhase.FINISHED, finished.phase());
         assertTrue(finished.legalVoteActions().isEmpty());
         assertFalse(finished.claimInquiry().available());
         assertTrue(finished.legalTargetSelections().isEmpty());
+        assertEquals(10, finished.revealedRoles().size());
+        assertEquals(new RevealedPlayerRole(2, Role.renlang), finished.revealedRoles().get(1));
+        assertThrows(UnsupportedOperationException.class,
+                () -> finished.revealedRoles().add(new RevealedPlayerRole(11, Role.wu)));
         assertThrows(IllegalStateException.class, () -> application.executeVote(
                 new ExecuteVoteCommand(
                         VotingMethod.FREE, List.of(1, 2, 3, 4, 5, 6, 7, 8, 9), false)));

@@ -235,6 +235,9 @@ public final class GameApplication
                 decisionPhase
                         ? LegalActionProjector.targetSelections(context)
                         : List.of(),
+                decisionPhase
+                        ? List.of()
+                        : SettlementRevealProjector.project(context),
                 batch.cursor(),
                 batch.nextCursor(),
                 batch.events());
