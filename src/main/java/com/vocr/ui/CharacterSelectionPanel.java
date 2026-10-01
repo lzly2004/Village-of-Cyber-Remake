@@ -193,7 +193,8 @@ class CharacterSelectionPanel {
                                     new SetClaimedRoleTargetSelectionCommand(
                                             type, roleNums.get(cur), idx + 1, true));
                             if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
-                            zbLabels.get(idx + cur * ui.ctx.getPlayerSum()).setVisible(true);
+                            setClaimedActorResultVisible(
+                                    zbLabels, idx, cur, roleNums.size(), true);
                             frameLabels.get(idx).setVisible(true);
                             frameLabels.get(idx).repaint();
                             ui.jPanel.repaint(label.getBounds());
@@ -229,8 +230,8 @@ class CharacterSelectionPanel {
                             new SetAllTargetSelectionCommand(type, idx + 1, false));
                     selectedTargets.remove(Integer.valueOf(idx + 1));
                     if (type != SelectionType.VOTE) {
-                        for (int u = 0; u < roleNums.size(); u++)
-                            zbLabels.get(idx + u * (ui.ctx.getPlayerSum())).setVisible(false);
+                        setAllClaimedActorResultsVisible(
+                                zbLabels, idx, roleNums.size(), false);
                     }
                     resultLabels.get(idx).setVisible(false);
                     frameLabels.get(idx).setVisible(false);
@@ -248,5 +249,30 @@ class CharacterSelectionPanel {
         panel.revalidate();
         panel.repaint();
         ui.resizeComponents();
+    }
+
+    static void setClaimedActorResultVisible(List<JLabel> labels, int playerIndex,
+                                             int actorIndex, int actorCount,
+                                             boolean visible) {
+        labels.get(claimedActorResultIndex(playerIndex, actorIndex, actorCount))
+                .setVisible(visible);
+    }
+
+    static void setAllClaimedActorResultsVisible(List<JLabel> labels, int playerIndex,
+                                                 int actorCount, boolean visible) {
+        for (int actorIndex = 0; actorIndex < actorCount; actorIndex++) {
+            setClaimedActorResultVisible(
+                    labels, playerIndex, actorIndex, actorCount, visible);
+        }
+    }
+
+    private static int claimedActorResultIndex(int playerIndex, int actorIndex,
+                                               int actorCount) {
+        if (playerIndex < 0 || actorIndex < 0 || actorIndex >= actorCount) {
+            throw new IllegalArgumentException(
+                    "非法的玩家或 CO 行动者索引: player=" + playerIndex
+                            + ", actor=" + actorIndex + ", actorCount=" + actorCount);
+        }
+        return playerIndex * actorCount + actorIndex;
     }
 }
