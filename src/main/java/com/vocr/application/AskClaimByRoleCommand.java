@@ -5,10 +5,12 @@ import com.vocr.domain.Role;
 import java.util.Objects;
 
 /** 按可公开声称的职业询问 CO。 */
-public record AskClaimByRoleCommand(Role role)
+public record AskClaimByRoleCommand(long expectedRevision, Role role)
+        implements RevisionedCommand
 {
     public AskClaimByRoleCommand
     {
+        RevisionedCommand.requireValid(expectedRevision);
         Objects.requireNonNull(role, "询问职业不能为空");
         switch (role)
         {

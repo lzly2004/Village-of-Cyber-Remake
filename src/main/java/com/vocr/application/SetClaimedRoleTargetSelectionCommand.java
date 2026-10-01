@@ -6,13 +6,15 @@ import java.util.Objects;
 
 /** 为一名已 CO 的占卜师或猎人更新其技能目标。 */
 public record SetClaimedRoleTargetSelectionCommand(
+        long expectedRevision,
         SelectionType type,
         int claimedPlayer,
         int target,
-        boolean selected)
+        boolean selected) implements RevisionedCommand
 {
     public SetClaimedRoleTargetSelectionCommand
     {
+        RevisionedCommand.requireValid(expectedRevision);
         Objects.requireNonNull(type, "选择类型不能为空");
         if (type == SelectionType.VOTE)
             throw new IllegalArgumentException("指定投票没有单独的 CO 行动者");

@@ -6,12 +6,14 @@ import java.util.Objects;
 
 /** 执行当日投票所需的不可变输入；回避开关仅在指定投票时由现有规则使用。 */
 public record ExecuteVoteCommand(
+        long expectedRevision,
         VotingMethod method,
         List<Integer> candidates,
-        boolean avoidanceEnabled)
+        boolean avoidanceEnabled) implements RevisionedCommand
 {
     public ExecuteVoteCommand
     {
+        RevisionedCommand.requireValid(expectedRevision);
         Objects.requireNonNull(method, "投票方式不能为空");
         Objects.requireNonNull(candidates, "投票候补不能为空");
         candidates = List.copyOf(candidates);

@@ -1,6 +1,7 @@
 package com.vocr.ui;
 
 import com.vocr.application.ClaimedRoleActor;
+import com.vocr.application.GameUpdate;
 import com.vocr.application.LegalTargetSelection;
 import com.vocr.application.SetAllTargetSelectionCommand;
 import com.vocr.application.SetClaimedRoleTargetSelectionCommand;
@@ -54,7 +55,8 @@ class CharacterSelectionPanel {
         UiImage frameIcon = FRAME_ICONS[typeIdx];
         UiImage resultAllIcon = RESULT_ALL_ICONS[typeIdx];
         UiImage dragAllIcon = DRAG_ALL_ICONS[typeIdx];
-        LegalTargetSelection legalAction = ui.currentGameUpdate().legalTargetSelection(type)
+        GameUpdate initialUpdate = ui.currentGameUpdate();
+        LegalTargetSelection legalAction = initialUpdate.legalTargetSelection(type)
                 .orElseThrow(() -> new IllegalStateException("当前没有目标预约动作: " + type));
         List<Integer> targetCandidates = legalAction.targets();
 
@@ -150,8 +152,10 @@ class CharacterSelectionPanel {
                     int idx = targetLabels.indexOf(label);
                     if (!targetCandidates.contains(idx + 1)) break;
                     ui.resources.playSound(SoundEffect.CLICK);
-                    ui.gameApplication.setTargetSelection(
-                            new SetAllTargetSelectionCommand(type, idx + 1, true));
+                    GameUpdate update = ui.gameApplication.setTargetSelection(
+                            new SetAllTargetSelectionCommand(
+                                    ui.gameRevision(), type, idx + 1, true));
+                    ui.acceptGameUpdate(update);
                     if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                     resultLabels.get(idx).setVisible(true);
                     frameLabels.get(idx).setVisible(true);
@@ -189,9 +193,11 @@ class CharacterSelectionPanel {
                             int idx = targetLabels.indexOf(label);
                             if (!targetCandidates.contains(idx + 1)) break;
                             ui.resources.playSound(SoundEffect.CLICK);
-                            ui.gameApplication.setTargetSelection(
+                            GameUpdate update = ui.gameApplication.setTargetSelection(
                                     new SetClaimedRoleTargetSelectionCommand(
-                                            type, roleNums.get(cur), idx + 1, true));
+                                            ui.gameRevision(), type,
+                                            roleNums.get(cur), idx + 1, true));
+                            ui.acceptGameUpdate(update);
                             if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
                             setClaimedActorResultVisible(
                                     zbLabels, idx, cur, roleNums.size(), true);
@@ -226,8 +232,10 @@ class CharacterSelectionPanel {
                     int idx = targetLabels.indexOf(label);
                     if (!targetCandidates.contains(idx + 1)) break;
                     ui.resources.playSound(SoundEffect.CLICK);
-                    ui.gameApplication.setTargetSelection(
-                            new SetAllTargetSelectionCommand(type, idx + 1, false));
+                    GameUpdate update = ui.gameApplication.setTargetSelection(
+                            new SetAllTargetSelectionCommand(
+                                    ui.gameRevision(), type, idx + 1, false));
+                    ui.acceptGameUpdate(update);
                     selectedTargets.remove(Integer.valueOf(idx + 1));
                     if (type != SelectionType.VOTE) {
                         setAllClaimedActorResultsVisible(

@@ -53,7 +53,8 @@ public class GameSceneHandler implements SceneHandler {
                 ui.levelName = ImageNames.gameSetupTitle(j);
                 ui.resources.playSound(SoundEffect.CLICK);
                 StartedGame startedGame = ui.gameApplication.startGame(
-                        new StartGameCommand(peiyi.values()[j]));
+                        new StartGameCommand(ui.gameRevision(), peiyi.values()[j]));
+                ui.acceptStartedGame(startedGame);
                 ui.ctx = ui.mainLogic.getGameContext();
                 int playerSum = startedGame.playerCount();
                 ui.skillTargetPeople = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];

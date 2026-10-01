@@ -44,14 +44,17 @@ class GameApplicationTest
         MainLogic logic = new MainLogic(events::publish, records("start-record.json"));
         GameApplication application = new GameApplication(logic, events);
 
-        StartedGame result = application.startGame(new StartGameCommand(peiyi.jianyi));
+        StartGameCommand command = new StartGameCommand(0, peiyi.jianyi);
+        StartedGame result = application.startGame(command);
 
+        assertEquals(1, result.revision());
         assertEquals(peiyi.jianyi, result.configuration());
         assertEquals(logic.getGameContext().getPlayerSum(), result.playerCount());
         assertEquals(logic.getGameContext().getGameDay(), result.gameDay());
         assertTrue(result.playerCount() > 0);
         assertTrue(result.gameDay() >= 2);
         GameUpdate update = application.currentUpdate();
+        assertEquals(result.revision(), update.revision());
         assertFalse(update.events().isEmpty(), "开局领域事件应进入应用层更新");
         assertEquals(0, update.eventCursor());
         assertEquals(update.events().size(), update.nextEventCursor());
@@ -62,6 +65,12 @@ class GameApplicationTest
         assertEquals(first, update.events().getFirst(), "已发布的更新快照不得随消费进度变化");
         assertThrows(UnsupportedOperationException.class, () -> update.events().add(first));
 
+        StaleGameRevisionException stale = assertThrows(
+                StaleGameRevisionException.class,
+                () -> application.startGame(command));
+        assertEquals(0, stale.expectedRevision());
+        assertEquals(1, stale.currentRevision());
+
         GameUpdate completeHistory = application.currentUpdate(0);
         assertEquals(update.events(), completeHistory.events());
         assertEquals(update.nextEventCursor(), completeHistory.nextEventCursor());
@@ -71,8 +80,9 @@ class GameApplicationTest
     @Test
     void startCommand_shouldRejectMissingOrInvalidConfiguration()
     {
-        assertThrows(NullPointerException.class, () -> new StartGameCommand(null));
-        assertThrows(IllegalArgumentException.class, () -> new StartGameCommand(peiyi.NONE));
+        assertThrows(IllegalArgumentException.class, () -> new StartGameCommand(-1, peiyi.jianyi));
+        assertThrows(NullPointerException.class, () -> new StartGameCommand(0, null));
+        assertThrows(IllegalArgumentException.class, () -> new StartGameCommand(0, peiyi.NONE));
     }
 
     @Test
@@ -119,13 +129,54 @@ class GameApplicationTest
         application.publishDiagnosticEvent(earlier);
         logic.onAskRole = () -> events.publish(commandEvent);
 
-        GameUpdate result = application.requestClaims(new AskClaimByRoleCommand(Role.zhan));
+        GameUpdate result = application.requestClaims(
+                new AskClaimByRoleCommand(application.currentRevision(), Role.zhan));
 
         assertEquals(List.of(commandEvent), result.events());
         assertEquals(1, result.eventCursor());
         assertEquals(2, result.nextEventCursor());
         assertEquals(List.of(earlier, commandEvent), application.currentUpdate().events(),
                 "命令返回窗口不能消费桌面待展示队列");
+    }
+
+    @Test
+    void revision_shouldAdvanceForAcceptedWritesAndRejectStaleOrRepeatedCommands()
+    {
+        TrackingLogic logic = new TrackingLogic();
+        GameEventBuffer events = new GameEventBuffer();
+        GameApplication application = new GameApplication(logic, events);
+        AskClaimByRoleCommand firstCommand = new AskClaimByRoleCommand(0, Role.zhan);
+
+        assertEquals(0, application.currentRevision());
+        assertEquals(0, application.currentUpdate().revision());
+        GameUpdate firstUpdate = application.requestClaims(firstCommand);
+
+        assertEquals(1, firstUpdate.revision());
+        assertEquals(1, application.currentRevision());
+        assertEquals(1, logic.askRoleCalls);
+
+        application.currentUpdate();
+        application.currentUpdate(0);
+        application.publishDiagnosticEvent(
+                new Event(EventName.zco7, CharacterEnglishName.Abel));
+        application.pollNextEvent();
+        application.clearPendingEvents();
+        assertEquals(1, application.currentRevision(), "只读和展示队列操作不得推进状态版本");
+
+        StaleGameRevisionException stale = assertThrows(
+                StaleGameRevisionException.class,
+                () -> application.requestClaims(firstCommand));
+        assertEquals(0, stale.expectedRevision());
+        assertEquals(1, stale.currentRevision());
+        assertEquals(1, logic.askRoleCalls, "过期命令不得进入核心逻辑");
+
+        assertThrows(IllegalArgumentException.class, () -> application.requestClaims(
+                new AskClaimByPlayersCommand(application.currentRevision(), List.of(11))));
+        assertEquals(1, application.currentRevision(), "校验失败的命令不得推进状态版本");
+
+        GameUpdate secondUpdate = application.requestClaims(
+                new AskClaimByPlayersCommand(application.currentRevision(), List.of(2, 4)));
+        assertEquals(2, secondUpdate.revision());
     }
 
     @Test
@@ -172,12 +223,13 @@ class GameApplicationTest
         GameEventBuffer events = new GameEventBuffer();
         GameApplication application = new GameApplication(logic, events);
 
-        GameUpdate roleUpdate = application.requestClaims(new AskClaimByRoleCommand(Role.zhan));
+        GameUpdate roleUpdate = application.requestClaims(
+                new AskClaimByRoleCommand(application.currentRevision(), Role.zhan));
         assertEquals(Role.zhan, logic.askedRole);
         assertEquals(application.currentUpdate(), roleUpdate);
 
         GameUpdate playersUpdate = application.requestClaims(
-                new AskClaimByPlayersCommand(List.of(2, 4)));
+                new AskClaimByPlayersCommand(application.currentRevision(), List.of(2, 4)));
         assertEquals(List.of(2, 4), logic.askedPlayers);
         assertEquals(application.currentUpdate(), playersUpdate);
     }
@@ -185,17 +237,22 @@ class GameApplicationTest
     @Test
     void claimCommands_shouldRejectInvalidInputsAndDefensivelyCopyPlayers()
     {
-        assertThrows(NullPointerException.class, () -> new AskClaimByRoleCommand(null));
-        assertThrows(IllegalArgumentException.class, () -> new AskClaimByRoleCommand(Role.NONE));
-        assertThrows(IllegalArgumentException.class, () -> new AskClaimByRoleCommand(Role.renlang));
-        assertThrows(NullPointerException.class, () -> new AskClaimByPlayersCommand(null));
-        assertThrows(IllegalArgumentException.class, () -> new AskClaimByPlayersCommand(List.of()));
-        assertThrows(IllegalArgumentException.class, () -> new AskClaimByPlayersCommand(List.of(0)));
         assertThrows(IllegalArgumentException.class,
-                () -> new AskClaimByPlayersCommand(List.of(1, 1)));
+                () -> new AskClaimByRoleCommand(-1, Role.zhan));
+        assertThrows(NullPointerException.class, () -> new AskClaimByRoleCommand(0, null));
+        assertThrows(IllegalArgumentException.class, () -> new AskClaimByRoleCommand(0, Role.NONE));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AskClaimByRoleCommand(0, Role.renlang));
+        assertThrows(NullPointerException.class, () -> new AskClaimByPlayersCommand(0, null));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AskClaimByPlayersCommand(0, List.of()));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AskClaimByPlayersCommand(0, List.of(0)));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AskClaimByPlayersCommand(0, List.of(1, 1)));
 
         List<Integer> players = new ArrayList<>(List.of(1, 3));
-        AskClaimByPlayersCommand command = new AskClaimByPlayersCommand(players);
+        AskClaimByPlayersCommand command = new AskClaimByPlayersCommand(0, players);
         players.add(5);
         assertEquals(List.of(1, 3), command.players());
         assertThrows(UnsupportedOperationException.class, () -> command.players().add(5));
@@ -203,10 +260,10 @@ class GameApplicationTest
         TrackingLogic logic = new TrackingLogic();
         GameApplication application = new GameApplication(logic, new GameEventBuffer());
         assertThrows(IllegalArgumentException.class, () -> application.requestClaims(
-                new AskClaimByPlayersCommand(List.of(11))));
+                new AskClaimByPlayersCommand(application.currentRevision(), List.of(11))));
         logic.deadPlayers.add(4);
         assertThrows(IllegalArgumentException.class, () -> application.requestClaims(
-                new AskClaimByPlayersCommand(List.of(4))));
+                new AskClaimByPlayersCommand(application.currentRevision(), List.of(4))));
         assertNull(logic.askedPlayers);
     }
 
@@ -220,7 +277,7 @@ class GameApplicationTest
         List<Integer> candidates = new ArrayList<>(List.of(2, 4));
         logic.selectedVoteTargets.addAll(candidates);
         ExecuteVoteCommand command = new ExecuteVoteCommand(
-                VotingMethod.DESIGNATED, candidates, true);
+                application.currentRevision(), VotingMethod.DESIGNATED, candidates, true);
         candidates.add(6);
         VoteExecutionResult result = application.executeVote(command);
 
@@ -228,14 +285,17 @@ class GameApplicationTest
         assertEquals(List.of(2, 4), logic.voteCandidates);
         assertTrue(logic.avoidanceEnabled);
         assertTrue(result.voteCompleted());
+        assertEquals(1, result.update().revision());
         assertEquals(application.currentUpdate(), result.update());
         assertThrows(UnsupportedOperationException.class, () -> command.candidates().add(6));
 
         logic.voteCompleted = false;
         VoteExecutionResult interrupted = application.executeVote(
                 new ExecuteVoteCommand(
-                        VotingMethod.FREE, List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), true));
+                        application.currentRevision(), VotingMethod.FREE,
+                        List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), true));
         assertFalse(interrupted.voteCompleted(), "回避 CO 时必须保留核心的未完成状态");
+        assertEquals(2, interrupted.update().revision());
         assertEquals(0, logic.votingMethod);
     }
 
@@ -280,7 +340,9 @@ class GameApplicationTest
         assertThrows(UnsupportedOperationException.class,
                 () -> divination.targets().add(10));
         assertThrows(IllegalArgumentException.class, () -> application.executeVote(
-                new ExecuteVoteCommand(VotingMethod.FREE, List.of(1, 2), false)));
+                new ExecuteVoteCommand(
+                        application.currentRevision(), VotingMethod.FREE,
+                        List.of(1, 2), false)));
         assertNull(logic.voteCandidates);
 
         Arrays.fill(logic.actualRoles, Role.wu.ordinal());
@@ -297,36 +359,41 @@ class GameApplicationTest
                 () -> finished.revealedRoles().add(new RevealedPlayerRole(11, Role.wu)));
         assertThrows(IllegalStateException.class, () -> application.executeVote(
                 new ExecuteVoteCommand(
-                        VotingMethod.FREE, List.of(1, 2, 3, 4, 5, 6, 7, 8, 9), false)));
+                        application.currentRevision(), VotingMethod.FREE,
+                        List.of(1, 2, 3, 4, 5, 6, 7, 8, 9), false)));
         assertThrows(IllegalStateException.class, () -> application.requestClaims(
-                new AskClaimByRoleCommand(Role.zhan)));
+                new AskClaimByRoleCommand(application.currentRevision(), Role.zhan)));
         assertThrows(IllegalStateException.class, () -> application.setTargetSelection(
-                new SetAllTargetSelectionCommand(SelectionType.VOTE, 1, true)));
+                new SetAllTargetSelectionCommand(
+                        application.currentRevision(), SelectionType.VOTE, 1, true)));
     }
 
     @Test
     void executeVote_shouldRejectInvalidCandidatesBeforeCallingCore()
     {
         assertThrows(NullPointerException.class,
-                () -> new ExecuteVoteCommand(null, List.of(1), false));
+                () -> new ExecuteVoteCommand(0, null, List.of(1), false));
         assertThrows(NullPointerException.class,
-                () -> new ExecuteVoteCommand(VotingMethod.FREE, null, false));
+                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, null, false));
         assertThrows(IllegalArgumentException.class,
-                () -> new ExecuteVoteCommand(VotingMethod.FREE, List.of(), false));
+                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of(), false));
         assertThrows(IllegalArgumentException.class,
-                () -> new ExecuteVoteCommand(VotingMethod.FREE, List.of(0), false));
+                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of(0), false));
         assertThrows(IllegalArgumentException.class,
-                () -> new ExecuteVoteCommand(VotingMethod.FREE, List.of(1, 1), false));
+                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of(1, 1), false));
 
         TrackingLogic logic = new TrackingLogic();
         GameApplication application = new GameApplication(logic, new GameEventBuffer());
         assertThrows(IllegalArgumentException.class, () -> application.executeVote(
-                new ExecuteVoteCommand(VotingMethod.FREE, List.of(11), false)));
+                new ExecuteVoteCommand(
+                        application.currentRevision(), VotingMethod.FREE, List.of(11), false)));
         assertNull(logic.voteCandidates);
 
         logic.deadPlayers.add(4);
         assertThrows(IllegalArgumentException.class, () -> application.executeVote(
-                new ExecuteVoteCommand(VotingMethod.DESIGNATED, List.of(4), false)));
+                new ExecuteVoteCommand(
+                        application.currentRevision(), VotingMethod.DESIGNATED,
+                        List.of(4), false)));
         assertNull(logic.voteCandidates);
     }
 
@@ -337,8 +404,10 @@ class GameApplicationTest
         GameApplication application = new GameApplication(logic, new GameEventBuffer());
 
         GameUpdate voteUpdate = application.setTargetSelection(
-                new SetAllTargetSelectionCommand(SelectionType.VOTE, 6, true));
+                new SetAllTargetSelectionCommand(
+                        application.currentRevision(), SelectionType.VOTE, 6, true));
         assertEquals(List.of("setSelectedVoteTarget:[6, 4, true]"), logic.selectionWrites);
+        assertEquals(1, voteUpdate.revision());
         assertEquals(application.currentUpdate(), voteUpdate);
 
         logic.selectionWrites.clear();
@@ -346,8 +415,10 @@ class GameApplicationTest
         logic.claimedRoles[3] = Role.zhan.ordinal();
         logic.claimedRoles[5] = Role.zhan.ordinal();
         logic.deadPlayers.add(5);
-        application.setTargetSelection(
-                new SetAllTargetSelectionCommand(SelectionType.DIVINATION, 6, true));
+        GameUpdate divinationUpdate = application.setTargetSelection(
+                new SetAllTargetSelectionCommand(
+                        application.currentRevision(), SelectionType.DIVINATION, 6, true));
+        assertEquals(2, divinationUpdate.revision());
         assertEquals(List.of(
                 "setHiddenSeerScheduled:[6, 4, true]",
                 "setClaimedRoleScheduled:[2, 6, 4, true]",
@@ -357,8 +428,10 @@ class GameApplicationTest
         logic.actualRoles[2] = Role.lie.ordinal();
         logic.claimedRoles[3] = Role.lie.ordinal();
         logic.claimedRoles[5] = Role.lie.ordinal();
-        application.setTargetSelection(
-                new SetAllTargetSelectionCommand(SelectionType.GUARD, 6, false));
+        GameUpdate guardUpdate = application.setTargetSelection(
+                new SetAllTargetSelectionCommand(
+                        application.currentRevision(), SelectionType.GUARD, 6, false));
+        assertEquals(3, guardUpdate.revision());
         assertEquals(List.of(
                 "setHiddenHunterScheduled:[6, 4, false]",
                 "setClaimedRoleScheduled:[2, 6, 4, false]",
@@ -372,44 +445,52 @@ class GameApplicationTest
         logic.claimedRoles[3] = Role.zhan.ordinal();
         GameApplication application = new GameApplication(logic, new GameEventBuffer());
 
-        application.setTargetSelection(new SetClaimedRoleTargetSelectionCommand(
-                SelectionType.DIVINATION, 3, 6, true));
+        GameUpdate selected = application.setTargetSelection(
+                new SetClaimedRoleTargetSelectionCommand(
+                        application.currentRevision(), SelectionType.DIVINATION, 3, 6, true));
+        assertEquals(1, selected.revision());
         assertEquals(List.of("setClaimedRoleScheduled:[3, 6, 4, true]"), logic.selectionWrites);
 
         assertThrows(NullPointerException.class,
-                () -> new SetAllTargetSelectionCommand(null, 1, true));
+                () -> new SetAllTargetSelectionCommand(0, null, 1, true));
         assertThrows(IllegalArgumentException.class,
-                () -> new SetAllTargetSelectionCommand(SelectionType.VOTE, 0, true));
+                () -> new SetAllTargetSelectionCommand(0, SelectionType.VOTE, 0, true));
         assertThrows(NullPointerException.class,
-                () -> new SetClaimedRoleTargetSelectionCommand(null, 1, 2, true));
+                () -> new SetClaimedRoleTargetSelectionCommand(0, null, 1, 2, true));
         assertThrows(IllegalArgumentException.class,
                 () -> new SetClaimedRoleTargetSelectionCommand(
-                        SelectionType.VOTE, 1, 2, true));
+                        0, SelectionType.VOTE, 1, 2, true));
         assertThrows(IllegalArgumentException.class,
                 () -> new SetClaimedRoleTargetSelectionCommand(
-                        SelectionType.GUARD, 0, 2, true));
+                        0, SelectionType.GUARD, 0, 2, true));
         assertThrows(IllegalArgumentException.class,
                 () -> new SetClaimedRoleTargetSelectionCommand(
-                        SelectionType.GUARD, 1, 0, true));
+                        0, SelectionType.GUARD, 1, 0, true));
 
         assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
-                new SetAllTargetSelectionCommand(SelectionType.VOTE, 11, true)));
+                new SetAllTargetSelectionCommand(
+                        application.currentRevision(), SelectionType.VOTE, 11, true)));
         assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
                 new SetClaimedRoleTargetSelectionCommand(
-                        SelectionType.DIVINATION, 11, 6, true)));
+                        application.currentRevision(), SelectionType.DIVINATION,
+                        11, 6, true)));
         assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
                 new SetClaimedRoleTargetSelectionCommand(
-                        SelectionType.DIVINATION, 3, 11, true)));
+                        application.currentRevision(), SelectionType.DIVINATION,
+                        3, 11, true)));
 
         logic.deadPlayers.add(6);
         assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
                 new SetClaimedRoleTargetSelectionCommand(
-                        SelectionType.DIVINATION, 3, 6, true)));
+                        application.currentRevision(), SelectionType.DIVINATION,
+                        3, 6, true)));
+        assertEquals(1, application.currentRevision(), "失败的目标预约不得推进状态版本");
         logic.deadPlayers.clear();
         logic.claimedRoles[3] = Role.lie.ordinal();
         assertThrows(IllegalArgumentException.class, () -> application.setTargetSelection(
                 new SetClaimedRoleTargetSelectionCommand(
-                        SelectionType.DIVINATION, 3, 6, true)));
+                        application.currentRevision(), SelectionType.DIVINATION,
+                        3, 6, true)));
     }
 
     private GameRecordManager records(String fileName)
@@ -476,6 +557,7 @@ class GameApplicationTest
         private List<Integer> voteCandidates;
         private boolean avoidanceEnabled;
         private boolean voteCompleted;
+        private int askRoleCalls;
         private Runnable onAskRole = () -> { };
 
         @Override public GameContextView getGameContext() { return context; }
@@ -488,6 +570,7 @@ class GameApplicationTest
             return voteCompleted;
         }
         @Override public void askCo(Role role) {
+            askRoleCalls++;
             askedRole = role;
             onAskRole.run();
         }

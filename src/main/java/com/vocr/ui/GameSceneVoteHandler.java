@@ -415,7 +415,10 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (!greyVoteCandidates.isEmpty())
             DebugLogger.log("cxList不为空，且具体为" + greyVoteCandidates);
         VoteExecutionResult result = ui.gameApplication.executeVote(
-                new ExecuteVoteCommand(VotingMethod.GREY, greyVoteCandidates, ui.isAvoid));
+                new ExecuteVoteCommand(
+                        ui.gameRevision(), VotingMethod.GREY,
+                        greyVoteCandidates, ui.isAvoid));
+        ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
             int trueDay = ui.ctx.getEffectiveGameDay();
             isReVote = VoteResultRenderer.renderPiao(
@@ -450,7 +453,8 @@ public class GameSceneVoteHandler implements SceneHandler {
             isSelectingCo = false;
             DebugLogger.log(askList);
             GameUpdate update = ui.gameApplication.requestClaims(
-                    new AskClaimByPlayersCommand(askList));
+                    new AskClaimByPlayersCommand(ui.gameRevision(), askList));
+            ui.acceptGameUpdate(update);
             if (!update.events().isEmpty()) {
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
                 ui.run();
@@ -469,7 +473,9 @@ public class GameSceneVoteHandler implements SceneHandler {
         DebugLogger.log("自由投票" + chuxingList);
         boolean isReVote;
         VoteExecutionResult result = ui.gameApplication.executeVote(
-                new ExecuteVoteCommand(VotingMethod.FREE, chuxingList, ui.isAvoid));
+                new ExecuteVoteCommand(
+                        ui.gameRevision(), VotingMethod.FREE, chuxingList, ui.isAvoid));
+        ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
             if (ui.ctx.getEndResult() == GameResult.NONE) {
                 isReVote = VoteResultRenderer.renderPiao(
@@ -495,7 +501,10 @@ public class GameSceneVoteHandler implements SceneHandler {
         DebugLogger.log("指定投票" + chuxingList);
         boolean isReVote;
         VoteExecutionResult result = ui.gameApplication.executeVote(
-                new ExecuteVoteCommand(VotingMethod.DESIGNATED, chuxingList, ui.isAvoid));
+                new ExecuteVoteCommand(
+                        ui.gameRevision(), VotingMethod.DESIGNATED,
+                        chuxingList, ui.isAvoid));
+        ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
             int trueDay = ui.ctx.getEffectiveGameDay();
             StringBuilder isSelectedVoteTargetText = new StringBuilder();
@@ -551,7 +560,9 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     private void handleRoleCo(Role role, String noRoleMsg) {
         ui.resources.playSound(SoundEffect.CLICK);
-        GameUpdate update = ui.gameApplication.requestClaims(new AskClaimByRoleCommand(role));
+        GameUpdate update = ui.gameApplication.requestClaims(
+                new AskClaimByRoleCommand(ui.gameRevision(), role));
+        ui.acceptGameUpdate(update);
         if (update.events().isEmpty()) {
             createTishi(noRoleMsg);
         } else {

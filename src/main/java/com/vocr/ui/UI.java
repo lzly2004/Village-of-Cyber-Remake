@@ -4,6 +4,7 @@ import com.vocr.resources.SoundEffect;
 
 import com.vocr.application.GameApplication;
 import com.vocr.application.GameUpdate;
+import com.vocr.application.StartedGame;
 import com.vocr.logging.DebugLogger;
 import com.vocr.core.MainLogicInterface;
 import com.vocr.resources.ResourcesInterface;
@@ -147,6 +148,7 @@ public class UI
     final ResourcesInterface resources;//资源接口
     MainLogicInterface mainLogic;//主逻辑接口
     GameApplication gameApplication;//逐步承接平台无关的业务操作
+    private long gameRevision;//桌面端最近一次收到的应用状态版本
     final ReplayManager replayManager;//回放管理器
     final GameRecordManager gameRecordManager;//战绩管理器
     UIComponentFactory uiComponentFactory;
@@ -248,7 +250,24 @@ public class UI
 
     GameUpdate currentGameUpdate()
     {
-        return gameApplication.currentUpdate();
+        GameUpdate update = gameApplication.currentUpdate();
+        acceptGameUpdate(update);
+        return update;
+    }
+
+    long gameRevision()
+    {
+        return gameRevision;
+    }
+
+    void acceptGameUpdate(GameUpdate update)
+    {
+        gameRevision = Objects.requireNonNull(update, "应用更新不能为空").revision();
+    }
+
+    void acceptStartedGame(StartedGame startedGame)
+    {
+        gameRevision = Objects.requireNonNull(startedGame, "开局结果不能为空").revision();
     }
 
     Event pollEvent()

@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Objects;
 
 /** 询问一组指定玩家是否 CO。 */
-public record AskClaimByPlayersCommand(List<Integer> players)
+public record AskClaimByPlayersCommand(long expectedRevision, List<Integer> players)
+        implements RevisionedCommand
 {
     public AskClaimByPlayersCommand
     {
+        RevisionedCommand.requireValid(expectedRevision);
         Objects.requireNonNull(players, "询问玩家列表不能为空");
         players = List.copyOf(players);
         if (players.isEmpty())

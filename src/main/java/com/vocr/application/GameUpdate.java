@@ -10,10 +10,10 @@ import java.util.Optional;
 /**
  * 当前应用更新的不可变快照。
  *
- * 包含业务阶段、白名单玩家视图、当前合法动作、事件输出及其续读游标；完整状态
- * revision 会在相应写操作全部迁入应用层后加入。
+ * 包含状态 revision、业务阶段、白名单玩家视图、当前合法动作、事件输出及其续读游标。
  */
 public record GameUpdate(
+        long revision,
         BusinessPhase phase,
         PlayerViewSnapshot view,
         List<LegalVoteAction> legalVoteActions,
@@ -26,6 +26,8 @@ public record GameUpdate(
 {
     public GameUpdate
     {
+        if (revision < 0)
+            throw new IllegalArgumentException("状态版本不能为负数");
         Objects.requireNonNull(phase, "业务阶段不能为空");
         Objects.requireNonNull(view, "玩家视图不能为空");
         Objects.requireNonNull(claimInquiry, "CO 询问选项不能为空");

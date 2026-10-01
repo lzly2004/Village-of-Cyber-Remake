@@ -20,6 +20,7 @@ public final class GameApplication
 {
     private final MainLogicInterface gameLogic;
     private final GameEventBuffer eventBuffer;
+    private long revision;
 
     public GameApplication(MainLogicInterface gameLogic, GameEventBuffer eventBuffer)
     {
@@ -27,31 +28,37 @@ public final class GameApplication
         this.eventBuffer = Objects.requireNonNull(eventBuffer, "事件缓冲区不能为空");
     }
 
-    public StartedGame startGame(StartGameCommand command)
+    public synchronized StartedGame startGame(StartGameCommand command)
     {
         Objects.requireNonNull(command, "开局命令不能为空");
+        requireCurrentRevision(command);
         eventBuffer.reset();
         gameLogic.start(command.configuration());
         GameContextView context = Objects.requireNonNull(
                 gameLogic.getGameContext(), "主逻辑开局后未提供游戏状态");
-        return new StartedGame(context.getPeiyi(), context.getPlayerSum(), context.getGameDay());
+        advanceRevision();
+        return new StartedGame(
+                revision, context.getPeiyi(), context.getPlayerSum(), context.getGameDay());
     }
 
-    public GameUpdate requestClaims(AskClaimByRoleCommand command)
+    public synchronized GameUpdate requestClaims(AskClaimByRoleCommand command)
     {
         Objects.requireNonNull(command, "按职业询问命令不能为空");
+        requireCurrentRevision(command);
         GameContextView context = requireStartedContext();
         requireDayDecision(context, "询问 CO");
         if (!LegalActionProjector.claimInquiry(context).roles().contains(command.role()))
             throw new IllegalArgumentException("当前不能询问该职业 CO: " + command.role());
         long eventCursor = eventBuffer.currentCursor();
         gameLogic.askCo(command.role());
+        advanceRevision();
         return currentUpdate(eventCursor);
     }
 
-    public GameUpdate requestClaims(AskClaimByPlayersCommand command)
+    public synchronized GameUpdate requestClaims(AskClaimByPlayersCommand command)
     {
         Objects.requireNonNull(command, "按玩家询问命令不能为空");
+        requireCurrentRevision(command);
         GameContextView context = requireStartedContext();
         requireDayDecision(context, "询问 CO");
         if (command.players().stream().anyMatch(player -> player > context.getPlayerSum()))
@@ -63,6 +70,7 @@ public final class GameApplication
                     "询问对象必须全部来自当前合法候选: " + command.players());
         long eventCursor = eventBuffer.currentCursor();
         gameLogic.askCo(command.players());
+        advanceRevision();
         return currentUpdate(eventCursor);
     }
 
@@ -74,9 +82,10 @@ public final class GameApplication
         return context;
     }
 
-    public VoteExecutionResult executeVote(ExecuteVoteCommand command)
+    public synchronized VoteExecutionResult executeVote(ExecuteVoteCommand command)
     {
         Objects.requireNonNull(command, "投票命令不能为空");
+        requireCurrentRevision(command);
         GameContextView context = requireStartedContext();
         if (context.getEndResult() != GameResult.NONE)
             throw new IllegalStateException("对局已经结束，不能继续投票");
@@ -98,12 +107,14 @@ public final class GameApplication
         long eventCursor = eventBuffer.currentCursor();
         boolean voteCompleted = gameLogic.shokei(
                 command.method().legacyCode(), command.candidates(), command.avoidanceEnabled());
+        advanceRevision();
         return new VoteExecutionResult(voteCompleted, currentUpdate(eventCursor));
     }
 
-    public GameUpdate setTargetSelection(SetAllTargetSelectionCommand command)
+    public synchronized GameUpdate setTargetSelection(SetAllTargetSelectionCommand command)
     {
         Objects.requireNonNull(command, "全体目标命令不能为空");
+        requireCurrentRevision(command);
         GameContextView context = requireStartedContext();
         requireDayDecision(context, "预约目标");
         requireAlivePlayer(context, command.target(), "目标玩家");
@@ -116,6 +127,7 @@ public final class GameApplication
         if (command.type() == SelectionType.VOTE)
         {
             context.setSelectedVoteTarget(command.target(), day, command.selected());
+            advanceRevision();
             return currentUpdate(eventCursor);
         }
 
@@ -135,12 +147,14 @@ public final class GameApplication
                         player, command.target(), day, command.selected());
             }
         }
+        advanceRevision();
         return currentUpdate(eventCursor);
     }
 
-    public GameUpdate setTargetSelection(SetClaimedRoleTargetSelectionCommand command)
+    public synchronized GameUpdate setTargetSelection(SetClaimedRoleTargetSelectionCommand command)
     {
         Objects.requireNonNull(command, "CO 目标命令不能为空");
+        requireCurrentRevision(command);
         GameContextView context = requireStartedContext();
         requireDayDecision(context, "预约目标");
         requireAlivePlayer(context, command.claimedPlayer(), "CO 玩家");
@@ -160,6 +174,7 @@ public final class GameApplication
         long eventCursor = eventBuffer.currentCursor();
         context.setClaimedRoleScheduled(
                 command.claimedPlayer(), command.target(), context.getGameDay(), command.selected());
+        advanceRevision();
         return currentUpdate(eventCursor);
     }
 
@@ -201,7 +216,7 @@ public final class GameApplication
      * 返回桌面端尚未确认展示的事件后缀。该窗口可能晚于本局事件起点；需要可靠续读的
      * 调用方必须保存并传入自己的事件游标。
      */
-    public GameUpdate currentUpdate()
+    public synchronized GameUpdate currentUpdate()
     {
         return toUpdate(eventBuffer.pendingSnapshot());
     }
@@ -211,7 +226,7 @@ public final class GameApplication
      * {@code eventCursor} 与 {@code nextEventCursor} 明确标识事件窗口，重复使用同一游标
      * 会得到相同结果。
      */
-    public GameUpdate currentUpdate(long eventCursor)
+    public synchronized GameUpdate currentUpdate(long eventCursor)
     {
         return toUpdate(eventBuffer.snapshotAfter(eventCursor));
     }
@@ -224,6 +239,7 @@ public final class GameApplication
                 : BusinessPhase.FINISHED;
         boolean decisionPhase = phase == BusinessPhase.DAY_DECISION;
         return new GameUpdate(
+                revision,
                 phase,
                 PlayerViewProjector.project(context),
                 decisionPhase
@@ -241,6 +257,23 @@ public final class GameApplication
                 batch.cursor(),
                 batch.nextCursor(),
                 batch.events());
+    }
+
+    /** 当前应用状态版本；开局前为 0，成功写命令后严格递增。 */
+    public synchronized long currentRevision()
+    {
+        return revision;
+    }
+
+    private void requireCurrentRevision(RevisionedCommand command)
+    {
+        if (command.expectedRevision() != revision)
+            throw new StaleGameRevisionException(command.expectedRevision(), revision);
+    }
+
+    private void advanceRevision()
+    {
+        revision = Math.incrementExact(revision);
     }
 
     /** 桌面迁移期用于确认已展示的队首事件；Web 适配器后续改用事件游标。 */
