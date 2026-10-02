@@ -21,6 +21,7 @@ public final class GameApplication
     private final MainLogicInterface gameLogic;
     private final GameEventBuffer eventBuffer;
     private long revision;
+    private boolean avoidanceEnabled = true;
 
     public GameApplication(MainLogicInterface gameLogic, GameEventBuffer eventBuffer)
     {
@@ -36,6 +37,7 @@ public final class GameApplication
         gameLogic.start(command.configuration());
         GameContextView context = Objects.requireNonNull(
                 gameLogic.getGameContext(), "主逻辑开局后未提供游戏状态");
+        avoidanceEnabled = true;
         advanceRevision();
         return new StartedGame(
                 revision, context.getPeiyi(), context.getPlayerSum(), context.getGameDay());
@@ -178,6 +180,18 @@ public final class GameApplication
         return currentUpdate(eventCursor);
     }
 
+    public synchronized GameUpdate setAvoidance(SetAvoidanceCommand command)
+    {
+        Objects.requireNonNull(command, "回避设置命令不能为空");
+        requireCurrentRevision(command);
+        GameContextView context = requireStartedContext();
+        requireDayDecision(context, "设置投票回避");
+        long eventCursor = eventBuffer.currentCursor();
+        avoidanceEnabled = command.enabled();
+        advanceRevision();
+        return currentUpdate(eventCursor);
+    }
+
     private static Role scheduledRole(SelectionType type)
     {
         return switch (type)
@@ -242,6 +256,7 @@ public final class GameApplication
                 revision,
                 phase,
                 PlayerViewProjector.project(context),
+                SelectionStateProjector.project(context, avoidanceEnabled),
                 decisionPhase
                         ? VoteCandidateProjector.project(context)
                         : List.of(),

@@ -217,6 +217,82 @@ class GameApplicationTest
     }
 
     @Test
+    void selectionState_shouldExposeOnlyPublicCurrentSelections()
+    {
+        TrackingLogic logic = new TrackingLogic();
+        logic.actualRoles[1] = Role.zhan.ordinal();
+        logic.claimedRoles[2] = Role.zhan.ordinal();
+        logic.claimedRoles[3] = Role.lie.ordinal();
+        logic.selectedVoteTargets.addAll(List.of(4, 6));
+        logic.hiddenSeerTargets.add(5);
+        logic.hiddenHunterTargets.add(7);
+        logic.claimedRoleTargets[2].addAll(List.of(5, 8));
+        logic.claimedRoleTargets[3].add(9);
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+
+        SelectionStateSnapshot selections = application.currentUpdate(0).selections();
+
+        assertTrue(selections.avoidanceEnabled());
+        assertEquals(List.of(4, 6), selections.voteTargets());
+        assertEquals(List.of(5), selections.divination().hiddenTargets());
+        assertEquals(List.of(
+                new ClaimedActorTargets(2, 2, List.of(5, 8))),
+                selections.divination().claimedActors());
+        assertEquals(List.of(7), selections.guard().hiddenTargets());
+        assertEquals(List.of(
+                new ClaimedActorTargets(3, 3, List.of(9))),
+                selections.guard().claimedActors());
+        assertTrue(selections.isTargetSelected(SelectionType.DIVINATION, 8));
+        assertFalse(selections.isTargetSelected(SelectionType.GUARD, 8));
+
+        Set<String> selectionFields = Arrays.stream(
+                        SelectionStateSnapshot.class.getRecordComponents())
+                .map(RecordComponent::getName)
+                .collect(Collectors.toSet());
+        assertEquals(Set.of("avoidanceEnabled", "voteTargets", "divination", "guard"),
+                selectionFields);
+        Set<String> skillFields = Arrays.stream(
+                        SkillTargetSelections.class.getRecordComponents())
+                .map(RecordComponent::getName)
+                .collect(Collectors.toSet());
+        assertEquals(Set.of("hiddenTargets", "claimedActors"), skillFields);
+        Set<String> actorFields = Arrays.stream(
+                        ClaimedActorTargets.class.getRecordComponents())
+                .map(RecordComponent::getName)
+                .collect(Collectors.toSet());
+        assertEquals(Set.of("playerNumber", "claimedRoleOrder", "targets"), actorFields);
+        assertFalse(actorFields.contains("actualRole"));
+        assertThrows(UnsupportedOperationException.class,
+                () -> selections.voteTargets().add(10));
+        assertThrows(UnsupportedOperationException.class,
+                () -> selections.divination().hiddenTargets().add(10));
+        assertThrows(UnsupportedOperationException.class,
+                () -> selections.divination().claimedActors().getFirst().targets().add(10));
+    }
+
+    @Test
+    void avoidanceState_shouldBeVersionedAndResetForNewGame()
+    {
+        TrackingLogic logic = new TrackingLogic();
+        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+
+        GameUpdate disabled = application.setAvoidance(
+                new SetAvoidanceCommand(application.currentRevision(), false));
+
+        assertFalse(disabled.selections().avoidanceEnabled());
+        assertEquals(1, disabled.revision());
+        assertFalse(application.currentUpdate().selections().avoidanceEnabled());
+        assertThrows(StaleGameRevisionException.class, () -> application.setAvoidance(
+                new SetAvoidanceCommand(0, true)));
+        assertFalse(application.currentUpdate().selections().avoidanceEnabled());
+
+        StartedGame started = application.startGame(
+                new StartGameCommand(application.currentRevision(), peiyi.jianyi));
+        assertEquals(2, started.revision());
+        assertTrue(application.currentUpdate().selections().avoidanceEnabled());
+    }
+
+    @Test
     void claimCommands_shouldDelegateThroughApplicationAndReturnCurrentUpdate()
     {
         TrackingLogic logic = new TrackingLogic();
@@ -505,6 +581,10 @@ class GameApplicationTest
         private final int[] claimedRoles = new int[11];
         private final int[][] skillTargets = new int[11][16];
         private final Set<Integer> selectedVoteTargets = new HashSet<>();
+        @SuppressWarnings("unchecked")
+        private final Set<Integer>[] claimedRoleTargets = createTargetSets();
+        private final Set<Integer> hiddenSeerTargets = new HashSet<>();
+        private final Set<Integer> hiddenHunterTargets = new HashSet<>();
         private final List<String> selectionWrites = new ArrayList<>();
         private GameResult endResult = GameResult.NONE;
         private final GameContextView context = (GameContextView) Proxy.newProxyInstance(
@@ -529,6 +609,12 @@ class GameApplicationTest
                         case "getClaimedRole" -> claimedRoles[(Integer) arguments[0]];
                         case "getSkillTarget" -> skillTargets[(Integer) arguments[0]][(Integer) arguments[1]];
                         case "isSelectedVoteTarget" -> selectedVoteTargets.contains((Integer) arguments[0]);
+                        case "isClaimedRoleScheduled" -> claimedRoleTargets[(Integer) arguments[0]]
+                                .contains((Integer) arguments[1]);
+                        case "isHiddenSeerScheduled" -> hiddenSeerTargets.contains(
+                                (Integer) arguments[0]);
+                        case "isHiddenHunterScheduled" -> hiddenHunterTargets.contains(
+                                (Integer) arguments[0]);
                         case "getClaimedRoleOrder" -> claimedRoles[(Integer) arguments[0]] == 0
                                 ? 0 : (Integer) arguments[0];
                         case "getComingOutDay" -> claimedRoles[(Integer) arguments[0]] == 0 ? 0 : 2;
@@ -541,9 +627,23 @@ class GameApplicationTest
                                     method.getName() + ":" + Arrays.toString(arguments));
                             yield null;
                         }
-                        case "setClaimedRoleScheduled", "setHiddenSeerScheduled",
-                                "setHiddenHunterScheduled" ->
+                        case "setClaimedRoleScheduled" ->
                         {
+                            int player = (Integer) arguments[0];
+                            int target = (Integer) arguments[1];
+                            if ((Boolean) arguments[3]) claimedRoleTargets[player].add(target);
+                            else claimedRoleTargets[player].remove(target);
+                            selectionWrites.add(
+                                    method.getName() + ":" + Arrays.toString(arguments));
+                            yield null;
+                        }
+                        case "setHiddenSeerScheduled", "setHiddenHunterScheduled" ->
+                        {
+                            Set<Integer> targets = method.getName().equals("setHiddenSeerScheduled")
+                                    ? hiddenSeerTargets : hiddenHunterTargets;
+                            int target = (Integer) arguments[0];
+                            if ((Boolean) arguments[2]) targets.add(target);
+                            else targets.remove(target);
                             selectionWrites.add(
                                     method.getName() + ":" + Arrays.toString(arguments));
                             yield null;
@@ -559,6 +659,14 @@ class GameApplicationTest
         private boolean voteCompleted;
         private int askRoleCalls;
         private Runnable onAskRole = () -> { };
+
+        @SuppressWarnings("unchecked")
+        private static Set<Integer>[] createTargetSets()
+        {
+            Set<Integer>[] targets = new Set[11];
+            Arrays.setAll(targets, ignored -> new HashSet<>());
+            return targets;
+        }
 
         @Override public GameContextView getGameContext() { return context; }
         @Override public GameRecorder getRecorder() { return null; }
