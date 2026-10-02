@@ -12,11 +12,7 @@ public class StartSceneHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
         ui.count = 0;
-        ui.isAvoid = true;
         ui.isCo = false;
-        ui.selectedVoteTargets.clear();
-        ui.selectedDivinationTargets.clear();
-        ui.selectedGuardTargets.clear();
 
         ui.clearPendingEvents();
         DebugLogger.log("事件成功清空");

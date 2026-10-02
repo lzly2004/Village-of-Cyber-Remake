@@ -73,8 +73,7 @@ class CoSelectionPanel {
                     ui, UiImage.VOTE_RESULT_ALL, 60 + 5 + 74 * charIndex, baseY);
             infoCoPanel.add(voteLabel);
             infoCoPanel.setComponentZOrder(voteLabel, 0);
-            voteLabel.setVisible(false);
-            if (ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay())) voteLabel.setVisible(true);
+            voteLabel.setVisible(update.selections().voteTargets().contains(i));
 
             JLabel voteAllLabel = UIHelpers.createIconLabel(
                     ui, UiImage.DIVINATION_RESULT_ALL, 60 + 5 + 74 * charIndex, baseY + 20);

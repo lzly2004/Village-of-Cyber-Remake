@@ -17,7 +17,7 @@ class VoteButtonPanel {
     JButton fixedVoteBtn, fixedUranaiBtn, protectBtn;
     JScrollPane scrollPane1;
 
-    void create(UI ui) {
+    void create(UI ui, boolean avoidanceEnabled) {
         voteBtn = createVisibleButton(ui, 1060, 720 - 40 - 126, UiImage.VOTE_CONFIRM);
         recordBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 2 - 10, UiImage.VOTE_INFO);
         pointBtn = createVisibleButton(ui, 1060, 720 - 40 - 126 * 3 - 20, UiImage.DESIGNATION_MENU);
@@ -51,7 +51,7 @@ class VoteButtonPanel {
         protectBtn = createHiddenButton(
                 ui, 1060, 720 - 40 - 126, UiImage.DESIGNATED_GUARD);
 
-        if (ui.isAvoid) { avoidBtn.setVisible(true); avoidBtn1.setVisible(false); }
+        if (avoidanceEnabled) { avoidBtn.setVisible(true); avoidBtn1.setVisible(false); }
         else { avoidBtn1.setVisible(true); avoidBtn.setVisible(false); }
 
         scrollPane1 = new JScrollPane();

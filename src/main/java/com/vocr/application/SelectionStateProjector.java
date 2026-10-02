@@ -1,6 +1,7 @@
 package com.vocr.application;
 
 import com.vocr.domain.GameContextView;
+import com.vocr.domain.Role;
 import com.vocr.domain.SelectionType;
 
 import java.util.ArrayList;
@@ -25,10 +26,12 @@ final class SelectionStateProjector
     private static SkillTargetSelections skillSelections(
             GameContextView context, SelectionType type, int day)
     {
-        LegalTargetSelection legalAction = LegalActionProjector.targetSelections(context).stream()
-                .filter(action -> action.type() == type)
-                .findFirst()
-                .orElseThrow();
+        Role claimedRole = switch (type)
+        {
+            case DIVINATION -> Role.zhan;
+            case GUARD -> Role.lie;
+            case VOTE -> throw new IllegalArgumentException("指定投票不属于技能预约");
+        };
         List<Integer> hiddenTargets = selectedTargets(context, target -> switch (type)
         {
             case DIVINATION -> context.isHiddenSeerScheduled(target, day);
@@ -36,13 +39,17 @@ final class SelectionStateProjector
             case VOTE -> throw new IllegalArgumentException("指定投票不属于技能预约");
         });
         List<ClaimedActorTargets> claimedActors = new ArrayList<>();
-        for (ClaimedRoleActor actor : legalAction.claimedActors())
+        for (int player = 1; player <= context.getPlayerSum(); player++)
         {
+            if (!context.isAlive(player)
+                    || context.getClaimedRole(player) != claimedRole.ordinal())
+                continue;
+            int actor = player;
             claimedActors.add(new ClaimedActorTargets(
-                    actor.playerNumber(),
-                    actor.claimedRoleOrder(),
+                    actor,
+                    context.getClaimedRoleOrder(actor),
                     selectedTargets(context, target -> context.isClaimedRoleScheduled(
-                            actor.playerNumber(), target, day))));
+                            actor, target, day))));
         }
         return new SkillTargetSelections(hiddenTargets, claimedActors);
     }

@@ -1,5 +1,10 @@
 package com.vocr.ui;
 
+import com.vocr.application.ClaimedActorTargets;
+import com.vocr.application.SelectionStateSnapshot;
+import com.vocr.application.SkillTargetSelections;
+import com.vocr.domain.SelectionType;
+
 import org.junit.jupiter.api.Test;
 
 import javax.swing.JLabel;
@@ -12,58 +17,87 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CharacterSelectionPanelTest {
 
     @Test
-    void singleClaimedActor_shouldUpdateSelectedPlayersLabel() {
-        List<JLabel> labels = hiddenLabels(3);
+    void voteState_shouldDriveEveryVoteIndicator() {
+        SelectionStateSnapshot selections = new SelectionStateSnapshot(
+                true,
+                List.of(2),
+                emptySkillSelections(),
+                emptySkillSelections());
+        List<JLabel> frames = hiddenLabels(3);
+        List<JLabel> results = hiddenLabels(3);
+        List<JLabel> votes = hiddenLabels(3);
 
-        CharacterSelectionPanel.setClaimedActorResultVisible(
-                labels, 1, 0, 1, true);
+        CharacterSelectionPanel.applyTargetState(
+                selections, SelectionType.VOTE, 1, List.of(),
+                frames, results, votes, List.of());
 
-        assertFalse(labels.get(0).isVisible());
-        assertTrue(labels.get(1).isVisible());
-        assertFalse(labels.get(2).isVisible());
+        assertOnlyVisible(frames, 1);
+        assertOnlyVisible(results, 1);
+        assertOnlyVisible(votes, 1);
     }
 
     @Test
-    void multipleClaimedActors_shouldUpdateOnlySelectedActorForPlayer() {
-        List<JLabel> labels = hiddenLabels(6);
+    void hiddenSkillState_shouldShowAggregateResultWithoutClaimedActorResult() {
+        SelectionStateSnapshot selections = skillSelections();
+        List<JLabel> frames = hiddenLabels(3);
+        List<JLabel> results = hiddenLabels(3);
+        List<JLabel> actorResults = hiddenLabels(6);
 
-        CharacterSelectionPanel.setClaimedActorResultVisible(
-                labels, 1, 1, 2, true);
+        CharacterSelectionPanel.applyTargetState(
+                selections, SelectionType.DIVINATION, 0, List.of(2, 3),
+                frames, results, List.of(), actorResults);
 
-        assertOnlyVisible(labels, 3);
+        assertOnlyVisible(frames, 0);
+        assertOnlyVisible(results, 0);
+        assertNoneVisible(actorResults);
     }
 
     @Test
-    void claimedActorSelection_shouldSupportCancellingOneIndicator() {
-        List<JLabel> labels = hiddenLabels(6);
-        CharacterSelectionPanel.setClaimedActorResultVisible(
-                labels, 1, 0, 2, true);
-        CharacterSelectionPanel.setClaimedActorResultVisible(
-                labels, 1, 1, 2, true);
+    void claimedActorSkillState_shouldShowOnlyMatchingActorResult() {
+        SelectionStateSnapshot selections = skillSelections();
+        List<JLabel> frames = hiddenLabels(3);
+        List<JLabel> results = hiddenLabels(3);
+        List<JLabel> actorResults = hiddenLabels(6);
 
-        CharacterSelectionPanel.setClaimedActorResultVisible(
-                labels, 1, 0, 2, false);
+        CharacterSelectionPanel.applyTargetState(
+                selections, SelectionType.DIVINATION, 1, List.of(2, 3),
+                frames, results, List.of(), actorResults);
 
-        assertOnlyVisible(labels, 3);
+        assertOnlyVisible(frames, 1);
+        assertNoneVisible(results);
+        assertOnlyVisible(actorResults, 2);
     }
 
     @Test
-    void deletingTarget_shouldHideEveryClaimedActorIndicatorForPlayer() {
-        List<JLabel> labels = hiddenLabels(6);
-        CharacterSelectionPanel.setAllClaimedActorResultsVisible(
-                labels, 0, 2, true);
-        CharacterSelectionPanel.setAllClaimedActorResultsVisible(
-                labels, 1, 2, true);
+    void unselectedSkillTarget_shouldHideAllIndicators() {
+        SelectionStateSnapshot selections = skillSelections();
+        List<JLabel> frames = hiddenLabels(3);
+        List<JLabel> results = hiddenLabels(3);
+        List<JLabel> actorResults = hiddenLabels(6);
 
-        CharacterSelectionPanel.setAllClaimedActorResultsVisible(
-                labels, 1, 2, false);
+        CharacterSelectionPanel.applyTargetState(
+                selections, SelectionType.GUARD, 2, List.of(2, 4),
+                frames, results, List.of(), actorResults);
 
-        assertTrue(labels.get(0).isVisible());
-        assertTrue(labels.get(1).isVisible());
-        assertFalse(labels.get(2).isVisible());
-        assertFalse(labels.get(3).isVisible());
-        assertFalse(labels.get(4).isVisible());
-        assertFalse(labels.get(5).isVisible());
+        assertNoneVisible(frames);
+        assertNoneVisible(results);
+        assertNoneVisible(actorResults);
+    }
+
+    private static SelectionStateSnapshot skillSelections() {
+        return new SelectionStateSnapshot(
+                true,
+                List.of(),
+                new SkillTargetSelections(
+                        List.of(1),
+                        List.of(
+                                new ClaimedActorTargets(2, 1, List.of(2)),
+                                new ClaimedActorTargets(3, 2, List.of(3)))),
+                emptySkillSelections());
+    }
+
+    private static SkillTargetSelections emptySkillSelections() {
+        return new SkillTargetSelections(List.of(), List.of());
     }
 
     private static List<JLabel> hiddenLabels(int count) {
@@ -83,6 +117,12 @@ class CharacterSelectionPanelTest {
             } else {
                 assertFalse(labels.get(i).isVisible(), "标签不应显示: " + i);
             }
+        }
+    }
+
+    private static void assertNoneVisible(List<JLabel> labels) {
+        for (int i = 0; i < labels.size(); i++) {
+            assertFalse(labels.get(i).isVisible(), "标签不应显示: " + i);
         }
     }
 }

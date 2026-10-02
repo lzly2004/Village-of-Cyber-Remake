@@ -3,13 +3,14 @@ package com.vocr.ui;
 import com.vocr.application.ClaimedRoleActor;
 import com.vocr.application.GameUpdate;
 import com.vocr.application.LegalTargetSelection;
+import com.vocr.application.SelectionStateSnapshot;
 import com.vocr.application.SetAllTargetSelectionCommand;
 import com.vocr.application.SetClaimedRoleTargetSelectionCommand;
+import com.vocr.application.SkillTargetSelections;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
 
-import com.vocr.domain.GameContextView;
 import com.vocr.domain.SelectionType;
 
 import javax.swing.*;
@@ -39,8 +40,7 @@ class CharacterSelectionPanel {
             UiImage.GUARD_DRAG
     };
     static void render(UI ui, VoteButtonPanel vp, VoteInfoRenderer vi,
-                       JPanel panel, List<Integer> selectedTargets,
-                       SelectionType type, GameSceneVoteHandler handler) {
+                       JPanel panel, SelectionType type, GameSceneVoteHandler handler) {
         UIHelpers.hideButtons(vp.fixedVoteBtn, vp.fixedUranaiBtn, vp.protectBtn);
         vi.infoText.setVisible(false);
         vp.returnBtn.setVisible(true);
@@ -70,6 +70,7 @@ class CharacterSelectionPanel {
         List<JLabel> targetLabels = new ArrayList<>();
         List<JLabel> frameLabels = new ArrayList<>();
         List<JLabel> resultLabels = new ArrayList<>();
+        List<JLabel> voteLabels = new ArrayList<>();
         List<JLabel> zbLabels = new ArrayList<>();
 
         for (int i = 1; i <= n - 1; i++) {
@@ -88,15 +89,16 @@ class CharacterSelectionPanel {
             frameLabels.add(chooseLabel);
             chooseLabel.setBounds(handler.charGridX(i, 60, 74), handler.charGridY(i, 20, 128), 64, 98);
             panel.add(chooseLabel);
-            chooseLabel.setVisible(selectedTargets.contains(i));
+            chooseLabel.setVisible(false);
 
             if (type == SelectionType.VOTE) {
                 JLabel voteLabel = new JLabel(ui.resources.getImage(UiImage.VOTE_RESULT_ALL));
+                voteLabels.add(voteLabel);
                 voteLabel.setBounds(handler.charGridX(i, 65, 74), handler.charGridY(i, 20, 128),
                         voteLabel.getIcon().getIconWidth(), voteLabel.getIcon().getIconHeight());
                 panel.add(voteLabel);
                 panel.setComponentZOrder(voteLabel, 0);
-                voteLabel.setVisible(ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay()));
+                voteLabel.setVisible(false);
             }
 
             JLabel resultLabel = new JLabel(ui.resources.getImage(resultAllIcon));
@@ -104,7 +106,7 @@ class CharacterSelectionPanel {
             resultLabel.setBounds(handler.charGridX(i, 65, 74), handler.charGridY(i, 40, 148),
                     resultLabel.getIcon().getIconWidth(), resultLabel.getIcon().getIconHeight());
             panel.add(resultLabel);
-            resultLabel.setVisible(selectedTargets.contains(i));
+            resultLabel.setVisible(false);
 
             if (type != SelectionType.VOTE) {
                 for (int r = 0; r < roleNums.size(); r++) {
@@ -116,7 +118,7 @@ class CharacterSelectionPanel {
                                     128 + zbLabel.getIcon().getIconHeight() * roleOrders.get(r)),
                             zbLabel.getIcon().getIconWidth(), zbLabel.getIcon().getIconHeight());
                     panel.add(zbLabel);
-                    zbLabel.setVisible(selectedTargets.contains(i));
+                    zbLabel.setVisible(false);
                 }
             }
 
@@ -128,6 +130,10 @@ class CharacterSelectionPanel {
                     charImg.getIconWidth(), charImg.getIconHeight());
             panel.add(label);
         }
+
+        for (int targetIndex = 0; targetIndex < targetLabels.size(); targetIndex++)
+            applyTargetState(initialUpdate.selections(), type, targetIndex,
+                    roleNums, frameLabels, resultLabels, voteLabels, zbLabels);
 
         handler.renderSkillTargets(panel, 50, 74, 20, 128);
 
@@ -156,9 +162,8 @@ class CharacterSelectionPanel {
                             new SetAllTargetSelectionCommand(
                                     ui.gameRevision(), type, idx + 1, true));
                     ui.acceptGameUpdate(update);
-                    if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
-                    resultLabels.get(idx).setVisible(true);
-                    frameLabels.get(idx).setVisible(true);
+                    applyTargetState(update.selections(), type, idx,
+                            roleNums, frameLabels, resultLabels, voteLabels, zbLabels);
                     frameLabels.get(idx).repaint();
                     ui.jPanel.repaint(label.getBounds());
                     break;
@@ -198,10 +203,8 @@ class CharacterSelectionPanel {
                                             ui.gameRevision(), type,
                                             roleNums.get(cur), idx + 1, true));
                             ui.acceptGameUpdate(update);
-                            if (!selectedTargets.contains(idx + 1)) selectedTargets.add(idx + 1);
-                            setClaimedActorResultVisible(
-                                    zbLabels, idx, cur, roleNums.size(), true);
-                            frameLabels.get(idx).setVisible(true);
+                            applyTargetState(update.selections(), type, idx,
+                                    roleNums, frameLabels, resultLabels, voteLabels, zbLabels);
                             frameLabels.get(idx).repaint();
                             ui.jPanel.repaint(label.getBounds());
                             break;
@@ -236,13 +239,8 @@ class CharacterSelectionPanel {
                             new SetAllTargetSelectionCommand(
                                     ui.gameRevision(), type, idx + 1, false));
                     ui.acceptGameUpdate(update);
-                    selectedTargets.remove(Integer.valueOf(idx + 1));
-                    if (type != SelectionType.VOTE) {
-                        setAllClaimedActorResultsVisible(
-                                zbLabels, idx, roleNums.size(), false);
-                    }
-                    resultLabels.get(idx).setVisible(false);
-                    frameLabels.get(idx).setVisible(false);
+                    applyTargetState(update.selections(), type, idx,
+                            roleNums, frameLabels, resultLabels, voteLabels, zbLabels);
                     frameLabels.get(idx).repaint();
                     ui.jPanel.repaint(label.getBounds());
                     break;
@@ -259,19 +257,46 @@ class CharacterSelectionPanel {
         ui.resizeComponents();
     }
 
+    static void applyTargetState(
+            SelectionStateSnapshot selections,
+            SelectionType type,
+            int targetIndex,
+            List<Integer> roleNums,
+            List<JLabel> frameLabels,
+            List<JLabel> resultLabels,
+            List<JLabel> voteLabels,
+            List<JLabel> claimedActorLabels)
+    {
+        int target = targetIndex + 1;
+        boolean selected = selections.isTargetSelected(type, target);
+        frameLabels.get(targetIndex).setVisible(selected);
+        if (type == SelectionType.VOTE)
+        {
+            resultLabels.get(targetIndex).setVisible(selected);
+            voteLabels.get(targetIndex).setVisible(selected);
+            return;
+        }
+
+        SkillTargetSelections skillSelections = selections.skillSelections(type);
+        resultLabels.get(targetIndex).setVisible(
+                skillSelections.hiddenTargets().contains(target));
+        for (int actorIndex = 0; actorIndex < roleNums.size(); actorIndex++)
+        {
+            int actor = roleNums.get(actorIndex);
+            boolean actorSelected = skillSelections.claimedActors().stream()
+                    .filter(candidate -> candidate.playerNumber() == actor)
+                    .anyMatch(candidate -> candidate.targets().contains(target));
+            setClaimedActorResultVisible(
+                    claimedActorLabels, targetIndex, actorIndex,
+                    roleNums.size(), actorSelected);
+        }
+    }
+
     static void setClaimedActorResultVisible(List<JLabel> labels, int playerIndex,
                                              int actorIndex, int actorCount,
                                              boolean visible) {
         labels.get(claimedActorResultIndex(playerIndex, actorIndex, actorCount))
                 .setVisible(visible);
-    }
-
-    static void setAllClaimedActorResultsVisible(List<JLabel> labels, int playerIndex,
-                                                 int actorCount, boolean visible) {
-        for (int actorIndex = 0; actorIndex < actorCount; actorIndex++) {
-            setClaimedActorResultVisible(
-                    labels, playerIndex, actorIndex, actorCount, visible);
-        }
     }
 
     private static int claimedActorResultIndex(int playerIndex, int actorIndex,

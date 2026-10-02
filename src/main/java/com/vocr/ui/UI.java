@@ -327,17 +327,11 @@ public class UI
     boolean[] specialEvent ={false};//是不是特殊事件，也就是三个连续的事件组，有特殊显示方式
 
     int count = 0;//切歌计数
-    boolean isAvoid = true;//是否回避，默认开启
     boolean isCo = false;//是否询问co
     int[][] skillTargetPeople;//用于存技能使用对象
     String[][] skillTargetNames;//用于存技能使用对象对应的图标
     int[][] skillTargetOrder;//用于存技能使用的顺序
     int[][] claimedRolenum;//用于存职业编号//[人数+1][天数]用于发球
-    final List<Integer> selectedVoteTargets = new ArrayList<>();//被指定投票了的
-    final List<Integer> selectedDivinationTargets = new ArrayList<>();//被指定占卜了的
-    final List<Integer> selectedGuardTargets = new ArrayList<>();//被指定护卫了的
-    //用于保存当天的指定对象并控制指定内容显示，再次进入面板时不会消失
-
     // ==================== 第3步: 统一选择面板配置 ====================
 
     /** 指定面板类型 */

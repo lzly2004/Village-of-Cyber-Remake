@@ -2,8 +2,12 @@ package com.vocr.ui;
 
 import com.vocr.application.AskClaimByPlayersCommand;
 import com.vocr.application.AskClaimByRoleCommand;
+import com.vocr.application.ClaimedActorTargets;
 import com.vocr.application.ExecuteVoteCommand;
 import com.vocr.application.GameUpdate;
+import com.vocr.application.SelectionStateSnapshot;
+import com.vocr.application.SetAvoidanceCommand;
+import com.vocr.application.SkillTargetSelections;
 import com.vocr.application.VoteExecutionResult;
 import com.vocr.application.VotingMethod;
 import com.vocr.resources.BgmTrack;
@@ -36,6 +40,7 @@ public class GameSceneVoteHandler implements SceneHandler {
     private List<Integer> freeVoteCandidates = List.of();
     private List<Integer> greyVoteCandidates = List.of();
     private List<Integer> designatedVoteCandidates = List.of();
+    private SelectionStateSnapshot selections;
     // === 保留在Handler中的UI组件 ===
     private JPanel hisPanel, infoPanel, infoZhanPanel, infoHuPanel, infoCoPanel;
     private JLabel levellb, background;
@@ -65,11 +70,11 @@ public class GameSceneVoteHandler implements SceneHandler {
         // ========== 阶段4：投票信息面板 ==========
         createVoteInfoPanel();
 
-        // ========== 阶段5：按钮创建 ==========
-        createAllButtons();
+        // ========== 阶段5：读取应用层权威状态 ==========
+        refreshApplicationState();
 
-        // ========== 阶段6：读取应用层权威投票候选 ==========
-        refreshLegalVoteActions();
+        // ========== 阶段6：按钮创建 ==========
+        createAllButtons();
 
         // ========== 阶段7：重置回调 ==========
         createResetToAfternoon();
@@ -132,15 +137,16 @@ public class GameSceneVoteHandler implements SceneHandler {
     // ===================================================================
     private void createAllButtons()
     {
-        votePanel.create(ui);
+        votePanel.create(ui, selections.avoidanceEnabled());
     }
 
     // ===================================================================
-    // 阶段6：应用层权威投票候选
+    // 阶段5：应用层权威投票候选与当前选择
     // ===================================================================
-    private void refreshLegalVoteActions()
+    private void refreshApplicationState()
     {
         GameUpdate update = ui.currentGameUpdate();
+        selections = update.selections();
         freeVoteCandidates = update.legalVote(VotingMethod.FREE)
                 .map(action -> action.candidates()).orElseGet(List::of);
         greyVoteCandidates = update.legalVote(VotingMethod.GREY)
@@ -215,14 +221,14 @@ public class GameSceneVoteHandler implements SceneHandler {
         // --- 回避切替 ---
         votePanel.avoidBtn.addActionListener(e -> {
             ui.resources.playSound(SoundEffect.CLICK);
+            setAvoidance(false);
             votePanel.avoidBtn1.setVisible(true); votePanel.avoidBtn.setVisible(false);
-            ui.isAvoid = false;
             ui.resizeComponents();
         });
         votePanel.avoidBtn1.addActionListener(e -> {
             ui.resources.playSound(SoundEffect.CLICK);
+            setAvoidance(true);
             votePanel.avoidBtn1.setVisible(false); votePanel.avoidBtn.setVisible(true);
-            ui.isAvoid = true;
             ui.resizeComponents();
         });
 
@@ -304,11 +310,19 @@ public class GameSceneVoteHandler implements SceneHandler {
 
         // --- 指定パネル ---
         votePanel.fixedVoteBtn.addActionListener(e -> CharacterSelectionPanel.render(
-                ui, votePanel, voteInfo, infoPanel, ui.selectedVoteTargets, SelectionType.VOTE, this));
+                ui, votePanel, voteInfo, infoPanel, SelectionType.VOTE, this));
         votePanel.fixedUranaiBtn.addActionListener(e -> CharacterSelectionPanel.render(
-                ui, votePanel, voteInfo, infoZhanPanel, ui.selectedDivinationTargets, SelectionType.DIVINATION, this));
+                ui, votePanel, voteInfo, infoZhanPanel, SelectionType.DIVINATION, this));
         votePanel.protectBtn.addActionListener(e -> CharacterSelectionPanel.render(
-                ui, votePanel, voteInfo, infoHuPanel, ui.selectedGuardTargets, SelectionType.GUARD, this));
+                ui, votePanel, voteInfo, infoHuPanel, SelectionType.GUARD, this));
+    }
+
+    private void setAvoidance(boolean enabled)
+    {
+        GameUpdate update = ui.gameApplication.setAvoidance(
+                new SetAvoidanceCommand(ui.gameRevision(), enabled));
+        ui.acceptGameUpdate(update);
+        selections = update.selections();
     }
 
     // ===================================================================
@@ -317,12 +331,12 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     private void handleVoteButton()
     {
-        refreshLegalVoteActions();
+        refreshApplicationState();
         voteInfo.infoText.setVisible(false);
         ui.resources.playSound(SoundEffect.CLICK);
         votePanel.voteBtn.setVisible(false); votePanel.pointBtn.setVisible(false); votePanel.avoidBtn.setVisible(false);
         votePanel.recordBtn.setVisible(false); votePanel.avoidBtn1.setVisible(false);
-        if (!ui.selectedVoteTargets.isEmpty()) {
+        if (!selections.voteTargets().isEmpty()) {
             votePanel.readyVoteBtn.setVisible(true); votePanel.greyBtn.setVisible(false); votePanel.freeBtn.setVisible(false);
         } else {
             if (!greyVoteCandidates.isEmpty()) votePanel.greyBtn.setVisible(true);
@@ -333,66 +347,26 @@ public class GameSceneVoteHandler implements SceneHandler {
 
         JTextArea isSelectedVoteTargetText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, UIConstants.FONT_SIZE_VOTE, "");
         StringBuilder isSelectedVoteTargetResult = new StringBuilder("-指定内容-\n");
-        int playerSum = ui.ctx.getPlayerSum() + 1;
-        if (!ui.selectedVoteTargets.isEmpty()) {
+        if (!selections.voteTargets().isEmpty()) {
             isSelectedVoteTargetResult.append(GameStrings.SPECIFY_VOTE);
-            for (int i = 1; i < playerSum; ++i) {
-                if (ui.ctx.isSelectedVoteTarget(i, ui.ctx.getGameDay()))
-                    isSelectedVoteTargetResult.append(ui.getJobText(i) + " ");
-            }
+            for (int target : selections.voteTargets())
+                isSelectedVoteTargetResult.append(ui.getJobText(target)).append(" ");
             isSelectedVoteTargetResult.append("\n");
         }
-        if (!ui.selectedDivinationTargets.isEmpty()) {
+        if (selections.divination().hasSelections()) {
             isSelectedVoteTargetResult.append(GameStrings.SPECIFY_DIVINATION);
-            for (int i = 1; i < playerSum; ++i) {
-                if (ui.ctx.getClaimedRole(i) == 1 && ui.ctx.isAlive(i)) {
-                    isSelectedVoteTargetResult.append(ui.getJobText(i) + "→");
-                    for (int j = 1; j < playerSum; ++j) {
-                        if (ui.ctx.isClaimedRoleScheduled(i, j, ui.ctx.getGameDay()))
-                            isSelectedVoteTargetResult.append(ui.getJobText(j) + ",");
-                    }
-                    isSelectedVoteTargetResult.append("\n");
-                }
-            }
-            int cc = 0;
-            for (int j = 1; j < playerSum; ++j) {
-                if (ui.ctx.isHiddenSeerScheduled(j, ui.ctx.getGameDay())) {
-                    if (cc++ == 0) isSelectedVoteTargetResult.append(GameStrings.HIDDEN_ARROW);
-                    isSelectedVoteTargetResult.append(ui.getJobText(j) + ",");
-                }
-            }
-            isSelectedVoteTargetResult.append("\n");
+            appendSkillSelections(isSelectedVoteTargetResult, selections.divination());
         }
         if (DebugLogger.getInstance().isEnabled()) {
-            DebugLogger.log("是否护卫" + !ui.selectedGuardTargets.isEmpty());
-            for (int i = 1; i < playerSum; ++i) {
-                for (int j = 1; j < playerSum; ++j) {
-                    if (ui.ctx.isClaimedRoleScheduled(i, j, ui.ctx.getGameDay()))
-                        DebugLogger.log(ui.getJobText(i) + "护卫了"
-                                + ui.ctx.isClaimedRoleScheduled(i, j, ui.ctx.getGameDay()));
-                }
-            }
+            DebugLogger.log("是否护卫" + selections.guard().hasSelections());
+            for (ClaimedActorTargets actor : selections.guard().claimedActors())
+                for (int target : actor.targets())
+                    DebugLogger.log(ui.getJobText(actor.playerNumber())
+                            + "护卫了" + ui.getJobText(target));
         }
-        if (!ui.selectedGuardTargets.isEmpty()) {
+        if (selections.guard().hasSelections()) {
             isSelectedVoteTargetResult.append(GameStrings.SPECIFY_GUARD);
-            for (int i = 1; i < playerSum; ++i) {
-                if (ui.ctx.getClaimedRole(i) == 3 && ui.ctx.isAlive(i)) {
-                    isSelectedVoteTargetResult.append(ui.getJobText(i) + "→");
-                    for (int j = 1; j < playerSum; ++j) {
-                        if (ui.ctx.isClaimedRoleScheduled(i, j, ui.ctx.getGameDay()))
-                            isSelectedVoteTargetResult.append(ui.getJobText(j) + ",");
-                    }
-                    isSelectedVoteTargetResult.append("\n");
-                }
-            }
-            int vv = 0;
-            for (int j = 1; j < playerSum; ++j) {
-                if (ui.ctx.isHiddenHunterScheduled(j, ui.ctx.getGameDay())) {
-                    if (vv++ == 0) isSelectedVoteTargetResult.append(GameStrings.HIDDEN_ARROW);
-                    isSelectedVoteTargetResult.append(ui.getJobText(j) + ",");
-                }
-            }
-            isSelectedVoteTargetResult.append("\n");
+            appendSkillSelections(isSelectedVoteTargetResult, selections.guard());
         }
         isSelectedVoteTargetText.setText(isSelectedVoteTargetResult.toString());
         votePanel.scrollPane1.getViewport().setView(isSelectedVoteTargetText);
@@ -402,6 +376,25 @@ public class GameSceneVoteHandler implements SceneHandler {
         isSelectedVoteTargetText.setVisible(true);
         ui.jPanel.setComponentZOrder(votePanel.scrollPane1, 0);
         ui.resizeComponents();
+    }
+
+    private void appendSkillSelections(
+            StringBuilder text, SkillTargetSelections skillSelections)
+    {
+        for (ClaimedActorTargets actor : skillSelections.claimedActors())
+        {
+            text.append(ui.getJobText(actor.playerNumber())).append("→");
+            for (int target : actor.targets())
+                text.append(ui.getJobText(target)).append(",");
+            text.append("\n");
+        }
+        if (!skillSelections.hiddenTargets().isEmpty())
+        {
+            text.append(GameStrings.HIDDEN_ARROW);
+            for (int target : skillSelections.hiddenTargets())
+                text.append(ui.getJobText(target)).append(",");
+        }
+        text.append("\n");
     }
 
     private void handleGreyVoteButton()
@@ -417,7 +410,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         VoteExecutionResult result = ui.gameApplication.executeVote(
                 new ExecuteVoteCommand(
                         ui.gameRevision(), VotingMethod.GREY,
-                        greyVoteCandidates, ui.isAvoid));
+                        greyVoteCandidates));
         ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
             int trueDay = ui.ctx.getEffectiveGameDay();
@@ -434,11 +427,12 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     private void handleReturnButton()
     {
+        refreshApplicationState();
         if (isViewingVoteHistory) { ui.run(); }
         ui.resources.playSound(SoundEffect.CLICK);
         votePanel.voteBtn.setVisible(true); votePanel.pointBtn.setVisible(true); voteInfo.infoText.setVisible(true);
         ui.piaoText.setVisible(false); ui.piaoText1.setVisible(false);
-        if (ui.isAvoid) { votePanel.avoidBtn.setVisible(true); votePanel.avoidBtn1.setVisible(false); }
+        if (selections.avoidanceEnabled()) { votePanel.avoidBtn.setVisible(true); votePanel.avoidBtn1.setVisible(false); }
         else { votePanel.avoidBtn1.setVisible(true); votePanel.avoidBtn.setVisible(false); }
         levellb.setVisible(false);
         infoPanel.setVisible(false); infoZhanPanel.setVisible(false); infoHuPanel.setVisible(false);
@@ -474,7 +468,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         boolean isReVote;
         VoteExecutionResult result = ui.gameApplication.executeVote(
                 new ExecuteVoteCommand(
-                        ui.gameRevision(), VotingMethod.FREE, chuxingList, ui.isAvoid));
+                        ui.gameRevision(), VotingMethod.FREE, chuxingList));
         ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
             if (ui.ctx.getEndResult() == GameResult.NONE) {
@@ -503,7 +497,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         VoteExecutionResult result = ui.gameApplication.executeVote(
                 new ExecuteVoteCommand(
                         ui.gameRevision(), VotingMethod.DESIGNATED,
-                        chuxingList, ui.isAvoid));
+                        chuxingList));
         ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
             int trueDay = ui.ctx.getEffectiveGameDay();

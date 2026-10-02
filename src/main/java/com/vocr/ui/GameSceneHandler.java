@@ -86,9 +86,6 @@ public class GameSceneHandler implements SceneHandler {
 
     private void renderNight(UI ui) {
         ui.specialEvent[0] = false;
-        ui.selectedVoteTargets.clear();
-        ui.selectedDivinationTargets.clear();
-        ui.selectedGuardTargets.clear();
         if (ui.hasPendingEvents()) {
             DebugLogger.log("事件不为空");
         }

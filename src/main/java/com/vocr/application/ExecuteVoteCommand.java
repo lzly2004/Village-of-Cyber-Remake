@@ -4,12 +4,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
-/** 执行当日投票所需的不可变输入；回避开关仅在指定投票时由现有规则使用。 */
+/** 执行当日投票所需的不可变输入；回避开关由应用层权威状态提供。 */
 public record ExecuteVoteCommand(
         long expectedRevision,
         VotingMethod method,
-        List<Integer> candidates,
-        boolean avoidanceEnabled) implements RevisionedCommand
+        List<Integer> candidates) implements RevisionedCommand
 {
     public ExecuteVoteCommand
     {

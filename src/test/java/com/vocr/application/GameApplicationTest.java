@@ -273,6 +273,8 @@ class GameApplicationTest
     @Test
     void avoidanceState_shouldBeVersionedAndResetForNewGame()
     {
+        assertThrows(IllegalArgumentException.class,
+                () -> new SetAvoidanceCommand(-1, true));
         TrackingLogic logic = new TrackingLogic();
         GameApplication application = new GameApplication(logic, new GameEventBuffer());
 
@@ -353,7 +355,7 @@ class GameApplicationTest
         List<Integer> candidates = new ArrayList<>(List.of(2, 4));
         logic.selectedVoteTargets.addAll(candidates);
         ExecuteVoteCommand command = new ExecuteVoteCommand(
-                application.currentRevision(), VotingMethod.DESIGNATED, candidates, true);
+                application.currentRevision(), VotingMethod.DESIGNATED, candidates);
         candidates.add(6);
         VoteExecutionResult result = application.executeVote(command);
 
@@ -366,12 +368,16 @@ class GameApplicationTest
         assertThrows(UnsupportedOperationException.class, () -> command.candidates().add(6));
 
         logic.voteCompleted = false;
+        GameUpdate disabled = application.setAvoidance(
+                new SetAvoidanceCommand(application.currentRevision(), false));
+        assertFalse(disabled.selections().avoidanceEnabled());
         VoteExecutionResult interrupted = application.executeVote(
                 new ExecuteVoteCommand(
                         application.currentRevision(), VotingMethod.FREE,
-                        List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), true));
+                        List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
         assertFalse(interrupted.voteCompleted(), "回避 CO 时必须保留核心的未完成状态");
-        assertEquals(2, interrupted.update().revision());
+        assertFalse(logic.avoidanceEnabled, "投票必须使用应用层当前回避状态");
+        assertEquals(3, interrupted.update().revision());
         assertEquals(0, logic.votingMethod);
     }
 
@@ -418,12 +424,14 @@ class GameApplicationTest
         assertThrows(IllegalArgumentException.class, () -> application.executeVote(
                 new ExecuteVoteCommand(
                         application.currentRevision(), VotingMethod.FREE,
-                        List.of(1, 2), false)));
+                        List.of(1, 2))));
         assertNull(logic.voteCandidates);
 
         Arrays.fill(logic.actualRoles, Role.wu.ordinal());
         logic.actualRoles[2] = Role.renlang.ordinal();
         logic.endResult = GameResult.WOLF_WIN;
+        logic.deadPlayers.addAll(
+                List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         GameUpdate finished = application.currentUpdate(0);
         assertEquals(BusinessPhase.FINISHED, finished.phase());
         assertTrue(finished.legalVoteActions().isEmpty());
@@ -436,40 +444,42 @@ class GameApplicationTest
         assertThrows(IllegalStateException.class, () -> application.executeVote(
                 new ExecuteVoteCommand(
                         application.currentRevision(), VotingMethod.FREE,
-                        List.of(1, 2, 3, 4, 5, 6, 7, 8, 9), false)));
+                        List.of(1, 2, 3, 4, 5, 6, 7, 8, 9))));
         assertThrows(IllegalStateException.class, () -> application.requestClaims(
                 new AskClaimByRoleCommand(application.currentRevision(), Role.zhan)));
         assertThrows(IllegalStateException.class, () -> application.setTargetSelection(
                 new SetAllTargetSelectionCommand(
                         application.currentRevision(), SelectionType.VOTE, 1, true)));
+        assertThrows(IllegalStateException.class, () -> application.setAvoidance(
+                new SetAvoidanceCommand(application.currentRevision(), false)));
     }
 
     @Test
     void executeVote_shouldRejectInvalidCandidatesBeforeCallingCore()
     {
         assertThrows(NullPointerException.class,
-                () -> new ExecuteVoteCommand(0, null, List.of(1), false));
+                () -> new ExecuteVoteCommand(0, null, List.of(1)));
         assertThrows(NullPointerException.class,
-                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, null, false));
+                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, null));
         assertThrows(IllegalArgumentException.class,
-                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of(), false));
+                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of()));
         assertThrows(IllegalArgumentException.class,
-                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of(0), false));
+                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of(0)));
         assertThrows(IllegalArgumentException.class,
-                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of(1, 1), false));
+                () -> new ExecuteVoteCommand(0, VotingMethod.FREE, List.of(1, 1)));
 
         TrackingLogic logic = new TrackingLogic();
         GameApplication application = new GameApplication(logic, new GameEventBuffer());
         assertThrows(IllegalArgumentException.class, () -> application.executeVote(
                 new ExecuteVoteCommand(
-                        application.currentRevision(), VotingMethod.FREE, List.of(11), false)));
+                        application.currentRevision(), VotingMethod.FREE, List.of(11))));
         assertNull(logic.voteCandidates);
 
         logic.deadPlayers.add(4);
         assertThrows(IllegalArgumentException.class, () -> application.executeVote(
                 new ExecuteVoteCommand(
                         application.currentRevision(), VotingMethod.DESIGNATED,
-                        List.of(4), false)));
+                        List.of(4))));
         assertNull(logic.voteCandidates);
     }
 

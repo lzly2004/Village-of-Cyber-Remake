@@ -108,7 +108,7 @@ public final class GameApplication
 
         long eventCursor = eventBuffer.currentCursor();
         boolean voteCompleted = gameLogic.shokei(
-                command.method().legacyCode(), command.candidates(), command.avoidanceEnabled());
+                command.method().legacyCode(), command.candidates(), avoidanceEnabled);
         advanceRevision();
         return new VoteExecutionResult(voteCompleted, currentUpdate(eventCursor));
     }
