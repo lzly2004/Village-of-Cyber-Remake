@@ -34,6 +34,7 @@ class WolfBiteAnalyzerTest
         assertArrayEquals(new boolean[context.getPlayerSum() + 1], analysis.plausibleMediums);
         assertArrayEquals(new int[context.getPlayerSum() + 1], analysis.whiteBallsBySeer);
         assertArrayEquals(new int[context.getPlayerSum() + 1], analysis.whiteBallsReceived);
+        assertArrayEquals(new boolean[context.getPlayerSum() + 1], analysis.hiddenHunterTargets);
         assertTrue(context.getRandom().stopRecording().isEmpty());
     }
 
@@ -50,8 +51,8 @@ class WolfBiteAnalyzerTest
         context.registerClaim(hunter, Role.lie.ordinal());
         context.recordSkillTarget(seer, 1, villager);
         context.recordSkillTarget(medium, 1, villager);
-        context.setHiddenHunterScheduled(villager, context.getPlayerSum(), true);
         context.incrementGameDay();
+        context.setHiddenHunterScheduled(villager, context.getGameDay(), true);
 
         WolfBiteAnalyzer.Analysis analysis = new WolfBiteAnalyzer(context).analyze(
                 context.getPlayerSum(), context.getGameDay());
@@ -66,6 +67,7 @@ class WolfBiteAnalyzerTest
         assertEquals(1, analysis.whiteBallsReceived[villager]);
         assertEquals(0.5, analysis.hunterGuardFactor, 0.000_001);
         assertEquals(1, analysis.hiddenHunterTargetCount);
+        assertTrue(analysis.hiddenHunterTargets[villager]);
     }
 
     private static GameContext createContext()

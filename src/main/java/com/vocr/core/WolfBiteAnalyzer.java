@@ -19,6 +19,7 @@ final class WolfBiteAnalyzer
         int[] whiteBallsBySeer;
         double hunterGuardFactor;
         int hiddenHunterTargetCount;
+        boolean[] hiddenHunterTargets;
         int[] whiteBallsReceived;
     }
 
@@ -36,7 +37,7 @@ final class WolfBiteAnalyzer
         analyzeFirstDaySeerBite(playerSum, analysis);
         analyzeRealRoles(playerSum, gameDay, analysis);
         countWhiteBalls(playerSum, gameDay, analysis);
-        calculateHunterGuardFactor(playerSum, analysis);
+        calculateHunterGuardFactor(playerSum, gameDay, analysis);
         countGlobalWhiteBalls(playerSum, gameDay, analysis);
         return analysis;
     }
@@ -142,7 +143,7 @@ final class WolfBiteAnalyzer
         analysis.whiteBallsBySeer = whiteBallCounts;
     }
 
-    private void calculateHunterGuardFactor(int playerSum, Analysis analysis)
+    private void calculateHunterGuardFactor(int playerSum, int gameDay, Analysis analysis)
     {
         double guardFactor;
         switch (analysis.plausibleHunterCount)
@@ -167,11 +168,19 @@ final class WolfBiteAnalyzer
         if (ctx.getClaimedRoleAskDay(3) > 0) guardFactor = 0;
 
         int hiddenHunterCount = 0;
+        boolean[] hiddenHunterTargets = new boolean[playerSum + 1];
         for (int player = 1; player <= playerSum; player++)
-            if (ctx.isHiddenHunterScheduled(player, playerSum)) hiddenHunterCount++;
+        {
+            if (ctx.isHiddenHunterScheduled(player, gameDay))
+            {
+                hiddenHunterTargets[player] = true;
+                hiddenHunterCount++;
+            }
+        }
 
         analysis.hunterGuardFactor = guardFactor;
         analysis.hiddenHunterTargetCount = hiddenHunterCount;
+        analysis.hiddenHunterTargets = hiddenHunterTargets;
     }
 
     private void countGlobalWhiteBalls(int playerSum, int gameDay, Analysis analysis)

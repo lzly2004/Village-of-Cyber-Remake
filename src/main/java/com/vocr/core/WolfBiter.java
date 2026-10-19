@@ -31,6 +31,7 @@ class WolfBiter
 
         final double kFinal = analysis.hunterGuardFactor;
         final int hiddenHunterCntFinal = analysis.hiddenHunterTargetCount;
+        final boolean[] hiddenHunterTargetsFinal = analysis.hiddenHunterTargets;
         final int zhenZhanCntFinal = analysis.plausibleSeerCount;
         final int zhenLieCntFinal = analysis.plausibleHunterCount;
         final int zhenLingCntFinal = analysis.plausibleMediumCount;
@@ -74,7 +75,7 @@ class WolfBiter
         if (hiddenHunterCntFinal > 0 && kFinal > 0)
         {
             engine.addSimpleRule("R06_潜伏猎护卫目标减权",
-                    i -> ctx.isHiddenHunterScheduled(i, n),
+                    i -> hiddenHunterTargetsFinal[i],
                     i -> (int) (-200.0 / hiddenHunterCntFinal * kFinal));
         }
 
