@@ -37,6 +37,7 @@ gradlew.bat fatJar
 ## 目录说明
 
 - `src/main/java/com/vocr/app/`：程序入口与应用装配
+- `src/main/java/com/vocr/application/`：单局会话、玩家命令、安全视图与合法动作
 - `src/main/java/com/vocr/config/`：全局常量、路径和概率配置
 - `src/main/java/com/vocr/core/`：对局状态、流程协调、规则执行和录像采集
 - `src/main/java/com/vocr/domain/`：事件、角色、配役、死亡原因等领域类型
