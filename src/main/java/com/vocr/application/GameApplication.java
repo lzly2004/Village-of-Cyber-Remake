@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 平台无关的对局应用入口。
+ * 单局应用门面，由 {@link GameSession} 持有；外部只通过会话进入。
  *
  * 开局、CO 询问、目标预约与投票/处刑已经按垂直切片迁入；后续业务操作继续逐步加入，
- * Swing 与 Web 均不得绕过这里复制一份规则流程。
+ * Swing 与 Web 均不得绕过会话复制一份规则流程。
  */
-public final class GameApplication
+final class GameApplication
 {
     private final MainLogicInterface gameLogic;
     private final GameEventBuffer eventBuffer;

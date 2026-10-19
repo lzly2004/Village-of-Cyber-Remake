@@ -158,7 +158,7 @@ class CharacterSelectionPanel {
                     int idx = targetLabels.indexOf(label);
                     if (!targetCandidates.contains(idx + 1)) break;
                     ui.resources.playSound(SoundEffect.CLICK);
-                    GameUpdate update = ui.gameApplication.setTargetSelection(
+                    GameUpdate update = ui.gameSession.setTargetSelection(
                             new SetAllTargetSelectionCommand(
                                     ui.gameRevision(), type, idx + 1, true));
                     ui.acceptGameUpdate(update);
@@ -198,7 +198,7 @@ class CharacterSelectionPanel {
                             int idx = targetLabels.indexOf(label);
                             if (!targetCandidates.contains(idx + 1)) break;
                             ui.resources.playSound(SoundEffect.CLICK);
-                            GameUpdate update = ui.gameApplication.setTargetSelection(
+                            GameUpdate update = ui.gameSession.setTargetSelection(
                                     new SetClaimedRoleTargetSelectionCommand(
                                             ui.gameRevision(), type,
                                             roleNums.get(cur), idx + 1, true));
@@ -235,7 +235,7 @@ class CharacterSelectionPanel {
                     int idx = targetLabels.indexOf(label);
                     if (!targetCandidates.contains(idx + 1)) break;
                     ui.resources.playSound(SoundEffect.CLICK);
-                    GameUpdate update = ui.gameApplication.setTargetSelection(
+                    GameUpdate update = ui.gameSession.setTargetSelection(
                             new SetAllTargetSelectionCommand(
                                     ui.gameRevision(), type, idx + 1, false));
                     ui.acceptGameUpdate(update);

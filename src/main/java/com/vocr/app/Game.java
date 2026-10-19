@@ -1,7 +1,7 @@
 package com.vocr.app;
 
-import com.vocr.application.GameApplication;
 import com.vocr.application.GameEventBuffer;
+import com.vocr.application.GameSession;
 import com.vocr.logging.DebugLogger;
 import com.vocr.core.MainLogic;
 import com.vocr.history.GameRecordManager;
@@ -17,7 +17,6 @@ public class Game
     UI ui;
     Resources resources;
     MainLogic mainlogic;
-    GameApplication gameApplication;
     ReplayManager replayManager;
     GameRecordManager gameRecordManager;
     private Game()
@@ -26,11 +25,16 @@ public class Game
         this.replayManager = new ReplayManager();
         this.gameRecordManager = new GameRecordManager();
         this.ui = new UI(resources, replayManager, gameRecordManager);
+        this.ui.attachSessionFactory(this::createSession);
+    }
+
+    /** 每局创建独立会话；桌面端共用同一战绩文件以保持战绩页累计行为。 */
+    private GameSession createSession()
+    {
         GameEventBuffer eventBuffer = new GameEventBuffer();
-        this.mainlogic = new MainLogic(eventBuffer::publish, gameRecordManager);
-        this.gameApplication = new GameApplication(mainlogic, eventBuffer);
-        this.ui.attachMainLogic(mainlogic);
-        this.ui.attachGameApplication(gameApplication);
+        MainLogic logic = new MainLogic(eventBuffer::publish, gameRecordManager);
+        this.mainlogic = logic;
+        return new GameSession(logic, eventBuffer);
     }
     public static Game getInstance()
     {

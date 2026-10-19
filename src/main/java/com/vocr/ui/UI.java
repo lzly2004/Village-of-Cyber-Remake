@@ -2,16 +2,18 @@ package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
 
-import com.vocr.application.GameApplication;
+import com.vocr.application.GameSession;
 import com.vocr.application.GameUpdate;
+import com.vocr.application.StartGameCommand;
 import com.vocr.application.StartedGame;
 import com.vocr.logging.DebugLogger;
-import com.vocr.core.MainLogicInterface;
+import com.vocr.core.GameRecorder;
 import com.vocr.resources.ResourcesInterface;
 import com.vocr.resources.UiImage;
 
 import com.vocr.domain.Event;
 import com.vocr.domain.GameContextView;
+import com.vocr.domain.peiyi;
 import com.vocr.domain.whyDie;
 
 import com.vocr.history.GameRecordManager;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 //****************前言*******************
 //后悔一开始只顾着写，没想过代码复用了
 //代码越来越臃肿，还好整个项目的体量不算很大
@@ -146,8 +149,8 @@ public class UI
     //定义当前待处理的事件
     GameContextView ctx;//封装后的游戏状态只读访问
     final ResourcesInterface resources;//资源接口
-    MainLogicInterface mainLogic;//主逻辑接口
-    GameApplication gameApplication;//逐步承接平台无关的业务操作
+    GameSession gameSession;//当前一局的应用会话
+    private Supplier<GameSession> sessionFactory;//每局创建新会话
     private long gameRevision;//桌面端最近一次收到的应用状态版本
     final ReplayManager replayManager;//回放管理器
     final GameRecordManager gameRecordManager;//战绩管理器
@@ -160,12 +163,30 @@ public class UI
         this.gameRecordManager = Objects.requireNonNull(gameRecordManager, "战绩管理器不能为空");
     }
 
-    public void attachMainLogic(MainLogicInterface mainLogic) {
-        this.mainLogic = Objects.requireNonNull(mainLogic, "主逻辑不能为空");
+    public void attachSessionFactory(Supplier<GameSession> sessionFactory) {
+        this.sessionFactory = Objects.requireNonNull(sessionFactory, "对局会话工厂不能为空");
     }
 
-    public void attachGameApplication(GameApplication gameApplication) {
-        this.gameApplication = Objects.requireNonNull(gameApplication, "对局应用入口不能为空");
+    /** 为下一局创建独立会话并启动；桌面端每局只允许启动一次。 */
+    StartedGame startNewGame(peiyi configuration) {
+        if (sessionFactory == null) {
+            throw new IllegalStateException("UI 尚未关联对局会话工厂");
+        }
+        if (gameSession != null && gameSession.state() != GameSession.State.CLOSED) {
+            gameSession.close();
+        }
+        GameSession session = Objects.requireNonNull(
+                sessionFactory.get(), "对局会话工厂返回了空会话");
+        StartedGame started = session.startGame(
+                new StartGameCommand(session.currentRevision(), configuration));
+        gameSession = session;
+        ctx = session.contextView();
+        acceptStartedGame(started);
+        return started;
+    }
+
+    GameRecorder currentRecorder() {
+        return gameSession == null ? null : gameSession.recorder();
     }
 
     /** 获取玩家职业图标文本（便捷转发） */
@@ -224,13 +245,12 @@ public class UI
     } //调整所有组件大小和位置
     public void run()
     {
-        if (mainLogic == null) {
-            throw new IllegalStateException("UI 尚未关联主逻辑");
+        if (sessionFactory == null) {
+            throw new IllegalStateException("UI 尚未关联对局会话工厂");
         }
-        if (gameApplication == null) {
-            throw new IllegalStateException("UI 尚未关联对局应用入口");
+        if (gameSession != null) {
+            ctx = gameSession.contextView();
         }
-        ctx = mainLogic.getGameContext();
 
         // 优先走 Handler 分发
         SceneHandler handler = sceneHandlers.get(currentScene);
@@ -250,7 +270,7 @@ public class UI
 
     GameUpdate currentGameUpdate()
     {
-        GameUpdate update = gameApplication.currentUpdate();
+        GameUpdate update = requireSession().currentUpdate();
         acceptGameUpdate(update);
         return update;
     }
@@ -272,33 +292,42 @@ public class UI
 
     Event pollEvent()
     {
-        return gameApplication.pollNextEvent();
+        return gameSession == null ? null : gameSession.pollNextEvent();
     }
 
     Event peekEvent()
     {
-        return gameApplication.peekNextEvent();
+        return gameSession == null ? null : gameSession.peekNextEvent();
     }
 
     boolean hasPendingEvents()
     {
-        return gameApplication.hasPendingEvents();
+        return gameSession != null && gameSession.hasPendingEvents();
     }
 
     int pendingEventCount()
     {
-        return currentGameUpdate().events().size();
+        return gameSession == null ? 0 : currentGameUpdate().events().size();
     }
 
     void clearPendingEvents()
     {
-        gameApplication.clearPendingEvents();
+        if (gameSession != null)
+            gameSession.clearPendingEvents();
     }
 
     void addDiagnosticEvent(Event event)
     {
-        gameApplication.publishDiagnosticEvent(event);
+        requireSession().publishDiagnosticEvent(event);
         DebugLogger.log("事件添加成功且不为空");
+    }
+
+    private GameSession requireSession()
+    {
+        if (gameSession == null) {
+            throw new IllegalStateException("当前没有进行中的对局会话");
+        }
+        return gameSession;
     }
     public void testBtn()
     {

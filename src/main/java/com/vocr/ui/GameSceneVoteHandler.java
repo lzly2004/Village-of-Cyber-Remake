@@ -319,7 +319,7 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     private void setAvoidance(boolean enabled)
     {
-        GameUpdate update = ui.gameApplication.setAvoidance(
+        GameUpdate update = ui.gameSession.setAvoidance(
                 new SetAvoidanceCommand(ui.gameRevision(), enabled));
         ui.acceptGameUpdate(update);
         selections = update.selections();
@@ -407,7 +407,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         boolean isReVote;
         if (!greyVoteCandidates.isEmpty())
             DebugLogger.log("cxList不为空，且具体为" + greyVoteCandidates);
-        VoteExecutionResult result = ui.gameApplication.executeVote(
+        VoteExecutionResult result = ui.gameSession.executeVote(
                 new ExecuteVoteCommand(
                         ui.gameRevision(), VotingMethod.GREY,
                         greyVoteCandidates));
@@ -446,7 +446,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         if (!askList.isEmpty() && isSelectingCo) {
             isSelectingCo = false;
             DebugLogger.log(askList);
-            GameUpdate update = ui.gameApplication.requestClaims(
+            GameUpdate update = ui.gameSession.requestClaims(
                     new AskClaimByPlayersCommand(ui.gameRevision(), askList));
             ui.acceptGameUpdate(update);
             if (!update.events().isEmpty()) {
@@ -466,7 +466,7 @@ public class GameSceneVoteHandler implements SceneHandler {
         List<Integer> chuxingList = freeVoteCandidates;
         DebugLogger.log("自由投票" + chuxingList);
         boolean isReVote;
-        VoteExecutionResult result = ui.gameApplication.executeVote(
+        VoteExecutionResult result = ui.gameSession.executeVote(
                 new ExecuteVoteCommand(
                         ui.gameRevision(), VotingMethod.FREE, chuxingList));
         ui.acceptGameUpdate(result.update());
@@ -494,7 +494,7 @@ public class GameSceneVoteHandler implements SceneHandler {
             DebugLogger.log("指定了" + candidate);
         DebugLogger.log("指定投票" + chuxingList);
         boolean isReVote;
-        VoteExecutionResult result = ui.gameApplication.executeVote(
+        VoteExecutionResult result = ui.gameSession.executeVote(
                 new ExecuteVoteCommand(
                         ui.gameRevision(), VotingMethod.DESIGNATED,
                         chuxingList));
@@ -554,7 +554,7 @@ public class GameSceneVoteHandler implements SceneHandler {
 
     private void handleRoleCo(Role role, String noRoleMsg) {
         ui.resources.playSound(SoundEffect.CLICK);
-        GameUpdate update = ui.gameApplication.requestClaims(
+        GameUpdate update = ui.gameSession.requestClaims(
                 new AskClaimByRoleCommand(ui.gameRevision(), role));
         ui.acceptGameUpdate(update);
         if (update.events().isEmpty()) {

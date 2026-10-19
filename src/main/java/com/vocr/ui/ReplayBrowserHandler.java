@@ -200,7 +200,7 @@ public class ReplayBrowserHandler implements SceneHandler {
     }
 
     private boolean checkReplayDataAvailable(UI ui) {
-        GameRecorder recorder = ui.mainLogic.getRecorder();
+        GameRecorder recorder = ui.currentRecorder();
         if (recorder == null || recorder.getRecords().isEmpty()) {
             JOptionPane.showMessageDialog(ui.getJFrame(), 
                 "没有可保存的对局数据。\n请先完成一局游戏后再保存。",
@@ -213,7 +213,7 @@ public class ReplayBrowserHandler implements SceneHandler {
     }
 
     private void saveReplayToSlot(UI ui, int slotIndex) {
-        GameRecorder recorder = ui.mainLogic.getRecorder();
+        GameRecorder recorder = ui.currentRecorder();
         if (recorder == null) return;
 
         ReplaySave save = ReplaySave.fromRecords(slotIndex, recorder.getRecords());

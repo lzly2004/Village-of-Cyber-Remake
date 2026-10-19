@@ -5,7 +5,6 @@ import com.vocr.resources.ImageNames;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.UiImage;
 
-import com.vocr.application.StartGameCommand;
 import com.vocr.application.StartedGame;
 import com.vocr.logging.DebugLogger;
 
@@ -52,10 +51,7 @@ public class GameSceneHandler implements SceneHandler {
             btn1.addActionListener(e -> {
                 ui.levelName = ImageNames.gameSetupTitle(j);
                 ui.resources.playSound(SoundEffect.CLICK);
-                StartedGame startedGame = ui.gameApplication.startGame(
-                        new StartGameCommand(ui.gameRevision(), peiyi.values()[j]));
-                ui.acceptStartedGame(startedGame);
-                ui.ctx = ui.mainLogic.getGameContext();
+                StartedGame startedGame = ui.startNewGame(peiyi.values()[j]);
                 int playerSum = startedGame.playerCount();
                 ui.skillTargetPeople = new int[playerSum + 1][GameConstants.MAX_GAME_DAYS];
                 ui.skillTargetNames = new String[playerSum + 1][GameConstants.MAX_GAME_DAYS];
