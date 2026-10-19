@@ -110,7 +110,7 @@ final class OpeningBlackResultResponsePlanner
             }
             else
             {
-                handleWhiteNonHumanResponse(blackTarget, responses);
+                handleWhiteNonHumanResponse(blackTarget, actualRole, responses);
             }
         }
     }
@@ -128,25 +128,12 @@ final class OpeningBlackResultResponsePlanner
         return blackTargets;
     }
 
-    private void handleWhiteNonHumanResponse(int blackTarget, List<IntPair> responses)
+    private void handleWhiteNonHumanResponse(
+            int blackTarget, int actualRole, List<IntPair> responses)
     {
         DebugLogger.log("白非接黒并且没有之前的计划->狂狐背");
-        int option = 0;
-        // 兼容旧实现：这里按被判黑玩家编号分配权重，而不是按实际职业分配。
-        switch(blackTarget)
-        {
-            case 8: case 9:
-                option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(95,5,0,0)));
-                break;
-            case 10:
-                option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(80,5,10,5)));
-                break;
-            case 11:
-                int aggression = ctx.getNonHumanAggression();
-                option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
-                        45 + aggression, 30, 20, 5 - aggression)));
-                break;
-        }
+        int option = ctx.getRandom().weightedIndex(new ArrayList<>(
+                whiteResponseWeights(actualRole, ctx.getNonHumanAggression())));
 
         switch(option)
         {
@@ -168,6 +155,19 @@ final class OpeningBlackResultResponsePlanner
                 ctx.clearNonHumanPlan(blackTarget);
                 break;
         }
+    }
+
+    /** 白方非人接黑后的四类响应权重：占/灵/猎或猫/潜伏。 */
+    static List<Integer> whiteResponseWeights(int actualRole, int aggression)
+    {
+        return switch(actualRole)
+        {
+            case 8, 9 -> List.of(95, 5, 0, 0);
+            case 10 -> List.of(80, 5, 10, 5);
+            case 11 -> List.of(45 + aggression, 30, 20, 5 - aggression);
+            default -> throw new IllegalArgumentException(
+                    "不是白方非人职业: " + actualRole);
+        };
     }
 
     private int chooseHunterOrCatRole()

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OpeningBlackResultResponsePlannerTest
@@ -112,6 +113,57 @@ class OpeningBlackResultResponsePlannerTest
         assertEquals(List.of(new IntPair(respondingWolf, 2)), responses);
         assertEquals(NonHumanPlan.STAY_HIDDEN, context.getNonHumanPlan(plannedMediumWolf));
         assertEquals(List.of(14), context.getRandom().stopRecording());
+    }
+
+    @Test
+    void whiteResponseWeights_shouldFollowActualRole()
+    {
+        assertEquals(List.of(95, 5, 0, 0),
+                OpeningBlackResultResponsePlanner.whiteResponseWeights(8, 0));
+        assertEquals(List.of(95, 5, 0, 0),
+                OpeningBlackResultResponsePlanner.whiteResponseWeights(9, 3));
+        assertEquals(List.of(80, 5, 10, 5),
+                OpeningBlackResultResponsePlanner.whiteResponseWeights(10, 3));
+        assertEquals(List.of(48, 30, 20, 2),
+                OpeningBlackResultResponsePlanner.whiteResponseWeights(11, 3));
+        assertThrows(IllegalArgumentException.class,
+                () -> OpeningBlackResultResponsePlanner.whiteResponseWeights(7, 3));
+        assertThrows(IllegalArgumentException.class,
+                () -> OpeningBlackResultResponsePlanner.whiteResponseWeights(12, 3));
+    }
+
+    @Test
+    void collectResponses_shouldUseActualRoleWeightsForWhiteNonHumanOutsideNumberRange()
+    {
+        GameContext context = createContext();
+        int target = context.getActualRoleIndex(8);
+        assertTrue(target < 8 || target > 11,
+                "测试场景要求狂人位于玩家编号 8..11 之外，实际为 " + target);
+        int seer = context.getActualRoleIndex(1);
+        markBlackResult(context, seer, target);
+        List<IntPair> responses = new ArrayList<>();
+        long seed = findSeedForWeightedIndex(List.of(95, 5, 0, 0), 1);
+        context.getRandom().reseedForTest(seed);
+
+        context.getRandom().startRecording();
+        new OpeningBlackResultResponsePlanner(context)
+                .collectResponses(context.getPlayerSum(), responses);
+
+        assertEquals(List.of(new IntPair(target, 2)), responses,
+                "白方非人应按实际职业的权重选择响应，而不是按玩家编号");
+        assertEquals(1, context.getRandom().stopRecording().size(),
+                "按实际职业选择权重必须消耗一次随机数");
+        assertEquals(NonHumanPlan.NONE, context.getNonHumanPlan(target));
+    }
+
+    private static long findSeedForWeightedIndex(List<Integer> weights, int expectedIndex)
+    {
+        for (long seed = 0; seed < 100_000; seed++)
+        {
+            if (new GameRandom(seed).weightedIndex(weights) == expectedIndex)
+                return seed;
+        }
+        throw new AssertionError("在 100000 个种子内没有找到目标权重索引");
     }
 
     private static void markBlackResult(GameContext context, int claimedSeer, int target)
