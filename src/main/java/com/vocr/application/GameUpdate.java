@@ -11,7 +11,7 @@ import java.util.Optional;
  * 当前应用更新的不可变快照。
  *
  * 包含状态 revision、业务阶段、白名单玩家视图、当前选择、合法动作、公开投票历史、
- * 事件输出及其续读游标。
+ * 原始事件、跨端展示阶段投影及其续读游标。
  */
 public record GameUpdate(
         long revision,
@@ -25,7 +25,8 @@ public record GameUpdate(
         List<RevealedPlayerRole> revealedRoles,
         long eventCursor,
         long nextEventCursor,
-        List<Event> events)
+        List<Event> events,
+        List<PresentedEvent> presentedEvents)
 {
     public GameUpdate
     {
@@ -68,8 +69,14 @@ public record GameUpdate(
         if (eventCursor < 0 || nextEventCursor < eventCursor)
             throw new IllegalArgumentException("事件游标窗口无效");
         events = List.copyOf(events);
+        presentedEvents = List.copyOf(presentedEvents);
         if (nextEventCursor - eventCursor != events.size())
             throw new IllegalArgumentException("事件数量与游标窗口不一致");
+        if (presentedEvents.size() != events.size())
+            throw new IllegalArgumentException("事件展示投影与原始事件数量不一致");
+        for (int index = 0; index < events.size(); index++)
+            if (!events.get(index).equals(presentedEvents.get(index).event()))
+                throw new IllegalArgumentException("事件展示投影与原始事件顺序不一致");
     }
 
     public Optional<LegalVoteAction> legalVote(VotingMethod method)

@@ -69,7 +69,7 @@ class GameSessionTest
 
         int pendingBefore = session.currentUpdate().events().size();
         assertTrue(pendingBefore > 0);
-        session.pollNextEvent();
+        session.pollNextPresentedEvent();
         assertEquals(pendingBefore - 1, session.currentUpdate().events().size(),
                 "桌面端消费只应缩短待展示后缀");
         assertEquals(history.events(), session.currentUpdate(0).events(),

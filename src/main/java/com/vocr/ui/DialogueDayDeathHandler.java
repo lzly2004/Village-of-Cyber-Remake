@@ -2,6 +2,8 @@ package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.UiImage;
+import com.vocr.application.EventPresentationStage;
+import com.vocr.application.PresentedEvent;
 
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
@@ -12,10 +14,17 @@ import java.awt.*;
 public class DialogueDayDeathHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
-        if (ui.peekEvent().eventname() == EventName.wsw) {
+        PresentedEvent next = ui.peekPresentedEvent();
+        if (next == null || next.stage() != EventPresentationStage.NIGHT_RESULT) {
+            UIHelpers.playDayPhaseBgm(ui);
+            ui.currentScene = UI.Scene.DIALOGUE_DAY;
+            ui.run();
+            return;
+        }
+        if (next != null && next.event().eventname() == EventName.wsw) {
             ui.resources.playSound(SoundEffect.PEACEFUL_NIGHT);
             DialogueBox.Components dc = DialogueBox.setup(ui, UiImage.DIALOGUE_DAY_BACKGROUND);
-            ui.pollEvent();
+            ui.pollPresentedEvent();
             UIHelpers.bindTypewriter(dc.dialogText, GameStrings.NO_SACRIFICE, dc.nextBtn, () -> {
                 UIHelpers.playDayPhaseBgm(ui);
                 ui.currentScene = UI.Scene.DIALOGUE_DAY;
@@ -24,19 +33,15 @@ public class DialogueDayDeathHandler implements SceneHandler {
             dc.dialogPanel.setVisible(true);
             DialogueBox.finalize(ui, dc);
         } else {
-            Event event = ui.pollEvent();
-            if (event == null) {
-                ui.currentScene = UI.Scene.GAME_SCENE_VOTE;
-                ui.run();
-                return;
-            }
+            PresentedEvent presented = ui.pollPresentedEvent();
+            Event event = presented.event();
             ui.jPanel.removeAll();
             UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(
                     ui, UiImage.DIALOGUE_DAY_BACKGROUND, event);
             ds.dc().nextBtn.setVisible(false);
             ds.dc().nextBtn.setEnabled(false);
             Timer typeTimer = UIHelpers.bindTypewriter(ds.dc().dialogText, ds.text(), ds.dc().nextBtn, () -> {
-                if (!ui.hasPendingEvents() || ui.peekEvent().eventname() != EventName.yjsw) {
+                if (!ui.hasPendingEvents(EventPresentationStage.NIGHT_RESULT)) {
                     UIHelpers.playDayPhaseBgm(ui);
                     ui.currentScene = UI.Scene.DIALOGUE_DAY;
                 }

@@ -7,6 +7,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
+import com.vocr.application.EventPresentationStage;
 import com.vocr.core.MainLogicInterface;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.Role;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ArchitectureBoundaryTest {
     private static final DescribedPredicate<JavaAccess<?>> DIRECT_PROCESS_OUTPUT =
@@ -127,6 +129,24 @@ class ArchitectureBoundaryTest {
                         GameContextView.class, "getVotingCandidates", int.class)
                 .because("Swing 投票结果界面只能渲染应用层已经计票完成的权威快照")
                 .check(productionClasses);
+    }
+
+    @Test
+    void dialogueHandlersShouldFollowApplicationEventPresentationStages() {
+        Set<String> stageDrivenHandlers = Set.of(
+                "DialogueAfternoonHandler",
+                "DialogueChuxingHandler",
+                "DialogueDayDeathHandler",
+                "DialogueDayHandler",
+                "EndGameHandler");
+
+        for (String simpleName : stageDrivenHandlers) {
+            JavaClass handler = productionClasses.get("com.vocr.ui." + simpleName);
+            assertTrue(handler.getDirectDependenciesFromSelf().stream()
+                            .anyMatch(dependency -> dependency.getTargetClass()
+                                    .isEquivalentTo(EventPresentationStage.class)),
+                    simpleName + " 必须使用应用层展示阶段推进事件流");
+        }
     }
 
     @Test

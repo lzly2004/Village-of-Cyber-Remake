@@ -109,6 +109,9 @@ final class GameApplication
         long eventCursor = eventBuffer.currentCursor();
         boolean voteCompleted = gameLogic.shokei(
                 command.method().legacyCode(), command.candidates(), avoidanceEnabled);
+        if (!voteCompleted)
+            eventBuffer.markDialogueAfter(
+                    eventCursor, EventPresentationStage.AFTERNOON_DIALOGUE);
         advanceRevision();
         return new VoteExecutionResult(voteCompleted, currentUpdate(eventCursor));
     }
@@ -272,7 +275,8 @@ final class GameApplication
                         : SettlementRevealProjector.project(context),
                 batch.cursor(),
                 batch.nextCursor(),
-                batch.events());
+                batch.presentedEvents().stream().map(PresentedEvent::event).toList(),
+                batch.presentedEvents());
     }
 
     /** 当前应用状态版本；开局前为 0，成功写命令后严格递增。 */
@@ -293,19 +297,19 @@ final class GameApplication
     }
 
     /** 桌面迁移期用于确认已展示的队首事件；Web 适配器后续改用事件游标。 */
-    public Event pollNextEvent()
+    public PresentedEvent pollNextPresentedEvent()
     {
         return eventBuffer.poll();
     }
 
-    public Event peekNextEvent()
+    public PresentedEvent peekNextPresentedEvent()
     {
         return eventBuffer.peek();
     }
 
     public boolean hasPendingEvents()
     {
-        return peekNextEvent() != null;
+        return peekNextPresentedEvent() != null;
     }
 
     public void clearPendingEvents()

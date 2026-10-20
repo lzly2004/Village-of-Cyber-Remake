@@ -151,16 +151,16 @@ public final class GameSession
         return gameLogic.getRecorder();
     }
 
-    public synchronized Event pollNextEvent()
+    public synchronized PresentedEvent pollNextPresentedEvent()
     {
         requireOpen();
-        return application.pollNextEvent();
+        return application.pollNextPresentedEvent();
     }
 
-    public synchronized Event peekNextEvent()
+    public synchronized PresentedEvent peekNextPresentedEvent()
     {
         requireOpen();
-        return application.peekNextEvent();
+        return application.peekNextPresentedEvent();
     }
 
     public synchronized boolean hasPendingEvents()

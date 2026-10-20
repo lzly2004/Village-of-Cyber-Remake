@@ -61,7 +61,7 @@ class GameApplicationTest
         assertEquals(peiyi.jianyi, update.view().configuration());
         assertEquals(result.playerCount(), update.view().players().size());
         Event first = update.events().getFirst();
-        assertEquals(first, application.pollNextEvent());
+        assertEquals(first, application.pollNextPresentedEvent().event());
         assertEquals(first, update.events().getFirst(), "已发布的更新快照不得随消费进度变化");
         assertThrows(UnsupportedOperationException.class, () -> update.events().add(first));
 
@@ -103,7 +103,8 @@ class GameApplicationTest
         assertEquals(1, unread.nextEventCursor() - unread.eventCursor());
         assertEquals(unread, application.currentUpdate(cursorAfterFirst),
                 "同一游标必须可重复读取，便于网络重试");
-        assertEquals(first, application.pollNextEvent(), "游标读取不得消费桌面待展示事件");
+        assertEquals(first, application.pollNextPresentedEvent().event(),
+                "游标读取不得消费桌面待展示事件");
         GameUpdate pendingSuffix = application.currentUpdate();
         assertEquals(List.of(second), pendingSuffix.events());
         assertEquals(cursorAfterFirst, pendingSuffix.eventCursor(),
@@ -133,6 +134,10 @@ class GameApplicationTest
                 new AskClaimByRoleCommand(application.currentRevision(), Role.zhan));
 
         assertEquals(List.of(commandEvent), result.events());
+        assertEquals(
+                List.of(new PresentedEvent(
+                        commandEvent, EventPresentationStage.DAY_DIALOGUE)),
+                result.presentedEvents());
         assertEquals(1, result.eventCursor());
         assertEquals(2, result.nextEventCursor());
         assertEquals(List.of(earlier, commandEvent), application.currentUpdate().events(),
@@ -159,7 +164,7 @@ class GameApplicationTest
         application.currentUpdate(0);
         application.publishDiagnosticEvent(
                 new Event(EventName.zco7, CharacterEnglishName.Abel));
-        application.pollNextEvent();
+        application.pollNextPresentedEvent();
         application.clearPendingEvents();
         assertEquals(1, application.currentRevision(), "只读和展示队列操作不得推进状态版本");
 
@@ -350,7 +355,8 @@ class GameApplicationTest
     {
         TrackingLogic logic = new TrackingLogic();
         logic.voteCompleted = true;
-        GameApplication application = new GameApplication(logic, new GameEventBuffer());
+        GameEventBuffer events = new GameEventBuffer();
+        GameApplication application = new GameApplication(logic, events);
 
         List<Integer> candidates = new ArrayList<>(List.of(2, 4));
         logic.selectedVoteTargets.addAll(candidates);
@@ -372,6 +378,8 @@ class GameApplicationTest
         assertThrows(UnsupportedOperationException.class, () -> command.candidates().add(6));
 
         logic.voteCompleted = false;
+        Event avoidanceEvent = new Event(EventName.lrco, CharacterEnglishName.Abel);
+        logic.onVote = () -> events.publish(avoidanceEvent);
         GameUpdate disabled = application.setAvoidance(
                 new SetAvoidanceCommand(application.currentRevision(), false));
         assertFalse(disabled.selections().avoidanceEnabled());
@@ -384,6 +392,15 @@ class GameApplicationTest
         assertFalse(logic.avoidanceEnabled, "投票必须使用应用层当前回避状态");
         assertEquals(3, interrupted.update().revision());
         assertEquals(0, logic.votingMethod);
+        assertEquals(List.of(avoidanceEvent), interrupted.update().events());
+        assertEquals(
+                List.of(EventPresentationStage.AFTERNOON_DIALOGUE),
+                interrupted.update().presentedEvents().stream()
+                        .map(PresentedEvent::stage).toList());
+        assertThrows(UnsupportedOperationException.class, () ->
+                interrupted.update().presentedEvents().add(
+                        new PresentedEvent(
+                                avoidanceEvent, EventPresentationStage.DAY_DIALOGUE)));
     }
 
     @Test
@@ -688,6 +705,7 @@ class GameApplicationTest
         private boolean voteCompleted;
         private int askRoleCalls;
         private Runnable onAskRole = () -> { };
+        private Runnable onVote = () -> { };
 
         @SuppressWarnings("unchecked")
         private static Set<Integer>[] createTargetSets()
@@ -714,6 +732,7 @@ class GameApplicationTest
             votingMethod = method;
             voteCandidates = List.copyOf(players);
             avoidanceEnabled = avoid;
+            onVote.run();
             if (voteCompleted)
                 recordCompletedVote(method, players);
             return voteCompleted;

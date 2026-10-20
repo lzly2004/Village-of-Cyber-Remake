@@ -2,6 +2,8 @@ package com.vocr.ui;
 
 import com.vocr.logging.DebugLogger;
 import com.vocr.resources.UiImage;
+import com.vocr.application.EventPresentationStage;
+import com.vocr.application.PresentedEvent;
 
 import com.vocr.domain.Event;
 import com.vocr.domain.EventName;
@@ -12,12 +14,14 @@ import java.awt.*;
 public class DialogueDayHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
-        Event event = ui.pollEvent();
-        if (event == null) {
+        PresentedEvent next = ui.peekPresentedEvent();
+        if (next == null || next.stage() != EventPresentationStage.DAY_DIALOGUE) {
             ui.currentScene = UI.Scene.GAME_SCENE_VOTE;
             ui.run();
             return;
         }
+        PresentedEvent presented = ui.pollPresentedEvent();
+        Event event = presented.event();
         boolean isConnect = true;
         switch (event.eventname()) {
             case jhdh8b:
@@ -40,7 +44,7 @@ public class DialogueDayHandler implements SceneHandler {
         UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(
                 ui, UiImage.DIALOGUE_DAY_BACKGROUND, event);
         Timer typeTimer = UIHelpers.bindTypewriter(ds.dc().dialogText, ds.text(), ds.dc().nextBtn, () -> {
-            if (!ui.hasPendingEvents()) {
+            if (!ui.hasPendingEvents(EventPresentationStage.DAY_DIALOGUE)) {
                 ui.linkIcon.clear();
                 ui.currentScene = UI.Scene.GAME_SCENE_VOTE;
             }
@@ -55,7 +59,9 @@ public class DialogueDayHandler implements SceneHandler {
                 UIHelpers.renderLinkIconPair(ui, CharIcon);
                 if (event.eventname() == EventName.gprz11r) {
                     DebugLogger.log("共有认证rrrr");
-                    if (ui.peekEvent().eventname() == EventName.gprz11p) {
+                    PresentedEvent following = ui.peekPresentedEvent();
+                    if (following != null
+                            && following.event().eventname() == EventName.gprz11p) {
                             DebugLogger.log("共有认证pppp");
                         ui.linkIcon.add(CharIcon[0]);
                         ui.specialEvent[0] = true;

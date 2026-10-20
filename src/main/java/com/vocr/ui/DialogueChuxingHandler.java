@@ -2,6 +2,8 @@ package com.vocr.ui;
 
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.UiImage;
+import com.vocr.application.EventPresentationStage;
+import com.vocr.application.PresentedEvent;
 
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.Event;
@@ -14,7 +16,14 @@ public class DialogueChuxingHandler implements SceneHandler {
     @Override
     public void render(UI ui) {
         ui.resources.stopBgm();
-        Event event = ui.pollEvent();
+        PresentedEvent next = ui.peekPresentedEvent();
+        if (next == null || next.stage() != EventPresentationStage.EXECUTION) {
+            ui.currentScene = UI.Scene.GAME_SCENE_NIGHT;
+            ui.run();
+            return;
+        }
+        PresentedEvent presented = ui.pollPresentedEvent();
+        Event event = presented.event();
         ui.jPanel.removeAll();
         UIHelpers.DialogueSetup ds = UIHelpers.prepareDialogueEvent(
                 ui, UiImage.DIALOGUE_AFTERNOON_BACKGROUND, event);
@@ -48,9 +57,7 @@ public class DialogueChuxingHandler implements SceneHandler {
                     resultText = "";
                 }
                 UIHelpers.bindTypewriter(dialogText, resultText, nextBtn, () -> {
-                    if (!ui.hasPendingEvents() || (ui.peekEvent().eventname() != EventName.cxs
-                            && ui.peekEvent().eventname() != EventName.hzsw
-                            && ui.peekEvent().eventname() != EventName.mzsw)) {
+                    if (!ui.hasPendingEvents(EventPresentationStage.EXECUTION)) {
                         ui.currentScene = UI.Scene.GAME_SCENE_NIGHT;
                     }
                     ui.run();

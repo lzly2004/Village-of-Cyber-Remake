@@ -8,17 +8,18 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 
-/** 单局领域事件缓冲区；核心写入，应用层发布不可变快照。 */
+/** 单局领域事件缓冲区；核心写入，应用层标注展示阶段并发布不可变快照。 */
 public final class GameEventBuffer
 {
-    private final Deque<Event> pendingEvents = new ArrayDeque<>();
-    private final List<Event> publishedEvents = new ArrayList<>();
+    private final Deque<PresentedEvent> pendingEvents = new ArrayDeque<>();
+    private final List<PresentedEvent> publishedEvents = new ArrayList<>();
 
     public synchronized void publish(Event event)
     {
         Event publishedEvent = Objects.requireNonNull(event, "领域事件不能为空");
-        pendingEvents.addLast(publishedEvent);
-        publishedEvents.add(publishedEvent);
+        PresentedEvent presentation = EventPresentationProjector.project(publishedEvent);
+        pendingEvents.addLast(presentation);
+        publishedEvents.add(presentation);
     }
 
     synchronized EventBatch pendingSnapshot()
@@ -44,14 +45,33 @@ public final class GameEventBuffer
         return publishedEvents.size();
     }
 
-    synchronized Event poll()
+    synchronized PresentedEvent poll()
     {
         return pendingEvents.pollFirst();
     }
 
-    synchronized Event peek()
+    synchronized PresentedEvent peek()
     {
         return pendingEvents.peekFirst();
+    }
+
+    synchronized void markDialogueAfter(long cursor, EventPresentationStage stage)
+    {
+        if (cursor < 0 || cursor > publishedEvents.size())
+            throw new IllegalArgumentException("事件游标超出当前对局范围: " + cursor);
+        if (stage != EventPresentationStage.DAY_DIALOGUE
+                && stage != EventPresentationStage.AFTERNOON_DIALOGUE)
+            throw new IllegalArgumentException("只能重标记对话展示阶段: " + stage);
+
+        int pendingStart = publishedEvents.size() - pendingEvents.size();
+        for (int index = Math.toIntExact(cursor); index < publishedEvents.size(); index++)
+        {
+            PresentedEvent current = publishedEvents.get(index);
+            if (current.stage() == EventPresentationStage.DAY_DIALOGUE)
+                publishedEvents.set(index, new PresentedEvent(current.event(), stage));
+        }
+        pendingEvents.clear();
+        pendingEvents.addAll(publishedEvents.subList(pendingStart, publishedEvents.size()));
     }
 
     synchronized void clear()

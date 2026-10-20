@@ -4,6 +4,8 @@ import com.vocr.resources.SoundEffect;
 
 import com.vocr.application.GameSession;
 import com.vocr.application.GameUpdate;
+import com.vocr.application.EventPresentationStage;
+import com.vocr.application.PresentedEvent;
 import com.vocr.application.StartGameCommand;
 import com.vocr.application.StartedGame;
 import com.vocr.logging.DebugLogger;
@@ -290,19 +292,25 @@ public class UI
         gameRevision = Objects.requireNonNull(startedGame, "开局结果不能为空").revision();
     }
 
-    Event pollEvent()
+    PresentedEvent pollPresentedEvent()
     {
-        return gameSession == null ? null : gameSession.pollNextEvent();
+        return gameSession == null ? null : gameSession.pollNextPresentedEvent();
     }
 
-    Event peekEvent()
+    PresentedEvent peekPresentedEvent()
     {
-        return gameSession == null ? null : gameSession.peekNextEvent();
+        return gameSession == null ? null : gameSession.peekNextPresentedEvent();
     }
 
     boolean hasPendingEvents()
     {
         return gameSession != null && gameSession.hasPendingEvents();
+    }
+
+    boolean hasPendingEvents(EventPresentationStage stage)
+    {
+        PresentedEvent next = peekPresentedEvent();
+        return next != null && next.stage() == stage;
     }
 
     int pendingEventCount()
