@@ -1,117 +1,143 @@
 package com.vocr.ui;
 
+import com.vocr.application.PlayerViewSnapshot;
+import com.vocr.application.VisiblePlayer;
+import com.vocr.application.VoteLineSnapshot;
+import com.vocr.application.VoteResultSnapshot;
+import com.vocr.application.VoteRoundSnapshot;
+import com.vocr.application.VotingMethod;
 import com.vocr.logging.DebugLogger;
 
-import com.vocr.config.GameConstants;
-
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * 投票结果渲染器 —— 从 GameSceneVoteHandler.createPiao()/createDayPiao() 提取。
- * 负责渲染投票结果面板（票数统计、处刑判定、再投票逻辑）。
- */
-class VoteResultRenderer {
-
-    static boolean renderPiao(UI ui, String str, int round, GameSceneVoteHandler handler) {
-        DebugLogger.log("***当前gameDay等于" + ui.ctx.getGameDay() + "***");
+/** 只负责把应用层已经计票完成的权威投票快照渲染到 Swing。 */
+class VoteResultRenderer
+{
+    static boolean renderPiao(
+            UI ui,
+            PlayerViewSnapshot view,
+            VoteResultSnapshot result,
+            String title,
+            int round,
+            GameSceneVoteHandler handler)
+    {
         ui.piaoText.setVisible(true);
         ui.piaoText1.setVisible(true);
-        int gameDay = ui.ctx.getEffectiveGameDay();
-        int playerSum = ui.ctx.getPlayerSum() + 1;
-        int[][] voteTotal = buildVoteTotal(ui, playerSum, gameDay, round, true);
-        StringBuilder leftPiao = new StringBuilder(str);
+        VoteRoundSnapshot roundResult = round(result, round);
+        StringBuilder leftPiao = new StringBuilder(title);
         StringBuilder rightPiao = new StringBuilder("\n\n");
-        int leftCnt = buildVotePanels(ui, playerSum, gameDay, round, voteTotal, leftPiao, rightPiao, true);
-        int max = voteTotal[1][round];
-        for (int i = 2; i < playerSum; ++i)
-            if (voteTotal[i][round] > max) max = voteTotal[i][round];
-        int maxCnt = 0;
-        List<Integer> maxPos = new ArrayList<>();
-        for (int i = 1; i < playerSum; ++i)
-            if (voteTotal[i][round] == max) { maxCnt++; maxPos.add(i); }
-        for (int i1 = 0; i1 < 10 - leftCnt; ++i1) leftPiao.append("\n");
-        if (maxCnt == 1) {
-            leftPiao.append(String.format(GameStrings.VOTE_RESULT_FORMAT, max, ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(maxPos.get(0)))));
-            ui.chuxingWho = maxPos.get(0);
-        } else {
+        int leftCnt = buildVotePanels(ui, view, roundResult, leftPiao, rightPiao);
+        for (int index = 0; index < 10 - leftCnt; index++)
+            leftPiao.append("\n");
+        if (roundResult.tied())
+        {
             leftPiao.append(GameStrings.VOTE_TIE);
         }
+        else
+        {
+            int executedPlayer = roundResult.soleLeader().orElseThrow();
+            leftPiao.append(String.format(
+                    GameStrings.VOTE_RESULT_FORMAT,
+                    roundResult.maximumVotes(),
+                    playerName(ui, view, executedPlayer)));
+            ui.chuxingWho = executedPlayer;
+        }
         renderVoteResult(ui, handler, leftPiao, rightPiao, 900, 530);
-        return maxCnt != 1;
+        return roundResult.tied();
     }
 
-    static void renderDayPiao(UI ui, int round, int gameDay, GameSceneVoteHandler handler) {
+    static void renderDayPiao(
+            UI ui,
+            PlayerViewSnapshot view,
+            VoteResultSnapshot result,
+            int round,
+            GameSceneVoteHandler handler)
+    {
         ui.piaoText.setVisible(true);
         ui.piaoText1.setVisible(true);
-        int playerSum = ui.ctx.getPlayerSum() + 1;
-        StringBuilder extraText = buildDailyVotingRuleText(ui, gameDay);
-        int[][] voteTotal = buildVoteTotal(ui, playerSum, gameDay, round, false);
-        StringBuilder leftPiao = new StringBuilder(GameStrings.getVoteHistoryTitle(gameDay, round, extraText.toString()));
+        VoteRoundSnapshot roundResult = round(result, round);
+        String extraText = buildDailyVotingRuleText(ui, view, result);
+        StringBuilder leftPiao = new StringBuilder(
+                GameStrings.getVoteHistoryTitle(result.day(), round, extraText));
         StringBuilder rightPiao = new StringBuilder("\n\n");
-        buildVotePanels(ui, playerSum, gameDay, round, voteTotal, leftPiao, rightPiao, false);
+        buildVotePanels(ui, view, roundResult, leftPiao, rightPiao);
         renderVoteResult(ui, handler, leftPiao, rightPiao, 1000, 400);
     }
 
-    private static int[][] buildVoteTotal(UI ui, int playerSum, int gameDay, int round, boolean exactDayMatch) {
-        int[][] voteTotal = new int[playerSum][GameConstants.MAX_VOTE_ROUNDS + 1];
-        for (int i = 1; i < playerSum; ++i) {
-            boolean isParticipated = ui.ctx.isAlive(i) || 
-                    (exactDayMatch ? ui.ctx.getDeathDay(i) == gameDay : ui.ctx.getDeathDay(i) >= gameDay);
-            if (isParticipated) {
-                voteTotal[ui.ctx.getVoteTarget(i, gameDay, round)][round]++;
-            }
-        }
-        return voteTotal;
+    private static VoteRoundSnapshot round(VoteResultSnapshot result, int round)
+    {
+        if (round <= 0 || round > result.rounds().size())
+            throw new IllegalArgumentException("投票轮次超出权威结果范围: " + round);
+        return result.rounds().get(round - 1);
     }
 
-    private static int buildVotePanels(UI ui, int playerSum, int gameDay, int round, int[][] voteTotal,
-                                        StringBuilder leftPiao, StringBuilder rightPiao, boolean exactDayMatch) {
+    private static int buildVotePanels(
+            UI ui,
+            PlayerViewSnapshot view,
+            VoteRoundSnapshot round,
+            StringBuilder leftPiao,
+            StringBuilder rightPiao)
+    {
         int leftCnt = 0;
-        for (int i = 1; i < playerSum; ++i) {
-            boolean isParticipated = ui.ctx.isAlive(i) || 
-                    (exactDayMatch ? ui.ctx.getDeathDay(i) == gameDay : ui.ctx.getDeathDay(i) >= gameDay);
-            if (isParticipated) {
-                String line = formatVoteLine(ui, i, round, gameDay, voteTotal);
-                if (leftCnt >= 10) rightPiao.append(line);
-                else { leftPiao.append(line); leftCnt++; }
+        for (VoteLineSnapshot line : round.lines())
+        {
+            String text = String.format(
+                    GameStrings.VOTE_LINE_FORMAT,
+                    playerName(ui, view, line.playerNumber()),
+                    line.receivedVotes(),
+                    playerName(ui, view, line.targetPlayerNumber()));
+            if (leftCnt >= 10)
+                rightPiao.append(text);
+            else
+            {
+                leftPiao.append(text);
+                leftCnt++;
             }
         }
         return leftCnt;
     }
 
-    private static StringBuilder buildDailyVotingRuleText(UI ui, int gameDay) {
+    private static String buildDailyVotingRuleText(
+            UI ui, PlayerViewSnapshot view, VoteResultSnapshot result)
+    {
         StringBuilder extraText = new StringBuilder();
-        switch (ui.ctx.getVotingRule(gameDay)) {
-            case 0: extraText.append(GameStrings.VOTE_FREE); break;
-            case 1:
-                extraText.append(GameStrings.VOTE_GREY);
-                for (int candidate : ui.ctx.getVotingCandidates(gameDay))
-                    extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(candidate)));
-                break;
-            case 2:
-                extraText.append(GameStrings.VOTE_DESIGNATED);
-                for (int candidate : ui.ctx.getVotingCandidates(gameDay))
-                    extraText.append(ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(candidate))).append(",");
-                break;
+        if (result.method() == VotingMethod.FREE)
+            return GameStrings.VOTE_FREE;
+        if (result.method() == VotingMethod.GREY)
+            extraText.append(GameStrings.VOTE_GREY);
+        else
+            extraText.append(GameStrings.VOTE_DESIGNATED);
+        for (int candidate : result.candidates())
+        {
+            extraText.append(playerName(ui, view, candidate));
+            if (result.method() == VotingMethod.DESIGNATED)
+                extraText.append(",");
         }
-        return extraText;
+        return extraText.toString();
     }
 
-    private static void renderVoteResult(UI ui, GameSceneVoteHandler handler, 
-                                         StringBuilder leftPiao, StringBuilder rightPiao,
-                                         int leftWidth, int rightX) {
+    private static String playerName(UI ui, PlayerViewSnapshot view, int playerNumber)
+    {
+        VisiblePlayer player = view.players().stream()
+                .filter(candidate -> candidate.playerNumber() == playerNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "玩家视图缺少投票玩家: " + playerNumber));
+        return ui.uiComponentFactory.getJobText(player.character().ordinal());
+    }
+
+    private static void renderVoteResult(
+            UI ui,
+            GameSceneVoteHandler handler,
+            StringBuilder leftPiao,
+            StringBuilder rightPiao,
+            int leftWidth,
+            int rightX)
+    {
         DebugLogger.log(leftPiao);
         DebugLogger.log(rightPiao);
-        handler.stylePiaoTextArea(ui.piaoText, leftPiao.toString(), 40, 228, leftWidth, 430);
-        handler.stylePiaoTextArea(ui.piaoText1, rightPiao.toString(), rightX, 228, 450, 430);
+        handler.stylePiaoTextArea(
+                ui.piaoText, leftPiao.toString(), 40, 228, leftWidth, 430);
+        handler.stylePiaoTextArea(
+                ui.piaoText1, rightPiao.toString(), rightX, 228, 450, 430);
         ui.resizeComponents();
-    }
-
-    private static String formatVoteLine(UI ui, int i, int round, int gameDay, int[][] voteTotal) {
-        return String.format(GameStrings.VOTE_LINE_FORMAT,
-                ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(i)),
-                voteTotal[i][round],
-                ui.uiComponentFactory.getJobText(ui.ctx.getCharacterNumber(ui.ctx.getVoteTarget(i, gameDay, round))));
     }
 }

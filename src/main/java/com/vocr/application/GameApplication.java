@@ -266,6 +266,7 @@ final class GameApplication
                 decisionPhase
                         ? LegalActionProjector.targetSelections(context)
                         : List.of(),
+                VoteResultProjector.projectHistory(context),
                 decisionPhase
                         ? List.of()
                         : SettlementRevealProjector.project(context),

@@ -363,6 +363,10 @@ class GameApplicationTest
         assertEquals(List.of(2, 4), logic.voteCandidates);
         assertTrue(logic.avoidanceEnabled);
         assertTrue(result.voteCompleted());
+        assertEquals(VotingMethod.DESIGNATED, result.completedVote().method());
+        assertEquals(4, result.completedVote().day());
+        assertEquals(2, result.completedVote().executedPlayer());
+        assertEquals(10, result.completedVote().finalRound().maximumVotes());
         assertEquals(1, result.update().revision());
         assertEquals(application.currentUpdate(), result.update());
         assertThrows(UnsupportedOperationException.class, () -> command.candidates().add(6));
@@ -376,6 +380,7 @@ class GameApplicationTest
                         application.currentRevision(), VotingMethod.FREE,
                         List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
         assertFalse(interrupted.voteCompleted(), "回避 CO 时必须保留核心的未完成状态");
+        assertThrows(IllegalStateException.class, interrupted::completedVote);
         assertFalse(logic.avoidanceEnabled, "投票必须使用应用层当前回避状态");
         assertEquals(3, interrupted.update().revision());
         assertEquals(0, logic.votingMethod);
@@ -429,6 +434,7 @@ class GameApplicationTest
 
         Arrays.fill(logic.actualRoles, Role.wu.ordinal());
         logic.actualRoles[2] = Role.renlang.ordinal();
+        logic.recordCompletedVote(0, List.of(1, 2, 3, 4, 5, 6, 7, 8, 9));
         logic.endResult = GameResult.WOLF_WIN;
         logic.deadPlayers.addAll(
                 List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
@@ -438,6 +444,8 @@ class GameApplicationTest
         assertFalse(finished.claimInquiry().available());
         assertTrue(finished.legalTargetSelections().isEmpty());
         assertEquals(10, finished.revealedRoles().size());
+        assertEquals(1, finished.voteHistory().size(),
+                "终局更新也必须保留已完成的公开投票历史");
         assertEquals(new RevealedPlayerRole(2, Role.renlang), finished.revealedRoles().get(1));
         assertThrows(UnsupportedOperationException.class,
                 () -> finished.revealedRoles().add(new RevealedPlayerRole(11, Role.wu)));
@@ -595,7 +603,11 @@ class GameApplicationTest
         private final Set<Integer>[] claimedRoleTargets = createTargetSets();
         private final Set<Integer> hiddenSeerTargets = new HashSet<>();
         private final Set<Integer> hiddenHunterTargets = new HashSet<>();
+        private final int[][] voteTargets = new int[11][4];
         private final List<String> selectionWrites = new ArrayList<>();
+        private int completedVoteRounds;
+        private int recordedVotingRule = -1;
+        private List<Integer> recordedVoteCandidates = List.of();
         private GameResult endResult = GameResult.NONE;
         private final GameContextView context = (GameContextView) Proxy.newProxyInstance(
                 GameContextView.class.getClassLoader(),
@@ -605,6 +617,7 @@ class GameApplicationTest
                     {
                         case "getPlayerSum" -> 10;
                         case "getGameDay" -> 4;
+                        case "getEffectiveGameDay" -> 4;
                         case "isAlive" -> !deadPlayers.contains((Integer) arguments[0]);
                         case "getAliveCounter" -> 10 - deadPlayers.size();
                         case "getDeathCounter" -> deadPlayers.size();
@@ -618,6 +631,12 @@ class GameApplicationTest
                         case "getActualRole" -> actualRoles[(Integer) arguments[0]];
                         case "getClaimedRole" -> claimedRoles[(Integer) arguments[0]];
                         case "getSkillTarget" -> skillTargets[(Integer) arguments[0]][(Integer) arguments[1]];
+                        case "getVoteRoundCount" -> (Integer) arguments[0] == 4
+                                ? completedVoteRounds : 0;
+                        case "getVotingRule" -> recordedVotingRule;
+                        case "getVotingCandidates" -> recordedVoteCandidates;
+                        case "getVoteTarget" -> (Integer) arguments[1] == 4
+                                ? voteTargets[(Integer) arguments[0]][(Integer) arguments[2]] : 0;
                         case "isSelectedVoteTarget" -> selectedVoteTargets.contains((Integer) arguments[0]);
                         case "isClaimedRoleScheduled" -> claimedRoleTargets[(Integer) arguments[0]]
                                 .contains((Integer) arguments[1]);
@@ -678,6 +697,16 @@ class GameApplicationTest
             return targets;
         }
 
+        private void recordCompletedVote(int method, List<Integer> candidates)
+        {
+            completedVoteRounds = 1;
+            recordedVotingRule = method;
+            recordedVoteCandidates = List.copyOf(candidates);
+            int target = candidates.get(0);
+            for (int player = 1; player <= 10; player++)
+                voteTargets[player][1] = deadPlayers.contains(player) ? 0 : target;
+        }
+
         @Override public GameContextView getGameContext() { return context; }
         @Override public GameRecorder getRecorder() { return null; }
         @Override public void start(peiyi configuration) { }
@@ -685,6 +714,8 @@ class GameApplicationTest
             votingMethod = method;
             voteCandidates = List.copyOf(players);
             avoidanceEnabled = avoid;
+            if (voteCompleted)
+                recordCompletedVote(method, players);
             return voteCompleted;
         }
         @Override public void askCo(Role role) {

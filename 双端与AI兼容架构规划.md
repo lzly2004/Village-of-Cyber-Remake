@@ -240,6 +240,8 @@ Spring Boot 仍是账号、数据库迁移、复杂监控或团队规模扩大�
 
 当前进度：已建立不依赖 Swing/HTTP 的 `GameApplication`。桌面端开局通过 `StartGameCommand` 并接收无秘密的 `StartedGame` 摘要；按职业/玩家询问 CO 分别通过两种不可变命令；自由、灰区和指定投票统一通过 `ExecuteVoteCommand` 与语义化 `VotingMethod`，应用层保留“回避 CO 打断投票”的既有返回语义。目标选择分为“为全部相关行动者指定”和“为某个已 CO 行动者指定”两种命令，应用层根据真实身份、CO 和存活状态展开底层预约，Swing 不再直接写四类状态或读取真实身份名单。领域事件已迁入单局 `GameEventBuffer`；每份更新用 `[eventCursor, nextEventCursor)` 明确标识所带事件窗口，桌面待展示后缀不再冒充完整历史，命令结果只带该命令同步发布的事件，Web 则可按自有游标非破坏、可重复地续读。`GameUpdate` 现已包含白名单构造的 `PlayerViewSnapshot`，并把核心返回应用层后的稳定业务状态明确为 `DAY_DECISION` 或 `FINISHED`。自由、灰区和指定投票由 `LegalVoteAction` 返回候选；CO 询问由 `ClaimInquiryOptions` 返回可询问职业与存活玩家；三类预约由 `LegalTargetSelection` 返回存活目标和公开 CO 行动者。普通视图始终不含真实身份；仅在 `FINISHED` 阶段通过独立 `RevealedPlayerRole` 列表一一揭晓，投影器在对局结束前会主动拒绝调用。`SelectionStateSnapshot` 额外白名单投影指定投票、匿名潜伏技能目标、公开 CO 行动者目标和回避开关；它不暴露真实行动者身份。回避设置是带 revision 的应用命令，投票只使用应用层权威值；Swing 已删除对应本地镜像，并从同一快照恢复选择面板和摘要。`GameApplication` 现以 0 为初始 revision，在同一实例内对每个成功接受的写命令严格递增且不因新开局归零；所有写命令携带客户端已见版本，校验与核心调用在同一串行临界区内完成，过期或重复请求在进入核心前被拒绝。`GameUpdate`、`StartedGame` 与 Swing 均使用同一版本契约；只读查询、事件续读和桌面展示队列操作不推进 revision。`4b5b1ce` 进一步把 `GameApplication` 收为包内实现，由每局独立的 `GameSession` 持有；桌面端开局、CO、投票、目标预约、回避和事件读取统一经会话进入，会话状态为 `NEW/RUNNING/FINISHED/CLOSED`，关闭后拒绝命令与读取。阶段 2 尚未正式退出：`VoteResultRenderer` 等展示推导仍在 UI，`DialogueDayHandler` 等事件消费也仍按桌面语义推进。
 
+TASK-007 更新：上述关于 `VoteResultRenderer` 仍在 Swing 推导权威结论的描述已经过时。`GameUpdate` 现已公开投影投票方式、候补、逐轮票型、最高票、同票与最终处刑者，当前结果和历史浏览只渲染该快照，并有架构门禁禁止恢复旧读取。阶段 2 仍未正式退出，因为 `DialogueDayHandler` 等事件消费仍按桌面语义推进，其他结果展示也需逐条核实权威边界。
+
 1. 只定义业务阶段，不复制 `UI.Scene`；先覆盖“开始对局 → 读取事件 → 完成一种玩家操作”；
 2. 定义 `GameCommand/GameUpdate/LegalAction/PlayerViewSnapshot` 的最小集合，令更新同时携带合法候选项、业务结果和 `revision`；
 3. 让 Swing 的这一条流程改用门面，证明接口不依赖 HTTP；

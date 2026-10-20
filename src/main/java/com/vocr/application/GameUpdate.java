@@ -10,7 +10,8 @@ import java.util.Optional;
 /**
  * 当前应用更新的不可变快照。
  *
- * 包含状态 revision、业务阶段、白名单玩家视图、当前选择、合法动作、事件输出及其续读游标。
+ * 包含状态 revision、业务阶段、白名单玩家视图、当前选择、合法动作、公开投票历史、
+ * 事件输出及其续读游标。
  */
 public record GameUpdate(
         long revision,
@@ -20,6 +21,7 @@ public record GameUpdate(
         List<LegalVoteAction> legalVoteActions,
         ClaimInquiryOptions claimInquiry,
         List<LegalTargetSelection> legalTargetSelections,
+        List<VoteResultSnapshot> voteHistory,
         List<RevealedPlayerRole> revealedRoles,
         long eventCursor,
         long nextEventCursor,
@@ -35,6 +37,7 @@ public record GameUpdate(
         Objects.requireNonNull(claimInquiry, "CO 询问选项不能为空");
         legalVoteActions = List.copyOf(legalVoteActions);
         legalTargetSelections = List.copyOf(legalTargetSelections);
+        voteHistory = List.copyOf(voteHistory);
         revealedRoles = List.copyOf(revealedRoles);
         if (phase == BusinessPhase.DAY_DECISION
                 && (legalVoteActions.isEmpty() || !claimInquiry.available()
@@ -56,6 +59,12 @@ public record GameUpdate(
         if (legalTargetSelections.stream().map(LegalTargetSelection::type).distinct().count()
                 != legalTargetSelections.size())
             throw new IllegalArgumentException("同一目标预约类型不能重复");
+        if (voteHistory.stream().map(VoteResultSnapshot::day).distinct().count()
+                != voteHistory.size())
+            throw new IllegalArgumentException("同一游戏日不能出现多份投票结果");
+        for (int index = 1; index < voteHistory.size(); index++)
+            if (voteHistory.get(index - 1).day() >= voteHistory.get(index).day())
+                throw new IllegalArgumentException("投票历史必须按日期递增排列");
         if (eventCursor < 0 || nextEventCursor < eventCursor)
             throw new IllegalArgumentException("事件游标窗口无效");
         events = List.copyOf(events);
@@ -73,5 +82,12 @@ public record GameUpdate(
     {
         Objects.requireNonNull(type, "目标预约类型不能为空");
         return legalTargetSelections.stream().filter(action -> action.type() == type).findFirst();
+    }
+
+    public Optional<VoteResultSnapshot> latestVoteResult()
+    {
+        return voteHistory.isEmpty()
+                ? Optional.empty()
+                : Optional.of(voteHistory.get(voteHistory.size() - 1));
     }
 }

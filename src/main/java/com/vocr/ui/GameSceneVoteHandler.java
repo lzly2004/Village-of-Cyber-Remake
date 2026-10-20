@@ -9,6 +9,7 @@ import com.vocr.application.SelectionStateSnapshot;
 import com.vocr.application.SetAvoidanceCommand;
 import com.vocr.application.SkillTargetSelections;
 import com.vocr.application.VoteExecutionResult;
+import com.vocr.application.VoteResultSnapshot;
 import com.vocr.application.VotingMethod;
 import com.vocr.resources.BgmTrack;
 import com.vocr.resources.ImageNames;
@@ -18,7 +19,6 @@ import com.vocr.resources.UiImage;
 import com.vocr.logging.DebugLogger;
 
 import com.vocr.domain.GameContextView;
-import com.vocr.domain.GameResult;
 import com.vocr.domain.Role;
 import com.vocr.domain.SelectionType;
 
@@ -274,14 +274,12 @@ public class GameSceneVoteHandler implements SceneHandler {
         // --- 再投票 ---
         votePanel.againBtn.addActionListener(e -> {
             ui.resources.playSound(SoundEffect.CLICK);
-            boolean isReVote;
-            if (ui.ctx.getEndResult() == GameResult.NONE) {
-                isReVote = VoteResultRenderer.renderPiao(
-                        ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay() - 1), currentRound, this);
-            } else {
-                isReVote = VoteResultRenderer.renderPiao(
-                        ui, GameStrings.getVoteTitleRedo(ui.ctx.getGameDay()), currentRound, this);
-            }
+            GameUpdate update = ui.currentGameUpdate();
+            VoteResultSnapshot result = update.latestVoteResult().orElseThrow(
+                    () -> new IllegalStateException("重投界面缺少投票结果"));
+            boolean isReVote = VoteResultRenderer.renderPiao(
+                    ui, update.view(), result,
+                    GameStrings.getVoteTitleRedo(result.day()), currentRound, this);
             handleReVoteResultWithLimit(isReVote);
         });
 
@@ -413,9 +411,10 @@ public class GameSceneVoteHandler implements SceneHandler {
                         greyVoteCandidates));
         ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
-            int trueDay = ui.ctx.getEffectiveGameDay();
+            VoteResultSnapshot vote = result.completedVote();
             isReVote = VoteResultRenderer.renderPiao(
-                    ui, String.format(GameStrings.VOTE_TITLE_GREY, trueDay) + greyText + "\n",
+                    ui, result.update().view(), vote,
+                    String.format(GameStrings.VOTE_TITLE_GREY, vote.day()) + greyText + "\n",
                     currentRound, this);
             handleReVoteResult(isReVote);
         } else {
@@ -471,13 +470,10 @@ public class GameSceneVoteHandler implements SceneHandler {
                         ui.gameRevision(), VotingMethod.FREE, chuxingList));
         ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
-            if (ui.ctx.getEndResult() == GameResult.NONE) {
-                isReVote = VoteResultRenderer.renderPiao(
-                        ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay() - 1), currentRound, this);
-            } else {
-                isReVote = VoteResultRenderer.renderPiao(
-                        ui, GameStrings.getVoteTitleFree(ui.ctx.getGameDay()), currentRound, this);
-            }
+            VoteResultSnapshot vote = result.completedVote();
+            isReVote = VoteResultRenderer.renderPiao(
+                    ui, result.update().view(), vote,
+                    GameStrings.getVoteTitleFree(vote.day()), currentRound, this);
             handleReVoteResult(isReVote);
         } else {
             votePanel.freeBtn.setVisible(true); votePanel.greyBtn.setVisible(true); votePanel.returnBtn.setVisible(true);
@@ -500,13 +496,14 @@ public class GameSceneVoteHandler implements SceneHandler {
                         chuxingList));
         ui.acceptGameUpdate(result.update());
         if (result.voteCompleted()) {
-            int trueDay = ui.ctx.getEffectiveGameDay();
+            VoteResultSnapshot vote = result.completedVote();
             StringBuilder isSelectedVoteTargetText = new StringBuilder();
             for (int i = 0; i < chuxingList.size(); ++i)
                 isSelectedVoteTargetText.append(ui.getJobText(chuxingList.get(i))).append(",");
             DebugLogger.log(isSelectedVoteTargetText);
             isReVote = VoteResultRenderer.renderPiao(
-                    ui, GameStrings.getVoteTitleDesign(trueDay, isSelectedVoteTargetText.toString()),
+                    ui, result.update().view(), vote,
+                    GameStrings.getVoteTitleDesign(vote.day(), isSelectedVoteTargetText.toString()),
                     currentRound, this);
             handleReVoteResult(isReVote);
         } else {

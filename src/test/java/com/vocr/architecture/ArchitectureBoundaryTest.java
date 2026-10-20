@@ -112,6 +112,24 @@ class ArchitectureBoundaryTest {
     }
 
     @Test
+    void uiShouldRenderAuthoritativeVoteResultsWithoutRecountingCoreState() {
+        noClasses()
+                .that().haveSimpleName("VoteResultRenderer")
+                .or().haveSimpleName("VoteHistoryBrowser")
+                .should().callMethod(
+                        GameContextView.class, "getVoteTarget",
+                        int.class, int.class, int.class)
+                .orShould().callMethod(
+                        GameContextView.class, "getVoteRoundCount", int.class)
+                .orShould().callMethod(
+                        GameContextView.class, "getVotingRule", int.class)
+                .orShould().callMethod(
+                        GameContextView.class, "getVotingCandidates", int.class)
+                .because("Swing 投票结果界面只能渲染应用层已经计票完成的权威快照")
+                .check(productionClasses);
+    }
+
+    @Test
     void uiShouldChangeTargetSelectionsThroughApplicationLayer() {
         noClasses()
                 .that().resideInAPackage("com.vocr.ui..")

@@ -1,5 +1,7 @@
 package com.vocr.ui;
 
+import com.vocr.application.GameUpdate;
+import com.vocr.application.VoteResultSnapshot;
 import com.vocr.resources.SoundEffect;
 import com.vocr.resources.ImageNames;
 import com.vocr.resources.UiImage;
@@ -21,11 +23,11 @@ class VoteHistoryBrowser {
         vp.doubtBtn.setVisible(false); vp.votehisBtn.setVisible(false); vi.infoText.setVisible(false);
         hisPanel.setVisible(true); hisPanel.removeAll();
         ui.jPanel.setComponentZOrder(levellb, 0); levellb.setVisible(true);
+        GameUpdate update = ui.currentGameUpdate();
         int displayedDay = 0;
-        for (int dayCursor = 2; dayCursor <= ui.ctx.getEffectiveGameDay(); ++dayCursor) {
-            int gameday = dayCursor;
-            int roundMax = ui.ctx.getVoteRoundCount(gameday);
-            if (roundMax == 0) continue;
+        for (VoteResultSnapshot result : update.voteHistory()) {
+            int gameday = result.day();
+            int roundMax = result.rounds().size();
             int dayPosition = displayedDay++;
             JButton backResult = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, 1060,
                     720 - 40 - 126 * 3 - 20, ui.resources.getImage(UiImage.HISTORY_BACK));
@@ -44,22 +46,22 @@ class VoteHistoryBrowser {
             nextResult1.setVisible(false); ui.jPanel.add(nextResult1);
             ui.jPanel.setComponentZOrder(nextResult1, 0);
             nextResult.addActionListener(e1 -> {
-                VoteResultRenderer.renderDayPiao(ui, 2, gameday, handler);
+                VoteResultRenderer.renderDayPiao(ui, update.view(), result, 2, handler);
                 backResult.setVisible(true); nextResult.setVisible(false);
                 if (roundMax == GameConstants.MAX_VOTE_ROUNDS) nextResult1.setVisible(true);
             });
             backResult.addActionListener(e1 -> {
-                VoteResultRenderer.renderDayPiao(ui, 1, gameday, handler);
+                VoteResultRenderer.renderDayPiao(ui, update.view(), result, 1, handler);
                 backResult.setVisible(false); nextResult.setVisible(true);
                 nextResult1.setVisible(false);
             });
             nextResult1.addActionListener(e1 -> {
-                VoteResultRenderer.renderDayPiao(ui, 3, gameday, handler);
+                VoteResultRenderer.renderDayPiao(ui, update.view(), result, 3, handler);
                 backResult1.setVisible(true); nextResult1.setVisible(false);
                 backResult.setVisible(false);
             });
             backResult1.addActionListener(e1 -> {
-                VoteResultRenderer.renderDayPiao(ui, 2, gameday, handler);
+                VoteResultRenderer.renderDayPiao(ui, update.view(), result, 2, handler);
                 backResult1.setVisible(false); nextResult1.setVisible(true);
                 backResult.setVisible(true);
             });
@@ -67,7 +69,7 @@ class VoteHistoryBrowser {
             JButton dayBtn = ButtonSimpleFactory.makeButton(ButtonConst.Simple_Button, dayIcon);
             dayBtn.setSize(dayIcon.getIconWidth(), dayIcon.getIconHeight());
             dayBtn.addActionListener(e1 -> {
-                VoteResultRenderer.renderDayPiao(ui, 1, gameday, handler);
+                VoteResultRenderer.renderDayPiao(ui, update.view(), result, 1, handler);
                 hisPanel.setVisible(false);
                 if (roundMax != 1) nextResult.setVisible(true);
             });

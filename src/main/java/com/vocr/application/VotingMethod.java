@@ -18,4 +18,12 @@ public enum VotingMethod
     {
         return legacyCode;
     }
+
+    static VotingMethod fromLegacyCode(int legacyCode)
+    {
+        for (VotingMethod method : values())
+            if (method.legacyCode == legacyCode)
+                return method;
+        throw new IllegalArgumentException("未知投票方式编号: " + legacyCode);
+    }
 }
