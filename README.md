@@ -42,6 +42,21 @@ gradlew.bat fatJar
 会话和战绩只保存在当前进程内；重启后清空。接口与示例见
 [游客 HTTP API](docs/guest-http-api.md)。
 
+## 浏览器文本试玩
+
+除 Java 21 外，前端需要 Node.js 22.12+。先在项目根目录启动 `gradlew.bat runWeb`，
+再在另一个终端执行：
+
+```sh
+cd web-client
+npm ci
+npm run dev
+```
+
+打开 `http://127.0.0.1:5173` 可选择配役、逐条阅读公开事件、指定投票并查看终局。
+刷新同一标签页可恢复当前会话与未确认事件。构建与浏览器测试见
+[客户端说明](web-client/README.md)。
+
 ## 目录说明
 
 - `src/main/java/com/vocr/app/`：程序入口与应用装配
@@ -57,6 +72,7 @@ gradlew.bat fatJar
 - `src/main/java/com/vocr/ui/`：Swing 场景、渲染器和组件工厂
 - `src/test/java/com/vocr/`：JUnit 5 测试，按生产包镜像组织
 - `src/web/java/com/vocr/web/`：独立 HTTP 源集与游客会话组合根，不进入桌面 Fat JAR
+- `web-client/`：独立 Vue/Vite 文本试玩客户端与 Playwright 端到端测试
 - `src/main/resources/`：图片、台词、事件映射、音效和 BGM
 - `docs/legacy/`：从旧源码目录移出的历史设计文档和进度记录
 - `config/probability.json`：唯一的外部概率配置
