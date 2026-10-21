@@ -104,6 +104,48 @@ test('409 同步权威选择，未自动重试失败的写命令', async ({ page
   } finally { await release(request, id) }
 })
 
+test('固定种子 CO 中断显示提示、先读下午发言且刷新保留事件', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    let interrupted = false
+    for (let attempt = 0; attempt < 40; attempt++) {
+      await readEvents(page)
+      const candidate = page.locator('.player-row:not(.departed)')
+        .filter({ hasNotText: '共有者' }).getByRole('checkbox').first()
+      await expect(candidate).toBeVisible()
+      if (!await candidate.isChecked()) {
+        await candidate.click()
+        await expect(candidate).toBeChecked()
+      }
+      const response = page.waitForResponse(res => res.request().method() === 'POST'
+        && res.url().endsWith('/votes'))
+      await page.getByTestId('vote').click()
+      const result = await (await response).json()
+      if (result.voteCompleted) continue
+      interrupted = true
+      expect(result.update.phase).toBe('DAY_DECISION')
+      expect(result.update.presentedEvents.some(event => event.stage === 'AFTERNOON_DIALOGUE')).toBeTruthy()
+      await expect(page.getByRole('alert')).toContainText('投票被回避 CO 中断')
+      await expect(page.getByTestId('vote')).toBeDisabled()
+      await expect(page.getByTestId('next-event')).toBeVisible()
+      const event = await page.getByRole('region', { name: '当前事件' }).textContent()
+      const state = await saved(page)
+      const reread = await (await request.get('/api/v1/games/' + id
+        + '?eventCursor=' + result.update.eventCursor)).json()
+      expect(reread).toEqual(result.update)
+      await page.reload()
+      await expect(page.getByRole('region', { name: '当前事件' })).toHaveText(event)
+      expect(await saved(page)).toEqual(state)
+      await expect(page.getByTestId('vote')).toBeDisabled()
+      await readEvents(page)
+      await expect(page.getByTestId('vote')).toBeEnabled()
+      break
+    }
+    expect(interrupted, 'seed 4202 must actually interrupt voting, not merely complete a game').toBeTruthy()
+  } finally { await release(request, id) }
+})
+
 test('失效会话清除本地记录并可重新开局', async ({ page, request }) => {
   await start(page)
   const id = (await saved(page)).sessionId

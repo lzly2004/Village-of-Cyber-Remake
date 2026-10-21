@@ -60,6 +60,15 @@ tasks.register('runWeb', JavaExec) {
     workingDir = rootDir
 }
 
+tasks.register('runWebTestServer', JavaExec) {
+    group = 'verification'
+    description = '仅供浏览器回归使用的固定种子真实 HTTP 服务，不进入生产产物。'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.vocr.web.SeededGuestGameServer'
+    workingDir = rootDir
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }

@@ -17,7 +17,7 @@ export default defineConfig({
     {
       command: process.env.VOCR_WEB_SERVER_COMMAND
         || (process.platform === 'win32' ? 'gradlew.bat' : './gradlew')
-          + ' runWeb --args=17071 --console=plain',
+          + ' runWebTestServer --args=17071 --console=plain',
       cwd: fileURLToPath(new URL('..', import.meta.url)),
       port: 17071,
       timeout: 120_000,

@@ -55,12 +55,15 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-测试自动启动 Java API（17071）与 Vite（5175），结束后停止它们，端口须空闲。
-默认使用仓库 Gradle Wrapper。如需其他 Gradle 入口，可通过
+测试自动启动固定种子的真实 Java API（17071）与 Vite（5175），结束后停止它们，端口须空闲。
+默认使用仓库 Gradle Wrapper 的 `runWebTestServer`：测试源码中的启动器为每局注入 seed=4202，
+不改变生产 `runWeb` 随机行为，不新增种子 HTTP 参数，也不进入 Web 生产类路径或桌面 Fat JAR。
+如需其他 Gradle 入口，可通过
 `VOCR_WEB_SERVER_COMMAND` 指定完整启动命令，例如
-`gradle runWeb --args=17071 --console=plain`，Java 环境由当前终端继承。
+`gradle runWebTestServer --args=17071 --console=plain`，Java 环境由当前终端继承；
+覆盖命令仍须启动该测试入口，不能用随机生产服务声称通过固定种子中断验收。
 
-七项测试连接真实后端，覆盖：
+八项测试连接真实后端，覆盖：
 
 1. 配役选择、事件确认与刷新恢复游标；
 2. 浏览器指定投票至终局与刷新恢复身份揭晓；
@@ -69,11 +72,12 @@ npm run test:e2e
 5. 后端已完成写入但响应丢失，读取恢复正确结果；
 6. 显式释放会话；
 7. 390px 手机视口的可访问操作和横向溢出检查。
+8. 通常村 seed=4202 实际触发 CO 中断：提示、下午事件、命令/GET 一致、刷新保留未读事件，读完前不得再投票。
 
 截图与失败轨迹位于忽略的 `test-results/`。Java/HTTP 验收仍按仓库根目录的
 `clean check verifyRuntimeAssets fatJar` 执行。
 
 当前 Ubuntu 20.04 不在 Playwright 1.64 的官方支持列表中。本次验收在临时目录下载
 Ubuntu 22 x64 构建，确认 Chromium 156 可运行后，以
-`PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu22.04-x64` 运行并通过全部七项测试。
+`PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu22.04-x64` 运行；WEB-005 的八项测试亦以该环境验证。
 新环境推荐使用官方支持的系统；该覆盖参数不代表对所有 Ubuntu 20 环境的兼容保证。

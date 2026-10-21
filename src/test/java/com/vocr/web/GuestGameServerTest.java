@@ -51,6 +51,7 @@ class GuestGameServerTest
             GuestWireContract.assertCreated(body);
 
             int rounds = 0;
+            int interruptions = 0;
             while (!direct.isFinished())
             {
                 assertTrue(++rounds <= 80, "对局必须能结束");
@@ -78,6 +79,13 @@ class GuestGameServerTest
                 assertEquals(200, voted.statusCode(), voted.body());
                 assertEquals(wireJson(result), json.readTree(voted.body()));
                 GuestWireContract.assertVoteResult(json.readTree(voted.body()));
+                if (!result.voteCompleted()) {
+                    interruptions++;
+                    assertEquals(BusinessPhase.DAY_DECISION, result.update().phase());
+                    assertEquals(selected.view().gameDay(), result.update().view().gameDay());
+                    assertTrue(result.update().presentedEvents().stream()
+                            .anyMatch(event -> event.stage() == EventPresentationStage.AFTERNOON_DIALOGUE));
+                }
                 // 事件续读可重复；投票成功或被 CO 回避打断都必须保持同一窗口。
                 JsonNode read = json.readTree(request(server, "GET",
                         path + "?eventCursor=" + cursor, null).body());
@@ -88,6 +96,8 @@ class GuestGameServerTest
             }
             assertEquals(BusinessPhase.FINISHED, direct.currentUpdate().phase());
             assertFalse(direct.currentUpdate().revealedRoles().isEmpty());
+            if (configuration == peiyi.tongchang)
+                assertTrue(interruptions > 0, "fixed seed 4202 must exercise CO interruption over HTTP");
             assertEquals(409, request(server, "POST", path + "/votes",
                     new ExecuteVoteCommand(direct.currentRevision(),
                             VotingMethod.DESIGNATED, List.of(1))).statusCode());

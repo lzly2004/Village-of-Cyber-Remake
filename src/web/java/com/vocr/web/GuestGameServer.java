@@ -14,6 +14,7 @@ import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -34,6 +35,8 @@ public final class GuestGameServer implements AutoCloseable
     private final Function<String, GameSession> sessionFactory;
     private final int maxSessions;
     private final Javalin app;
+    private int pendingCreations;
+    private boolean closed;
 
     public GuestGameServer()
     {
@@ -108,26 +111,43 @@ public final class GuestGameServer implements AutoCloseable
 
     public GuestGameServer start(int port)
     {
+        synchronized (this) {
+            if (closed) throw new IllegalStateException("游客服务已经关闭");
+        }
         app.start(port);
         return this;
     }
 
     public int port() { return app.port(); }
 
-    private synchronized GameSession create(peiyi configuration)
+    private GameSession create(peiyi configuration)
     {
-        if (sessions.size() >= maxSessions)
-            throw new ApiException(503, "SESSION_LIMIT", "游客会话数量已达上限，请释放旧会话");
-        String id = UUID.randomUUID().toString();
-        GameSession session = sessionFactory.apply(id);
+        synchronized (this) {
+            if (closed) throw new IllegalStateException("游客服务已经关闭");
+            if (sessions.size() + pendingCreations >= maxSessions)
+                throw new ApiException(503, "SESSION_LIMIT", "游客会话数量已达上限，请释放旧会话");
+            pendingCreations++;
+        }
+        String id;
+        GameSession session = null;
         try {
+            id = UUID.randomUUID().toString();
+            session = sessionFactory.apply(id);
             session.startGame(new StartGameCommand(0, configuration));
-            sessions.put(id, session);
-            return session;
-        } catch (RuntimeException error) {
-            session.close();
+        } catch (RuntimeException | Error error) {
+            synchronized (this) { pendingCreations--; }
+            if (session != null) session.close();
             throw error;
         }
+        synchronized (this) {
+            pendingCreations--;
+            if (!closed) {
+                sessions.put(id, session);
+                return session;
+            }
+        }
+        session.close();
+        throw new IllegalStateException("游客服务已经关闭");
     }
 
     private synchronized GameSession session(String id)
@@ -137,10 +157,13 @@ public final class GuestGameServer implements AutoCloseable
         return session;
     }
 
-    private synchronized void remove(String id)
+    private void remove(String id)
     {
-        GameSession session = session(id);
-        sessions.remove(id);
+        GameSession session;
+        synchronized (this) {
+            session = session(id);
+            sessions.remove(id);
+        }
         session.close();
     }
 
@@ -178,19 +201,61 @@ public final class GuestGameServer implements AutoCloseable
     @Override
     public void close()
     {
-        app.stop();
+        List<GameSession> toClose;
         synchronized (this) {
-            sessions.values().forEach(GameSession::close);
+            if (closed) return;
+            closed = true;
+            toClose = List.copyOf(sessions.values());
             sessions.clear();
+        }
+        try {
+            toClose.forEach(GameSession::close);
+        } finally {
+            app.stop();
         }
     }
 
     public static void main(String[] args)
     {
-        GuestGameServer server = new GuestGameServer().start(
-                args.length == 0 ? 7070 : Integer.parseInt(args[0]));
+        int status = run(args);
+        if (status != 0) System.exit(status);
+    }
+
+    static int parsePort(String[] args)
+    {
+        if (args.length == 0) return 7070;
+        if (args.length != 1 || !args[0].matches("[0-9]+"))
+            throw new IllegalArgumentException("只接受一个十进制端口参数");
+        try {
+            int port = Integer.parseInt(args[0]);
+            if (port >= 1 && port <= 65535) return port;
+        } catch (NumberFormatException ignored) {
+            // Fall through to the same bounded, user-facing diagnostic.
+        }
+        throw new IllegalArgumentException("端口必须在 1—65535 之间");
+    }
+
+    static int run(String[] args)
+    {
+        int port;
+        try {
+            port = parsePort(args);
+        } catch (IllegalArgumentException error) {
+            DebugLogger.error(error.getMessage() + "；用法：runWeb --args=\"7070\"（可省略端口）");
+            return 2;
+        }
+        GuestGameServer server = new GuestGameServer();
+        try {
+            server.start(port);
+        } catch (RuntimeException error) {
+            try { server.close(); }
+            catch (RuntimeException ignored) { DebugLogger.warn("启动失败后的服务清理未完成"); }
+            DebugLogger.error("无法启动游客服务，请检查端口 " + port + " 是否被占用及监听权限");
+            return 1;
+        }
         DebugLogger.info("[HTTP] 游客 API: http://127.0.0.1:" + server.port() + "/api/v1/games");
         Runtime.getRuntime().addShutdownHook(new Thread(server::close));
+        return 0;
     }
 
     public record CreateGame(peiyi configuration) { }
