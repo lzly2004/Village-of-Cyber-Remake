@@ -1,12 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useGuestGame } from './useGuestGame'
-import { configurations, configurationName, roles, stages, results, eventLabel } from './labels'
+import { configurations, configurationName, roles, claimRoleNames, stages, results, eventLabel } from './labels'
 
 const {
   sessionId, cursor, update, busy, uncertain, notice, storageWarning,
-  pending, currentEvent, canDecide, canVote,
-  start, nextEvent, toggleTarget, vote, refresh, release,
+  pending, currentEvent, canDecide, canVote, claimRoles,
+  start, nextEvent, toggleTarget, vote, askClaimRole, refresh, release,
 } = useGuestGame()
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
@@ -115,6 +115,14 @@ function name(number) {
             </div>
           </section>
         </div>
+
+        <section v-if="claimRoles.length" class="panel claim-inquiry" aria-label="職業別CO確認" lang="ja">
+          <header class="panel-heading"><span>職業別CO確認</span><span>発言を読み終えてから操作してください。</span></header>
+          <div class="claim-actions">
+            <button v-for="role in claimRoles" :key="role" class="primary-button"
+              :disabled="!canDecide" @click="askClaimRole(role)">{{ claimRoleNames[role] || role }}のCOを聞く</button>
+          </div>
+        </section>
 
         <section v-if="lastRound" class="panel vote-history" aria-label="最近投票结果">
           <header class="panel-heading"><span class="eyebrow">03 / 最近投票</span><span>第 {{ lastVote.day }} 日 · {{ lastVote.rounds.length }} 轮</span></header>

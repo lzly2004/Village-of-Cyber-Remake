@@ -78,6 +78,10 @@ public final class GuestGameServer implements AutoCloseable
                     throw new IllegalArgumentException("此切片只支持指定投票");
                 send(ctx, session(ctx.pathParam("id")).executeVote(request));
             });
+            config.routes.post("/api/v1/games/{id}/claims/by-role", ctx -> {
+                AskClaimByRoleCommand request = read(ctx, AskClaimByRoleCommand.class);
+                send(ctx, session(ctx.pathParam("id")).requestClaims(request));
+            });
             config.routes.delete("/api/v1/games/{id}", ctx -> {
                 remove(ctx.pathParam("id"));
                 ctx.status(204);

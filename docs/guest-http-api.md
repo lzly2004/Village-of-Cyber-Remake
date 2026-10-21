@@ -39,6 +39,7 @@ Javalin/SLF4J 的提示，框架内部日志使用 NOP。正式运行监控与�
 | GET `/api/v1/games/{id}?eventCursor=0` | 无 | 200，`GameUpdate`；省略游标时从 0 读取 |
 | PUT `/api/v1/games/{id}/vote-target` | `{"expectedRevision":1,"target":3,"selected":true}` | 200，选择后的 `GameUpdate` |
 | POST `/api/v1/games/{id}/votes` | `{"expectedRevision":2,"method":"DESIGNATED","candidates":[3]}` | 200，`{voteCompleted, update}` |
+| POST `/api/v1/games/{id}/claims/by-role` | `{"expectedRevision":1,"role":"zhan"}` | 200，询问后的 `GameUpdate` |
 | DELETE `/api/v1/games/{id}` | 无 | 204，释放该局；随后读取返回 404 |
 
 配役可取 `jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing`。
@@ -49,7 +50,11 @@ Javalin/SLF4J 的提示，框架内部日志使用 NOP。正式运行监控与�
 投票被回避 CO 中断时，`voteCompleted:false`，revision 仍递增，产生的对话带
 `AFTERNOON_DIALOGUE` 阶段。客户端先展示对话，再从最新合法动作重新提交。
 公开共有者的回避遵循桌面规则，客户端可取消其目标后改选其他玩家。
-首批 API 只开放指定投票及其目标选择。
+投票目前只开放指定方式。WEB-006 已开放按职业询问 CO：role 必须取自最新
+`claimInquiry.roles`（运行中为 zhan/ling/lie/gong/mao），询问成功 revision 加 1，
+即使没有新发言也返回权威更新；新事件沿用应用层展示阶段。缺失/null/未知或不可询问的职业返回 400，
+旧版本返回 409 且不重放，终局拒绝询问。浏览器读完待确认事件后才允许发起询问；
+刷新按保存游标恢复公开 CO 状态与未读发言，不持久化本地“已询问职业”镜像。
 
 ## 更新契约
 

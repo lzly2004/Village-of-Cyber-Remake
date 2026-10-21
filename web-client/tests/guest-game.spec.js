@@ -76,6 +76,7 @@ test('真实对局从浏览器指定投票直至终局，并刷新恢复揭晓',
     await page.reload()
     await expect(page.getByRole('heading', { name: /阵营胜利|妖狐胜利/ })).toBeVisible()
     await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
+    await expect(page.getByRole('region', { name: '職業別CO確認' })).toHaveCount(0)
   } finally { await release(request, id) }
 })
 
@@ -184,6 +185,95 @@ test('显式释放后回到配役选择', async ({ page }) => {
   await page.getByRole('button', { name: '确认释放' }).click()
   await expect(page.getByRole('button', { name: '开始对局' })).toBeVisible()
   expect(await saved(page)).toBeNull()
+})
+
+test('按职业询问 CO 使用权威候补，未读时禁用且刷新恢复发言', async ({ page, request }, testInfo) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    const panel = page.getByRole('region', { name: '職業別CO確認' })
+    const ask = page.getByRole('button', { name: '狩人のCOを聞く', exact: true })
+    await expect(panel.getByRole('button')).toHaveCount(5)
+    await expect(ask).toBeDisabled()
+    await readEvents(page)
+    await expect(ask).toBeEnabled()
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.url().endsWith('/claims/by-role')) writes++ })
+    const response = page.waitForResponse(res => res.url().endsWith('/claims/by-role'))
+    await ask.click()
+    const result = await (await response).json()
+    expect(result.revision).toBe(before.revision + 1)
+    expect(result.events.length).toBeGreaterThan(0)
+    expect(result.view.players.some(player => player.claimedRole === 'lie')).toBeTruthy()
+    await expect(page.getByTestId('next-event')).toBeVisible()
+    await expect(ask).toBeDisabled()
+    const event = await page.getByRole('region', { name: '当前事件' }).textContent()
+    const state = await saved(page)
+    await page.reload()
+    await expect(page.getByRole('region', { name: '当前事件' })).toHaveText(event)
+    expect(await saved(page)).toEqual(state)
+    const restored = await (await request.get('/api/v1/games/' + id)).json()
+    expect(restored.revision).toBe(result.revision)
+    expect(restored.view.players).toEqual(result.view.players)
+    await expect(ask).toBeDisabled()
+    await readEvents(page)
+    await expect(ask).toBeEnabled()
+    expect(writes).toBe(1)
+    await page.screenshot({ path: testInfo.outputPath('role-claims.png'), fullPage: true })
+  } finally { await release(request, id) }
+})
+
+test('职业 CO 的 409 只同步，不重放询问', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    const target = before.legalTargetSelections.find(action => action.type === 'VOTE').targets[0]
+    const changed = await (await request.put('/api/v1/games/' + id + '/vote-target', {
+      data: { expectedRevision: before.revision, target, selected: true },
+    })).json()
+    let writes = 0
+    page.on('request', req => { if (req.url().endsWith('/claims/by-role')) writes++ })
+    await page.getByRole('button', { name: '狩人のCOを聞く', exact: true }).click()
+    await expect(page.getByRole('alert')).toContainText('已重新同步')
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual({
+      ...changed, eventCursor: 0,
+      events: before.events.concat(changed.events),
+      presentedEvents: before.presentedEvents.concat(changed.presentedEvents),
+    })
+    expect(writes).toBe(1)
+  } finally { await release(request, id) }
+})
+
+test('职业 CO 已执行但响应丢失，先同步且不重复询问', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.url().endsWith('/claims/by-role')) writes++ })
+    await page.route('**/claims/by-role', async route => {
+      await route.fetch()
+      await route.abort('failed')
+    })
+    const ask = page.getByRole('button', { name: '狩人のCOを聞く', exact: true })
+    await ask.click()
+    await expect(page.getByRole('alert')).toContainText('连接未能确认')
+    await expect(ask).toBeDisabled()
+    const applied = await (await request.get('/api/v1/games/' + id)).json()
+    expect(applied.revision).toBe(before.revision + 1)
+    await page.unroute('**/claims/by-role')
+    await page.getByRole('button', { name: '重新同步' }).click()
+    await expect(page.getByTestId('next-event')).toBeVisible()
+    await expect(ask).toBeDisabled()
+    await readEvents(page)
+    await expect(ask).toBeEnabled()
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(applied)
+    expect(writes).toBe(1)
+  } finally { await release(request, id) }
 })
 
 test('手机视口无横向溢出，配役与主要操作仍可访问', async ({ page }, testInfo) => {

@@ -20,6 +20,7 @@ export function useGuestGame() {
   const designatedVote = computed(() =>
     update.value?.legalVoteActions.find(action => action.method === 'DESIGNATED'))
   const canVote = computed(() => canDecide.value && Boolean(designatedVote.value))
+  const claimRoles = computed(() => update.value?.claimInquiry.roles || [])
 
   function persist() {
     try {
@@ -148,6 +149,15 @@ export function useGuestGame() {
     })
   }
 
+  function askClaimRole(role) {
+    if (!canDecide.value || !claimRoles.value.includes(role)) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/claims/by-role', {
+        method: 'POST', body: { expectedRevision: update.value.revision, role },
+      }))
+    })
+  }
+
   function refresh() { return run(sync) }
 
   function release() {
@@ -176,7 +186,7 @@ export function useGuestGame() {
 
   return {
     sessionId, cursor, update, busy, uncertain, notice, storageWarning,
-    pending, currentEvent, canDecide, canVote,
-    start, nextEvent, toggleTarget, vote, refresh, release,
+    pending, currentEvent, canDecide, canVote, claimRoles,
+    start, nextEvent, toggleTarget, vote, askClaimRole, refresh, release,
   }
 }

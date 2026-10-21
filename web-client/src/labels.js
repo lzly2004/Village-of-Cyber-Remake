@@ -13,6 +13,7 @@ export const roles = {
   mao: '猫又', wu: '村人', renlang: '人狼', kuangren: '狂人',
   kuangxinzhe: '狂信者', yaohu: '妖狐', beidezhe: '背德者',
 }
+export const claimRoleNames = { zhan: '占い師', ling: '霊能者', lie: '狩人', gong: '共有', mao: '猫又' }
 export const stages = {
   NIGHT_RESULT: '夜间结果', DAY_DIALOGUE: '白天发言', AFTERNOON_DIALOGUE: '回避发言',
   EXECUTION: '处刑', SETTLEMENT: '终局',

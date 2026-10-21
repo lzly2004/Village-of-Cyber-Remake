@@ -23,7 +23,7 @@
 | PUT `/{id}/vote-target` | expectedRevision, target, selected | 200 GameUpdate | 已实现；SetAllTargetSelectionCommand，type 固定 VOTE | 已有 |
 | POST `/{id}/votes` | expectedRevision, method, candidates | 200 `{voteCompleted, update}` | DESIGNATED 已实现，FREE/GREY 待开放；ExecuteVoteCommand | 009 |
 | DELETE `/{id}` | 无 | 204，无响应体 | 已实现；移除并 close，无 revision；重复删除返回 404 | 已有 |
-| POST `/{id}/claims/by-role` | expectedRevision, role | 200 GameUpdate | 草案；AskClaimByRoleCommand | 006 |
+| POST `/{id}/claims/by-role` | expectedRevision, role | 200 GameUpdate | 已实现；AskClaimByRoleCommand | 006 |
 | POST `/{id}/claims/by-players` | expectedRevision, players | 200 GameUpdate | 草案；AskClaimByPlayersCommand | 007 |
 | PUT `/{id}/avoidance` | expectedRevision, enabled | 200 GameUpdate | 草案；SetAvoidanceCommand | 008 |
 | PUT `/{id}/target-selections` | expectedRevision, type, target, selected | 200 GameUpdate | 草案；SetAllTargetSelectionCommand；此路由 type 只开放 DIVINATION/GUARD，VOTE 保持原路径 | 010、011 |

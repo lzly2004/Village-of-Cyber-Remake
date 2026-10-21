@@ -98,9 +98,92 @@ class GuestGameServerTest
             assertFalse(direct.currentUpdate().revealedRoles().isEmpty());
             if (configuration == peiyi.tongchang)
                 assertTrue(interruptions > 0, "fixed seed 4202 must exercise CO interruption over HTTP");
+            JsonNode finished = json.readTree(request(server, "GET", path, null).body());
+            HttpResponse<String> finishedClaim = request(server, "POST", path + "/claims/by-role",
+                    new AskClaimByRoleCommand(direct.currentRevision(), Role.zhan));
+            assertEquals(409, finishedClaim.statusCode(), finishedClaim.body());
+            assertEquals("INVALID_STATE", json.readTree(finishedClaim.body()).path("code").asText());
+            assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
             assertEquals(409, request(server, "POST", path + "/votes",
                     new ExecuteVoteCommand(direct.currentRevision(),
                             VotingMethod.DESIGNATED, List.of(1))).statusCode());
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = peiyi.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void roleClaims_shouldMatchDirectCommandsAndRecoverFromCursor(peiyi configuration) throws Exception
+    {
+        long seed = 4200 + configuration.ordinal();
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, seed), 3).start(0))
+        {
+            GameSession direct = SeededGuestSession.create("claims-direct", seed);
+            direct.startGame(new StartGameCommand(0, configuration));
+            String path = create(server, configuration.name());
+            String other = create(server, configuration.name());
+            JsonNode otherBefore = json.readTree(request(server, "GET", other, null).body());
+            for (Role role : List.of(Role.zhan, Role.ling, Role.lie, Role.gong, Role.mao))
+            {
+                GameUpdate before = direct.currentUpdate(0);
+                AskClaimByRoleCommand command = new AskClaimByRoleCommand(before.revision(), role);
+                GameUpdate expected = direct.requestClaims(command);
+                HttpResponse<String> response = request(server, "POST", path + "/claims/by-role", command);
+                assertEquals(200, response.statusCode(), response.body());
+                JsonNode actual = json.readTree(response.body());
+                assertEquals(wireJson(expected), actual);
+                GuestWireContract.assertUpdate(actual);
+                assertEquals(before.revision() + 1, actual.path("revision").asLong());
+                String cursorPath = path + "?eventCursor=" + before.nextEventCursor();
+                assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
+                assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
+            }
+            assertEquals(wireJson(direct.currentUpdate(0)),
+                    json.readTree(request(server, "GET", path, null).body()));
+            assertEquals(otherBefore, json.readTree(request(server, "GET", other, null).body()));
+        }
+    }
+
+    @Test
+    void roleClaims_shouldRejectMalformedInputsAndConcurrentOldRevisionsWithoutReplaying() throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, 4202), 2).start(0))
+        {
+            String path = create(server, "tongchang");
+            JsonNode before = json.readTree(request(server, "GET", path, null).body());
+            for (String payload : List.of("{}", "{\"expectedRevision\":1}",
+                    "{\"role\":\"zhan\"}", "{\"expectedRevision\":1,\"role\":null}",
+                    "{\"expectedRevision\":null,\"role\":\"zhan\"}",
+                    "{\"expectedRevision\":-1,\"role\":\"zhan\"}",
+                    "{\"expectedRevision\":1.5,\"role\":\"zhan\"}",
+                    "{\"expectedRevision\":1,\"role\":\"NONE\"}",
+                    "{\"expectedRevision\":1,\"role\":\"wu\"}",
+                    "{\"expectedRevision\":1,\"role\":\"unknown\"}",
+                    "{\"expectedRevision\":1,\"role\":\"zhan\",\"players\":[1]}", "null", "{"))
+            {
+                HttpResponse<String> response = raw(server, "POST", path + "/claims/by-role", payload);
+                assertEquals(400, response.statusCode(), payload + ": " + response.body());
+                assertEquals("INVALID_REQUEST", json.readTree(response.body()).path("code").asText());
+                assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            }
+            assertEquals(404, request(server, "POST", "/api/v1/games/missing/claims/by-role",
+                    new AskClaimByRoleCommand(1, Role.zhan)).statusCode());
+            HttpResponse<String> stale = request(server, "POST", path + "/claims/by-role",
+                    new AskClaimByRoleCommand(0, Role.zhan));
+            assertEquals(409, stale.statusCode());
+            assertEquals("STALE_REVISION", json.readTree(stale.body()).path("code").asText());
+            assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            var first = client.sendAsync(http(server, "POST", path + "/claims/by-role",
+                    "{\"expectedRevision\":1,\"role\":\"lie\"}"), HttpResponse.BodyHandlers.ofString());
+            var second = client.sendAsync(http(server, "POST", path + "/claims/by-role",
+                    "{\"expectedRevision\":1,\"role\":\"ling\"}"), HttpResponse.BodyHandlers.ofString());
+            CompletableFuture.allOf(first, second).join();
+            assertEquals(List.of(200, 409), List.of(first.join().statusCode(), second.join().statusCode())
+                    .stream().sorted().toList());
+            JsonNode after = json.readTree(request(server, "GET", path, null).body());
+            assertEquals(2, after.path("revision").asLong());
+            GuestWireContract.assertUpdate(after);
         }
     }
 
