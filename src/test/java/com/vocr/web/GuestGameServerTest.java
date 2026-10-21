@@ -48,7 +48,7 @@ class GuestGameServerTest
             JsonNode body = json.readTree(created.body());
             String path = "/api/v1/games/" + body.get("sessionId").asText();
             assertEquals(wireJson(direct.currentUpdate(0)), body.get("update"));
-            assertNoSecrets(body.get("update"));
+            GuestWireContract.assertCreated(body);
 
             int rounds = 0;
             while (!direct.isFinished())
@@ -67,6 +67,7 @@ class GuestGameServerTest
                                 selection.expectedRevision(), target, true));
                 assertEquals(200, selectedHttp.statusCode(), selectedHttp.body());
                 assertEquals(wireJson(selected), json.readTree(selectedHttp.body()));
+                GuestWireContract.assertUpdate(json.readTree(selectedHttp.body()));
 
                 List<Integer> candidates = selected.legalVote(VotingMethod.DESIGNATED)
                         .orElseThrow().candidates();
@@ -76,13 +77,14 @@ class GuestGameServerTest
                 HttpResponse<String> voted = request(server, "POST", path + "/votes", command);
                 assertEquals(200, voted.statusCode(), voted.body());
                 assertEquals(wireJson(result), json.readTree(voted.body()));
+                GuestWireContract.assertVoteResult(json.readTree(voted.body()));
                 // 事件续读可重复；投票成功或被 CO 回避打断都必须保持同一窗口。
                 JsonNode read = json.readTree(request(server, "GET",
                         path + "?eventCursor=" + cursor, null).body());
                 assertEquals(wireJson(direct.currentUpdate(cursor)), read);
                 assertEquals(read, json.readTree(request(server, "GET",
                         path + "?eventCursor=" + cursor, null).body()));
-                if (!direct.isFinished()) assertNoSecrets(read);
+                GuestWireContract.assertUpdate(read);
             }
             assertEquals(BusinessPhase.FINISHED, direct.currentUpdate().phase());
             assertFalse(direct.currentUpdate().revealedRoles().isEmpty());
@@ -184,13 +186,29 @@ class GuestGameServerTest
         }
     }
 
-    private void assertNoSecrets(JsonNode update)
+    @Test
+    void unknownRequestFields_shouldBeRejectedBeforeCreatingOrMutatingSession() throws Exception
     {
-        assertTrue(update.path("revealedRoles").isEmpty());
-        String payload = update.toString();
-        for (String field : List.of("actualRole", "suspicion", "nonHumanPlan",
-                "gameContext", "recorder", "random"))
-            assertFalse(payload.contains("\"" + field + "\""), field);
+        try (GuestGameServer server = new GuestGameServer(GuestGameServer::newGuestSession, 1).start(0))
+        {
+            HttpResponse<String> rejected = raw(server, "POST", "/api/v1/games",
+                    "{\"configuration\":\"jianyi\",\"targe\":1}");
+            assertEquals(400, rejected.statusCode(), rejected.body());
+            assertEquals("INVALID_REQUEST", json.readTree(rejected.body()).path("code").asText());
+            String path = create(server, "jianyi"); // invalid create did not consume capacity
+            JsonNode before = json.readTree(request(server, "GET", path, null).body());
+            int target = 0;
+            for (JsonNode action : before.path("legalTargetSelections"))
+                if (action.path("type").asText().equals("VOTE"))
+                    target = action.path("targets").get(0).asInt();
+            assertTrue(target > 0, "use an otherwise legal target to isolate unknown-field rejection");
+            HttpResponse<String> write = raw(server, "PUT", path + "/vote-target",
+                    "{\"expectedRevision\":1,\"target\":" + target
+                            + ",\"selected\":true,\"actualRole\":\"lang\"}");
+            assertEquals(400, write.statusCode(), write.body());
+            assertEquals("INVALID_REQUEST", json.readTree(write.body()).path("code").asText());
+            assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+        }
     }
 
     private JsonNode wireJson(Object value) throws Exception

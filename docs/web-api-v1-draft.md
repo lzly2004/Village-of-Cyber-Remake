@@ -7,7 +7,7 @@
 - 基础路径 `/api/v1/games`；同源 JSON API，成功 JSON 为 UTF-8，响应 `Cache-Control: no-store`。当前服务仅绑定回环；公网 HTTPS、同源托管和安全限额由 WEB-039/041/043 完成。
 - 创建返回的 UUID 是本局访问凭据，不是账号；不放入分析系统、业务日志、错误链或 Replay 文件。路径、Location、请求/响应体也在脱敏范围，不能只遮请求头。
 - 请求体限 16 KiB；有请求体的路由使用 `application/json`（允许 charset 参数）；GET/DELETE 不需 JSON 请求体或 Content-Type。生产接口不接受种子、核心上下文或实际身份注入。
-- 请求端使用 JSON 原生整数/布尔值、非 null 必填字段、精确大小写枚举；不得依赖 Jackson 可能存在的标量强制转换。额外请求字段不属于扩展渠道，当前解析器会拒绝未知字段。
+- 请求端使用 JSON 原生整数/布尔值、非 null 必填字段、精确大小写枚举；不得依赖 Jackson 可能存在的标量强制转换。额外请求字段不属于扩展渠道，当前 Jackson 2.17.1 解析器默认启用 FAIL_ON_UNKNOWN_PROPERTIES，会拒绝未知字段；WEB-004 已用真实 HTTP 创建/写入请求锁定此行为，不需修改默认配置。
 - 同一 v1 只允许新增端点/可选响应字段，且不得改变既有字段含义、枚举既有成员、排序、错误恢复类别或默认值。旧客户端忽略未知响应字段；新增可选字段缺失时保持原功能，不能假装已有新能力。
 - 新枚举值会影响既有消费者，不能一概按“增量”放行；须有兼容兜底和消费者测试，否则用 v2。删除/重命名字段、改变事件窗口语义或扩大原有错误含义同理。
 - 草案端点首次落地时可在其任务内定稿并同步文档；已实现端点不得借“草案”名义破坏兼容。尚待信息审计的字段不伪装成已冻结白名单。
@@ -57,10 +57,12 @@
 | rounds[] | round, lines, maximumVotes, leaders | 轮次从 1 连续递增；非最终轮为平票，最终轮唯一领先者 |
 | lines[] | playerNumber, receivedVotes, targetPlayerNumber | 全部沿用权威公开票型，不由浏览器另算替代 |
 | revealedRoles[] | playerNumber, actualRole | DAY_DECISION 必须为空；FINISHED 与 players 数量、编号顺序一一对应 |
-| events[] | eventname, ch1, ch2, ch3 | ch1/ch2/ch3 可为 null；不得通过字符串 toString() 解析角色或事件 |
+| events[] | eventname, ch1, ch2, ch3 | ch1/ch2/ch3 可为 null 或枚举字符串 "NONE"，见下文；不得通过 toString() 解析角色或事件 |
 | presentedEvents[] | event, stage | 与 events 等长同序，event 内容相等；展示采用服务端 stage |
 
 stage 为 `NIGHT_RESULT/DAY_DIALOGUE/AFTERNOON_DIALOGUE/EXECUTION/SETTLEMENT`。业务可能已处于 FINISHED 而客户端仍需按顺序展示前置事件，不应只看到结算快照就吞掉未读对话。角色/结果/死亡原因/外观的全部现有枚举名称以对应源码为准；日文展示目录由 WEB-018 建立，不修改 wire 名称实现翻译。
+
+事件角色参数的 JSON `null` 与字符串 `"NONE"` 不相等：前者是未提供参数（Event 简写构造器将省略参数置 null），后者是显式的 CharacterEnglishName.NONE 枚举占位，均不对应可绘制的具体角色。客户端展示应同时处理两者；不能擅自将 wire 值互相改写，也不从此区别推断新的游戏规则。WEB-004 已验证两者的实际序列化区别。
 
 ### WEB-013/014 待定的公开信息扩展
 
