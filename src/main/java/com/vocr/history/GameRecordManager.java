@@ -17,6 +17,16 @@ public class GameRecordManager implements GameResultSink {
 
     public GameRecordManager() { this(PathConfig.GAME_RECORD); }
 
+    private GameRecordManager(GameRecord initialRecord) {
+        this.savePath = null;
+        this.record = initialRecord;
+    }
+
+    /** 游客会话独占的临时战绩；开局读取与终局累计均不接触文件系统。 */
+    public static GameRecordManager inMemory() {
+        return new GameRecordManager(new GameRecord());
+    }
+
     /** 允许测试或便携运行环境指定独立存档位置。 */
     public GameRecordManager(String savePath) {
         if (savePath == null || savePath.isBlank()) {
@@ -27,6 +37,10 @@ public class GameRecordManager implements GameResultSink {
     }
 
     public void load() {
+        if (savePath == null) {
+            record = new GameRecord();
+            return;
+        }
         File file = new File(savePath);
         if (file.exists() && file.length() > 10) {
             try {
@@ -49,6 +63,7 @@ public class GameRecordManager implements GameResultSink {
     }
 
     public void save() {
+        if (savePath == null) return;
         try {
             File file = new File(savePath);
             File dir = file.getParentFile();

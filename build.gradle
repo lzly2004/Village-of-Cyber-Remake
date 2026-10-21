@@ -18,7 +18,28 @@ repositories {
     mavenCentral()
 }
 
+// HTTP 适配器独立编译、运行；不把 Jetty/Javalin 装进桌面 Fat JAR。
+sourceSets {
+    web {
+        java.srcDir 'src/web/java'
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+    test {
+        compileClasspath += sourceSets.web.output
+        runtimeClasspath += sourceSets.web.output
+    }
+}
+
+configurations {
+    webImplementation.extendsFrom implementation
+    webRuntimeOnly.extendsFrom runtimeOnly
+    testImplementation.extendsFrom webImplementation
+    testRuntimeOnly.extendsFrom webRuntimeOnly
+}
+
 dependencies {
+    webImplementation 'io.javalin:javalin:7.2.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.17.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.1'
@@ -29,6 +50,14 @@ dependencies {
 
 application {
     mainClass = 'com.vocr.app.Game'
+}
+
+tasks.register('runWeb', JavaExec) {
+    group = 'application'
+    description = '启动仅绑定 127.0.0.1 的游客 HTTP API。'
+    classpath = sourceSets.web.runtimeClasspath
+    mainClass = 'com.vocr.web.GuestGameServer'
+    workingDir = rootDir
 }
 
 tasks.withType(JavaCompile).configureEach {

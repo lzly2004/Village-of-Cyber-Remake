@@ -19,6 +19,21 @@ class GameRecordManagerAdapterTest
     Path tempDir;
 
     @Test
+    void memoryGuests_shouldAccumulateIndependently()
+    {
+        GameRecordManager first = GameRecordManager.inMemory();
+        GameRecordManager second = GameRecordManager.inMemory();
+        first.record(peiyi.jianyi, GameResult.VILLAGE_WIN);
+        first.record(peiyi.jianyi, GameResult.FOX_WIN);
+        second.record(peiyi.tongchang, GameResult.WOLF_WIN);
+
+        assertEquals(2, first.getRecord().totalPlayCnt);
+        assertEquals(0, first.getRecord().playcnt[peiyi.tongchang.ordinal()]);
+        assertEquals(1, second.getRecord().totalPlayCnt);
+        assertEquals(0, second.getRecord().playcnt[peiyi.jianyi.ordinal()]);
+    }
+
+    @Test
     void resultPort_shouldPreserveCumulativeDesktopJsonSemantics()
     {
         Path recordPath = tempDir.resolve("game-record.json");

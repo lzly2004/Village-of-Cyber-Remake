@@ -34,6 +34,14 @@ gradlew.bat fatJar
 
 `fatJar` 在打包前会自动运行全部测试、校验 560 条概率规则，并验证代码引用的必需音频均存在、已从 Git LFS 拉取且具有 RIFF/WAV 文件头。
 
+## 游客 HTTP 原型
+
+在项目根目录执行 `gradlew.bat runWeb`（Linux：`./gradlew runWeb`），默认监听
+`127.0.0.1:7070`。指定端口可用 `runWeb --args="7071"`。
+此原型支持创建游客局、读取安全更新、指定投票与释放会话，尚无浏览器页面。
+会话和战绩只保存在当前进程内；重启后清空。接口与示例见
+[游客 HTTP API](docs/guest-http-api.md)。
+
 ## 目录说明
 
 - `src/main/java/com/vocr/app/`：程序入口与应用装配
@@ -48,6 +56,7 @@ gradlew.bat fatJar
 - `src/main/java/com/vocr/rules/`：通用权重规则引擎
 - `src/main/java/com/vocr/ui/`：Swing 场景、渲染器和组件工厂
 - `src/test/java/com/vocr/`：JUnit 5 测试，按生产包镜像组织
+- `src/web/java/com/vocr/web/`：独立 HTTP 源集与游客会话组合根，不进入桌面 Fat JAR
 - `src/main/resources/`：图片、台词、事件映射、音效和 BGM
 - `docs/legacy/`：从旧源码目录移出的历史设计文档和进度记录
 - `config/probability.json`：唯一的外部概率配置

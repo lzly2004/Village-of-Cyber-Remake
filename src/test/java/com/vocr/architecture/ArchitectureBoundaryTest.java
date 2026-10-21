@@ -82,6 +82,16 @@ class ArchitectureBoundaryTest {
     }
 
     @Test
+    void httpFrameworkShouldRemainInsideWebAdapter() {
+        noClasses()
+                .that().resideOutsideOfPackage("com.vocr.web..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "io.javalin..", "org.eclipse.jetty..")
+                .because("桌面、领域和应用契约必须独立于 HTTP 框架")
+                .check(productionClasses);
+    }
+
+    @Test
     void coreShouldNotPersistGameResultsDirectly() {
         noClasses()
                 .that().resideInAPackage("com.vocr.core..")
