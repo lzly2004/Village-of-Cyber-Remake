@@ -30,20 +30,35 @@ public final class GameSession
     private final MainLogicInterface gameLogic;
     private final GameEventBuffer eventBuffer;
     private final GameApplication application;
+    private final GameResultSink resultSink;
     private State state = State.NEW;
+    private boolean resultRecorded;
 
     /**
      * @param gameLogic 必须已把领域事件投递到传入的 {@code eventBuffer}，否则更新无法携带事件
      * @param eventBuffer 本局独占的事件缓冲区
      */
-    public GameSession(String sessionId, MainLogicInterface gameLogic, GameEventBuffer eventBuffer)
+    public GameSession(String sessionId, MainLogicInterface gameLogic, GameEventBuffer eventBuffer,
+                       GameResultSink resultSink)
     {
         if (sessionId == null || sessionId.isBlank())
             throw new IllegalArgumentException("会话编号不能为空");
         this.sessionId = sessionId;
         this.gameLogic = Objects.requireNonNull(gameLogic, "主逻辑不能为空");
         this.eventBuffer = Objects.requireNonNull(eventBuffer, "事件缓冲区不能为空");
+        this.resultSink = Objects.requireNonNull(resultSink, "对局结果持久化端口不能为空");
         this.application = new GameApplication(gameLogic, eventBuffer);
+    }
+
+    public GameSession(String sessionId, MainLogicInterface gameLogic, GameEventBuffer eventBuffer)
+    {
+        this(sessionId, gameLogic, eventBuffer, (configuration, result) -> { });
+    }
+
+    public GameSession(MainLogicInterface gameLogic, GameEventBuffer eventBuffer,
+                       GameResultSink resultSink)
+    {
+        this(UUID.randomUUID().toString(), gameLogic, eventBuffer, resultSink);
     }
 
     public GameSession(MainLogicInterface gameLogic, GameEventBuffer eventBuffer)
@@ -190,8 +205,21 @@ public final class GameSession
     private GameUpdate observe(GameUpdate update)
     {
         if (update.phase() == BusinessPhase.FINISHED)
+        {
             state = State.FINISHED;
+            recordResultOnce();
+        }
         return update;
+    }
+
+    private void recordResultOnce()
+    {
+        if (resultRecorded)
+            return;
+        GameContextView context = Objects.requireNonNull(
+                gameLogic.getGameContext(), "终局时缺少游戏状态");
+        resultRecorded = true;
+        resultSink.record(context.getPeiyi(), context.getEndResult());
     }
 
     private void requireOpen()

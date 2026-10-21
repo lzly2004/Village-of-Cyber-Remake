@@ -6,7 +6,6 @@ import com.vocr.domain.GameContextView;
 import com.vocr.domain.GameResult;
 import com.vocr.domain.Role;
 import com.vocr.domain.peiyi;
-import com.vocr.history.GameRecord;
 import com.vocr.history.GameRecordManager;
 
 import org.junit.jupiter.api.Test;
@@ -137,7 +136,6 @@ class FullGameCharacterizationTest
             assertNotEquals(GameResult.NONE, context.getEndResult());
             assertTrue(dayCount > 0);
             assertEquals(status.getPlayerSum(), context.getAliveCounter() + context.getDeathCounter());
-            assertRecordedResult(records.getRecord(), configuration, context.getEndResult());
             return sha256(buildTrace(
                     configuration, seed, dayCount, decisions, events, logic, context, random));
         }
@@ -151,16 +149,6 @@ class FullGameCharacterizationTest
                 return player;
         }
         throw new IllegalStateException("没有可执行的非共有者玩家");
-    }
-
-    private static void assertRecordedResult(GameRecord record, peiyi configuration, GameResult result)
-    {
-        int index = configuration.ordinal();
-        assertEquals(1, record.playcnt[index]);
-        assertEquals(1, record.totalPlayCnt);
-        assertEquals(result == GameResult.VILLAGE_WIN ? 1 : 0, record.villageWincnt[index]);
-        assertEquals(result == GameResult.WOLF_WIN ? 1 : 0, record.wolfWincnt[index]);
-        assertEquals(result == GameResult.FOX_WIN ? 1 : 0, record.foxWincnt[index]);
     }
 
     private static String buildTrace(peiyi configuration, long seed, int dayCount,

@@ -165,7 +165,6 @@ public class MainLogic implements MainLogicInterface
                 .deliverEvents(this::deliverEvents)
                 .dieaux(dielogicCarrier::dieaux)
                 .nightaction(this::nightaction)
-                .gameRecordManager(gameRecordManager)
                 .recorder(recorder)
                 .build();
 
@@ -243,9 +242,6 @@ public class MainLogic implements MainLogicInterface
             executionManager.recordReplayDailySnapshot(ctx.getGameDay() + 1);
             executionManager.recordReplayGameEnd(ctx.getEndResult().getValue(), ctx.getGameDay());
             executionManager.presentGameEnd(ctx.getEndResult());
-            DebugLogger.info("[战绩] 游戏结束，准备更新记录: peiyi=" + ctx.getPeiyi() + "(ordinal=" + ctx.getPeiyi().ordinal() + "), end=" + ctx.getEndResult());
-            gameRecordManager.updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult().getValue());
-            DebugLogger.info("[战绩] 记录更新完成");
             return;//胜负已分
         }
         //6,非人占灵猎编造结果逻辑

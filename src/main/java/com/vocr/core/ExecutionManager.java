@@ -10,8 +10,6 @@ import com.vocr.domain.whyDie;
 
 import com.vocr.config.GameConstants;
 import com.vocr.config.ProbabilityCalculator;
-import com.vocr.history.GameRecordManager;
-
 import java.util.List;
 
 class ExecutionManager
@@ -26,7 +24,6 @@ class ExecutionManager
     private final Runnable deliverEvents;
     private final java.util.function.BiConsumer<Integer, whyDie> dieaux;
     private final Runnable nightaction;
-    private final GameRecordManager gameRecordManager;
     private final GameRecorder recorder;
 
     public ExecutionManager(GameModule module)
@@ -41,7 +38,6 @@ class ExecutionManager
         this.deliverEvents = module.getDeliverEvents();
         this.dieaux = module.getDieaux();
         this.nightaction = module.getNightaction();
-        this.gameRecordManager = module.getGameRecordManager();
         this.recorder = module.getRecorder();
     }
 
@@ -107,8 +103,6 @@ class ExecutionManager
         if (ctx.getEndResult() != GameResult.NONE) {
             recordReplayDailySnapshot(gd + 1);
             presentGameEnd(ctx.getEndResult());
-            DebugLogger.info("[战绩] 游戏结束(ExecutionManager): peiyi=" + ctx.getPeiyi() + ", end=" + ctx.getEndResult());
-            gameRecordManager.updateRecord(ctx.getPeiyi().ordinal(), ctx.getEndResult().getValue());
             recordReplayEnd(ctx.getEndResult().getValue(), gd + 1);
             return true;
         }

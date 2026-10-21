@@ -1,6 +1,9 @@
 package com.vocr.history;
 
+import com.vocr.application.GameResultSink;
 import com.vocr.config.PathConfig;
+import com.vocr.domain.GameResult;
+import com.vocr.domain.peiyi;
 import com.vocr.logging.DebugLogger;
 
 // C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\history\GameRecordManager.java
@@ -8,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 
-public class GameRecordManager {
+public class GameRecordManager implements GameResultSink {
     private GameRecord record;
     private final String savePath;
 
@@ -60,6 +63,14 @@ public class GameRecordManager {
     }
 
     public GameRecord getRecord() { return record; }
+
+    @Override
+    public void record(peiyi configuration, GameResult result) {
+        if (configuration == null) throw new IllegalArgumentException("配役不能为空");
+        if (result == null || result == GameResult.NONE)
+            throw new IllegalArgumentException("只能记录已经结束的对局结果");
+        updateRecord(configuration.ordinal(), result.getValue());
+    }
 
     public void updateRecord(int peiyiIndex, int result) {
         DebugLogger.info("[GameRecordManager] 调用update: peiyi=" + peiyiIndex + ", result=" + result);

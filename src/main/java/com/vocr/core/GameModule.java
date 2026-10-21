@@ -3,8 +3,6 @@ package com.vocr.core;
 import com.vocr.domain.whyDie;
 
 import com.vocr.config.ProbabilityCalculator;
-import com.vocr.history.GameRecordManager;
-
 import java.util.function.BiConsumer;
 
 class GameModule {
@@ -19,7 +17,6 @@ class GameModule {
     private final Runnable deliverEvents;
     private final BiConsumer<Integer, whyDie> dieaux;
     private final Runnable nightaction;
-    private final GameRecordManager gameRecordManager;
     private final GameRecorder recorder;
 
     private GameModule(Builder builder) {
@@ -34,7 +31,6 @@ class GameModule {
         this.deliverEvents = builder.deliverEvents;
         this.dieaux = builder.dieaux;
         this.nightaction = builder.nightaction;
-        this.gameRecordManager = builder.gameRecordManager;
         this.recorder = builder.recorder;
     }
 
@@ -82,10 +78,6 @@ class GameModule {
         return nightaction;
     }
 
-    public GameRecordManager getGameRecordManager() {
-        return gameRecordManager;
-    }
-
     public GameRecorder getRecorder() {
         return recorder;
     }
@@ -102,7 +94,6 @@ class GameModule {
         private Runnable deliverEvents;
         private BiConsumer<Integer, whyDie> dieaux;
         private Runnable nightaction;
-        private GameRecordManager gameRecordManager;
         private GameRecorder recorder;
 
         public Builder ctx(GameContext ctx) {
@@ -157,11 +148,6 @@ class GameModule {
 
         public Builder nightaction(Runnable nightaction) {
             this.nightaction = nightaction;
-            return this;
-        }
-
-        public Builder gameRecordManager(GameRecordManager gameRecordManager) {
-            this.gameRecordManager = gameRecordManager;
             return this;
         }
 

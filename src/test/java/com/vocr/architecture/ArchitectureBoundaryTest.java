@@ -8,6 +8,7 @@ import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.vocr.application.EventPresentationStage;
+import com.vocr.history.GameRecordManager;
 import com.vocr.core.MainLogicInterface;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.Role;
@@ -77,6 +78,16 @@ class ArchitectureBoundaryTest {
                         "com.vocr.resources..",
                         "com.vocr.ui..")
                 .because("应用用例应能被桌面端、Web端和测试共同调用")
+                .check(productionClasses);
+    }
+
+    @Test
+    void coreShouldNotPersistGameResultsDirectly() {
+        noClasses()
+                .that().resideInAPackage("com.vocr.core..")
+                .should().callMethod(
+                        GameRecordManager.class, "updateRecord", int.class, int.class)
+                .because("对局结果只能由应用会话通过持久化端口提交")
                 .check(productionClasses);
     }
 

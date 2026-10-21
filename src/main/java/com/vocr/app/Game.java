@@ -34,7 +34,7 @@ public class Game
         GameEventBuffer eventBuffer = new GameEventBuffer();
         MainLogic logic = new MainLogic(eventBuffer::publish, gameRecordManager);
         this.mainlogic = logic;
-        return new GameSession(logic, eventBuffer);
+        return new GameSession(logic, eventBuffer, gameRecordManager);
     }
     public static Game getInstance()
     {

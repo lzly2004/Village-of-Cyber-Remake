@@ -5,6 +5,7 @@ import com.vocr.domain.GameContextView;
 import com.vocr.domain.Role;
 import com.vocr.domain.SelectionType;
 import com.vocr.domain.peiyi;
+import com.vocr.history.GameRecord;
 import com.vocr.history.GameRecordManager;
 
 import org.junit.jupiter.api.Test;
@@ -126,12 +127,29 @@ class GameSessionTest
         assertTrue(Files.exists(secondRecord) && Files.size(secondRecord) > 0);
         assertNotEquals(Files.readString(firstRecord), Files.readString(secondRecord),
                 "不同配役的战绩文件必须各自独立");
+
+        GameRecord firstStats = new GameRecordManager(firstRecord.toString()).getRecord();
+        GameRecord secondStats = new GameRecordManager(secondRecord.toString()).getRecord();
+        assertEquals(1, firstStats.totalPlayCnt);
+        assertEquals(1, firstStats.playcnt[peiyi.jianyi.ordinal()]);
+        assertEquals(0, firstStats.playcnt[peiyi.tongchang.ordinal()]);
+        assertEquals(1, secondStats.totalPlayCnt);
+        assertEquals(0, secondStats.playcnt[peiyi.jianyi.ordinal()]);
+        assertEquals(1, secondStats.playcnt[peiyi.tongchang.ordinal()]);
+
+        first.currentUpdate();
+        first.currentUpdate(0);
+        assertEquals(1, new GameRecordManager(firstRecord.toString()).getRecord().totalPlayCnt,
+                "重复读取终局不得再次累计战绩");
     }
 
     private GameSession newSession(String label, peiyi configuration)
     {
         GameEventBuffer events = new GameEventBuffer();
-        GameSession session = new GameSession(label, logic(label, events), events);
+        GameRecordManager records = new GameRecordManager(
+                tempDir.resolve(label + "-record.json").toString());
+        GameSession session = new GameSession(
+                label, new MainLogic(events::publish, records), events, records);
         session.startGame(new StartGameCommand(0, configuration));
         session.setAvoidance(new SetAvoidanceCommand(session.currentRevision(), false));
         return session;
