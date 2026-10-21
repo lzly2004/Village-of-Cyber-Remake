@@ -40,6 +40,7 @@ Javalin/SLF4J 的提示，框架内部日志使用 NOP。正式运行监控与�
 | PUT `/api/v1/games/{id}/vote-target` | `{"expectedRevision":1,"target":3,"selected":true}` | 200，选择后的 `GameUpdate` |
 | POST `/api/v1/games/{id}/votes` | `{"expectedRevision":2,"method":"DESIGNATED","candidates":[3]}` | 200，`{voteCompleted, update}` |
 | POST `/api/v1/games/{id}/claims/by-role` | `{"expectedRevision":1,"role":"zhan"}` | 200，询问后的 `GameUpdate` |
+| POST `/api/v1/games/{id}/claims/by-players` | `{"expectedRevision":1,"players":[9,1]}` | 200，询问后的 `GameUpdate` |
 | DELETE `/api/v1/games/{id}` | 无 | 204，释放该局；随后读取返回 404 |
 
 配役可取 `jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing`。
@@ -55,6 +56,12 @@ Javalin/SLF4J 的提示，框架内部日志使用 NOP。正式运行监控与�
 即使没有新发言也返回权威更新；新事件沿用应用层展示阶段。缺失/null/未知或不可询问的职业返回 400，
 旧版本返回 409 且不重放，终局拒绝询问。浏览器读完待确认事件后才允许发起询问；
 刷新按保存游标恢复公开 CO 状态与未读发言，不持久化本地“已询问职业”镜像。
+
+WEB-007 已开放按玩家询问：players 必须非空、无重复/无 null，全部来自最新 `claimInquiry.players`，
+请求顺序交由既有应用命令处理，不在 HTTP 层重排。一次单选或批量询问只使 revision 加 1；
+非法/死亡/越界目标返回 400，旧版本与终局返回对应 409，失败前置校验不改变状态。
+网页多选是尚未发送的临时草稿，不修改投票目标、不进入 sessionStorage；取消勾选不发请求。
+新权威快照、同步或刷新会清理草稿；已执行询问的公开状态与未读事件仍按游标恢复，绝不自动重新询问。
 
 ## 更新契约
 

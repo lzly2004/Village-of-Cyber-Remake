@@ -1,4 +1,4 @@
-import { computed, onMounted, ref, shallowRef } from 'vue'
+import { computed, onMounted, ref, shallowRef, watch } from 'vue'
 import { ApiError, request } from './api'
 
 export const STORAGE_KEY = 'vocr.guest.v1'
@@ -21,6 +21,12 @@ export function useGuestGame() {
     update.value?.legalVoteActions.find(action => action.method === 'DESIGNATED'))
   const canVote = computed(() => canDecide.value && Boolean(designatedVote.value))
   const claimRoles = computed(() => update.value?.claimInquiry.roles || [])
+  const claimPlayers = computed(() => update.value?.claimInquiry.players || [])
+  const claimPlayerDraft = ref([])
+  const canAskClaimPlayers = computed(() => canDecide.value && claimPlayerDraft.value.length > 0
+    && claimPlayerDraft.value.every(player => claimPlayers.value.includes(player)))
+  // Unsubmitted choices are UI drafts, never authoritative or replayed after synchronization.
+  watch(update, () => { claimPlayerDraft.value = [] })
 
   function persist() {
     try {
@@ -160,6 +166,22 @@ export function useGuestGame() {
 
   function refresh() { return run(sync) }
 
+  function toggleClaimPlayer(player, selected) {
+    if (!canDecide.value || !claimPlayers.value.includes(player)) return
+    if (selected && !claimPlayerDraft.value.includes(player)) claimPlayerDraft.value.push(player)
+    else if (!selected) claimPlayerDraft.value = claimPlayerDraft.value.filter(value => value !== player)
+  }
+
+  function askClaimPlayers() {
+    if (!canAskClaimPlayers.value) return
+    const players = [...claimPlayerDraft.value]
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/claims/by-players', {
+        method: 'POST', body: { expectedRevision: update.value.revision, players },
+      }))
+    })
+  }
+
   function release() {
     return run(async () => {
       await request('/' + sessionId.value, { method: 'DELETE' })
@@ -186,7 +208,7 @@ export function useGuestGame() {
 
   return {
     sessionId, cursor, update, busy, uncertain, notice, storageWarning,
-    pending, currentEvent, canDecide, canVote, claimRoles,
-    start, nextEvent, toggleTarget, vote, askClaimRole, refresh, release,
+    pending, currentEvent, canDecide, canVote, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
+    start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, refresh, release,
   }
 }

@@ -5,13 +5,14 @@ import { configurations, configurationName, roles, claimRoleNames, stages, resul
 
 const {
   sessionId, cursor, update, busy, uncertain, notice, storageWarning,
-  pending, currentEvent, canDecide, canVote, claimRoles,
-  start, nextEvent, toggleTarget, vote, askClaimRole, refresh, release,
+  pending, currentEvent, canDecide, canVote, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
+  start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, refresh, release,
 } = useGuestGame()
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
 const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
 const players = computed(() => update.value?.view.players || [])
+const claimCandidates = computed(() => players.value.filter(player => claimPlayers.value.includes(player.playerNumber)))
 const voteTargets = computed(() => update.value?.selections.voteTargets || [])
 const legalTargets = computed(() =>
   update.value?.legalTargetSelections.find(action => action.type === 'VOTE')?.targets || [])
@@ -122,6 +123,19 @@ function name(number) {
             <button v-for="role in claimRoles" :key="role" class="primary-button"
               :disabled="!canDecide" @click="askClaimRole(role)">{{ claimRoleNames[role] || role }}のCOを聞く</button>
           </div>
+        </section>
+
+        <section v-if="claimPlayers.length" class="panel claim-inquiry" aria-label="プレイヤー別CO確認" lang="ja">
+          <header class="panel-heading"><span>プレイヤー別CO確認</span><span>未送信の選択は再読み込み・同期で解除されます。</span></header>
+          <div class="claim-player-list">
+            <label v-for="player in claimCandidates" :key="player.playerNumber" class="claim-player">
+              <input type="checkbox" :aria-label="player.playerNumber + '番 ' + player.character + 'をCO確認対象に選択'"
+                :checked="claimPlayerDraft.includes(player.playerNumber)" :disabled="!canDecide"
+                @change="toggleClaimPlayer(player.playerNumber, $event.target.checked)">
+              <span>{{ player.playerNumber }} · {{ player.character }}</span>
+            </label>
+          </div>
+          <div class="claim-actions"><button class="primary-button" :disabled="!canAskClaimPlayers" @click="askClaimPlayers">選択したプレイヤーのCOを聞く</button></div>
         </section>
 
         <section v-if="lastRound" class="panel vote-history" aria-label="最近投票结果">

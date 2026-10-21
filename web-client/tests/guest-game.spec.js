@@ -77,6 +77,7 @@ test('真实对局从浏览器指定投票直至终局，并刷新恢复揭晓',
     await expect(page.getByRole('heading', { name: /阵营胜利|妖狐胜利/ })).toBeVisible()
     await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
     await expect(page.getByRole('region', { name: '職業別CO確認' })).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'プレイヤー別CO確認' })).toHaveCount(0)
   } finally { await release(request, id) }
 })
 
@@ -271,6 +272,124 @@ test('职业 CO 已执行但响应丢失，先同步且不重复询问', async (
     await expect(ask).toBeDisabled()
     await readEvents(page)
     await expect(ask).toBeEnabled()
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(applied)
+    expect(writes).toBe(1)
+  } finally { await release(request, id) }
+})
+
+test('按玩家批量询问 CO 保留选择顺序，恢复公开状态与未读事件', async ({ page, request }, testInfo) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    const panel = page.getByRole('region', { name: 'プレイヤー別CO確認' })
+    const ask = panel.getByRole('button', { name: '選択したプレイヤーのCOを聞く', exact: true })
+    await expect(panel.getByRole('checkbox').first()).toBeDisabled()
+    await expect(ask).toBeDisabled()
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    await expect(panel.getByRole('checkbox')).toHaveCount(before.claimInquiry.players.length)
+    const targets = [9, before.claimInquiry.players[0]] // fixed-seed public player numbers, not actual-role reads
+    for (const target of targets) {
+      expect(before.claimInquiry.players).toContain(target)
+      await panel.getByRole('checkbox', { name: new RegExp('^' + target + '番 ') }).check()
+    }
+    expect((await (await request.get('/api/v1/games/' + id)).json()).revision).toBe(before.revision)
+    const response = page.waitForResponse(res => res.url().endsWith('/claims/by-players'))
+    await ask.click()
+    const applied = await response
+    expect(applied.request().postDataJSON()).toEqual({ expectedRevision: before.revision, players: targets })
+    const result = await applied.json()
+    expect(result.revision).toBe(before.revision + 1)
+    expect(result.events.length).toBeGreaterThan(0)
+    expect(result.view.players.find(player => player.playerNumber === 9).claimedRole).toBe('lie')
+    await expect(ask).toBeDisabled()
+    await expect(panel.getByRole('checkbox', { checked: true })).toHaveCount(0)
+    const event = await page.getByRole('region', { name: '当前事件' }).textContent()
+    const state = await saved(page)
+    await page.reload()
+    await expect(page.getByRole('region', { name: '当前事件' })).toHaveText(event)
+    expect(await saved(page)).toEqual(state)
+    const restored = await (await request.get('/api/v1/games/' + id)).json()
+    expect(restored.revision).toBe(result.revision)
+    expect(restored.view.players).toEqual(result.view.players)
+    await readEvents(page)
+    await expect(panel.getByRole('checkbox').first()).toBeEnabled()
+    await expect(ask).toBeDisabled()
+    await page.screenshot({ path: testInfo.outputPath('player-claims.png'), fullPage: true })
+  } finally { await release(request, id) }
+})
+
+test('按玩家 CO 的未发送选择可取消，刷新不提交也不恢复草稿', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const panel = page.getByRole('region', { name: 'プレイヤー別CO確認' })
+    const ask = panel.getByRole('button')
+    const target = panel.getByRole('checkbox').first()
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.url().endsWith('/claims/by-players')) writes++ })
+    await target.check()
+    await expect(ask).toBeEnabled()
+    await target.uncheck()
+    await expect(ask).toBeDisabled()
+    await target.check()
+    await page.reload()
+    await expect(target).not.toBeChecked()
+    await expect(ask).toBeDisabled()
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(before)
+    expect(Object.keys(await saved(page)).sort()).toEqual(['eventCursor', 'sessionId'])
+    expect(writes).toBe(0)
+  } finally { await release(request, id) }
+})
+
+test('按玩家 CO 冲突只同步并清理草稿，不重放请求', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const panel = page.getByRole('region', { name: 'プレイヤー別CO確認' })
+    await panel.getByRole('checkbox').first().check()
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    expect((await request.put('/api/v1/games/' + id + '/vote-target', {
+      data: { expectedRevision: before.revision, target: before.claimInquiry.players[0], selected: true },
+    })).ok()).toBeTruthy()
+    const authority = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.url().endsWith('/claims/by-players')) writes++ })
+    await panel.getByRole('button').click()
+    await expect(page.getByRole('alert')).toContainText('已重新同步')
+    await expect(panel.getByRole('checkbox', { checked: true })).toHaveCount(0)
+    await expect(panel.getByRole('button')).toBeDisabled()
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
+    expect(writes).toBe(1)
+  } finally { await release(request, id) }
+})
+
+test('按玩家 CO 已执行但丢失响应，先同步且不重复提交', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const panel = page.getByRole('region', { name: 'プレイヤー別CO確認' })
+    await panel.getByRole('checkbox', { name: /^9番 / }).check()
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.url().endsWith('/claims/by-players')) writes++ })
+    await page.route('**/claims/by-players', async route => { await route.fetch(); await route.abort('failed') })
+    await panel.getByRole('button').click()
+    await expect(page.getByRole('alert')).toContainText('连接未能确认')
+    await expect(panel.getByRole('button')).toBeDisabled()
+    await expect(panel.getByRole('checkbox').first()).toBeDisabled()
+    const applied = await (await request.get('/api/v1/games/' + id)).json()
+    expect(applied.revision).toBe(before.revision + 1)
+    await page.unroute('**/claims/by-players')
+    await page.getByRole('button', { name: '重新同步' }).click()
+    await expect(page.getByTestId('next-event')).toBeVisible()
+    await expect(panel.getByRole('checkbox', { checked: true })).toHaveCount(0)
+    await readEvents(page)
+    await expect(panel.getByRole('checkbox').first()).toBeEnabled()
     expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(applied)
     expect(writes).toBe(1)
   } finally { await release(request, id) }

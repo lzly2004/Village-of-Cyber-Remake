@@ -104,6 +104,11 @@ class GuestGameServerTest
             assertEquals(409, finishedClaim.statusCode(), finishedClaim.body());
             assertEquals("INVALID_STATE", json.readTree(finishedClaim.body()).path("code").asText());
             assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
+            HttpResponse<String> finishedPlayers = request(server, "POST", path + "/claims/by-players",
+                    new AskClaimByPlayersCommand(direct.currentRevision(), List.of(1)));
+            assertEquals(409, finishedPlayers.statusCode(), finishedPlayers.body());
+            assertEquals("INVALID_STATE", json.readTree(finishedPlayers.body()).path("code").asText());
+            assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
             assertEquals(409, request(server, "POST", path + "/votes",
                     new ExecuteVoteCommand(direct.currentRevision(),
                             VotingMethod.DESIGNATED, List.of(1))).statusCode());
@@ -178,6 +183,94 @@ class GuestGameServerTest
                     "{\"expectedRevision\":1,\"role\":\"lie\"}"), HttpResponse.BodyHandlers.ofString());
             var second = client.sendAsync(http(server, "POST", path + "/claims/by-role",
                     "{\"expectedRevision\":1,\"role\":\"ling\"}"), HttpResponse.BodyHandlers.ofString());
+            CompletableFuture.allOf(first, second).join();
+            assertEquals(List.of(200, 409), List.of(first.join().statusCode(), second.join().statusCode())
+                    .stream().sorted().toList());
+            JsonNode after = json.readTree(request(server, "GET", path, null).body());
+            assertEquals(2, after.path("revision").asLong());
+            GuestWireContract.assertUpdate(after);
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = peiyi.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void playerClaims_shouldMatchOrderedDirectCommandsAndIsolateOtherSessions(peiyi configuration) throws Exception
+    {
+        long seed = 4200 + configuration.ordinal();
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, seed), 3).start(0))
+        {
+            GameSession direct = SeededGuestSession.create("players-direct", seed);
+            direct.startGame(new StartGameCommand(0, configuration));
+            String path = create(server, configuration.name());
+            String other = create(server, configuration.name());
+            JsonNode isolated = json.readTree(request(server, "GET", other, null).body());
+            List<Integer> legal = direct.currentUpdate(0).claimInquiry().players();
+            for (List<Integer> players : List.of(List.of(legal.getLast(), legal.getFirst()),
+                    List.of(legal.getFirst())))
+            {
+                GameUpdate before = direct.currentUpdate(0);
+                var command = new AskClaimByPlayersCommand(before.revision(), players);
+                GameUpdate expected = direct.requestClaims(command);
+                HttpResponse<String> response = request(server, "POST", path + "/claims/by-players", command);
+                assertEquals(200, response.statusCode(), response.body());
+                JsonNode actual = json.readTree(response.body());
+                assertEquals(wireJson(expected), actual);
+                GuestWireContract.assertUpdate(actual);
+                assertEquals(before.revision() + 1, actual.path("revision").asLong());
+                String cursorPath = path + "?eventCursor=" + before.nextEventCursor();
+                assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
+                assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
+            }
+            assertEquals(wireJson(direct.currentUpdate(0)), json.readTree(request(server, "GET", path, null).body()));
+            assertEquals(isolated, json.readTree(request(server, "GET", other, null).body()));
+        }
+    }
+
+    @Test
+    void playerClaims_shouldRejectInvalidCandidatesAndAcceptOnlyOneConcurrentRevision() throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, 4202), 2).start(0))
+        {
+            String path = create(server, "tongchang");
+            String endpoint = path + "/claims/by-players";
+            JsonNode before = json.readTree(request(server, "GET", path, null).body());
+            int legal = before.path("claimInquiry").path("players").get(0).asInt();
+            int dead = 0;
+            for (JsonNode player : before.path("view").path("players"))
+                if (!player.path("alive").asBoolean()) dead = player.path("playerNumber").asInt();
+            assertTrue(dead > 0, "fixed seed must include an actually ineligible dead candidate");
+            for (String payload : List.of("{}", "null", "{", "{\"players\":[1]}",
+                    "{\"expectedRevision\":1}", "{\"expectedRevision\":1,\"players\":null}",
+                    "{\"expectedRevision\":1,\"players\":[]}",
+                    "{\"expectedRevision\":1,\"players\":[null]}",
+                    "{\"expectedRevision\":null,\"players\":[1]}",
+                    "{\"expectedRevision\":-1,\"players\":[1]}",
+                    "{\"expectedRevision\":1.5,\"players\":[1]}",
+                    "{\"expectedRevision\":1,\"players\":[1.5]}",
+                    "{\"expectedRevision\":1,\"players\":[0]}",
+                    "{\"expectedRevision\":1,\"players\":[-1]}",
+                    "{\"expectedRevision\":1,\"players\":[99999]}",
+                    "{\"expectedRevision\":1,\"players\":[" + dead + "]}",
+                    "{\"expectedRevision\":1,\"players\":[" + legal + "," + legal + "]}",
+                    "{\"expectedRevision\":1,\"players\":[" + legal + "],\"role\":\"zhan\"}"))
+            {
+                HttpResponse<String> response = raw(server, "POST", endpoint, payload);
+                assertEquals(400, response.statusCode(), payload + ": " + response.body());
+                assertEquals("INVALID_REQUEST", json.readTree(response.body()).path("code").asText());
+                assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            }
+            assertEquals(404, request(server, "POST", "/api/v1/games/missing/claims/by-players",
+                    new AskClaimByPlayersCommand(1, List.of(legal))).statusCode());
+            HttpResponse<String> stale = request(server, "POST", endpoint,
+                    new AskClaimByPlayersCommand(0, List.of(legal)));
+            assertEquals(409, stale.statusCode());
+            assertEquals("STALE_REVISION", json.readTree(stale.body()).path("code").asText());
+            assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            String payload = json.writeValueAsString(new AskClaimByPlayersCommand(1, List.of(legal)));
+            var first = client.sendAsync(http(server, "POST", endpoint, payload), HttpResponse.BodyHandlers.ofString());
+            var second = client.sendAsync(http(server, "POST", endpoint, payload), HttpResponse.BodyHandlers.ofString());
             CompletableFuture.allOf(first, second).join();
             assertEquals(List.of(200, 409), List.of(first.join().statusCode(), second.join().statusCode())
                     .stream().sorted().toList());
