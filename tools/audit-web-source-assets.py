@@ -14,32 +14,25 @@ import struct
 import wave
 
 
-def audit(root):
+def image_reference_catalog(root):
+    """Shared WEB-020/022 candidate set, without audio or directory-wide selection."""
     resources = root / 'src/main/resources'
     java = root / 'src/main/java/com/vocr/resources'
-    files = sorted(path for path in resources.rglob('*') if path.is_file())
-    if not files:
-        raise ValueError('No source resources found')
-    groups = defaultdict(list)
-    for path in files:
-        parts = path.relative_to(resources).parts
-        groups[parts[0] if len(parts) > 1 else '[root]'].append(path)
-    group_report = {key: {'files': len(paths), 'bytes': sum(p.stat().st_size for p in paths)}
-                    for key, paths in sorted(groups.items())}
     references = defaultdict(set)
 
     def ref(name, origin, folder='images'):
-        if not isinstance(name, str) or not name or Path(name).name != name:
+        if (not isinstance(name, str) or not name or Path(name).name != name
+                or '/' in name or '\\' in name):
             raise ValueError('Invalid source filename in ' + origin)
         references[folder + '/' + name].add(origin)
 
     fixed = re.findall(r'^\s+([A-Z_0-9]+)\("([^"\n]+)"\)',
-                       (java / 'UiImage.java').read_text(), re.M)
+                       (java / 'UiImage.java').read_text(encoding='utf-8'), re.M)
     for key, name in fixed:
         ref(name, 'UiImage.' + key)
     if not fixed:
         raise ValueError('No UiImage entries parsed')
-    mapping = json.loads((resources / 'config/event_image_mapping.json').read_text())
+    mapping = json.loads((resources / 'config/event_image_mapping.json').read_text(encoding='utf-8'))
     branches = Counter()
     shapes = Counter()
     event_images = set()
@@ -80,9 +73,32 @@ def audit(root):
                 ref(f'{"uranai" if role == 1 else "goei"}{order}.png', 'ImageNames.claimedRoleActionIcon')
     for name in ('yaku4.png', 'yaku5.png', 'turi.png', 'noroi.png', 'atooi.png', 'kami.png'):
         ref(name, 'ImageNames.static suffix')
+    return references, fixed, mapping, branches, shapes, event_images
+
+
+def audit(root):
+    resources = root / 'src/main/resources'
+    java = root / 'src/main/java/com/vocr/resources'
+    files = sorted(path for path in resources.rglob('*') if path.is_file())
+    if not files:
+        raise ValueError('No source resources found')
+    groups = defaultdict(list)
+    for path in files:
+        parts = path.relative_to(resources).parts
+        groups[parts[0] if len(parts) > 1 else '[root]'].append(path)
+    group_report = {key: {'files': len(paths), 'bytes': sum(p.stat().st_size for p in paths)}
+                    for key, paths in sorted(groups.items())}
+    references = defaultdict(set)
+
+    def ref(name, origin, folder='images'):
+        if not isinstance(name, str) or not name or Path(name).name != name:
+            raise ValueError('Invalid source filename in ' + origin)
+        references[folder + '/' + name].add(origin)
+
+    references, fixed, mapping, branches, shapes, event_images = image_reference_catalog(root)
     audio_catalogs = {}
     for catalog, folder in (('BgmTrack', 'BGM'), ('SoundEffect', 'sounds')):
-        source = (java / (catalog + '.java')).read_text()
+        source = (java / (catalog + '.java')).read_text(encoding='utf-8')
         names = re.findall(r'"([^"\n]+\.wav)"', source)
         if not names:
             raise ValueError('No audio entries parsed: ' + catalog)

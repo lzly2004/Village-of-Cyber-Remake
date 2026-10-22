@@ -1,0 +1,2 @@
+# Build-time only; no frontend/Java production dependency.
+Pillow==12.3.0
