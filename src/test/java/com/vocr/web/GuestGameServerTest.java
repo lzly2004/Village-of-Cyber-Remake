@@ -802,6 +802,224 @@ class GuestGameServerTest
         }
     }
 
+    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> claimedSkillConfigurations()
+    {
+        var baseline = java.util.Arrays.stream(peiyi.values()).filter(configuration -> configuration != peiyi.NONE)
+                .flatMap(configuration -> java.util.stream.Stream.of(SelectionType.DIVINATION, SelectionType.GUARD)
+                        .map(type -> org.junit.jupiter.params.provider.Arguments.of(configuration, type, 4200L + configuration.ordinal())));
+        return java.util.stream.Stream.concat(baseline, java.util.stream.Stream.of(
+                org.junit.jupiter.params.provider.Arguments.of(peiyi.yaoohu, SelectionType.GUARD, 4202L)));
+    }
+
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.MethodSource("claimedSkillConfigurations")
+    void claimedSkillSelections_shouldMatchDirectAndComposeWithAllSelections(peiyi configuration, SelectionType type, long seed) throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(id -> SeededGuestSession.create(id, seed), 2).start(0))
+        {
+            GameSession direct = SeededGuestSession.create("claimed-direct", seed);
+            direct.startGame(new StartGameCommand(0, configuration));
+            String path = create(server, configuration.name());
+            String other = create(server, configuration.name());
+            JsonNode isolated = json.readTree(request(server, "GET", other, null).body());
+            int turns = 0, individualWrites = 0;
+            while (!direct.isFinished())
+            {
+                assertTrue(++turns <= 80);
+                assertFalse(direct.currentUpdate().selections().skillSelections(type).hasSelections());
+                var ask = new AskClaimByRoleCommand(direct.currentRevision(), type == SelectionType.DIVINATION ? Role.zhan : Role.lie);
+                GameUpdate asked = direct.requestClaims(ask);
+                var askedHttp = request(server, "POST", path + "/claims/by-role", ask);
+                assertEquals(200, askedHttp.statusCode(), askedHttp.body());
+                assertEquals(wireJson(asked), json.readTree(askedHttp.body()));
+                GuestWireContract.assertUpdate(json.readTree(askedHttp.body()));
+                var action = asked.legalTargetSelection(type).orElseThrow();
+                if (!action.claimedActors().isEmpty())
+                {
+                    int actor = action.claimedActors().getFirst().playerNumber();
+                    int first = action.targets().get(0), second = action.targets().get(1);
+                    SelectionType otherType = type == SelectionType.DIVINATION ? SelectionType.GUARD : SelectionType.DIVINATION;
+                    compareSkillWrite(server, path, direct, new SetAllTargetSelectionCommand(direct.currentRevision(), otherType, second, true));
+                    compareSkillWrite(server, path, direct, new SetAllTargetSelectionCommand(direct.currentRevision(), type, first, true));
+                    for (var choice : List.of(Map.entry(first, false), Map.entry(first, false),
+                            Map.entry(second, true), Map.entry(second, true)))
+                    {
+                        GameUpdate prior = direct.currentUpdate();
+                        var command = new SetClaimedRoleTargetSelectionCommand(prior.revision(), type, actor, choice.getKey(), choice.getValue());
+                        GameUpdate actual = compareSkillWrite(server, path, direct, command);
+                        individualWrites++;
+                        var oldSelections = prior.selections().skillSelections(type);
+                        var selections = actual.selections().skillSelections(type);
+                        assertEquals(oldSelections.hiddenTargets(), selections.hiddenTargets());
+                        assertEquals(prior.selections().skillSelections(otherType), actual.selections().skillSelections(otherType));
+                        assertEquals(prior.selections().voteTargets(), actual.selections().voteTargets());
+                        for (var selected : selections.claimedActors())
+                            if (selected.playerNumber() == actor)
+                                assertEquals(choice.getValue(), selected.targets().contains(choice.getKey()));
+                            else
+                                assertTrue(oldSelections.claimedActors().contains(selected), "individual write must not touch another actor");
+                    }
+                    var allSet = compareSkillWrite(server, path, direct,
+                            new SetAllTargetSelectionCommand(direct.currentRevision(), type, second, true));
+                    assertTrue(allSet.selections().skillSelections(type).hiddenTargets().contains(second));
+                    assertTrue(allSet.selections().skillSelections(type).claimedActors().stream().allMatch(value -> value.targets().contains(second)));
+                    compareSkillWrite(server, path, direct,
+                            new SetClaimedRoleTargetSelectionCommand(direct.currentRevision(), type, actor, second, false));
+                    var allClear = compareSkillWrite(server, path, direct,
+                            new SetAllTargetSelectionCommand(direct.currentRevision(), type, second, false));
+                    assertFalse(allClear.selections().skillSelections(type).isTargetSelected(second));
+                    assertTrue(allClear.selections().skillSelections(type).hiddenTargets().contains(first), "other targets must survive all-target command");
+                }
+                else
+                {
+                    var rejected = request(server, "PUT", path + "/claimed-target-selections",
+                            new SetClaimedRoleTargetSelectionCommand(direct.currentRevision(), type,
+                                    action.targets().getFirst(), action.targets().getFirst(), true));
+                    assertEquals(400, rejected.statusCode(), rejected.body());
+                    assertEquals(wireJson(direct.currentUpdate(0)), json.readTree(request(server, "GET", path, null).body()));
+                }
+                var free = direct.currentUpdate().legalVote(VotingMethod.FREE).orElseThrow();
+                var vote = new ExecuteVoteCommand(direct.currentRevision(), free.method(), free.candidates());
+                var expected = direct.executeVote(vote);
+                var response = request(server, "POST", path + "/votes", vote);
+                assertEquals(200, response.statusCode(), response.body());
+                assertEquals(wireJson(expected), json.readTree(response.body()));
+                GuestWireContract.assertVoteResult(json.readTree(response.body()));
+            }
+            if (configuration == peiyi.yaoohu && type == SelectionType.GUARD && seed == 4203)
+            {
+                assertEquals(0, individualWrites, "baseline has no public guard; must test refusal rather than invent an actor");
+                int hunter = direct.currentUpdate().revealedRoles().stream().filter(value -> value.actualRole() == Role.lie)
+                        .findFirst().orElseThrow().playerNumber();
+                var hunterView = direct.currentUpdate().view().players().stream().filter(value -> value.playerNumber() == hunter).findFirst().orElseThrow();
+                assertFalse(hunterView.alive());
+                assertEquals(1, hunterView.deathDay(), "baseline hunter dies before the first public request");
+            }
+            else assertTrue(individualWrites > 0, "fixed fixture must exercise public " + type + " actor");
+            JsonNode finished = json.readTree(request(server, "GET", path, null).body());
+            var rejected = request(server, "PUT", path + "/claimed-target-selections",
+                    new SetClaimedRoleTargetSelectionCommand(direct.currentRevision(), type, 1, 1, true));
+            assertEquals(409, rejected.statusCode(), rejected.body());
+            assertEquals("INVALID_STATE", json.readTree(rejected.body()).path("code").asText());
+            assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
+            assertEquals(isolated, json.readTree(request(server, "GET", other, null).body()));
+        }
+    }
+
+    private GameUpdate compareSkillWrite(GuestGameServer server, String path, GameSession direct, RevisionedCommand command) throws Exception
+    {
+        long cursor = direct.currentUpdate().nextEventCursor();
+        GameUpdate expected;
+        String endpoint;
+        if (command instanceof SetClaimedRoleTargetSelectionCommand individual)
+        {
+            expected = direct.setTargetSelection(individual);
+            endpoint = "/claimed-target-selections";
+        }
+        else
+        {
+            expected = direct.setTargetSelection((SetAllTargetSelectionCommand) command);
+            endpoint = "/target-selections";
+        }
+        var response = request(server, "PUT", path + endpoint, command);
+        assertEquals(200, response.statusCode(), response.body());
+        JsonNode actual = json.readTree(response.body());
+        assertEquals(wireJson(expected), actual);
+        GuestWireContract.assertUpdate(actual);
+        assertEquals(command.expectedRevision() + 1, expected.revision());
+        assertTrue(expected.events().isEmpty());
+        for (int repeat = 0; repeat < 2; repeat++)
+            assertEquals(actual, json.readTree(request(server, "GET", path + "?eventCursor=" + cursor, null).body()));
+        return expected;
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SelectionType.class, names = {"DIVINATION", "GUARD"})
+    void claimedSkillSelections_shouldRejectInvalidActorsPayloadsAndConcurrentOldRevision(SelectionType type) throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(id -> SeededGuestSession.create(id, 4202), 1).start(0))
+        {
+            String path = create(server, "tongchang");
+            JsonNode initial = json.readTree(request(server, "GET", path, null).body());
+            var asked = request(server, "POST", path + "/claims/by-role", new AskClaimByRoleCommand(
+                    initial.path("revision").asLong(), type == SelectionType.DIVINATION ? Role.zhan : Role.lie));
+            assertEquals(200, asked.statusCode(), asked.body());
+            JsonNode before = json.readTree(request(server, "GET", path, null).body());
+            var action = java.util.stream.StreamSupport.stream(before.path("legalTargetSelections").spliterator(), false)
+                    .filter(value -> value.path("type").asText().equals(type.name())).findFirst().orElseThrow();
+            int actor = action.path("claimedActors").get(0).path("playerNumber").asInt();
+            int target = action.path("targets").get(0).asInt();
+            long revision = before.path("revision").asLong();
+            String valid = json.writeValueAsString(new SetClaimedRoleTargetSelectionCommand(revision, type, actor, target, true));
+            List<String> invalid = new java.util.ArrayList<>();
+            for (String field : List.of("expectedRevision", "type", "claimedPlayer", "target", "selected"))
+            {
+                var missing = (com.fasterxml.jackson.databind.node.ObjectNode) json.readTree(valid);
+                missing.remove(field);
+                invalid.add(missing.toString());
+                var nil = (com.fasterxml.jackson.databind.node.ObjectNode) json.readTree(valid);
+                nil.putNull(field);
+                invalid.add(nil.toString());
+            }
+            for (String field : List.of("claimedPlayer", "target"))
+                for (String value : List.of("0", "-1", "999", "1.5"))
+                    invalid.add(valid.replace("\"" + field + "\":" + (field.equals("target") ? target : actor), "\"" + field + "\":" + value));
+            for (String value : List.of("VOTE", "UNKNOWN")) invalid.add(valid.replace(type.name(), value));
+            for (String value : List.of("-1", "1.5")) invalid.add(valid.replace("\"expectedRevision\":" + revision, "\"expectedRevision\":" + value));
+            invalid.add(valid.replace("\"selected\":true", "\"selected\":{}"));
+            invalid.add(valid.substring(0, valid.length() - 1) + ",\"actualRole\":\"lang\"}");
+            invalid.add(valid + " {}");
+            invalid.add("{");
+            int nonActor = java.util.stream.StreamSupport.stream(before.path("view").path("players").spliterator(), false)
+                    .filter(value -> value.path("alive").asBoolean() && !value.path("claimedRole").asText().equals(type == SelectionType.DIVINATION ? "zhan" : "lie"))
+                    .findFirst().orElseThrow().path("playerNumber").asInt();
+            invalid.add(valid.replace("\"claimedPlayer\":" + actor, "\"claimedPlayer\":" + nonActor));
+            for (String payload : invalid)
+            {
+                assertNotEquals(valid, payload);
+                var rejected = raw(server, "PUT", path + "/claimed-target-selections", payload);
+                assertEquals(400, rejected.statusCode(), payload + ": " + rejected.body());
+                assertEquals("INVALID_REQUEST", json.readTree(rejected.body()).path("code").asText());
+                assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            }
+            var stale = request(server, "PUT", path + "/claimed-target-selections",
+                    new SetClaimedRoleTargetSelectionCommand(revision - 1, type, actor, target, true));
+            assertEquals(409, stale.statusCode());
+            assertEquals("STALE_REVISION", json.readTree(stale.body()).path("code").asText());
+            assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            assertEquals(404, raw(server, "PUT", "/api/v1/games/missing/claimed-target-selections", valid).statusCode());
+            var first = client.sendAsync(http(server, "PUT", path + "/claimed-target-selections", valid), HttpResponse.BodyHandlers.ofString());
+            var second = client.sendAsync(http(server, "PUT", path + "/claimed-target-selections", valid), HttpResponse.BodyHandlers.ofString());
+            CompletableFuture.allOf(first, second).join();
+            assertEquals(List.of(200, 409), List.of(first.join().statusCode(), second.join().statusCode()).stream().sorted().toList());
+            JsonNode after = json.readTree(request(server, "GET", path, null).body());
+            assertEquals(revision + 1, after.path("revision").asLong());
+            GuestWireContract.assertUpdate(after);
+            var free = java.util.stream.StreamSupport.stream(after.path("legalVoteActions").spliterator(), false)
+                    .filter(value -> value.path("method").asText().equals("FREE")).findFirst().orElseThrow();
+            var voted = request(server, "POST", path + "/votes", Map.of("expectedRevision", after.path("revision").asLong(),
+                    "method", "FREE", "candidates", free.path("candidates")));
+            assertEquals(200, voted.statusCode(), voted.body());
+            JsonNode nextDay = json.readTree(request(server, "GET", path, null).body());
+            assertEquals("DAY_DECISION", nextDay.path("phase").asText());
+            int dead = java.util.stream.StreamSupport.stream(nextDay.path("view").path("players").spliterator(), false)
+                    .filter(value -> !value.path("alive").asBoolean()).findFirst().orElseThrow().path("playerNumber").asInt();
+            var nextAction = java.util.stream.StreamSupport.stream(nextDay.path("legalTargetSelections").spliterator(), false)
+                    .filter(value -> value.path("type").asText().equals(type.name())).findFirst().orElseThrow();
+            assertFalse(nextAction.path("claimedActors").isEmpty(), "fixture must retain a living public actor for dead-target validation");
+            int livingActor = nextAction.path("claimedActors").get(0).path("playerNumber").asInt();
+            int livingTarget = nextAction.path("targets").get(0).asInt();
+            for (var invalidCommand : List.of(
+                    new SetClaimedRoleTargetSelectionCommand(nextDay.path("revision").asLong(), type, dead, livingTarget, true),
+                    new SetClaimedRoleTargetSelectionCommand(nextDay.path("revision").asLong(), type, livingActor, dead, true)))
+            {
+                var rejected = request(server, "PUT", path + "/claimed-target-selections", invalidCommand);
+                assertEquals(400, rejected.statusCode(), rejected.body());
+                assertEquals(nextDay, json.readTree(request(server, "GET", path, null).body()));
+            }
+        }
+    }
+
     private JsonNode wireJson(Object value) throws Exception
     {
         // 经相同 JSON 文本边界比较，避免内存 LongNode 与解析后 IntNode 类型差异。

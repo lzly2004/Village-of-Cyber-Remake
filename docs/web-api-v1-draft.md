@@ -27,7 +27,7 @@
 | POST `/{id}/claims/by-players` | expectedRevision, players | 200 GameUpdate | 已实现；AskClaimByPlayersCommand | 007 |
 | PUT `/{id}/avoidance` | expectedRevision, enabled | 200 GameUpdate | 已实现；SetAvoidanceCommand | 008 |
 | PUT `/{id}/target-selections` | expectedRevision, type, target, selected | 200 GameUpdate | DIVINATION/GUARD 已实现；SetAllTargetSelectionCommand；VOTE 保持原路径 | 010、011 |
-| PUT `/{id}/claimed-target-selections` | expectedRevision, type, claimedPlayer, target, selected | 200 GameUpdate | 草案；SetClaimedRoleTargetSelectionCommand，type 只开放 DIVINATION/GUARD | 012 |
+| PUT `/{id}/claimed-target-selections` | expectedRevision, type, claimedPlayer, target, selected | 200 GameUpdate | 已实现；SetClaimedRoleTargetSelectionCommand，type 只开放 DIVINATION/GUARD | 012 |
 
 ### 参数与动作约束
 

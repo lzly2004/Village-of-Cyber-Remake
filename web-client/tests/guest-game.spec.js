@@ -717,6 +717,164 @@ for (const { type, skill, label } of [
   })
 }
 
+async function publicSkill(page, request, id, type) {
+  const label = type === 'DIVINATION' ? '個別の占い予約' : '個別の護衛予約'
+  for (const checkbox of await page.getByRole('region', { name: label }).getByRole('checkbox').all())
+    await expect(checkbox).toBeDisabled()
+  await readEvents(page)
+  const response = page.waitForResponse(res => res.url().endsWith('/claims/by-role'))
+  await page.getByRole('button', { name: type === 'DIVINATION' ? '占い師のCOを聞く' : '狩人のCOを聞く', exact: true }).click()
+  expect((await response).ok()).toBeTruthy()
+  if (type === 'GUARD') {
+    await expect(page.getByTestId('next-event')).toBeVisible()
+    await expect(page.getByRole('region', { name: label }).getByRole('checkbox').first()).toBeDisabled()
+  }
+  await readEvents(page)
+  const snapshot = await (await request.get('/api/v1/games/' + id)).json()
+  const action = snapshot.legalTargetSelections.find(action => action.type === type)
+  expect(action.claimedActors.length).toBeGreaterThan(0)
+  return { snapshot, action, actor: action.claimedActors[0].playerNumber }
+}
+
+for (const { type, skill, label, allLabel } of [
+  { type: 'DIVINATION', skill: 'divination', label: '個別の占い予約', allLabel: '全員の占い予約' },
+  { type: 'GUARD', skill: 'guard', label: '個別の護衛予約', allLabel: '全員の護衛予約' },
+]) {
+  test(label + ' 個体予約は他者・潜伏予約を変えず、応答待ち・取消・再読込に対応', async ({ page, request }, testInfo) => {
+    await start(page, '通常')
+    const id = (await saved(page)).sessionId
+    let proceed = () => {}
+    try {
+      if (type === 'GUARD') await expect(page.getByRole('region', { name: label })).toContainText('公開CO行動者はいません')
+      const { snapshot, action, actor } = await publicSkill(page, request, id, type)
+      const row = page.getByTestId('claimed-' + type + '-' + actor)
+      await expect(row.getByRole('checkbox')).toHaveCount(action.targets.length)
+      await expect(row).toContainText('CO順')
+      const first = row.getByRole('checkbox').nth(0), second = row.getByRole('checkbox').nth(1)
+      const gate = new Promise(resolve => { proceed = resolve })
+      await page.route('**/claimed-target-selections', async route => { await gate; await route.continue() })
+      const sent = page.waitForRequest(req => req.method() === 'PUT' && req.url().endsWith('/claimed-target-selections'))
+      const response = page.waitForResponse(res => res.url().endsWith('/claimed-target-selections'))
+      await first.click()
+      expect((await sent).postDataJSON()).toEqual({ expectedRevision: snapshot.revision, type, claimedPlayer: actor,
+        target: action.targets[0], selected: true })
+      await expect(first).not.toBeChecked()
+      await expect(second).toBeDisabled()
+      proceed()
+      const applied = await (await response).json()
+      await expect(first).toBeChecked()
+      expect(applied.selections[skill].hiddenTargets).toEqual(snapshot.selections[skill].hiddenTargets)
+      expect(applied.selections[skill].claimedActors.filter(value => value.playerNumber !== actor))
+        .toEqual(snapshot.selections[skill].claimedActors.filter(value => value.playerNumber !== actor))
+      expect(applied.selections[skill === 'guard' ? 'divination' : 'guard'])
+        .toEqual(snapshot.selections[skill === 'guard' ? 'divination' : 'guard'])
+      await page.unroute('**/claimed-target-selections')
+      await second.click()
+      await expect(second).toBeChecked()
+      await first.click()
+      await expect(first).not.toBeChecked()
+      await page.reload()
+      await expect(second).toBeChecked()
+      await expect(first).not.toBeChecked()
+      expect(Object.keys(await saved(page)).sort()).toEqual(['eventCursor', 'sessionId'])
+      await page.screenshot({ path: testInfo.outputPath('claimed-' + skill + '.png'), fullPage: true })
+    } finally { proceed(); await release(request, id) }
+  })
+
+  test(label + ' 個体設定と全体上書き・取消を組み合わせ、跨日と終局を復元', async ({ page, request }) => {
+    await start(page, '通常')
+    const id = (await saved(page)).sessionId
+    try {
+      const { action, actor } = await publicSkill(page, request, id, type)
+      if (type === 'DIVINATION') expect(action.claimedActors.length).toBeGreaterThan(1)
+      const row = page.getByTestId('claimed-' + type + '-' + actor)
+      const allPanel = page.getByRole('region', { name: allLabel })
+      await expect(allPanel).toContainText('この対象の個別設定も一括で上書き')
+      await row.getByRole('checkbox').nth(0).click()
+      await expect(row.getByRole('checkbox').nth(0)).toBeChecked()
+      await expect(allPanel.getByRole('checkbox').nth(0)).toBeChecked()
+      await row.getByRole('checkbox').nth(1).click()
+      await expect(row.getByRole('checkbox').nth(1)).toBeChecked()
+      // Union checkbox is checked after an individual reservation; clicking clears everyone for this target.
+      await allPanel.getByRole('checkbox').nth(0).click()
+      await expect(allPanel.getByRole('checkbox').nth(0)).not.toBeChecked()
+      await expect(row.getByRole('checkbox').nth(1)).toBeChecked()
+      await allPanel.getByRole('checkbox').nth(0).click()
+      await expect(row.getByRole('checkbox').nth(0)).toBeChecked()
+      await row.getByRole('checkbox').nth(0).click()
+      await expect(row.getByRole('checkbox').nth(0)).not.toBeChecked()
+      await expect(allPanel.getByRole('checkbox').nth(0)).toBeChecked()
+      await allPanel.getByRole('checkbox').nth(0).click()
+      await expect(allPanel.getByRole('checkbox').nth(0)).not.toBeChecked()
+      const composed = await (await request.get('/api/v1/games/' + id)).json()
+      expect(composed.selections[skill].hiddenTargets).not.toContain(action.targets[0])
+      for (const value of composed.selections[skill].claimedActors) expect(value.targets).not.toContain(action.targets[0])
+      expect(composed.selections[skill].claimedActors.find(value => value.playerNumber === actor).targets).toContain(action.targets[1])
+      let turns = 0
+      while (true) {
+        const response = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/votes'))
+        await page.getByTestId('vote-FREE').click()
+        const result = await (await response).json()
+        await readEvents(page)
+        expect(++turns).toBeLessThan(80)
+        if (result.update.phase === 'FINISHED') break
+        for (const checkbox of await page.getByRole('region', { name: label }).getByRole('checkbox').all()) await expect(checkbox).not.toBeChecked()
+        await page.reload()
+        await expect(page.getByTestId('vote-FREE')).toBeEnabled()
+      }
+      await expect(page.getByRole('region', { name: label })).toHaveCount(0)
+      await page.reload()
+      await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
+      await expect(page.getByRole('region', { name: label })).toHaveCount(0)
+    } finally { await release(request, id) }
+  })
+
+  test(label + ' 409は同期のみで個体予約を再送しない', async ({ page, request }) => {
+    await start(page, '通常')
+    const id = (await saved(page)).sessionId
+    try {
+      const { snapshot, action, actor } = await publicSkill(page, request, id, type)
+      expect((await request.put('/api/v1/games/' + id + '/claimed-target-selections', { data: {
+        expectedRevision: snapshot.revision, type, claimedPlayer: actor, target: action.targets[1], selected: true,
+      } })).ok()).toBeTruthy()
+      const authority = await (await request.get('/api/v1/games/' + id)).json()
+      let writes = 0
+      page.on('request', req => { if (req.method() === 'PUT' && req.url().endsWith('/claimed-target-selections')) writes++ })
+      const row = page.getByTestId('claimed-' + type + '-' + actor)
+      await row.getByRole('checkbox').nth(0).click()
+      await expect(page.getByRole('alert')).toContainText('已重新同步')
+      await expect(row.getByRole('checkbox').nth(0)).not.toBeChecked()
+      await expect(row.getByRole('checkbox').nth(1)).toBeChecked()
+      expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
+      expect(writes).toBe(1)
+    } finally { await release(request, id) }
+  })
+
+  test(label + ' 実行済み応答喪失は同期して復元し、再送しない', async ({ page, request }) => {
+    await start(page, '通常')
+    const id = (await saved(page)).sessionId
+    try {
+      const { snapshot, actor } = await publicSkill(page, request, id, type)
+      let writes = 0
+      page.on('request', req => { if (req.method() === 'PUT' && req.url().endsWith('/claimed-target-selections')) writes++ })
+      await page.route('**/claimed-target-selections', async route => { await route.fetch(); await route.abort('failed') })
+      const checkbox = page.getByTestId('claimed-' + type + '-' + actor).getByRole('checkbox').first()
+      await checkbox.click()
+      await expect(page.getByRole('alert')).toContainText('连接未能确认')
+      await expect(checkbox).not.toBeChecked()
+      await expect(checkbox).toBeDisabled()
+      const authority = await (await request.get('/api/v1/games/' + id)).json()
+      expect(authority.revision).toBe(snapshot.revision + 1)
+      await page.unroute('**/claimed-target-selections')
+      await page.getByRole('button', { name: '重新同步' }).click()
+      await expect(checkbox).toBeChecked()
+      await expect(checkbox).toBeEnabled()
+      expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
+      expect(writes).toBe(1)
+    } finally { await release(request, id) }
+  })
+}
+
 test('手机视口无横向溢出，配役与主要操作仍可访问', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')

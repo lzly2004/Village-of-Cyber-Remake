@@ -8,6 +8,7 @@ const {
   pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
   divinationTargets, selectedDivinationTargets, setDivinationTarget,
   guardTargets, selectedGuardTargets, setGuardTarget,
+  setClaimedTarget,
   start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
 const configuration = ref('jianyi')
@@ -22,6 +23,17 @@ const revealed = computed(() => new Map(
   finished.value ? update.value.revealedRoles.map(player => [player.playerNumber, player.actualRole]) : [],
 ))
 const lastVote = computed(() => update.value?.voteHistory.at(-1))
+const claimedSkills = computed(() => (update.value?.legalTargetSelections || [])
+  .filter(action => ['DIVINATION', 'GUARD'].includes(action.type))
+  .map(action => {
+    const skill = action.type === 'DIVINATION' ? 'divination' : 'guard'
+    return { ...action, label: action.type === 'DIVINATION' ? '個別の占い予約' : '個別の護衛予約',
+      actors: action.claimedActors.map(actor => ({ ...actor,
+        targets: update.value.selections[skill].claimedActors
+          .find(selected => selected.playerNumber === actor.playerNumber)?.targets || [],
+      })),
+    }
+  }))
 const lastRound = computed(() => lastVote.value?.rounds.at(-1))
 function name(number) {
   const player = players.value.find(item => item.playerNumber === number)
@@ -141,6 +153,7 @@ function name(number) {
         <section v-if="divinationTargets.length" class="panel claim-inquiry" aria-label="全員の占い予約" lang="ja">
           <header class="panel-heading"><span>全員の占い予約</span><span>当日の予約です。結果は確約されません。</span></header>
           <p class="avoidance-help">潜伏・公開COの占い候補をまとめて設定／解除します。チェックは公開された予約のいずれかに対象が含まれることを示します。</p>
+          <p class="avoidance-help">全体操作は、この対象の個別設定も一括で上書きします。他の対象の設定は変更しません。</p>
           <div class="claim-player-list">
             <label v-for="target in divinationTargets" :key="target" class="claim-player">
               <input type="checkbox" :aria-label="'全員占い対象 ' + target + '番 ' + name(target)"
@@ -154,6 +167,7 @@ function name(number) {
         <section v-if="guardTargets.length" class="panel claim-inquiry" aria-label="全員の護衛予約" lang="ja">
           <header class="panel-heading"><span>全員の護衛予約</span><span>当日の予約です。結果は確約されません。</span></header>
           <p class="avoidance-help">潜伏・公開COの護衛候補をまとめて設定／解除します。チェックは公開された予約のいずれかに対象が含まれることを示します。</p>
+          <p class="avoidance-help">全体操作は、この対象の個別設定も一括で上書きします。他の対象の設定は変更しません。</p>
           <div class="claim-player-list">
             <label v-for="target in guardTargets" :key="target" class="claim-player">
               <input type="checkbox" :aria-label="'全員護衛対象 ' + target + '番 ' + name(target)"
@@ -162,6 +176,21 @@ function name(number) {
               <span>{{ name(target) }}</span>
             </label>
           </div>
+        </section>
+
+        <section v-for="skill in claimedSkills" :key="skill.type" class="panel claim-inquiry" :aria-label="skill.label" lang="ja">
+          <header class="panel-heading"><span>{{ skill.label }}</span><span>公開COの行動者だけを表示します。予約は結果を保証しません。</span></header>
+          <p v-if="!skill.actors.length" class="avoidance-help">この技能の公開CO行動者はいません。</p>
+          <fieldset v-for="actor in skill.actors" :key="actor.playerNumber" class="claim-player-list"
+            :data-testid="'claimed-' + skill.type + '-' + actor.playerNumber" :disabled="!canDecide">
+            <legend>{{ name(actor.playerNumber) }} · CO順 {{ actor.claimedRoleOrder }}</legend>
+            <label v-for="target in skill.targets" :key="target" class="claim-player">
+              <input type="checkbox" :aria-label="skill.label + ' ' + actor.playerNumber + '番から' + target + '番へ'"
+                :checked="actor.targets.includes(target)"
+                @click.prevent="setClaimedTarget(skill.type, actor.playerNumber, target, !actor.targets.includes(target))">
+              <span>{{ name(target) }}</span>
+            </label>
+          </fieldset>
         </section>
 
         <section v-if="claimRoles.length" class="panel claim-inquiry" aria-label="職業別CO確認" lang="ja">

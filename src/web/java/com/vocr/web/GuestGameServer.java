@@ -94,6 +94,12 @@ public final class GuestGameServer implements AutoCloseable
                     throw new IllegalArgumentException("此路径仅支持全体占卜或护卫目标预约");
                 send(ctx, session(ctx.pathParam("id")).setTargetSelection(request));
             });
+            config.routes.put("/api/v1/games/{id}/claimed-target-selections", ctx -> {
+                SetClaimedRoleTargetSelectionCommand request = read(ctx, SetClaimedRoleTargetSelectionCommand.class);
+                if (request.type() != SelectionType.DIVINATION && request.type() != SelectionType.GUARD)
+                    throw new IllegalArgumentException("此路径仅支持公开占卜或护卫行动者预约");
+                send(ctx, session(ctx.pathParam("id")).setTargetSelection(request));
+            });
             config.routes.delete("/api/v1/games/{id}", ctx -> {
                 remove(ctx.pathParam("id"));
                 ctx.status(204);

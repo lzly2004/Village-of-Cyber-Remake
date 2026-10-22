@@ -43,6 +43,7 @@ Javalin/SLF4J 的提示，框架内部日志使用 NOP。正式运行监控与�
 | POST `/api/v1/games/{id}/claims/by-players` | `{"expectedRevision":1,"players":[9,1]}` | 200，询问后的 `GameUpdate` |
 | PUT `/api/v1/games/{id}/avoidance` | `{"expectedRevision":1,"enabled":false}` | 200，设置后的 `GameUpdate` |
 | PUT `/api/v1/games/{id}/target-selections` | `{"expectedRevision":1,"type":"DIVINATION","target":3,"selected":true}` | 200，预约后的 `GameUpdate`；支持 DIVINATION/GUARD |
+| PUT `/api/v1/games/{id}/claimed-target-selections` | `{"expectedRevision":1,"type":"DIVINATION","claimedPlayer":2,"target":3,"selected":true}` | 200，单个公开CO行动者预约后的 `GameUpdate` |
 | DELETE `/api/v1/games/{id}` | 无 | 204，释放该局；随后读取返回 404 |
 
 配役可取 `jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing`。
@@ -89,7 +90,16 @@ WEB-011 已开放全体护卫预约：同一路径 type 为 GUARD，目标取 GU
 及存活的实际/公开CO护卫行动者候补，未泄露潜伏身份，不保证实际护卫结果。
 同样支持多目标、同值设置、取消、跨日重读与异常恢复；只改变护卫预约，不改变占卜或投票选择。
 网页按 selections.guard 的匿名/公开预约并集显示勾选，而非声称所有行动者状态一致。
-单个公开CO行动者预约尚未开放网页操作，仍归WEB-012；其个体设置与全体操作的组合语义届时须一并验证。
+WEB-012 已开放单个公开CO行动者预约：type 为 DIVINATION/GUARD，claimedPlayer 必须取对应
+legalTargetSelections.claimedActors 的 playerNumber（不是CO顺位），target 取同一动作的合法目标。
+只更新该公开行动者，不改变其他行动者、匿名潜伏目标、另一技能或投票目标。
+未CO/职业不匹配/死亡行动者、死亡或非法目标返回400；旧版本/终局分别返回既有409，缺失会话404。
+同值设置仍递增revision且不虚构发言，刷新/409/失响应沿用权威同步，不自动重放。
+网页按公开行动者分行展示CO顺位和个人目标，无公开行动者时显示空态，终局移除入口。
+全体面板仍显示匿名与任一公开预约的并集：个体预约即可使全体框勾选，但全体操作会统一设置/取消
+该目标在所有相关行动者及匿名预约中的值，覆盖该目标的个体差异，**不影响其他目标**。
+并集已勾选时点击意味着全体取消，不是“补齐未选行动者”；网页明确提示覆盖语义。
+所有预约都是当日候补而非技能结果，跨日重新读取；公开CO不能作为真实职业证据。
 
 ## 更新契约
 

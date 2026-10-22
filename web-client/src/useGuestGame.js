@@ -203,6 +203,18 @@ export function useGuestGame() {
     })
   }
 
+  function setClaimedTarget(type, claimedPlayer, target, selected) {
+    const action = update.value?.legalTargetSelections.find(action => action.type === type)
+    if (!canDecide.value || !['DIVINATION', 'GUARD'].includes(type)
+      || !action?.targets.includes(target)
+      || !action.claimedActors.some(actor => actor.playerNumber === claimedPlayer)) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/claimed-target-selections', {
+        method: 'PUT', body: { expectedRevision: update.value.revision, type, claimedPlayer, target, selected },
+      }))
+    })
+  }
+
   function refresh() { return run(sync) }
 
   function setAvoidance(enabled) {
@@ -259,6 +271,7 @@ export function useGuestGame() {
     pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
     divinationTargets, selectedDivinationTargets, setDivinationTarget,
     guardTargets, selectedGuardTargets, setGuardTarget,
+    setClaimedTarget,
     start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
   }
 }
