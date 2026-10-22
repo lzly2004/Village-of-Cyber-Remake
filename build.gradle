@@ -81,6 +81,15 @@ tasks.withType(AbstractArchiveTask).configureEach {
 test {
     useJUnitPlatform()
     workingDir = rootDir
+    maxParallelForks = 1
+    minHeapSize = '32m'
+    maxHeapSize = '256m'
+    jvmArgs '-XX:MaxMetaspaceSize=192m', '-XX:ActiveProcessorCount=2'
+}
+
+tasks.withType(JavaExec).configureEach {
+    maxHeapSize = '256m'
+    jvmArgs '-XX:MaxMetaspaceSize=192m', '-XX:ActiveProcessorCount=2'
 }
 
 tasks.register('verifyProbabilityConfig') {

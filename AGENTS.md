@@ -1,5 +1,14 @@
 # Village of Cyber Remake 开发约定
 
+## 本机内存安全（优先于下文全量验收默认项）
+
+- 构建前停止本工具链旧 daemon，检查 `free -h`；MemAvailable < 2 GiB 不启动。
+- Linux 使用 `bash tools/run-gradle-safe.sh <定向任务> --tests "<pattern>" --offline`，可用 VOCR_GRADLE 选择缓存的 Gradle；内部固定 no-daemon / 单 worker。监护程序只向waitid确认的自身未回收直接子进程发信号，不得用ps/awk遍历全机进程后批量kill，也不得向进程组发送清理信号。
+- 2026-10-22旧安全脚本曾因AWK数组副作用误选桌面进程；“无Java残留”不证明清理安全。修改启动器须先运行`python3 -B tools/tests/test_guarded_process.py -v`，验证外部哨兵存活、PID归属、正常/中断/低内存路径。不以真实桌面或故意OOM做实验。
+- 禁止并行 JVM 构建；环境失败最多重试一次，先停止自身 JVM 并重新检查内存。不得把超时算测试通过/断言失败。
+- 全量 check/test/打包须用户另行明确授权；未获批准时只做定向验收，记录尚缺门槛，不提交未经完整验收的代码。批准后才可设 VOCR_APPROVED_FULL_CHECK=1。
+- 本机 systemd 245 使用 legacy memory cgroup，不能把用户级 MemoryMax 属性存在当作限额已生效；未验证前依赖低堆上限与上述监控，不声称硬 cgroup 隔离。
+
 ## 一、任务授权
 
 - 用户明确提出的任务视为已批准任务。

@@ -16,12 +16,13 @@ export default defineConfig({
   webServer: [
     {
       command: process.env.VOCR_WEB_SERVER_COMMAND
-        || (process.platform === 'win32' ? 'gradlew.bat' : './gradlew')
+        || (process.platform === 'win32' ? 'gradlew.bat --no-daemon --max-workers=1' : 'bash tools/run-gradle-safe.sh')
           + ' runWebTestServer --args=17071 --console=plain',
       cwd: fileURLToPath(new URL('..', import.meta.url)),
       port: 17071,
       timeout: 120_000,
       reuseExistingServer: false,
+      gracefulShutdown: { signal: 'SIGTERM', timeout: 5_000 },
     },
     {
       command: 'npm run dev -- --port 5175',
