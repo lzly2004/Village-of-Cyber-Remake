@@ -21,7 +21,7 @@
 | POST 空路径 | configuration | 201 `{sessionId, update}`，Location 指向读取地址 | 已实现；StartGameCommand 的初始 revision 由服务端置 0 | 已有 |
 | GET `/{id}?eventCursor=C` | 无；省略 C 默认为 0 | 200 GameUpdate | 已实现；currentUpdate(C) | 已有 |
 | PUT `/{id}/vote-target` | expectedRevision, target, selected | 200 GameUpdate | 已实现；SetAllTargetSelectionCommand，type 固定 VOTE | 已有 |
-| POST `/{id}/votes` | expectedRevision, method, candidates | 200 `{voteCompleted, update}` | DESIGNATED 已实现，FREE/GREY 待开放；ExecuteVoteCommand | 009 |
+| POST `/{id}/votes` | expectedRevision, method, candidates | 200 `{voteCompleted, update}` | DESIGNATED/FREE/GREY 已实现；ExecuteVoteCommand | 009 |
 | DELETE `/{id}` | 无 | 204，无响应体 | 已实现；移除并 close，无 revision；重复删除返回 404 | 已有 |
 | POST `/{id}/claims/by-role` | expectedRevision, role | 200 GameUpdate | 已实现；AskClaimByRoleCommand | 006 |
 | POST `/{id}/claims/by-players` | expectedRevision, players | 200 GameUpdate | 已实现；AskClaimByPlayersCommand | 007 |
@@ -35,7 +35,7 @@
 - role：只提交最新 `claimInquiry.roles` 中的成员；当前运行中投影固定为 zhan/ling/lie/gong/mao，终局为空，不能自行按配役删改。players：非空、无重复/无 null，全部来自 `claimInquiry.players`；保留请求顺序交给应用层，不由 HTTP 层重新排序。
 - selected/enabled 为布尔值；false 分别表示取消目标或关闭回避。选择命令是设值而非 toggle；重复设置同值也按当前应用行为成功递增 revision，不能因此自动重试旧版本。
 - target 必须来自对应 `legalTargetSelections[type].targets`；claimedPlayer 还须来自该类型的 claimedActors。不能凭真实身份筛出“实际技能持有者”；全体技能目标由应用层按既有规则应用，不由客户端分发多条个人命令模拟。
-- method：`DESIGNATED/FREE/GREY`；candidates 必须与最新 `legalVoteActions` 中该 method 的列表**逐项同序相等**，非空且无重复。客户端不能自行重算“灰区”，也不能把自由投票理解为任意手选候补。当前 HTTP 仍拒绝 FREE/GREY，WEB-009 再开放。
+- method：`DESIGNATED/FREE/GREY`；candidates 必须与最新 `legalVoteActions` 中该 method 的列表**逐项同序相等**，非空且无重复。客户端不能自行重算“灰区”，也不能把自由投票理解为任意手选候补。WEB-009 已开放全部三种方式；灰区候补耗尽则无 GREY 动作，不得提交空列表或用 FREE 候补冒充。
 - 所有游戏命令仅作用于 RUNNING 局；终局没有可提交动作，但仍允许读取。`phase` 是业务快照阶段，不代表客户端已读完事件，不能将 `DAY_DECISION` 当作跳过事件展示的许可。
 
 ## 3. 更新与公开数据白名单

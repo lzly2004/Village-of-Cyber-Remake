@@ -516,6 +516,141 @@ class GuestGameServerTest
         }
     }
 
+    @ParameterizedTest
+    @EnumSource(value = peiyi.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void freeAndGreyVotes_shouldMatchDirectCompleteGames(peiyi configuration) throws Exception
+    {
+        long seed = 4200 + configuration.ordinal();
+        for (VotingMethod preferred : List.of(VotingMethod.FREE, VotingMethod.GREY))
+        {
+            try (GuestGameServer server = new GuestGameServer(
+                    id -> SeededGuestSession.create(id, seed), 2).start(0))
+            {
+                GameSession direct = SeededGuestSession.create("vote-direct", seed);
+                direct.startGame(new StartGameCommand(0, configuration));
+                String path = create(server, configuration.name());
+                String other = create(server, configuration.name());
+                JsonNode isolated = json.readTree(request(server, "GET", other, null).body());
+                int turns = 0;
+                int preferredVotes = 0;
+                int unavailableGrey = 0;
+                while (!direct.isFinished())
+                {
+                    assertTrue(++turns <= 80, "fixed-seed game must finish");
+                    GameUpdate before = direct.currentUpdate();
+                    LegalVoteAction action = before.legalVote(preferred)
+                            .orElseGet(() -> before.legalVote(VotingMethod.FREE).orElseThrow());
+                    if (action.method() == preferred) preferredVotes++;
+                    if (before.legalVote(VotingMethod.GREY).isEmpty())
+                    {
+                        unavailableGrey++;
+                        JsonNode unchanged = json.readTree(request(server, "GET", path, null).body());
+                        assertEquals(400, request(server, "POST", path + "/votes",
+                                new ExecuteVoteCommand(before.revision(), VotingMethod.GREY,
+                                        action.candidates())).statusCode());
+                        assertEquals(unchanged, json.readTree(request(server, "GET", path, null).body()));
+                    }
+                    ExecuteVoteCommand command = new ExecuteVoteCommand(before.revision(),
+                            action.method(), action.candidates());
+                    VoteExecutionResult expected = direct.executeVote(command);
+                    HttpResponse<String> response = request(server, "POST", path + "/votes", command);
+                    assertEquals(200, response.statusCode(), response.body());
+                    JsonNode actual = json.readTree(response.body());
+                    assertEquals(wireJson(expected), actual);
+                    GuestWireContract.assertVoteResult(actual);
+                    assertEquals(before.revision() + 1, expected.update().revision());
+                    assertTrue(expected.voteCompleted());
+                    assertEquals(action.method(), expected.update().latestVoteResult().orElseThrow().method());
+                    String cursorPath = path + "?eventCursor=" + before.nextEventCursor();
+                    assertEquals(actual.path("update"), json.readTree(request(server, "GET", cursorPath, null).body()));
+                    assertEquals(actual.path("update"), json.readTree(request(server, "GET", cursorPath, null).body()));
+                }
+                assertTrue(preferredVotes > 0, "must really exercise " + preferred);
+                if (configuration == peiyi.tongchang && preferred == VotingMethod.GREY)
+                    assertTrue(unavailableGrey > 0, "seed 4202 must reject GREY after its candidates are exhausted");
+                JsonNode finished = json.readTree(request(server, "GET", path, null).body());
+                for (VotingMethod method : List.of(VotingMethod.FREE, VotingMethod.GREY))
+                {
+                    HttpResponse<String> rejected = request(server, "POST", path + "/votes",
+                            new ExecuteVoteCommand(direct.currentRevision(), method, List.of(1)));
+                    assertEquals(409, rejected.statusCode(), rejected.body());
+                    assertEquals("INVALID_STATE", json.readTree(rejected.body()).path("code").asText());
+                    assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
+                }
+                assertEquals(isolated, json.readTree(request(server, "GET", other, null).body()));
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = VotingMethod.class, names = {"FREE", "GREY"})
+    void alternativeVotes_shouldRejectInvalidCandidatesAndConcurrentOldRevision(VotingMethod method) throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, 4202), 1).start(0))
+        {
+            String path = create(server, "tongchang");
+            JsonNode before = json.readTree(request(server, "GET", path, null).body());
+            JsonNode action = java.util.stream.StreamSupport.stream(before.path("legalVoteActions").spliterator(), false)
+                    .filter(value -> value.path("method").asText().equals(method.name())).findFirst().orElseThrow();
+            List<Integer> candidates = new java.util.ArrayList<>();
+            action.path("candidates").forEach(value -> candidates.add(value.asInt()));
+            assertTrue(candidates.size() > 1, "fixed fixture must distinguish order and subsets");
+            long revision = before.path("revision").asLong();
+            var command = new ExecuteVoteCommand(revision, method, candidates);
+            String valid = json.writeValueAsString(command);
+            var reversed = new java.util.ArrayList<>(candidates);
+            java.util.Collections.reverse(reversed);
+            for (List<Integer> invalid : List.of(reversed, candidates.subList(0, 1),
+                    List.of(candidates.get(0), candidates.get(0)), List.of(999), List.of(0)))
+            {
+                var payload = json.createObjectNode().put("expectedRevision", revision).put("method", method.name());
+                payload.set("candidates", json.valueToTree(invalid));
+                HttpResponse<String> rejected = request(server, "POST", path + "/votes", payload);
+                assertEquals(400, rejected.statusCode(), rejected.body());
+                assertEquals("INVALID_REQUEST", json.readTree(rejected.body()).path("code").asText());
+                assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            }
+            for (String invalid : List.of(
+                    valid.replace("\"candidates\":" + action.path("candidates"), "\"candidates\":[]"),
+                    valid.replace("\"candidates\":" + action.path("candidates"), "\"candidates\":null"),
+                    valid.replace("\"candidates\":" + action.path("candidates"), "\"candidates\":[null]"),
+                    valid.replace("\"candidates\":" + action.path("candidates"), "\"candidates\":[1.5]"),
+                    valid.replace("\"candidates\":" + action.path("candidates"), "\"candidates\":{}"),
+                    valid.replace("\"expectedRevision\":" + revision + ",", ""),
+                    valid.replace("\"expectedRevision\":" + revision, "\"expectedRevision\":null"),
+                    valid.replace("\"expectedRevision\":" + revision, "\"expectedRevision\":1.5"),
+                    valid.replace("\"" + method.name() + "\"", "\"UNKNOWN\""),
+                    valid.replace("\"" + method.name() + "\"", "null"),
+                    valid.substring(0, valid.length() - 1) + ",\"extra\":1}", valid + " {}", "{"))
+            {
+                assertNotEquals(valid, invalid, "negative payload must differ from valid command");
+                HttpResponse<String> rejected = raw(server, "POST", path + "/votes", invalid);
+                assertEquals(400, rejected.statusCode(), invalid + ": " + rejected.body());
+                assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            }
+            HttpResponse<String> stale = request(server, "POST", path + "/votes",
+                    new ExecuteVoteCommand(revision - 1, method, candidates));
+            assertEquals(409, stale.statusCode());
+            assertEquals("STALE_REVISION", json.readTree(stale.body()).path("code").asText());
+            assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            var first = client.sendAsync(http(server, "POST", path + "/votes", valid), HttpResponse.BodyHandlers.ofString());
+            var second = client.sendAsync(http(server, "POST", path + "/votes", valid), HttpResponse.BodyHandlers.ofString());
+            CompletableFuture.allOf(first, second).join();
+            assertEquals(List.of(200, 409), List.of(first.join().statusCode(), second.join().statusCode()).stream().sorted().toList());
+            JsonNode after = json.readTree(request(server, "GET", path, null).body());
+            assertEquals(revision + 1, after.path("revision").asLong());
+            assertEquals(1, after.path("voteHistory").size());
+            GuestWireContract.assertUpdate(after);
+            int dead = java.util.stream.StreamSupport.stream(after.path("view").path("players").spliterator(), false)
+                    .filter(player -> !player.path("alive").asBoolean()).findFirst().orElseThrow().path("playerNumber").asInt();
+            assertEquals("DAY_DECISION", after.path("phase").asText(), "fixture must allow testing a dead candidate");
+            assertEquals(400, request(server, "POST", path + "/votes",
+                    new ExecuteVoteCommand(after.path("revision").asLong(), method, List.of(dead))).statusCode());
+            assertEquals(after, json.readTree(request(server, "GET", path, null).body()));
+        }
+    }
+
     private JsonNode wireJson(Object value) throws Exception
     {
         // 经相同 JSON 文本边界比较，避免内存 LongNode 与解析后 IntNode 类型差异。

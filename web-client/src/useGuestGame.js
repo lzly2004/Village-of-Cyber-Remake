@@ -20,6 +20,8 @@ export function useGuestGame() {
   const designatedVote = computed(() =>
     update.value?.legalVoteActions.find(action => action.method === 'DESIGNATED'))
   const canVote = computed(() => canDecide.value && Boolean(designatedVote.value))
+  const alternativeVotes = computed(() => update.value?.legalVoteActions.filter(
+    action => action.method === 'FREE' || action.method === 'GREY') || [])
   const claimRoles = computed(() => update.value?.claimInquiry.roles || [])
   const claimPlayers = computed(() => update.value?.claimInquiry.players || [])
   const claimPlayerDraft = ref([])
@@ -140,14 +142,15 @@ export function useGuestGame() {
     })
   }
 
-  function vote() {
-    if (!canVote.value) return
+  function vote(method) {
+    const action = update.value?.legalVoteActions.find(action => action.method === method)
+    if (!canDecide.value || !action) return
     return run(async () => {
       const result = await request('/' + sessionId.value + '/votes', {
         method: 'POST', body: {
           expectedRevision: update.value.revision,
-          method: 'DESIGNATED',
-          candidates: designatedVote.value.candidates,
+          method: action.method,
+          candidates: action.candidates,
         },
       })
       await accept(result.update)
@@ -217,7 +220,7 @@ export function useGuestGame() {
 
   return {
     sessionId, cursor, update, busy, uncertain, notice, storageWarning,
-    pending, currentEvent, canDecide, canVote, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
+    pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
     start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
   }
 }

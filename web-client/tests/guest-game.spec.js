@@ -484,6 +484,106 @@ test('回避设置已执行但响应丢失，暂停操作并同步权威值', as
   } finally { await release(request, id) }
 })
 
+for (const method of ['FREE', 'GREY']) {
+  test(method + ' 按权威候补完成真实对局，刷新保留事件与票型', async ({ page, request }, testInfo) => {
+    await start(page, '通常')
+    const id = (await saved(page)).sessionId
+    try {
+      await expect(page.getByTestId('vote-' + method)).toBeDisabled()
+      let turns = 0
+      let preferredVotes = 0
+      let unavailableGrey = 0
+      while (true) {
+        await readEvents(page)
+        const before = await (await request.get('/api/v1/games/' + id)).json()
+        if (before.phase === 'FINISHED') break
+        expect(++turns).toBeLessThan(80)
+        const action = before.legalVoteActions.find(action => action.method === method)
+          || before.legalVoteActions.find(action => action.method === 'FREE')
+        if (action.method === method) preferredVotes++
+        if (!before.legalVoteActions.some(action => action.method === 'GREY')) {
+          unavailableGrey++
+          await expect(page.getByTestId('vote-GREY')).toHaveCount(0)
+          await expect(page.getByText('グレー投票の候補はいません。')).toBeVisible()
+        }
+        const names = action.candidates.map(number => number + ' · '
+          + before.view.players.find(player => player.playerNumber === number).character).join('、')
+        await expect(page.getByTestId('candidates-' + action.method)).toHaveText(names)
+        const response = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/votes'))
+        await page.getByTestId('vote-' + action.method).click()
+        const voted = await response
+        expect(voted.request().postDataJSON()).toEqual({
+          expectedRevision: before.revision, method: action.method, candidates: action.candidates,
+        })
+        expect(voted.ok()).toBeTruthy()
+        const result = await voted.json()
+        expect(result.voteCompleted).toBe(true)
+        expect(result.update.voteHistory.at(-1).method).toBe(action.method)
+        await expect(page.getByTestId('next-event')).toBeVisible()
+        if (turns === 1) {
+          const event = await page.getByRole('region', { name: '当前事件' }).textContent()
+          await page.reload()
+          await expect(page.getByRole('region', { name: '当前事件' })).toHaveText(event)
+          await expect(page.getByTestId('vote-FREE')).toBeDisabled()
+          expect((await (await request.get('/api/v1/games/' + id)).json()).voteHistory).toEqual(result.update.voteHistory)
+        }
+      }
+      expect(preferredVotes).toBeGreaterThan(0)
+      if (method === 'GREY') expect(unavailableGrey).toBeGreaterThan(0)
+      await expect(page.getByRole('region', { name: '自由・グレー投票' })).toHaveCount(0)
+      expect(Object.keys(await saved(page)).sort()).toEqual(['eventCursor', 'sessionId'])
+      await page.screenshot({ path: testInfo.outputPath(method + '-finished.png'), fullPage: true })
+    } finally { await release(request, id) }
+  })
+
+  test(method + ' 旧版本只同步不重复投票', async ({ page, request }, testInfo) => {
+    await start(page, '通常')
+    const id = (await saved(page)).sessionId
+    try {
+      await readEvents(page)
+      const before = await (await request.get('/api/v1/games/' + id)).json()
+      expect(before.legalVoteActions.some(action => action.method === method)).toBe(true)
+      const changed = await request.put('/api/v1/games/' + id + '/avoidance', {
+        data: { expectedRevision: before.revision, enabled: false },
+      })
+      expect(changed.ok()).toBeTruthy()
+      const authority = await (await request.get('/api/v1/games/' + id)).json()
+      let writes = 0
+      page.on('request', req => { if (req.method() === 'POST' && req.url().endsWith('/votes')) writes++ })
+      await page.getByTestId('vote-' + method).click()
+      await expect(page.getByRole('alert')).toContainText('已重新同步')
+      await expect(page.getByTestId('vote-' + method)).toBeEnabled()
+      expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
+      expect(writes).toBe(1)
+      if (method === 'GREY') await page.screenshot({ path: testInfo.outputPath('alternative-votes.png'), fullPage: true })
+    } finally { await release(request, id) }
+  })
+
+  test(method + ' 已执行失响应后先同步，不自动重放', async ({ page, request }) => {
+    await start(page, '通常')
+    const id = (await saved(page)).sessionId
+    try {
+      await readEvents(page)
+      const before = await (await request.get('/api/v1/games/' + id)).json()
+      expect(before.legalVoteActions.some(action => action.method === method)).toBe(true)
+      let writes = 0
+      page.on('request', req => { if (req.method() === 'POST' && req.url().endsWith('/votes')) writes++ })
+      await page.route('**/votes', async route => { await route.fetch(); await route.abort('failed') })
+      await page.getByTestId('vote-' + method).click()
+      await expect(page.getByRole('alert')).toContainText('连接未能确认')
+      await expect(page.getByTestId('vote-' + method)).toBeDisabled()
+      const applied = await (await request.get('/api/v1/games/' + id)).json()
+      expect(applied.revision).toBe(before.revision + 1)
+      expect(applied.voteHistory.at(-1).method).toBe(method)
+      await page.unroute('**/votes')
+      await page.getByRole('button', { name: '重新同步' }).click()
+      await expect(page.getByTestId('next-event')).toBeVisible()
+      expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(applied)
+      expect(writes).toBe(1)
+    } finally { await release(request, id) }
+  })
+}
+
 test('手机视口无横向溢出，配役与主要操作仍可访问', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')

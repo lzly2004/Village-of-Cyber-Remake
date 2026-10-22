@@ -47,12 +47,17 @@ Javalin/SLF4J 的提示，框架内部日志使用 NOP。正式运行监控与�
 配役可取 `jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing`。
 每个成功写命令使 revision 递增；读取与展示事件不递增。选择多名目标时逐个 PUT，
 取消目标使用 `selected:false`。投票的 candidates 必须严格等于最新更新中
-`legalVoteActions` 的 DESIGNATED 候补列表，并保留顺序。
+`legalVoteActions` 中所选 method 的候补列表，并保留顺序。支持 `DESIGNATED/FREE/GREY`；
+自由投票并非任意自选候补，灰区也不得由客户端重新计算。灰区候补耗尽时没有 GREY 合法动作，
+客户端隐藏对应提交入口；服务端拒绝不可用方式、候补子集/乱序/死亡目标，失败不改变状态。
 
 投票被回避 CO 中断时，`voteCompleted:false`，revision 仍递增，产生的对话带
 `AFTERNOON_DIALOGUE` 阶段。客户端先展示对话，再从最新合法动作重新提交。
 公开共有者的回避遵循桌面规则，客户端可取消其目标后改选其他玩家。
-投票目前只开放指定方式。WEB-006 已开放按职业询问 CO：role 必须取自最新
+WEB-009 已开放自由/灰区方式，复用既有投票命令与 revision/游标/异常恢复，不增加新路由或协议字段。
+网页三种方式均在事件读完、状态确定且无在途请求时提交；冲突只同步，失响应先同步而不自动重放投票。
+普通指定回避的开关语义不扩展到自由/灰区投票，实际执行完全沿用核心规则。
+WEB-006 已开放按职业询问 CO：role 必须取自最新
 `claimInquiry.roles`（运行中为 zhan/ling/lie/gong/mao），询问成功 revision 加 1，
 即使没有新发言也返回权威更新；新事件沿用应用层展示阶段。缺失/null/未知或不可询问的职业返回 400，
 旧版本返回 409 且不重放，终局拒绝询问。浏览器读完待确认事件后才允许发起询问；

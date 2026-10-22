@@ -5,7 +5,7 @@ import { configurations, configurationName, roles, claimRoleNames, stages, resul
 
 const {
   sessionId, cursor, update, busy, uncertain, notice, storageWarning,
-  pending, currentEvent, canDecide, canVote, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
+  pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
   start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
 const configuration = ref('jianyi')
@@ -99,7 +99,7 @@ function name(number) {
             </div>
             <footer class="decision-footer" v-if="!finished">
               <div><span class="eyebrow">指定候补</span><p>{{ voteTargets.length ? voteTargets.map(name).join('、') : '尚未选择' }}</p></div>
-              <button class="primary-button" data-testid="vote" :disabled="!canVote" @click="vote">{{ busy ? '处理中…' : '确认投票' }}</button>
+              <button class="primary-button" data-testid="vote" :disabled="!canVote" @click="vote('DESIGNATED')">{{ busy ? '处理中…' : '确认投票' }}</button>
               <small v-if="currentEvent">请先阅读完待确认事件。</small><small v-else-if="uncertain">请重新同步以确认服务器状态。</small>
             </footer>
           </section>
@@ -116,6 +116,16 @@ function name(number) {
             </div>
           </section>
         </div>
+
+        <section v-if="update.phase === 'DAY_DECISION'" class="panel claim-inquiry" aria-label="自由・グレー投票" lang="ja">
+          <header class="panel-heading"><span>自由・グレー投票</span><span>候補はサーバーの最新状態に従います。</span></header>
+          <div v-for="action in alternativeVotes" :key="action.method" class="claim-actions">
+            <button class="primary-button" :data-testid="'vote-' + action.method" :disabled="!canDecide"
+              @click="vote(action.method)">{{ action.method === 'FREE' ? '自由投票' : 'グレー投票' }}</button>
+            <span :data-testid="'candidates-' + action.method">{{ action.candidates.map(name).join('、') }}</span>
+          </div>
+          <p v-if="!alternativeVotes.some(action => action.method === 'GREY')" class="avoidance-help">グレー投票の候補はいません。</p>
+        </section>
 
         <section v-if="update.phase === 'DAY_DECISION'" class="panel claim-inquiry" aria-label="投票回避設定" lang="ja">
           <header class="panel-heading"><span>投票回避CO</span>
