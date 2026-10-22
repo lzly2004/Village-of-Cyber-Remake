@@ -9,9 +9,9 @@ export const configurations = [
 ].map(([value, name, description]) => ({ value, name, description }))
 
 export const roles = {
-  NONE: '未 CO', zhan: '占卜师', ling: '灵媒师', lie: '猎人', gong: '共有者',
+  NONE: '未 CO', zhan: '占い師', ling: '霊能者', lie: '狩人', gong: '共有者',
   mao: '猫又', wu: '村人', renlang: '人狼', kuangren: '狂人',
-  kuangxinzhe: '狂信者', yaohu: '妖狐', beidezhe: '背德者',
+  kuangxinzhe: '狂信者', yaohu: '妖狐', beidezhe: '背徳者',
 }
 export const claimRoleNames = { zhan: '占い師', ling: '霊能者', lie: '狩人', gong: '共有', mao: '猫又' }
 export const stages = {

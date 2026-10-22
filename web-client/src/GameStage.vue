@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { characterKana } from './characterDisplay.js'
 
 const props = defineProps({
   event: { type: Object, default: null },
@@ -26,7 +27,7 @@ const positions = computed(() => participants.value.map((character, index, all) 
         <text x="40" y="60" class="stage-caption">舞台占位预览 · 正式素材待接</text>
         <g v-for="(actor, index) in positions" :key="actor.character" :transform="`translate(${actor.x} 0)`"
           data-testid="stage-actor">
-          <text y="205" text-anchor="middle" class="stage-actor-label">{{ actor.character }}</text>
+          <text y="205" text-anchor="middle" class="stage-actor-label">{{ characterKana(actor.character) }}</text>
           <circle cy="265" r="40" class="stage-figure" />
           <rect x="-64" y="315" width="128" height="220" rx="36" class="stage-figure" />
           <text y="375" text-anchor="middle" class="stage-slot-label">占位 {{ index + 1 }}</text>

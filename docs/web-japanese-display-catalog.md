@@ -11,8 +11,8 @@
 
 | 类别 | 权威来源 | 当前Web / 后续消费方 |
 |---|---|---|
-| 人物身份键/完整称号/短称号/片假名 | [English枚举](../src/main/java/com/vocr/domain/CharacterEnglishName.java)、[Kanji枚举](../src/main/java/com/vocr/domain/CharacterKanjiName.java)、[Katakana枚举](../src/main/java/com/vocr/domain/CharacterKatakanaName.java)、[UIComponentFactory](../src/main/java/com/vocr/ui/UIComponentFactory.java) | labels/App目前直接用英文键；019参数替换、023角色展示 |
-| 职业名称 | UIComponentFactory.ZY_NAMES/getZY；[Role](../src/main/java/com/vocr/domain/Role.java)只管枚举/编号 | labels.roles多为中文，claimRoleNames五项已有日文；023/025/029 |
+| 人物身份键/完整称号/短称号/片假名 | [English枚举](../src/main/java/com/vocr/domain/CharacterEnglishName.java)、[Kanji枚举](../src/main/java/com/vocr/domain/CharacterKanjiName.java)、[Katakana枚举](../src/main/java/com/vocr/domain/CharacterKatakanaName.java)、[UIComponentFactory](../src/main/java/com/vocr/ui/UIComponentFactory.java) | 019参数替换已接；023按枚举接日文人物展示，见[玩家契约](web-player-visuals.md)；协议键不变 |
+| 职业名称 | UIComponentFactory.ZY_NAMES/getZY；[Role](../src/main/java/com/vocr/domain/Role.java)只管枚举/编号 | 023正常职业文本按ZY_NAMES，未CO保留界面状态；claimRoleNames五项按钮原有日文不改，025/029仍待后续 |
 | 系统文字、胜负与票型 | [GameStrings](../src/main/java/com/vocr/ui/GameStrings.java)及实际调用者 | 公共信息/票型已有日文但样式不完全一致；019/023/025/029 |
 | 逐角色台词/特殊对象 | [event_lines.json](../src/main/resources/lines/event_lines.json)、[Resources.getEventText](../src/main/java/com/vocr/resources/Resources.java) | 018时eventLabel仅摘要；019现已接真正台词与兜底，见review-e3e67c2.md；024接场景 |
 | 按钮/配役内嵌文字 | [UiImage](../src/main/java/com/vocr/resources/UiImage.java)、[ImageNames](../src/main/java/com/vocr/resources/ImageNames.java)、[StartSceneHandler](../src/main/java/com/vocr/ui/StartSceneHandler.java)、[VoteButtonPanel](../src/main/java/com/vocr/ui/VoteButtonPanel.java) | 020/022核对图片，023/024/029接入，不把中文文件名当日文原文 |

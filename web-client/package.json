@@ -14,7 +14,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test:e2e": "playwright test",
     "test:gate": "playwright test --config playwright.gate.config.js",
-    "test:unit": "node --test unit/public-information-text.test.js unit/vote-history.test.js unit/gate-config.test.js unit/event-dialogue.test.js"
+    "test:unit": "node --test unit/public-information-text.test.js unit/vote-history.test.js unit/gate-config.test.js unit/event-dialogue.test.js unit/player-visual.test.js"
   },
   "dependencies": { "vue": "3.5.44" },
   "devDependencies": {

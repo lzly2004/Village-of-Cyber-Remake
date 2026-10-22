@@ -20,7 +20,7 @@
 
 ## 使用与失败边界
 
-转换工具仅为开发依赖：Python3及`tools/requirements-web-images.txt`固定的Pillow12.3.0；本轮编码器libwebp1.6.0。仓库不新增Vue/Java生产依赖。先在隔离Python环境安装开发依赖；本机也可用已配置的Codex bundled Python（完整路径见本轮验收）。
+日常`check`/`distribution`（包括npm构建前后门禁）只需Python3与支持WebP解码的Pillow；022 reviewer已实测系统Python3.8/Pillow7.0.0通过。这不等于该编码器可重建同一产物。重新生成的`build`要求Pillow≥10+WebP；为同版本复现使用`tools/requirements-web-images.txt`固定的Pillow12.3.0及libwebp1.6.0。仓库不新增Vue/Java生产依赖。先在隔离Python环境安装开发依赖；本机也可用已配置的Codex bundled Python（完整路径见本轮验收）。
 
 仓库根执行：
 
@@ -37,6 +37,8 @@ python3 -B -m unittest discover -s tools/tests -p test_web_images.py -v
 
 在web-client执行`npm run build`时，prebuild检查public资源，Vite复制，postbuild检查dist资源与原清单逐字一致，并统计**所有HTML/JS/CSS（含台词）**的原始及gzip总量。单图≤512KiB、全部唯一图片≤32MiB、清单≤1MiB、代码≤1MiB且gzip≤512KiB、当前静态产物总和≤100MiB。该总和只是目前已有分组，BGM/音效/帮助和备用编码后续仍占原100MiB预算，不能占用未完成组的额度冒充全量达标。
 
-`npm run test:assets`使用独立Playwright配置，1 worker、retries=0，仅启动静态preview，无Java；验证首页不请求WebP、每个唯一产物在Chromium完整解码且尺寸正确、未知哈希不能解码为图片。开发preview可能对未知路径返回SPA HTML，不能把HTTP200误认加载成功。正式404/cache-control/部署路径归042—045，后续UI加载失败提示归023—025。内容哈希支持缓存失效，但本轮不声称已配置生产immutable响应头。
+`npm run test:assets`使用独立Playwright配置，1 worker、retries=0，仅启动静态preview，无Java；验证大厅尚无玩家卡片时不请求图片/清单、开村后仅可视附近公开玩家资源加载且满足传输预算、每个唯一产物在Chromium完整解码且尺寸正确、未知哈希不能解码为图片。开发preview可能对未知路径返回SPA HTML，不能把HTTP200误认加载成功。正式404/cache-control/部署路径归042—045，后续UI加载失败提示归023—025。内容哈希支持缓存失效，但本轮不声称已配置生产immutable响应头。
 
-本批没有修改App/GameStage、游标、恢复、确认按钮、CO中断或身份揭晓行为；共享结构未变，未机械重跑默认65项或七配役gate。021/D1旧回归仅作为已接受基线；022实际命令、体积、画质抽样与失败修正见[本轮记录](review-58453f9.md)。冷首页1.5MiB和首舞台新增3MiB目标留待正式接入时按实际网络复核；本轮静态存在不等于首页预载。024/025必须实测事件切换时重新创建图片节点的加载、解码和首帧闪烁。
+022没有修改App/GameStage、游标、恢复、确认按钮、CO中断或身份揭晓行为；共享结构未变，022未机械重跑默认65项或七配役gate。021/D1旧回归仅作为022已接受基线；022实际命令、体积、画质抽样与失败修正见[本轮记录](review-58453f9.md)。冷首页1.5MiB和首舞台新增3MiB目标留待正式接入时按实际网络复核；本轮静态存在不等于首页预载。024/025必须实测事件切换时重新创建图片节点的加载、解码和首帧闪烁。
+
+023—025直接引用当前manifest和内容寻址文件，不重复生成入库。调整质量/格式前评估旧产物去留与Git历史增量；普通资源接入不重写历史。023玩家素材加载契约见[玩家展示](web-player-visuals.md)，本页编码清单/预算仍为022基线。

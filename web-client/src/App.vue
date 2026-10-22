@@ -5,6 +5,9 @@ import PublicInformationPanel from './PublicInformationPanel.vue'
 import VoteHistoryPanel from './VoteHistoryPanel.vue'
 import EventDialogue from './EventDialogue.vue'
 import GameStage from './GameStage.vue'
+import PlayerPortrait from './PlayerPortrait.vue'
+import { characterDisplayName } from './characterDisplay.js'
+import { playerVisual } from './playerVisual.js'
 import { configurations, configurationName, roles, claimRoleNames, stages, results } from './labels'
 
 const {
@@ -39,7 +42,7 @@ const claimedSkills = computed(() => (update.value?.legalTargetSelections || [])
   }))
 function name(number) {
   const player = players.value.find(item => item.playerNumber === number)
-  return player ? number + ' · ' + player.character : String(number)
+  return player ? number + ' · ' + characterDisplayName(player.character) : String(number)
 }
 </script>
 
@@ -56,7 +59,7 @@ function name(number) {
         <span>已确认事件 {{ cursor }}</span>
         <button class="quiet-button" :disabled="busy" @click="refresh">重新同步</button>
       </div>
-      <div class="side-footer"><span class="status-dot"></span>本机试玩<p>会话临时保留，服务重启后失效。<br>本页尚不支持图片、音频与复盘。</p></div>
+      <div class="side-footer"><span class="status-dot"></span>本机试玩<p>会话临时保留，服务重启后失效。<br>已接玩家头像；音频与复盘待后续。</p></div>
     </aside>
 
     <main>
@@ -102,9 +105,9 @@ function name(number) {
                 <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
                 <EventDialogue :event="currentEvent.event" />
                 <div v-if="currentEvent.event" class="event-participants">
-                  <span v-if="currentEvent.event.ch1 && currentEvent.event.ch1 !== 'NONE'">{{ currentEvent.event.ch1 }}</span>
-                  <span v-if="currentEvent.event.ch2 && currentEvent.event.ch2 !== 'NONE'"><small>关联玩家</small>{{ currentEvent.event.ch2 }}</span>
-                  <span v-if="currentEvent.event.ch3 && currentEvent.event.ch3 !== 'NONE'"><small>关联玩家</small>{{ currentEvent.event.ch3 }}</span>
+                  <span v-if="currentEvent.event.ch1 && currentEvent.event.ch1 !== 'NONE'">{{ characterDisplayName(currentEvent.event.ch1) }}</span>
+                  <span v-if="currentEvent.event.ch2 && currentEvent.event.ch2 !== 'NONE'"><small>关联玩家</small>{{ characterDisplayName(currentEvent.event.ch2) }}</span>
+                  <span v-if="currentEvent.event.ch3 && currentEvent.event.ch3 !== 'NONE'"><small>关联玩家</small>{{ characterDisplayName(currentEvent.event.ch3) }}</span>
                 </div>
                 <p class="event-hint">角色台词与叙述来自现有文本资源。CO 和报告只代表公开发言。</p>
               </div>
@@ -127,10 +130,11 @@ function name(number) {
             <header class="panel-heading"><span class="eyebrow">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
             <p id="player-list-help" class="list-help">名单较长时可在列表内滚动。按 Tab 聚焦列表后可用方向键；继续按 Tab 可逐个选择候补。</p>
             <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" tabindex="0" aria-describedby="player-list-help">
-              <label v-for="player in players" :key="player.playerNumber" class="player-row" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
+              <label v-for="player in players" :key="player.playerNumber" class="player-row" :data-player-number="player.playerNumber" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
+                <PlayerPortrait :player="player" />
                 <span class="player-number">{{ String(player.playerNumber).padStart(2, '0') }}</span>
-                <span class="player-identity"><strong>{{ player.character }}</strong><small>{{ finished ? '真实身份 · ' + roles[revealed.get(player.playerNumber)] : roles[player.claimedRole] }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日离场</span></small></span>
-                <input v-if="!finished" type="checkbox" :aria-label="'指定 ' + player.character + '（' + player.playerNumber + '号）'" :checked="voteTargets.includes(player.playerNumber)" :disabled="!canDecide || !legalTargets.includes(player.playerNumber)" @click.prevent="toggleTarget(player.playerNumber, !voteTargets.includes(player.playerNumber))">
+                <span class="player-identity"><strong lang="ja">{{ characterDisplayName(player.character) }}</strong><small>{{ finished ? '真实身份 · ' + roles[revealed.get(player.playerNumber)] : playerVisual(player).roleText + (playerVisual(player).orderText ? ' · ' + playerVisual(player).orderText : '') }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日离场</span></small><small v-if="playerVisual(player).claimDiagnostic" class="visual-diagnostic">表示診断：CO図なし</small><small v-if="playerVisual(player).deathDiagnostic" class="visual-diagnostic">表示診断：死因図なし</small></span>
+                <input v-if="!finished" type="checkbox" :aria-label="'指定 ' + characterDisplayName(player.character) + '（' + player.playerNumber + '号）'" :checked="voteTargets.includes(player.playerNumber)" :disabled="!canDecide || !legalTargets.includes(player.playerNumber)" @click.prevent="toggleTarget(player.playerNumber, !voteTargets.includes(player.playerNumber))">
                 <span v-else class="player-state">{{ player.alive ? '存活' : '离场' }}</span>
               </label>
             </div>
@@ -221,10 +225,10 @@ function name(number) {
           <header class="panel-heading"><span>プレイヤー別CO確認</span><span>未送信の選択は再読み込み・同期で解除されます。</span></header>
           <div class="claim-player-list">
             <label v-for="player in claimCandidates" :key="player.playerNumber" class="claim-player">
-              <input type="checkbox" :aria-label="player.playerNumber + '番 ' + player.character + 'をCO確認対象に選択'"
+              <input type="checkbox" :aria-label="player.playerNumber + '番 ' + characterDisplayName(player.character) + 'をCO確認対象に選択'"
                 :checked="claimPlayerDraft.includes(player.playerNumber)" :disabled="!canDecide"
                 @change="toggleClaimPlayer(player.playerNumber, $event.target.checked)">
-              <span>{{ player.playerNumber }} · {{ player.character }}</span>
+              <span>{{ player.playerNumber }} · {{ characterDisplayName(player.character) }}</span>
             </label>
           </div>
           <div class="claim-actions"><button class="primary-button" :disabled="!canAskClaimPlayers" @click="askClaimPlayers">選択したプレイヤーのCOを聞く</button></div>

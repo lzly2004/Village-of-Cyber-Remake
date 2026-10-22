@@ -62,7 +62,8 @@ async function expectContainedStage(page) {
 
 test('WEB-021 real session stage scales uniformly at desktop widths without changing cursor or text', async ({ page, request }, testInfo) => {
   const media = []
-  page.on('request', req => { if (/\/images\/|\/BGM\/|\/sounds\//.test(req.url())) media.push(req.url()) })
+  // WEB-023 allows lazy player-list WebP; the placeholder stage still requests no artwork/audio.
+  page.on('request', req => { if (/\/BGM\/|\/sounds\//.test(req.url()) || /\/images\/.*\.png$/.test(req.url())) media.push(req.url()) })
   const id = await start(page)
   try {
     const state = await saved(page)
@@ -80,6 +81,7 @@ test('WEB-021 real session stage scales uniformly at desktop widths without chan
       }
     }
     expect(media).toEqual([])
+    await expect(page.getByTestId('game-stage').locator('image, img, audio')).toHaveCount(0)
     await page.reload()
     await expect(page.getByTestId('event-dialogue')).toHaveJSProperty('textContent', text)
     expect(await saved(page)).toEqual(state)

@@ -1,3 +1,4 @@
+import { characterDisplayName } from '../src/characterDisplay.js'
 import { test, expect } from '@playwright/test'
 import { readFileSync, readdirSync } from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -39,7 +40,7 @@ async function drain(page, snapshot) {
   for (const event of snapshot.presentedEvents) {
     await expect(page.getByTestId('next-event')).toBeVisible()
     if (event.event.ch1 && event.event.ch1 !== 'NONE')
-      await expect(page.getByRole('region', { name: '当前事件', exact: true })).toContainText(event.event.ch1)
+      await expect(page.getByRole('region', { name: '当前事件', exact: true })).toContainText(characterDisplayName(event.event.ch1))
     await page.getByTestId('next-event').click()
   }
   await expect(page.getByTestId('next-event')).toHaveCount(0)
@@ -50,7 +51,7 @@ async function display(page, snapshot, beforeDrain = false) {
   await expect(page.locator('.player-row')).toHaveCount(snapshot.view.players.length)
   for (const player of snapshot.view.players) {
     const row = page.locator('.player-row').nth(player.playerNumber - 1)
-    await expect(row.locator('strong')).toHaveText(player.character)
+    await expect(row.locator('strong')).toHaveText(characterDisplayName(player.character))
     if (!player.alive) await expect(row).toHaveClass(/departed/)
   }
   const pending = beforeDrain && snapshot.presentedEvents.length > 0

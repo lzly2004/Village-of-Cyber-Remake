@@ -1,3 +1,4 @@
+import { characterDisplayName } from '../src/characterDisplay.js'
 import { test, expect } from '@playwright/test'
 
 const storageKey = 'vocr.guest.v1'
@@ -98,12 +99,12 @@ test('409 同步权威选择，未自动重试失败的写命令', async ({ page
     page.on('request', req => {
       if (req.method() === 'PUT' && req.url().endsWith('/vote-target')) writes++
     })
-    const target = page.getByRole('checkbox', { name: '指定 ' + staleTarget.character + '（' + staleTarget.playerNumber + '号）', exact: true })
+    const target = page.getByRole('checkbox', { name: '指定 ' + characterDisplayName(staleTarget.character) + '（' + staleTarget.playerNumber + '号）', exact: true })
     await target.click()
     await expect(page.getByRole('alert')).toContainText('已重新同步')
     await expect(target).not.toBeChecked()
     expect(writes).toBe(1)
-    await expect(page.getByRole('checkbox', { name: '指定 ' + alive[0].character + '（' + alive[0].playerNumber + '号）', exact: true })).toBeChecked()
+    await expect(page.getByRole('checkbox', { name: '指定 ' + characterDisplayName(alive[0].character) + '（' + alive[0].playerNumber + '号）', exact: true })).toBeChecked()
   } finally { await release(request, id) }
 })
 
@@ -507,7 +508,7 @@ for (const method of ['FREE', 'GREY']) {
           await expect(page.getByText('グレー投票の候補はいません。')).toBeVisible()
         }
         const names = action.candidates.map(number => number + ' · '
-          + before.view.players.find(player => player.playerNumber === number).character).join('、')
+          + characterDisplayName(before.view.players.find(player => player.playerNumber === number).character)).join('、')
         await expect(page.getByTestId('candidates-' + action.method)).toHaveText(names)
         const response = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/votes'))
         await page.getByTestId('vote-' + action.method).click()

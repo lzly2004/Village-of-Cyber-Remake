@@ -1,7 +1,8 @@
+import { characterDisplayName } from '../src/characterDisplay.js'
 import { test, expect } from '@playwright/test'
 
 const key = 'vocr.guest.v1'
-const name = (snapshot, number) => number + ' · ' + snapshot.view.players.find(player => player.playerNumber === number).character
+const name = (snapshot, number) => number + ' · ' + characterDisplayName(snapshot.view.players.find(player => player.playerNumber === number).character)
 const read = async (request, id) => (await request.get('/api/v1/games/' + id)).json()
 async function saved(page) { return page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), key) }
 async function start(page) {
