@@ -90,8 +90,8 @@ public final class GuestGameServer implements AutoCloseable
             });
             config.routes.put("/api/v1/games/{id}/target-selections", ctx -> {
                 SetAllTargetSelectionCommand request = read(ctx, SetAllTargetSelectionCommand.class);
-                if (request.type() != SelectionType.DIVINATION)
-                    throw new IllegalArgumentException("当前仅开放全体占卜目标预约");
+                if (request.type() != SelectionType.DIVINATION && request.type() != SelectionType.GUARD)
+                    throw new IllegalArgumentException("此路径仅支持全体占卜或护卫目标预约");
                 send(ctx, session(ctx.pathParam("id")).setTargetSelection(request));
             });
             config.routes.delete("/api/v1/games/{id}", ctx -> {

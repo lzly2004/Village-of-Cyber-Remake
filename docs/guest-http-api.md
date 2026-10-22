@@ -42,7 +42,7 @@ Javalin/SLF4J 的提示，框架内部日志使用 NOP。正式运行监控与�
 | POST `/api/v1/games/{id}/claims/by-role` | `{"expectedRevision":1,"role":"zhan"}` | 200，询问后的 `GameUpdate` |
 | POST `/api/v1/games/{id}/claims/by-players` | `{"expectedRevision":1,"players":[9,1]}` | 200，询问后的 `GameUpdate` |
 | PUT `/api/v1/games/{id}/avoidance` | `{"expectedRevision":1,"enabled":false}` | 200，设置后的 `GameUpdate` |
-| PUT `/api/v1/games/{id}/target-selections` | `{"expectedRevision":1,"type":"DIVINATION","target":3,"selected":true}` | 200，预约后的 `GameUpdate`；当前仅开放 DIVINATION |
+| PUT `/api/v1/games/{id}/target-selections` | `{"expectedRevision":1,"type":"DIVINATION","target":3,"selected":true}` | 200，预约后的 `GameUpdate`；支持 DIVINATION/GUARD |
 | DELETE `/api/v1/games/{id}` | 无 | 204，释放该局；随后读取返回 404 |
 
 配役可取 `jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing`。
@@ -76,7 +76,7 @@ WEB-008 已开放回避设置：enabled 表示设为开启/关闭，不是 toggl
 该开关按既有核心规则影响指定投票的普通回避 CO，关闭后共有者仍可触发回避，并非禁用一切 CO。
 终局拒绝设置，其他错误沿用既有错误表；未改变核心规则或开关作用范围。
 
-WEB-010 已开放全体占卜预约：type 当前必须为 DIVINATION（GUARD 待 WEB-011；VOTE 使用既有路径），
+WEB-010 已开放全体占卜预约：type 为 DIVINATION（VOTE 使用既有路径），
 target 必须来自最新 legalTargetSelections 的 DIVINATION.targets。selected 是设为选中/取消，不是 toggle；
 同值设置亦使 revision 加1，不虚构发言，不改变投票或护卫预约。
 操作直接复用应用命令，设置当日匿名潜伏占卜候补及存活的实际占卜/公开占卜 CO 行动者候补，
@@ -85,7 +85,11 @@ target 必须来自最新 legalTargetSelections 的 DIVINATION.targets。selecte
 不将其解释为“所有行动者均已选中”；点击设置/取消通过全体命令更新权威状态。
 预约按当前日投影，跨日后重新读取、不将旧预约写回；终局拒绝操作。
 缺失/null/非法类型或死亡/越界目标返回400，旧版本409仅同步、不重放；失响应先同步。
-单个公开CO行动者预约、护卫预约尚未开放网页操作。
+WEB-011 已开放全体护卫预约：同一路径 type 为 GUARD，目标取 GUARD.targets；设置当日匿名潜伏护卫候补
+及存活的实际/公开CO护卫行动者候补，未泄露潜伏身份，不保证实际护卫结果。
+同样支持多目标、同值设置、取消、跨日重读与异常恢复；只改变护卫预约，不改变占卜或投票选择。
+网页按 selections.guard 的匿名/公开预约并集显示勾选，而非声称所有行动者状态一致。
+单个公开CO行动者预约尚未开放网页操作，仍归WEB-012；其个体设置与全体操作的组合语义届时须一并验证。
 
 ## 更新契约
 

@@ -651,9 +651,16 @@ class GuestGameServerTest
         }
     }
 
+    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> skillConfigurations()
+    {
+        return java.util.Arrays.stream(peiyi.values()).filter(configuration -> configuration != peiyi.NONE)
+                .flatMap(configuration -> java.util.stream.Stream.of(SelectionType.DIVINATION, SelectionType.GUARD)
+                        .map(type -> org.junit.jupiter.params.provider.Arguments.of(configuration, type)));
+    }
+
     @ParameterizedTest
-    @EnumSource(value = peiyi.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
-    void divinationSelections_shouldMatchDirectAcrossDaysAndCompleteGames(peiyi configuration) throws Exception
+    @org.junit.jupiter.params.provider.MethodSource("skillConfigurations")
+    void allSkillSelections_shouldMatchDirectAcrossDaysAndCompleteGames(peiyi configuration, SelectionType type) throws Exception
     {
         long seed = 4200 + configuration.ordinal();
         try (GuestGameServer server = new GuestGameServer(
@@ -669,16 +676,23 @@ class GuestGameServerTest
             {
                 assertTrue(++turns <= 80, "fixed-seed scheduled game must finish");
                 GameUpdate before = direct.currentUpdate();
-                assertFalse(before.selections().divination().hasSelections(), "new day must not carry old reservations");
-                List<Integer> targets = before.legalTargetSelection(SelectionType.DIVINATION).orElseThrow().targets();
+                assertFalse(before.selections().skillSelections(type).hasSelections(), "new day must not carry old reservations");
+                List<Integer> targets = before.legalTargetSelection(type).orElseThrow().targets();
                 assertTrue(targets.size() >= 2);
                 int first = targets.get(0), second = targets.get(1);
+                SelectionType otherType = type == SelectionType.DIVINATION ? SelectionType.GUARD : SelectionType.DIVINATION;
+                var otherSelection = new SetAllTargetSelectionCommand(direct.currentRevision(), otherType, first, true);
+                GameUpdate primed = direct.setTargetSelection(otherSelection);
+                HttpResponse<String> primedHttp = request(server, "PUT", path + "/target-selections", otherSelection);
+                assertEquals(200, primedHttp.statusCode(), primedHttp.body());
+                assertEquals(wireJson(primed), json.readTree(primedHttp.body()));
+                GuestWireContract.assertUpdate(json.readTree(primedHttp.body()));
                 for (var choice : List.of(Map.entry(first, true), Map.entry(first, true),
                         Map.entry(second, true), Map.entry(first, false), Map.entry(first, false)))
                 {
                     GameUpdate prior = direct.currentUpdate();
                     var command = new SetAllTargetSelectionCommand(prior.revision(),
-                            SelectionType.DIVINATION, choice.getKey(), choice.getValue());
+                            type, choice.getKey(), choice.getValue());
                     GameUpdate expected = direct.setTargetSelection(command);
                     HttpResponse<String> response = request(server, "PUT", path + "/target-selections", command);
                     assertEquals(200, response.statusCode(), response.body());
@@ -688,8 +702,8 @@ class GuestGameServerTest
                     assertEquals(prior.revision() + 1, expected.revision());
                     assertTrue(expected.events().isEmpty(), "reservation must not invent dialogue");
                     assertEquals(prior.selections().voteTargets(), expected.selections().voteTargets());
-                    assertEquals(prior.selections().guard(), expected.selections().guard());
-                    var selected = expected.selections().divination();
+                    assertEquals(prior.selections().skillSelections(otherType), expected.selections().skillSelections(otherType));
+                    var selected = expected.selections().skillSelections(type);
                     assertEquals(choice.getValue(), selected.hiddenTargets().contains(choice.getKey()));
                     for (var actor : selected.claimedActors())
                         assertEquals(choice.getValue(), actor.targets().contains(choice.getKey()));
@@ -697,7 +711,7 @@ class GuestGameServerTest
                     assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
                     assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
                 }
-                assertEquals(List.of(second), direct.currentUpdate().selections().divination().hiddenTargets());
+                assertEquals(List.of(second), direct.currentUpdate().selections().skillSelections(type).hiddenTargets());
                 GameUpdate selected = direct.currentUpdate();
                 var action = selected.legalVote(VotingMethod.FREE).orElseThrow();
                 var vote = new ExecuteVoteCommand(selected.revision(), action.method(), action.candidates());
@@ -709,7 +723,7 @@ class GuestGameServerTest
             }
             JsonNode finished = json.readTree(request(server, "GET", path, null).body());
             HttpResponse<String> rejected = request(server, "PUT", path + "/target-selections",
-                    new SetAllTargetSelectionCommand(direct.currentRevision(), SelectionType.DIVINATION, 1, true));
+                    new SetAllTargetSelectionCommand(direct.currentRevision(), type, 1, true));
             assertEquals(409, rejected.statusCode(), rejected.body());
             assertEquals("INVALID_STATE", json.readTree(rejected.body()).path("code").asText());
             assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
@@ -717,8 +731,9 @@ class GuestGameServerTest
         }
     }
 
-    @Test
-    void divinationSelections_shouldRejectMalformedInputsAndConcurrentStaleWrites() throws Exception
+    @ParameterizedTest
+    @EnumSource(value = SelectionType.class, names = {"DIVINATION", "GUARD"})
+    void allSkillSelections_shouldRejectMalformedInputsAndConcurrentStaleWrites(SelectionType type) throws Exception
     {
         try (GuestGameServer server = new GuestGameServer(
                 id -> SeededGuestSession.create(id, 4202), 1).start(0))
@@ -727,7 +742,7 @@ class GuestGameServerTest
             JsonNode before = json.readTree(request(server, "GET", path, null).body());
             long revision = before.path("revision").asLong();
             int target = before.path("legalTargetSelections").get(0).path("targets").get(0).asInt();
-            var command = new SetAllTargetSelectionCommand(revision, SelectionType.DIVINATION, target, true);
+            var command = new SetAllTargetSelectionCommand(revision, type, target, true);
             String valid = json.writeValueAsString(command);
             List<String> invalid = new java.util.ArrayList<>();
             for (String field : List.of("expectedRevision", "type", "target", "selected"))
@@ -739,8 +754,8 @@ class GuestGameServerTest
                 nil.putNull(field);
                 invalid.add(nil.toString());
             }
-            for (String type : List.of("VOTE", "GUARD", "UNKNOWN"))
-                invalid.add(valid.replace("DIVINATION", type));
+            for (String invalidType : List.of("VOTE", "UNKNOWN"))
+                invalid.add(valid.replace(type.name(), invalidType));
             invalid.add(valid.replace("\"target\":" + target, "\"target\":999"));
             invalid.add(valid.replace("\"target\":" + target, "\"target\":0"));
             invalid.add(valid.replace("\"target\":" + target, "\"target\":-1"));
@@ -761,7 +776,7 @@ class GuestGameServerTest
             }
             assertEquals(404, request(server, "PUT", "/api/v1/games/missing/target-selections", command).statusCode());
             HttpResponse<String> stale = request(server, "PUT", path + "/target-selections",
-                    new SetAllTargetSelectionCommand(revision - 1, SelectionType.DIVINATION, target, true));
+                    new SetAllTargetSelectionCommand(revision - 1, type, target, true));
             assertEquals(409, stale.statusCode());
             assertEquals("STALE_REVISION", json.readTree(stale.body()).path("code").asText());
             assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
@@ -782,7 +797,7 @@ class GuestGameServerTest
             int dead = java.util.stream.StreamSupport.stream(after.path("view").path("players").spliterator(), false)
                     .filter(player -> !player.path("alive").asBoolean()).findFirst().orElseThrow().path("playerNumber").asInt();
             assertEquals(400, request(server, "PUT", path + "/target-selections",
-                    new SetAllTargetSelectionCommand(after.path("revision").asLong(), SelectionType.DIVINATION, dead, true)).statusCode());
+                    new SetAllTargetSelectionCommand(after.path("revision").asLong(), type, dead, true)).statusCode());
             assertEquals(after, json.readTree(request(server, "GET", path, null).body()));
         }
     }
