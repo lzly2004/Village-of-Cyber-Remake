@@ -4,6 +4,7 @@ import { useGuestGame } from './useGuestGame'
 import PublicInformationPanel from './PublicInformationPanel.vue'
 import VoteHistoryPanel from './VoteHistoryPanel.vue'
 import EventDialogue from './EventDialogue.vue'
+import GameStage from './GameStage.vue'
 import { configurations, configurationName, roles, claimRoleNames, stages, results } from './labels'
 
 const {
@@ -95,23 +96,25 @@ function name(number) {
         <div class="game-layout">
           <section class="journal panel" aria-label="事件展示">
             <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ currentEvent ? stages[currentEvent.stage] : finished ? '对局结束' : '白天决策' }}</span></header>
-            <div v-if="currentEvent" class="event-content" role="region" aria-label="当前事件" aria-live="polite">
-              <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
-              <EventDialogue :event="currentEvent.event" />
-              <div v-if="currentEvent.event" class="event-participants">
-                <span v-if="currentEvent.event.ch1 && currentEvent.event.ch1 !== 'NONE'">{{ currentEvent.event.ch1 }}</span>
-                <span v-if="currentEvent.event.ch2 && currentEvent.event.ch2 !== 'NONE'"><small>关联玩家</small>{{ currentEvent.event.ch2 }}</span>
-                <span v-if="currentEvent.event.ch3 && currentEvent.event.ch3 !== 'NONE'"><small>关联玩家</small>{{ currentEvent.event.ch3 }}</span>
+            <GameStage :event="currentEvent?.event" :stage="currentEvent?.stage">
+              <div v-if="currentEvent" class="event-content" role="region" aria-label="当前事件" aria-live="polite">
+                <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
+                <EventDialogue :event="currentEvent.event" />
+                <div v-if="currentEvent.event" class="event-participants">
+                  <span v-if="currentEvent.event.ch1 && currentEvent.event.ch1 !== 'NONE'">{{ currentEvent.event.ch1 }}</span>
+                  <span v-if="currentEvent.event.ch2 && currentEvent.event.ch2 !== 'NONE'"><small>关联玩家</small>{{ currentEvent.event.ch2 }}</span>
+                  <span v-if="currentEvent.event.ch3 && currentEvent.event.ch3 !== 'NONE'"><small>关联玩家</small>{{ currentEvent.event.ch3 }}</span>
+                </div>
+                <p class="event-hint">角色台词与叙述来自现有文本资源。CO 和报告只代表公开发言。</p>
               </div>
-              <p class="event-hint">角色台词与叙述来自现有文本资源。CO 和报告只代表公开发言。</p>
-              <div class="event-controls"><span>尚有 {{ pending.length }} 条待确认</span><button data-testid="next-event" class="primary-button" :disabled="busy" @click="nextEvent">{{ pending.length === 1 ? '读完，继续对局' : '继续阅读' }} <span aria-hidden="true">→</span></button></div>
-            </div>
-            <div v-else-if="finished" class="event-content settlement" role="status">
-              <span class="event-number">THE FINAL VERDICT</span><h2>{{ results[update.view.result] || '对局结束' }}</h2><p>本局身份现已揭晓，查看玩家列表回顾各自阵营。</p>
-            </div>
-            <div v-else class="event-content decision">
-              <span class="event-number">YOUR DECISION</span><h2>今天，投给谁？</h2><p>从玩家列表勾选指定投票候补，再确认投票。</p><p>遇到回避 CO 时，先听完发言，再重新判断。共有者回避后可取消其目标，另选候补。</p>
-            </div>
+              <div v-else-if="finished" class="event-content settlement" role="status">
+                <span class="event-number">THE FINAL VERDICT</span><h2>{{ results[update.view.result] || '对局结束' }}</h2><p>本局身份现已揭晓，查看玩家列表回顾各自阵营。</p>
+              </div>
+              <div v-else class="event-content decision">
+                <span class="event-number">YOUR DECISION</span><h2>今天，投给谁？</h2><p>从玩家列表勾选指定投票候补，再确认投票。</p><p>遇到回避 CO 时，先听完发言，再重新判断。共有者回避后可取消其目标，另选候补。</p>
+              </div>
+            </GameStage>
+            <div v-if="currentEvent" class="event-controls"><span>尚有 {{ pending.length }} 条待确认</span><button data-testid="next-event" class="primary-button" :disabled="busy" @click="nextEvent">{{ pending.length === 1 ? '读完，继续对局' : '继续阅读' }} <span aria-hidden="true">→</span></button></div>
             <footer class="decision-footer" v-if="!finished">
               <div><span class="eyebrow">指定候补</span><p>{{ voteTargets.length ? voteTargets.map(name).join('、') : '尚未选择' }}</p></div>
               <button class="primary-button" data-testid="vote" :disabled="!canVote" @click="vote('DESIGNATED')">{{ busy ? '处理中…' : '确认投票' }}</button>
@@ -121,7 +124,8 @@ function name(number) {
 
           <section class="players panel" aria-label="公开玩家列表">
             <header class="panel-heading"><span class="eyebrow">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
-            <div class="player-list">
+            <p id="player-list-help" class="list-help">名单较长时可在列表内滚动。按 Tab 聚焦列表后可用方向键；继续按 Tab 可逐个选择候补。</p>
+            <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" tabindex="0" aria-describedby="player-list-help">
               <label v-for="player in players" :key="player.playerNumber" class="player-row" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
                 <span class="player-number">{{ String(player.playerNumber).padStart(2, '0') }}</span>
                 <span class="player-identity"><strong>{{ player.character }}</strong><small>{{ finished ? '真实身份 · ' + roles[revealed.get(player.playerNumber)] : roles[player.claimedRole] }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日离场</span></small></span>
@@ -179,20 +183,30 @@ function name(number) {
           </div>
         </section>
 
-        <section v-for="skill in claimedSkills" :key="skill.type" class="panel claim-inquiry" :aria-label="skill.label" lang="ja">
-          <header class="panel-heading"><span>{{ skill.label }}</span><span>公開COの行動者だけを表示します。予約は結果を保証しません。</span></header>
-          <p v-if="!skill.actors.length" class="avoidance-help">この技能の公開CO行動者はいません。</p>
-          <fieldset v-for="actor in skill.actors" :key="actor.playerNumber" class="claim-player-list"
-            :data-testid="'claimed-' + skill.type + '-' + actor.playerNumber" :disabled="!canDecide">
-            <legend>{{ name(actor.playerNumber) }} · CO順 {{ actor.claimedRoleOrder }}</legend>
-            <label v-for="target in skill.targets" :key="target" class="claim-player">
-              <input type="checkbox" :aria-label="skill.label + ' ' + actor.playerNumber + '番から' + target + '番へ'"
-                :checked="actor.targets.includes(target)"
-                @click.prevent="setClaimedTarget(skill.type, actor.playerNumber, target, !actor.targets.includes(target))">
-              <span>{{ name(target) }}</span>
-            </label>
-          </fieldset>
-        </section>
+        <div v-if="claimedSkills.length" class="claimed-skills-layout">
+          <section v-for="skill in claimedSkills" :key="skill.type" class="panel claim-inquiry" :aria-label="skill.label" lang="ja">
+            <header class="panel-heading"><span>{{ skill.label }} · {{ skill.actors.length }}人</span><span>公開COの行動者だけを表示します。予約は結果を保証しません。</span></header>
+            <p v-if="!skill.actors.length" class="avoidance-help">この技能の公開CO行動者はいません。</p>
+            <template v-else>
+              <p class="list-help" :id="'claimed-help-' + skill.type">行ごとに折りたためます。長い一覧は枠内でスクロールできます。Tabで枠に移動し、方向キーで閲覧できます。</p>
+              <div class="claimed-actor-list" role="region" :aria-label="skill.label + ' 一覧'" tabindex="0"
+                :aria-describedby="'claimed-help-' + skill.type">
+                <details v-for="actor in skill.actors" :key="actor.playerNumber" class="claimed-actor" open>
+                  <summary>{{ name(actor.playerNumber) }} · CO順 {{ actor.claimedRoleOrder }}<span>予約 {{ actor.targets.length }}件</span></summary>
+                  <fieldset class="claim-player-list" :data-testid="'claimed-' + skill.type + '-' + actor.playerNumber" :disabled="!canDecide">
+                    <legend class="visually-hidden">{{ name(actor.playerNumber) }} · CO順 {{ actor.claimedRoleOrder }}</legend>
+                    <label v-for="target in skill.targets" :key="target" class="claim-player">
+                      <input type="checkbox" :aria-label="skill.label + ' ' + actor.playerNumber + '番から' + target + '番へ'"
+                        :checked="actor.targets.includes(target)"
+                        @click.prevent="setClaimedTarget(skill.type, actor.playerNumber, target, !actor.targets.includes(target))">
+                      <span>{{ name(target) }}</span>
+                    </label>
+                  </fieldset>
+                </details>
+              </div>
+            </template>
+          </section>
+        </div>
 
         <section v-if="claimRoles.length" class="panel claim-inquiry" aria-label="職業別CO確認" lang="ja">
           <header class="panel-heading"><span>職業別CO確認</span><span>発言を読み終えてから操作してください。</span></header>
