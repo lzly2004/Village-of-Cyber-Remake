@@ -166,6 +166,15 @@ export function useGuestGame() {
 
   function refresh() { return run(sync) }
 
+  function setAvoidance(enabled) {
+    if (!canDecide.value) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/avoidance', {
+        method: 'PUT', body: { expectedRevision: update.value.revision, enabled },
+      }))
+    })
+  }
+
   function toggleClaimPlayer(player, selected) {
     if (!canDecide.value || !claimPlayers.value.includes(player)) return
     if (selected && !claimPlayerDraft.value.includes(player)) claimPlayerDraft.value.push(player)
@@ -209,6 +218,6 @@ export function useGuestGame() {
   return {
     sessionId, cursor, update, busy, uncertain, notice, storageWarning,
     pending, currentEvent, canDecide, canVote, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
-    start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, refresh, release,
+    start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
   }
 }

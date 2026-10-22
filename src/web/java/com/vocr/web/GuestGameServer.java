@@ -86,6 +86,10 @@ public final class GuestGameServer implements AutoCloseable
                 AskClaimByPlayersCommand request = read(ctx, AskClaimByPlayersCommand.class);
                 send(ctx, session(ctx.pathParam("id")).requestClaims(request));
             });
+            config.routes.put("/api/v1/games/{id}/avoidance", ctx -> {
+                SetAvoidanceCommand request = read(ctx, SetAvoidanceCommand.class);
+                send(ctx, session(ctx.pathParam("id")).setAvoidance(request));
+            });
             config.routes.delete("/api/v1/games/{id}", ctx -> {
                 remove(ctx.pathParam("id"));
                 ctx.status(204);

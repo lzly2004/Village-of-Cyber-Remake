@@ -41,6 +41,7 @@ Javalin/SLF4J 的提示，框架内部日志使用 NOP。正式运行监控与�
 | POST `/api/v1/games/{id}/votes` | `{"expectedRevision":2,"method":"DESIGNATED","candidates":[3]}` | 200，`{voteCompleted, update}` |
 | POST `/api/v1/games/{id}/claims/by-role` | `{"expectedRevision":1,"role":"zhan"}` | 200，询问后的 `GameUpdate` |
 | POST `/api/v1/games/{id}/claims/by-players` | `{"expectedRevision":1,"players":[9,1]}` | 200，询问后的 `GameUpdate` |
+| PUT `/api/v1/games/{id}/avoidance` | `{"expectedRevision":1,"enabled":false}` | 200，设置后的 `GameUpdate` |
 | DELETE `/api/v1/games/{id}` | 无 | 204，释放该局；随后读取返回 404 |
 
 配役可取 `jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing`。
@@ -62,6 +63,12 @@ WEB-007 已开放按玩家询问：players 必须非空、无重复/无 null，�
 非法/死亡/越界目标返回 400，旧版本与终局返回对应 409，失败前置校验不改变状态。
 网页多选是尚未发送的临时草稿，不修改投票目标、不进入 sessionStorage；取消勾选不发请求。
 新权威快照、同步或刷新会清理草稿；已执行询问的公开状态与未读事件仍按游标恢复，绝不自动重新询问。
+
+WEB-008 已开放回避设置：enabled 表示设为开启/关闭，不是 toggle；新局默认 true，
+每个合法设置（含设置同值）revision 加 1，不产生新事件，值由 selections.avoidanceEnabled 权威返回。
+浏览器等待服务响应后才改变显示，刷新从服务恢复，不在本地另存偏好；409 不重放，失响应时先同步。
+该开关按既有核心规则影响指定投票的普通回避 CO，关闭后共有者仍可触发回避，并非禁用一切 CO。
+终局拒绝设置，其他错误沿用既有错误表；未改变核心规则或开关作用范围。
 
 ## 更新契约
 

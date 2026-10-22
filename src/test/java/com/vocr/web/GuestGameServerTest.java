@@ -11,6 +11,7 @@ import com.vocr.domain.peiyi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -103,6 +104,11 @@ class GuestGameServerTest
                     new AskClaimByRoleCommand(direct.currentRevision(), Role.zhan));
             assertEquals(409, finishedClaim.statusCode(), finishedClaim.body());
             assertEquals("INVALID_STATE", json.readTree(finishedClaim.body()).path("code").asText());
+            assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
+            HttpResponse<String> finishedAvoidance = request(server, "PUT", path + "/avoidance",
+                    new SetAvoidanceCommand(direct.currentRevision(), false));
+            assertEquals(409, finishedAvoidance.statusCode(), finishedAvoidance.body());
+            assertEquals("INVALID_STATE", json.readTree(finishedAvoidance.body()).path("code").asText());
             assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
             HttpResponse<String> finishedPlayers = request(server, "POST", path + "/claims/by-players",
                     new AskClaimByPlayersCommand(direct.currentRevision(), List.of(1)));
@@ -276,6 +282,119 @@ class GuestGameServerTest
                     .stream().sorted().toList());
             JsonNode after = json.readTree(request(server, "GET", path, null).body());
             assertEquals(2, after.path("revision").asLong());
+            GuestWireContract.assertUpdate(after);
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = peiyi.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void avoidance_shouldMatchDirectStateAcrossRepeatedSettingsAndIsolateGuests(peiyi configuration) throws Exception
+    {
+        long seed = 4200 + configuration.ordinal();
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, seed), 3).start(0))
+        {
+            GameSession direct = SeededGuestSession.create("avoidance-direct", seed);
+            direct.startGame(new StartGameCommand(0, configuration));
+            String path = create(server, configuration.name());
+            String other = create(server, configuration.name());
+            JsonNode otherBefore = json.readTree(request(server, "GET", other, null).body());
+            assertTrue(otherBefore.path("selections").path("avoidanceEnabled").asBoolean());
+            for (boolean enabled : new boolean[]{false, false, true})
+            {
+                GameUpdate before = direct.currentUpdate(0);
+                var command = new SetAvoidanceCommand(before.revision(), enabled);
+                GameUpdate expected = direct.setAvoidance(command);
+                HttpResponse<String> response = request(server, "PUT", path + "/avoidance", command);
+                assertEquals(200, response.statusCode(), response.body());
+                JsonNode actual = json.readTree(response.body());
+                assertEquals(wireJson(expected), actual);
+                GuestWireContract.assertUpdate(actual);
+                assertEquals(before.revision() + 1, actual.path("revision").asLong());
+                assertEquals(enabled, actual.path("selections").path("avoidanceEnabled").asBoolean());
+                assertTrue(actual.path("events").isEmpty(), "setting the flag must not invent dialogue");
+                String cursorPath = path + "?eventCursor=" + before.nextEventCursor();
+                assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
+                assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
+                assertEquals(otherBefore, json.readTree(request(server, "GET", other, null).body()));
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true,9,false", "false,9,true", "false,3,false"})
+    void avoidance_shouldControlRealVotingButPreserveSharedRoleException(
+            boolean enabled, int target, boolean voteCompleted) throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, 4202), 1).start(0))
+        {
+            GameSession direct = SeededGuestSession.create("avoidance-vote", 4202);
+            direct.startGame(new StartGameCommand(0, peiyi.tongchang));
+            String path = create(server, "tongchang");
+            var setting = new SetAvoidanceCommand(direct.currentRevision(), enabled);
+            assertEquals(wireJson(direct.setAvoidance(setting)),
+                    json.readTree(request(server, "PUT", path + "/avoidance", setting).body()));
+            var selection = new SetAllTargetSelectionCommand(direct.currentRevision(), SelectionType.VOTE, target, true);
+            GameUpdate selected = direct.setTargetSelection(selection);
+            assertEquals(wireJson(selected), json.readTree(request(server, "PUT", path + "/vote-target",
+                    new GuestGameServer.VoteTarget(selection.expectedRevision(), target, true)).body()));
+            var command = new ExecuteVoteCommand(direct.currentRevision(), VotingMethod.DESIGNATED,
+                    selected.legalVote(VotingMethod.DESIGNATED).orElseThrow().candidates());
+            VoteExecutionResult expected = direct.executeVote(command);
+            HttpResponse<String> response = request(server, "POST", path + "/votes", command);
+            assertEquals(200, response.statusCode(), response.body());
+            JsonNode actual = json.readTree(response.body());
+            assertEquals(wireJson(expected), actual);
+            GuestWireContract.assertVoteResult(actual);
+            assertEquals(voteCompleted, actual.path("voteCompleted").asBoolean());
+            assertEquals(enabled, actual.path("update").path("selections").path("avoidanceEnabled").asBoolean());
+            if (!voteCompleted) assertTrue(expected.update().presentedEvents().stream()
+                    .anyMatch(event -> event.stage() == EventPresentationStage.AFTERNOON_DIALOGUE));
+            if (!enabled && target == 3) assertTrue(actual.path("update").path("events").findValuesAsText("eventname")
+                    .contains("hbg"), "shared-role avoidance is independent of the flag");
+        }
+    }
+
+    @Test
+    void avoidance_shouldRejectInvalidSettingsAndOnlyAcceptOneConcurrentRevision() throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, 4202), 2).start(0))
+        {
+            String path = create(server, "tongchang");
+            String endpoint = path + "/avoidance";
+            JsonNode before = json.readTree(request(server, "GET", path, null).body());
+            for (String payload : List.of("{}", "null", "{", "{\"enabled\":false}",
+                    "{\"expectedRevision\":1}", "{\"expectedRevision\":1,\"enabled\":null}",
+                    "{\"expectedRevision\":null,\"enabled\":false}",
+                    "{\"expectedRevision\":-1,\"enabled\":false}",
+                    "{\"expectedRevision\":1.5,\"enabled\":false}",
+                    "{\"expectedRevision\":1,\"enabled\":{}}", "{\"expectedRevision\":1,\"enabled\":[]}",
+                    "{\"expectedRevision\":1,\"enabled\":\"not-a-boolean\"}",
+                    "{\"expectedRevision\":1,\"enabled\":false,\"extra\":true}",
+                    "{\"expectedRevision\":1,\"enabled\":false} {}"))
+            {
+                HttpResponse<String> response = raw(server, "PUT", endpoint, payload);
+                assertEquals(400, response.statusCode(), payload + ": " + response.body());
+                assertEquals("INVALID_REQUEST", json.readTree(response.body()).path("code").asText());
+                assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            }
+            assertEquals(404, request(server, "PUT", "/api/v1/games/missing/avoidance",
+                    new SetAvoidanceCommand(1, false)).statusCode());
+            HttpResponse<String> stale = request(server, "PUT", endpoint, new SetAvoidanceCommand(0, false));
+            assertEquals(409, stale.statusCode());
+            assertEquals("STALE_REVISION", json.readTree(stale.body()).path("code").asText());
+            assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            String payload = json.writeValueAsString(new SetAvoidanceCommand(1, false));
+            var first = client.sendAsync(http(server, "PUT", endpoint, payload), HttpResponse.BodyHandlers.ofString());
+            var second = client.sendAsync(http(server, "PUT", endpoint, payload), HttpResponse.BodyHandlers.ofString());
+            CompletableFuture.allOf(first, second).join();
+            assertEquals(List.of(200, 409), List.of(first.join().statusCode(), second.join().statusCode())
+                    .stream().sorted().toList());
+            JsonNode after = json.readTree(request(server, "GET", path, null).body());
+            assertEquals(2, after.path("revision").asLong());
+            assertFalse(after.path("selections").path("avoidanceEnabled").asBoolean());
             GuestWireContract.assertUpdate(after);
         }
     }

@@ -78,6 +78,7 @@ test('真实对局从浏览器指定投票直至终局，并刷新恢复揭晓',
     await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
     await expect(page.getByRole('region', { name: '職業別CO確認' })).toHaveCount(0)
     await expect(page.getByRole('region', { name: 'プレイヤー別CO確認' })).toHaveCount(0)
+    await expect(page.getByRole('switch', { name: '投票回避CO' })).toHaveCount(0)
   } finally { await release(request, id) }
 })
 
@@ -390,6 +391,94 @@ test('按玩家 CO 已执行但丢失响应，先同步且不重复提交', asyn
     await expect(panel.getByRole('checkbox', { checked: true })).toHaveCount(0)
     await readEvents(page)
     await expect(panel.getByRole('checkbox').first()).toBeEnabled()
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(applied)
+    expect(writes).toBe(1)
+  } finally { await release(request, id) }
+})
+
+test('回避开关等待权威响应，刷新恢复且新局重置默认值', async ({ page, request }, testInfo) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  let nextId
+  let proceed = () => {}
+  try {
+    const toggle = page.getByRole('switch', { name: '投票回避CO' })
+    await expect(toggle).toHaveAttribute('aria-checked', 'true')
+    await expect(toggle).toBeDisabled()
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    const gate = new Promise(resolve => { proceed = resolve })
+    await page.route('**/avoidance', async route => { await gate; await route.continue() })
+    const sent = page.waitForRequest(req => req.method() === 'PUT' && req.url().endsWith('/avoidance'))
+    const response = page.waitForResponse(res => res.url().endsWith('/avoidance'))
+    await toggle.click()
+    expect((await sent).postDataJSON()).toEqual({ expectedRevision: before.revision, enabled: false })
+    await expect(toggle).toBeDisabled()
+    await expect(toggle).toHaveAttribute('aria-checked', 'true')
+    proceed()
+    const changed = await (await response).json()
+    expect(changed.revision).toBe(before.revision + 1)
+    expect(changed.selections.avoidanceEnabled).toBe(false)
+    await expect(toggle).toHaveAttribute('aria-checked', 'false')
+    await page.unroute('**/avoidance')
+    await page.reload()
+    await expect(toggle).toHaveAttribute('aria-checked', 'false')
+    await expect(toggle).toBeEnabled()
+    expect((await (await request.get('/api/v1/games/' + id)).json()).revision).toBe(changed.revision)
+    await page.screenshot({ path: testInfo.outputPath('avoidance.png'), fullPage: true })
+    await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-checked', 'true')
+    await release(request, id)
+    await start(page, '通常')
+    nextId = (await saved(page)).sessionId
+    expect(nextId).not.toBe(id)
+    await expect(toggle).toHaveAttribute('aria-checked', 'true')
+    await expect(toggle).toBeDisabled()
+  } finally { proceed(); await release(request, id); await release(request, nextId) }
+})
+
+test('回避开关旧版本只同步权威值，不自动重放切换', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    expect((await request.put('/api/v1/games/' + id + '/avoidance', {
+      data: { expectedRevision: before.revision, enabled: false },
+    })).ok()).toBeTruthy()
+    const authority = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.method() === 'PUT' && req.url().endsWith('/avoidance')) writes++ })
+    const toggle = page.getByRole('switch', { name: '投票回避CO' })
+    await toggle.click()
+    await expect(page.getByRole('alert')).toContainText('已重新同步')
+    await expect(toggle).toHaveAttribute('aria-checked', 'false')
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
+    expect(writes).toBe(1)
+  } finally { await release(request, id) }
+})
+
+test('回避设置已执行但响应丢失，暂停操作并同步权威值', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.method() === 'PUT' && req.url().endsWith('/avoidance')) writes++ })
+    await page.route('**/avoidance', async route => { await route.fetch(); await route.abort('failed') })
+    const toggle = page.getByRole('switch', { name: '投票回避CO' })
+    await toggle.click()
+    await expect(page.getByRole('alert')).toContainText('连接未能确认')
+    await expect(toggle).toHaveAttribute('aria-checked', 'true')
+    await expect(toggle).toBeDisabled()
+    const applied = await (await request.get('/api/v1/games/' + id)).json()
+    expect(applied.revision).toBe(before.revision + 1)
+    expect(applied.selections.avoidanceEnabled).toBe(false)
+    await page.unroute('**/avoidance')
+    await page.getByRole('button', { name: '重新同步' }).click()
+    await expect(toggle).toHaveAttribute('aria-checked', 'false')
+    await expect(toggle).toBeEnabled()
     expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(applied)
     expect(writes).toBe(1)
   } finally { await release(request, id) }

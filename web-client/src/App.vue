@@ -6,7 +6,7 @@ import { configurations, configurationName, roles, claimRoleNames, stages, resul
 const {
   sessionId, cursor, update, busy, uncertain, notice, storageWarning,
   pending, currentEvent, canDecide, canVote, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
-  start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, refresh, release,
+  start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
@@ -116,6 +116,15 @@ function name(number) {
             </div>
           </section>
         </div>
+
+        <section v-if="update.phase === 'DAY_DECISION'" class="panel claim-inquiry" aria-label="投票回避設定" lang="ja">
+          <header class="panel-heading"><span>投票回避CO</span>
+            <button class="primary-button" role="switch" aria-label="投票回避CO"
+              :aria-checked="update.selections.avoidanceEnabled" :disabled="!canDecide"
+              @click="setAvoidance(!update.selections.avoidanceEnabled)">{{ update.selections.avoidanceEnabled ? '回避あり' : '回避なし' }}</button>
+          </header>
+          <p class="avoidance-help">指定投票時の回避CO。共有の回避は無効化されません。</p>
+        </section>
 
         <section v-if="claimRoles.length" class="panel claim-inquiry" aria-label="職業別CO確認" lang="ja">
           <header class="panel-heading"><span>職業別CO確認</span><span>発言を読み終えてから操作してください。</span></header>

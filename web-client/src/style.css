@@ -84,6 +84,7 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .player-state { font-size: 10px; color: #7c8c70; }
 .vote-history { margin-top: 24px; }
 .claim-inquiry { margin-top: 24px; }
+.avoidance-help { margin: 16px 22px; font-size: 12px; color: #70806c; }
 .claim-actions { display: flex; flex-wrap: wrap; gap: 12px; padding: 20px 22px; }
 .claim-player-list { display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 20px 22px 0; }
 .claim-player { display: flex; align-items: center; gap: 8px; font-size: 13px; }
