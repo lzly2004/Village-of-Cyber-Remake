@@ -138,7 +138,7 @@ npm run test:e2e
 ```
 
 `VOCR_GRADLE` 避开本机已有 CRLF 的 Wrapper，不修改用户文件；浏览器路径必须与安装缓存一致。
-如需离线启动，可显式设置
+仅默认`npm run test:e2e`如需离线启动，可显式设置
 `VOCR_WEB_SERVER_COMMAND='bash tools/run-gradle-safe.sh runWebTestServer --args=17071 --offline'`，
 但须在验收记录中注明用了覆盖命令，不能把它当作默认配置路径的证据。
 安全入口检查内存并串行启动 JVM；不要绕过监护、并行启动构建或附加未批准的全量任务。
@@ -146,6 +146,8 @@ npm run test:e2e
 ## WEB-017 七配役内部功能门
 
 这是本机回环自动试玩，不是公网发布或人工原版视听验收。先按上段设置同一工具链环境，
+必须先`unset VOCR_WEB_SERVER_COMMAND`：gate显式拒绝任何已设置的命令覆盖（包括空串），
+在启动服务前提示错误，不自动猜测或改写自定义命令；上段的offline命令覆盖仅供默认e2e使用。
 在本目录**依次**执行（前一步成功才继续，不能并行 JVM）：
 
 ```sh
@@ -159,6 +161,9 @@ bash ../tools/run-gradle-safe.sh test --tests 'com.vocr.web.Web017JourneyTest' -
 而不是靠FREE回退声称覆盖。妖狐4203无公开护卫者是显式断言的合法缺席，不删除该局或换种子。
 
 脚本带main/test/web全部Java源码SHA-256指纹；源码改变后必须重跑生成步骤。
+该指纹不包含`config/probability.json`、`build.gradle`或前端源码；概率/构建配置变化也必须重新生成，
+不能把指纹相同当作全部输入未变。前端变化须按影响验证浏览器；若同轮准备运行gate，先重新生成对照，
+不要把可能的响应差异只归咎于浏览器。不在本批扩展指纹或改游戏输入。
 这些文件不提交、不替换黄金摘要、不进入桌面或生产Web产物，不含会话凭据。
 `npm run test:gate`缺产物或指纹不匹配会失败；不要手工刷新文件来掩盖对等断言失败。
 Gradle若显示UP-TO-DATE可复用同源成功结果；需强制重跑时可在同一定向命令末尾追加`--rerun-tasks`，
