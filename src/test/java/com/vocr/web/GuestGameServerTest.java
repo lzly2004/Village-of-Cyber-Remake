@@ -1020,6 +1020,74 @@ class GuestGameServerTest
         }
     }
 
+    @ParameterizedTest
+    @EnumSource(com.vocr.domain.whyDie.class)
+    void publicDeathClassification_shouldBeSafeOverRealHttpAndPreciseOnlyWhenFinished(com.vocr.domain.whyDie reason) throws Exception
+    {
+        var fixture = new PublicInformationFixture();
+        fixture.deaths[6] = reason; fixture.deathDays[6] = reason == com.vocr.domain.whyDie.NONE ? 0 : 2;
+        try (GuestGameServer server = new GuestGameServer(fixture::session, 1).start(0))
+        {
+            String path = create(server, "tongchang");
+            JsonNode running = json.readTree(request(server, "GET", path, null).body());
+            GuestWireContract.assertUpdate(running);
+            String expected = switch (reason) {
+                case NONE -> "NONE";
+                case chuxing -> "EXECUTION";
+                case daymaozhou -> "DAY_CAT_CURSE";
+                case dayhouzhui -> "DAY_PURSUED";
+                default -> "NIGHT_DEATH";
+            };
+            assertEquals(expected, running.path("view").path("players").get(5).path("deathReason").asText());
+            assertEquals(running, json.readTree(request(server, "GET", path + "?eventCursor=0", null).body()));
+            fixture.result = com.vocr.domain.GameResult.VILLAGE_WIN;
+            JsonNode finished = json.readTree(request(server, "GET", path, null).body());
+            GuestWireContract.assertUpdate(finished);
+            assertEquals(reason.name(), finished.path("view").path("players").get(5).path("deathReason").asText());
+            assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
+            assertEquals(expected, running.path("view").path("players").get(5).path("deathReason").asText());
+        }
+    }
+
+    @Test
+    void publicInformation_shouldRecoverByCursorAndRestartMustInvalidateOldSession() throws Exception
+    {
+        JsonNode before;
+        String oldPath;
+        try (GuestGameServer server = new GuestGameServer(id -> SeededGuestSession.create(id, 4202), 1).start(0))
+        {
+            oldPath = create(server, "tongchang");
+            before = json.readTree(request(server, "GET", oldPath, null).body());
+            GuestWireContract.assertUpdate(before);
+            long cursor = before.path("nextEventCursor").asLong();
+            JsonNode resumed = json.readTree(request(server, "GET", oldPath + "?eventCursor=" + cursor, null).body());
+            assertEquals(before.path("publicInformation"), resumed.path("publicInformation"));
+            assertEquals(before.path("view"), resumed.path("view"));
+            assertTrue(resumed.path("events").isEmpty());
+        }
+        try (GuestGameServer restarted = new GuestGameServer(id -> SeededGuestSession.create(id, 4202), 1).start(0))
+        {
+            assertEquals(404, request(restarted, "GET", oldPath, null).statusCode());
+            String newPath = create(restarted, "tongchang");
+            assertNotEquals(oldPath, newPath);
+            JsonNode fresh = json.readTree(request(restarted, "GET", newPath, null).body());
+            GuestWireContract.assertUpdate(fresh);
+            assertEquals(before, fresh, "fixed-seed new game is safe and deterministic, not restored old credentials");
+        }
+    }
+
+    @Test
+    void diagnosticState_shouldNotBeAvailableAsHttpEndpoint() throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(id -> SeededGuestSession.create(id, 4202), 1).start(0))
+        {
+            String path = create(server, "tongchang");
+            for (String endpoint : List.of("/debug", "/context", "/recorder", "/suspicion"))
+                assertEquals(404, request(server, "GET", path + endpoint, null).statusCode());
+            GuestWireContract.assertUpdate(json.readTree(request(server, "GET", path, null).body()));
+        }
+    }
+
     private JsonNode wireJson(Object value) throws Exception
     {
         // 经相同 JSON 文本边界比较，避免内存 LongNode 与解析后 IntNode 类型差异。

@@ -24,6 +24,18 @@ public final class Web013AuditProbe
     {
         DebugLogger.getInstance().setEnabled(false);
         var directory = Files.createTempDirectory("vocr-web013-data-");
+        try {
+            runProbe(directory);
+        } finally {
+            // Only these exact paths belong to this invocation. Never recurse
+            // over /tmp or delete another run's evidence directory.
+            Files.deleteIfExists(directory.resolve("replay.json"));
+            Files.deleteIfExists(directory);
+        }
+    }
+
+    private static void runProbe(java.nio.file.Path directory) throws Exception
+    {
         var constructor = ReplayManager.class.getDeclaredConstructor(String.class);
         constructor.setAccessible(true);
         var replay = constructor.newInstance(directory.resolve("replay.json").toString());
@@ -76,9 +88,9 @@ public final class Web013AuditProbe
         projector.setAccessible(true);
         var view = (com.vocr.application.PlayerViewSnapshot) projector.invoke(null, ui.ctx);
         require(view.result() == GameResult.NONE, "running view, not settlement");
-        require(view.players().get(5).deathReason() == whyDie.zhousha, "existing running projector discloses exact night cause");
-        System.out.println("CURRENT_RUNNING_PROJECTOR player=6 deathReason=" + view.players().get(5).deathReason()
-                + " / desktopMarker=" + ImageNames.deathMarker(view.players().get(5).deathReason()));
+        require(view.players().get(5).deathReason().name().equals("NIGHT_DEATH"), "running projector must hide exact night cause");
+        System.out.println("FIXED_RUNNING_PROJECTOR player=6 deathReason=" + view.players().get(5).deathReason()
+                + " / desktopMarker=" + ImageNames.deathMarker(ui.ctx.getDeathReason(6)));
         System.out.println("PASS: actual renderer assertions; no interactive window, real images, or live HTTP exercised");
     }
 

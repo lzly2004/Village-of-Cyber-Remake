@@ -640,6 +640,8 @@ class GameApplicationTest
                         case "getDeathCounter" -> deadPlayers.size();
                         case "getPeiyi" -> peiyi.jianyi;
                         case "getEndResult" -> endResult;
+                        case "isNonHumanMarked" -> false;
+                        case "getTop3SuspectedPlayer", "getCat", "getFox", "getDeviant" -> 0;
                         case "getCharacterNumber" -> (Integer) arguments[0];
                         case "getDeathReason" -> deadPlayers.contains((Integer) arguments[0])
                                 ? com.vocr.domain.whyDie.chuxing

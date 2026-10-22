@@ -3,6 +3,7 @@ package com.vocr.application;
 import com.vocr.domain.CharacterEnglishName;
 import com.vocr.domain.GameContextView;
 import com.vocr.domain.Role;
+import com.vocr.domain.GameResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,8 @@ final class PlayerViewProjector
                     player,
                     CharacterEnglishName.values()[context.getCharacterNumber(player)],
                     context.isAlive(player),
-                    context.getDeathReason(player),
+                    PublicDeathReason.project(context.getDeathReason(player), context.getEndResult() == GameResult.NONE
+                            ? BusinessPhase.DAY_DECISION : BusinessPhase.FINISHED),
                     context.getDeathDay(player),
                     Role.values()[context.getClaimedRole(player)],
                     context.getClaimedRoleOrder(player),

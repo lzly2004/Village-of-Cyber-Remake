@@ -27,9 +27,13 @@ class GuestSerializationBoundaryTest
             ClaimInquiryOptions.class, LegalTargetSelection.class, ClaimedRoleActor.class,
             VoteResultSnapshot.class, VoteRoundSnapshot.class, VoteLineSnapshot.class,
             RevealedPlayerRole.class, Event.class, PresentedEvent.class,
-            GuestGameServer.CreatedGame.class, VoteExecutionResult.class);
+            GuestGameServer.CreatedGame.class, VoteExecutionResult.class,
+            PublicInformation.class, PublicInformation.SkillReport.class, PublicInformation.SkillResult.class,
+            PublicInformation.SuspicionSummary.class, PublicInformation.SuspicionRow.class,
+            PublicInformation.DeathDay.class, PublicInformation.Execution.class);
     private static final Set<Class<?>> SCALARS = Set.of(int.class, long.class, boolean.class, Integer.class,
-            String.class, peiyi.class, Role.class, GameResult.class, whyDie.class,
+            String.class, peiyi.class, Role.class, GameResult.class, PublicDeathReason.class,
+            PublicInformation.ReportColor.class, PublicInformation.Comparison.class,
             CharacterEnglishName.class, SelectionType.class, VotingMethod.class,
             BusinessPhase.class, EventPresentationStage.class, EventName.class);
 
@@ -136,6 +140,21 @@ class GuestSerializationBoundaryTest
         assertTrue(event.path("ch1").isNull());
         assertEquals("NONE", event.path("ch2").asText());
         assertTrue(event.path("ch3").isNull());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"beiyao", "nightmaozhou", "nighthouzhui", "zhousha"})
+    void valueGate_shouldRejectExactNightCauseAnywhereInRunningResponse(String cause) throws Exception
+    {
+        ObjectNode player = initialUpdate();
+        ((ObjectNode) player.path("view").path("players").get(0)).put("deathReason", cause);
+        assertThrows(AssertionError.class, () -> GuestWireContract.assertUpdate(player));
+        ObjectNode nested = initialUpdate();
+        ((ObjectNode) nested.path("events").get(0)).put("ch1", cause);
+        assertThrows(AssertionError.class, () -> GuestWireContract.assertUpdate(nested));
+        ObjectNode secret = initialUpdate();
+        ((ObjectNode) secret.path("publicInformation").path("suspicion")).put("rawScore", 100);
+        assertThrows(AssertionError.class, () -> GuestWireContract.assertUpdate(secret));
     }
 
     private ObjectNode initialUpdate() throws Exception

@@ -875,6 +875,22 @@ for (const { type, skill, label, allLabel } of [
   })
 }
 
+test('安全公开投影与夜死分类在刷新后保持一致', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    expect(before.phase).toBe('DAY_DECISION')
+    expect(before.view.players.some(player => player.deathReason === 'NIGHT_DEATH')).toBe(true)
+    expect(JSON.stringify(before)).not.toMatch(/beiyao|nightmaozhou|nighthouzhui|zhousha/)
+    expect(before.publicInformation.suspicion).toEqual({ available: false, rows: [] })
+    await page.reload()
+    await expect(page.getByRole('region', { name: '当前事件' })).toBeVisible()
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(before)
+    expect(Object.keys(await saved(page)).sort()).toEqual(['eventCursor', 'sessionId'])
+  } finally { await release(request, id) }
+})
+
 test('手机视口无横向溢出，配役与主要操作仍可访问', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')

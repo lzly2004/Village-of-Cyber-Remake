@@ -108,13 +108,17 @@ legalTargetSelections.claimedActors 的 playerNumber（不是CO顺位），targe
 - `revision/phase/view`：状态版本、业务阶段、玩家公开状态与胜负；
 - `selections/legalVoteActions/claimInquiry/legalTargetSelections`：当前选择与合法候选；
 - `voteHistory/revealedRoles`：权威票型，以及仅在 FINISHED 阶段出现的真实身份揭晓；
+- `publicInformation`：经桌面审计的公开CO技能历史、日期受限怀疑摘要与公开死亡历史，见v1草案字段表；WEB-015才接入页面展示；
 - `eventCursor/nextEventCursor/events/presentedEvents`：半开窗口
   `[eventCursor,nextEventCursor)` 与同顺序的原始事件、展示阶段投影。
 
 游标应使用上一次成功处理后的 `nextEventCursor`。重复读取同一游标可重复取得事件，
 不会消耗其他客户端或桌面展示队列。命令响应只包含本次命令发布的事件窗口，
 刷新恢复可 GET 当前状态并按已保存游标补读。
-运行中响应不序列化核心上下文、真实职业、怀疑度、随机源或录像器。
+运行中响应不序列化核心上下文、真实职业、原始怀疑分数/矩阵、随机源或录像器。
+WEB-014按已批准的未上线v1修订：deathReason运行中只返回NONE/EXECUTION/DAY_CAT_CURSE/DAY_PURSUED/NIGHT_DEATH；
+仅FINISHED返回核心精确名称，未保留旧泄漏字段。四类夜死归一不吞并白天死因。无新端点、无核心枚举/存储格式修改。
+公开信息随权威快照重读；进程重启旧会话404，不是持久化恢复。
 
 ## 错误响应
 

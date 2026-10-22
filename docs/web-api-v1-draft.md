@@ -12,6 +12,8 @@
 - 新枚举值会影响既有消费者，不能一概按“增量”放行；须有兼容兜底和消费者测试，否则用 v2。删除/重命名字段、改变事件窗口语义或扩大原有错误含义同理。
 - 草案端点首次落地时可在其任务内定稿并同步文档；已实现端点不得借“草案”名义破坏兼容。尚待信息审计的字段不伪装成已冻结白名单。
 
+WEB-014例外：用户明确批准AUDIT-SEC-001，在v1正式上线前直接修订`deathReason`类型与语义，不保留泄漏旧字段。旧原型消费者须按下述阶段分类读取；当前Vue原型未使用该字段，新增`publicInformation`可忽略，WEB-015再接入展示。该例外不授权后续任意破坏兼容。
+
 ## 2. 核心操作目录
 
 路径中的 `{id}` 为本局凭据。`R` 表示 `expectedRevision`（非负整数）；所有写命令都从最近权威 update 取 R，不使用本地自增猜测。以下 JSON 形状是字段说明，不是可复制的带占位符 JSON。
@@ -44,7 +46,7 @@
 
 | 对象 | 字段 / 形状 | 约束 |
 |---|---|---|
-| GameUpdate | revision, phase, view, selections, legalVoteActions, claimInquiry, legalTargetSelections, voteHistory, revealedRoles, eventCursor, nextEventCursor, events, presentedEvents | phase 为 DAY_DECISION 或 FINISHED |
+| GameUpdate | revision, phase, view, selections, legalVoteActions, claimInquiry, legalTargetSelections, voteHistory, revealedRoles, publicInformation, eventCursor, nextEventCursor, events, presentedEvents | phase 为 DAY_DECISION 或 FINISHED |
 | view | configuration, gameDay, aliveCount, deathCount, result, players | 计数和人数一致；游戏日期以权威投影为准，不从事件游标推算 |
 | view.players[] | playerNumber, character, alive, deathReason, deathDay, claimedRole, claimedRoleOrder, comingOutDay | character 是外观标识，claimedRole 仅为公开声称，不是实际身份 |
 | selections | avoidanceEnabled, voteTargets, divination, guard | 当前日权威状态，客户端不维护跨日镜像 |
@@ -64,13 +66,31 @@ stage 为 `NIGHT_RESULT/DAY_DIALOGUE/AFTERNOON_DIALOGUE/EXECUTION/SETTLEMENT`。
 
 事件角色参数的 JSON `null` 与字符串 `"NONE"` 不相等：前者是未提供参数（Event 简写构造器将省略参数置 null），后者是显式的 CharacterEnglishName.NONE 枚举占位，均不对应可绘制的具体角色。客户端展示应同时处理两者；不能擅自将 wire 值互相改写，也不从此区别推断新的游戏规则。WEB-004 已验证两者的实际序列化区别。
 
-### WEB-013审计结论与WEB-014待定的公开信息扩展
+### WEB-014公开信息与死因值级契约
 
-首发必须包含经桌面实际行为审计确认的信息与技能报告；本草案保留 GameUpdate 可选响应字段 `publicInformation` 的扩展位置，**尚无具体 payload schema，也不得现在直接序列化核心数据**。WEB-013 产出逐字段公开条件与桌面证据；WEB-014 再定稿安全 DTO、字段类型/缺省及其契约测试；WEB-015 消费。旧客户端忽略该字段，缺失表示“不支持此投影”，不是“结果为空”。如审计需要不同结构，先更新草案及调用方再实现。
+逐字段来源见[公开信息审计](web-public-information-audit.md)。`view.players[].deathReason`不再采用核心whyDie类型，而是PublicDeathReason：
 
-WEB-013已完成，逐字段依据见[公开信息审计](web-public-information-audit.md)：当前公开CO行动者（含死亡者）的可见技能历史、报告行破绽，以及第3日起的怀疑前三项/强弱类别允许安全投影；不允许原始怀疑值、矩阵、未CO技能结果或额外真实身份。局内灵能从技能日2开始，不能套用Replay或旧参考的日1规则。
+- DAY_DECISION：仅`NONE / EXECUTION / DAY_CAT_CURSE / DAY_PURSUED / NIGHT_DEATH`。对应存活、处刑、白天猫咒、白天后追和四类夜死归一；白天原因不得被吞并。
+- FINISHED：`NONE / chuxing / daymaozhou / dayhouzhui / beiyao / nightmaozhou / nighthouzhui / zhousha`，保留原始精确值（用户批准的终局选择），而非桌面终局文字对猫咒/后追的合并粒度。此时全身份已揭晓；客户端仍须读完前置事件再展示终局。
+- 运行中完整响应任意嵌套位置不得出现四类精确夜死字面量；没有rawDeathReason等兼容后门。核心whyDie、游戏规则和持久化不改。
 
-**已知未修复缺口AUDIT-SEC-001**：当前`view.players[].deathReason`仍原样返回精确夜间原因，超出桌面局内统一夜死标记/事件。现有结构白名单没有值级脱敏保证。本轮不改当前wire事实；WEB-014需先获用户批准，修订未上线v1的公开死因分类及兼容规则，再实施运行中归一与终局精确展示。不能保留泄露旧字段仅新增安全字段，不能伪造为“咬杀”。此决策未通过不得进入投影或消费实施。
+本版始终返回非null `publicInformation`；数组均非null不可变。旧原型缺此字段表示“不支持”，不能视为“报告为空”。结构：
+
+| 对象 | 字段 / 形状 | 公开条件 |
+|---|---|---|
+| publicInformation | skillReports, suspicion, deathHistory | 完整最新公开状态，与事件游标无关 |
+| skillReports[] | playerNumber, claimedRole, claimedRoleOrder, exposed, results | 运行中当前公开zhan/ling/lie，包括死亡者；exposed仅是该报告行公开破绽，不代表真实职业 |
+| results[] | skillDay, targetPlayerNumber, color | 占卜从1、灵能/护卫从2，严格小于当前日及死亡日；不按CO日起点裁掉桌面可见旧历史；原始0不生成项 |
+| suspicion | available, rows | 仅运行中gameDay>2为true，否则false且rows为空 |
+| rows[] | playerNumber, targets, comparisons | 仅存活观察者，最多3个非零目标，原次序；comparisons数量=max(0,targets数量-1) |
+| deathHistory[] | day, executions, nightDeaths | 日1到当前日-1，逐日递增；每项可为空，空nightDeaths表示平和 |
+| executions[] | playerNumber, cause, prefixPlayers | cause仅EXECUTION/DAY_CAT_CURSE/DAY_PURSUED；按桌面狐/猫处刑组合规则；prefixPlayers至多一个桌面已显示的前缀玩家，不是额外角色索引 |
+
+`color`仅WHITE/BLACK/NOT_APPLICABLE；护卫只能NOT_APPLICABLE，不传护卫成功判断。报告不包括未CO真实技能者，不返回原始编码。
+`comparisons`为CLOSE(`=`)、SLIGHTLY_GREATER(`≧`)、GREATER(`>`)、MUCH_GREATER(`≫`)，内部相邻差依次<=2、<=5、<=10、其余，不发分数/差值/矩阵，不重新排名。CLOSE不等于数学意义分数相等。
+`nightDeaths`仅玩家编号，不带夜死子类；历史保留桌面公开分组，即使终局也不把该列表改成私有原因表。终局skillReports为空、suspicion不可用；精确死因只取终局玩家视图。
+
+刷新同游标读取保持公开状态不变；游标只裁事件，不能裁公开信息。进程重启不恢复会话：旧id为404，客户端清凭据，新局不是旧局持久化。HTTP测试用固定种子验证新进程新局的一致性，不承诺生产随机新局相同。
 
 运行中禁止返回 GameContextView、实际职业、核心怀疑度、随机源、非人计划、完整 recorder 或未经审计的私有技能结果。`claimedRole`、匿名预约与终局揭晓不等于允许扩大秘密公开。WEB-004 先为现有形状建立持续正/负门禁；后续新增字段必须显式更新白名单及条件测试，不能用宽泛豁免绕过。
 
@@ -127,7 +147,7 @@ Replay 不能只靠现有公开 GameUpdate 重建；旧录像包含的数据必�
 
 ## 7. 实现差距与持续契约验收
 
-本轮只交付文档，不更改已运行 API；以下在相应任务中完成代码和回归测试：
+WEB-003仅交付文档；后续已实现项目见上方当前契约与各轮验收记录，不能把下面的历史文档验证当作本轮运行证据：
 
 | 任务 | 必交证据 |
 |---|---|

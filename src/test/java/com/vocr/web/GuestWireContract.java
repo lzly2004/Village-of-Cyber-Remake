@@ -15,7 +15,14 @@ final class GuestWireContract
     private static final Map<String, Set<String>> OBJECTS = Map.ofEntries(
             shape("", "revision phase view selections legalVoteActions claimInquiry "
                     + "legalTargetSelections voteHistory revealedRoles eventCursor nextEventCursor "
-                    + "events presentedEvents"),
+                    + "events presentedEvents publicInformation"),
+            shape("/publicInformation", "skillReports suspicion deathHistory"),
+            shape("/publicInformation/skillReports/*", "playerNumber claimedRole claimedRoleOrder exposed results"),
+            shape("/publicInformation/skillReports/*/results/*", "skillDay targetPlayerNumber color"),
+            shape("/publicInformation/suspicion", "available rows"),
+            shape("/publicInformation/suspicion/rows/*", "playerNumber targets comparisons"),
+            shape("/publicInformation/deathHistory/*", "day executions nightDeaths"),
+            shape("/publicInformation/deathHistory/*/executions/*", "playerNumber cause prefixPlayers"),
             shape("/view", "configuration gameDay aliveCount deathCount result players"),
             shape("/view/players/*", "playerNumber character alive deathReason deathDay "
                     + "claimedRole claimedRoleOrder comingOutDay"),
@@ -38,6 +45,11 @@ final class GuestWireContract
 
     private static final Set<String> ARRAYS = Set.of(
             "/view/players", "/selections/voteTargets",
+            "/publicInformation/skillReports", "/publicInformation/skillReports/*/results",
+            "/publicInformation/suspicion/rows", "/publicInformation/suspicion/rows/*/targets",
+            "/publicInformation/suspicion/rows/*/comparisons", "/publicInformation/deathHistory",
+            "/publicInformation/deathHistory/*/executions", "/publicInformation/deathHistory/*/nightDeaths",
+            "/publicInformation/deathHistory/*/executions/*/prefixPlayers",
             "/selections/divination/hiddenTargets", "/selections/divination/claimedActors",
             "/selections/divination/claimedActors/*/targets",
             "/selections/guard/hiddenTargets", "/selections/guard/claimedActors",
@@ -79,9 +91,19 @@ final class GuestWireContract
         check(update, "");
         String phase = update.path("phase").asText();
         assertTrue(Set.of("DAY_DECISION", "FINISHED").contains(phase), "unknown phase");
+        assertEquals(phase.equals("FINISHED"), !update.path("view").path("result").asText().equals("NONE"));
         JsonNode revealed = update.path("revealedRoles");
         if (phase.equals("DAY_DECISION"))
+        {
             assertTrue(revealed.isEmpty(), "running game must not reveal actual roles");
+            assertNoPreciseNightCause(update);
+            for (JsonNode player : update.path("view").path("players"))
+            {
+                assertTrue(Set.of("NONE", "EXECUTION", "DAY_CAT_CURSE", "DAY_PURSUED", "NIGHT_DEATH")
+                        .contains(player.path("deathReason").asText()));
+                assertEquals(player.path("alive").asBoolean(), player.path("deathReason").asText().equals("NONE"));
+            }
+        }
         else
         {
             JsonNode players = update.path("view").path("players");
@@ -91,9 +113,65 @@ final class GuestWireContract
                 assertEquals(players.get(i).get("playerNumber"), revealed.get(i).get("playerNumber"));
                 assertTrue(revealed.get(i).path("actualRole").isTextual());
                 assertNotEquals("NONE", revealed.get(i).path("actualRole").asText());
+                assertTrue(Set.of("NONE", "chuxing", "daymaozhou", "dayhouzhui", "beiyao", "nightmaozhou", "nighthouzhui", "zhousha")
+                        .contains(players.get(i).path("deathReason").asText()));
             }
         }
         long start = update.path("eventCursor").asLong();
+        JsonNode information = update.path("publicInformation");
+        if (phase.equals("FINISHED")) assertTrue(information.path("skillReports").isEmpty());
+        JsonNode suspicion = information.path("suspicion");
+        if (phase.equals("FINISHED") || update.path("view").path("gameDay").asInt() <= 2)
+        {
+            assertFalse(suspicion.path("available").asBoolean());
+            assertTrue(suspicion.path("rows").isEmpty());
+        }
+        for (JsonNode report : information.path("skillReports"))
+        {
+            int actor = report.path("playerNumber").asInt();
+            assertTrue(actor >= 1 && actor <= update.path("view").path("players").size());
+            JsonNode player = update.path("view").path("players").get(actor - 1);
+            assertTrue(Set.of("zhan", "ling", "lie").contains(report.path("claimedRole").asText()));
+            assertEquals(player.path("claimedRole"), report.path("claimedRole"));
+            assertEquals(player.path("claimedRoleOrder"), report.path("claimedRoleOrder"));
+            for (JsonNode result : report.path("results"))
+            {
+                int day = result.path("skillDay").asInt();
+                assertTrue(day >= (report.path("claimedRole").asText().equals("zhan") ? 1 : 2));
+                assertTrue(day < update.path("view").path("gameDay").asInt());
+                assertTrue(player.path("deathDay").asInt() == 0 || day < player.path("deathDay").asInt());
+                assertTrue(result.path("targetPlayerNumber").asInt() >= 1
+                        && result.path("targetPlayerNumber").asInt() <= update.path("view").path("players").size());
+                assertTrue(Set.of("WHITE", "BLACK", "NOT_APPLICABLE").contains(result.path("color").asText()));
+                assertEquals(report.path("claimedRole").asText().equals("lie"), result.path("color").asText().equals("NOT_APPLICABLE"));
+            }
+        }
+        for (JsonNode row : suspicion.path("rows"))
+        {
+            assertTrue(row.path("playerNumber").asInt() >= 1 && row.path("playerNumber").asInt() <= update.path("view").path("players").size());
+            assertTrue(update.path("view").path("players").get(row.path("playerNumber").asInt() - 1).path("alive").asBoolean());
+            assertTrue(row.path("targets").size() <= 3);
+            assertEquals(Math.max(0, row.path("targets").size() - 1), row.path("comparisons").size());
+            row.path("targets").forEach(value -> assertTrue(value.asInt() >= 1
+                    && value.asInt() <= update.path("view").path("players").size()));
+            row.path("comparisons").forEach(value -> assertTrue(Set.of("CLOSE", "SLIGHTLY_GREATER", "GREATER", "MUCH_GREATER").contains(value.asText())));
+        }
+        int previousDay = 0;
+        int count = update.path("view").path("players").size();
+        for (JsonNode day : information.path("deathHistory"))
+        {
+            assertTrue(day.path("day").asInt() > previousDay
+                    && day.path("day").asInt() < update.path("view").path("gameDay").asInt());
+            previousDay = day.path("day").asInt();
+            day.path("nightDeaths").forEach(value -> assertTrue(value.asInt() >= 1 && value.asInt() <= count));
+            for (JsonNode death : day.path("executions"))
+            {
+                assertTrue(death.path("playerNumber").asInt() >= 1 && death.path("playerNumber").asInt() <= count);
+                assertTrue(Set.of("EXECUTION", "DAY_CAT_CURSE", "DAY_PURSUED").contains(death.path("cause").asText()));
+                assertTrue(death.path("prefixPlayers").size() <= 1);
+                death.path("prefixPlayers").forEach(value -> assertTrue(value.asInt() >= 1 && value.asInt() <= count));
+            }
+        }
         long end = update.path("nextEventCursor").asLong();
         assertTrue(start >= 0 && end >= start);
         assertEquals(end - start, (long) update.path("events").size());
@@ -101,6 +179,18 @@ final class GuestWireContract
         for (int i = 0; i < update.path("events").size(); i++)
             assertEquals(update.path("events").get(i),
                     update.path("presentedEvents").get(i).get("event"));
+    }
+
+    private static void assertNoPreciseNightCause(JsonNode node)
+    {
+        // Scan the entire response, including object keys and any nested scalar, not only player fields.
+        if (node.isObject()) node.fields().forEachRemaining(field -> {
+            assertFalse(Set.of("beiyao", "nightmaozhou", "nighthouzhui", "zhousha").contains(field.getKey()));
+            assertNoPreciseNightCause(field.getValue());
+        });
+        else if (node.isArray()) node.forEach(GuestWireContract::assertNoPreciseNightCause);
+        else if (node.isTextual())
+            assertFalse(node.asText().matches("(?s).*(beiyao|nightmaozhou|nighthouzhui|zhousha).*"), "running response hides exact night cause");
     }
 
     private static void check(JsonNode node, String path)

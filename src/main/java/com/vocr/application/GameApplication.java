@@ -273,6 +273,7 @@ final class GameApplication
                 decisionPhase
                         ? List.of()
                         : SettlementRevealProjector.project(context),
+                PublicInformationProjector.project(context, phase),
                 batch.cursor(),
                 batch.nextCursor(),
                 batch.presentedEvents().stream().map(PresentedEvent::event).toList(),

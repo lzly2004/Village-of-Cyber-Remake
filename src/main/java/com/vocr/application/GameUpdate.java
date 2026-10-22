@@ -23,6 +23,7 @@ public record GameUpdate(
         List<LegalTargetSelection> legalTargetSelections,
         List<VoteResultSnapshot> voteHistory,
         List<RevealedPlayerRole> revealedRoles,
+        PublicInformation publicInformation,
         long eventCursor,
         long nextEventCursor,
         List<Event> events,
@@ -36,6 +37,28 @@ public record GameUpdate(
         Objects.requireNonNull(view, "玩家视图不能为空");
         Objects.requireNonNull(selections, "当前选择状态不能为空");
         Objects.requireNonNull(claimInquiry, "CO 询问选项不能为空");
+        Objects.requireNonNull(publicInformation, "公开信息不能为空");
+        if ((phase == BusinessPhase.FINISHED) != (view.result() != com.vocr.domain.GameResult.NONE))
+            throw new IllegalArgumentException("阶段与胜负不一致");
+        if (view.players().stream().anyMatch(player -> !player.deathReason().allowedIn(phase)))
+            throw new IllegalArgumentException("死因值不属于当前阶段的公开范围");
+        if ((phase == BusinessPhase.FINISHED || view.gameDay() <= 2) && publicInformation.suspicion().available())
+            throw new IllegalArgumentException("此阶段不公开怀疑摘要");
+        for (var report : publicInformation.skillReports())
+        {
+            var actor = view.players().stream().filter(player -> player.playerNumber() == report.playerNumber()).findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("未知公开报告行动者"));
+            if (phase == BusinessPhase.FINISHED || actor.claimedRole() != report.claimedRole()
+                    || actor.claimedRoleOrder() != report.claimedRoleOrder()
+                    || report.results().stream().anyMatch(result -> result.skillDay() < (report.claimedRole() == com.vocr.domain.Role.zhan ? 1 : 2)
+                    || result.skillDay() >= view.gameDay() || result.targetPlayerNumber() > view.players().size()
+                    || (actor.deathDay() > 0 && result.skillDay() >= actor.deathDay())))
+                throw new IllegalArgumentException("报告超出当前公开范围");
+        }
+        for (var row : publicInformation.suspicion().rows())
+            if (view.players().stream().noneMatch(player -> player.playerNumber() == row.playerNumber() && player.alive())
+                    || row.targets().stream().anyMatch(target -> target > view.players().size()))
+                throw new IllegalArgumentException("怀疑摘要超出公开范围");
         legalVoteActions = List.copyOf(legalVoteActions);
         legalTargetSelections = List.copyOf(legalTargetSelections);
         voteHistory = List.copyOf(voteHistory);
