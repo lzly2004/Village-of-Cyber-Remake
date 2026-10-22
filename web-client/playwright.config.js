@@ -16,8 +16,9 @@ export default defineConfig({
   webServer: [
     {
       command: process.env.VOCR_WEB_SERVER_COMMAND
-        || (process.platform === 'win32' ? 'gradlew.bat --no-daemon --max-workers=1' : 'bash tools/run-gradle-safe.sh')
-          + ' runWebTestServer --args=17071 --console=plain',
+        || (process.platform === 'win32'
+          ? 'gradlew.bat --no-daemon --max-workers=1 --console=plain runWebTestServer --args=17071'
+          : 'bash tools/run-gradle-safe.sh runWebTestServer --args=17071'),
       cwd: fileURLToPath(new URL('..', import.meta.url)),
       port: 17071,
       timeout: 120_000,

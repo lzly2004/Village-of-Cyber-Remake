@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test:e2e": "playwright test",
-    "test:unit": "node --test unit/public-information-text.test.js"
+    "test:unit": "node --test unit/public-information-text.test.js unit/vote-history.test.js"
   },
   "dependencies": { "vue": "3.5.44" },
   "devDependencies": {

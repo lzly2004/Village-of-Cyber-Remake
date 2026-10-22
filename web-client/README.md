@@ -1,7 +1,7 @@
 # 电脑村 · Vue 文本试玩
 
 本机 HTTP 原型的最小客户端。所有玩家状态、合法候补、票型与胜负来自 Java 应用快照。
-目前支持七配役开局、公开事件摘要、按职业/玩家询问 CO、投票回避开关、指定/自由/灰区投票、全体/单个公开CO行动者占卜与护卫预约、最近票型和终局揭晓。
+目前支持七配役开局、公开事件摘要、按职业/玩家询问 CO、投票回避开关、指定/自由/灰区投票、全体/单个公开CO行动者占卜与护卫预约、公开报告/疑い先/死亡历史、全日全轮票型和终局揭晓。
 事件摘要只解释事件种类及关联玩家，尚未迁移原版逐角色台词、图片或音频。
 
 ## 开发与构建
@@ -59,6 +59,10 @@ npm run dev
 全体框是并集：个体预约可令其勾选；点击已勾选全体框会统一取消该目标，覆盖相关个体差异，
 再次勾选会统一设置该目标，不影响其他目标。全体面板已明确提示覆盖语义。
 个体预约也等待权威响应、409不重放、失响应先同步，不保存本地镜像；新日重读、终局移除。
+投票履历按天折叠，默认展开最新一天；可用键盘展开早先日期，查看每轮全部投票者、目标、得票数、
+全部同票首位与最终处刑者。候补、票数和首位顺序均直接使用服务端投影，不本地计票或推断胜者。
+回避CO中断不生成一条完成票型；未知历史投票方式明确显示未支持，不伪装成已知方式或开放新投票按钮。
+折叠状态只属临时浏览状态，刷新回到默认展开；浏览不写入、不推进事件游标、不新增存储键。
 
 ## 浏览器验收
 
@@ -71,14 +75,17 @@ npm run test:e2e
 ```
 
 测试自动启动固定种子的真实 Java API（17071）与 Vite（5175），结束后停止它们，端口须空闲。
-默认使用仓库 Gradle Wrapper 的 `runWebTestServer`：测试源码中的启动器为每局注入 seed=4202，
+Linux 默认命令是 `bash tools/run-gradle-safe.sh runWebTestServer --args=17071`，
+安全入口内部已固定 `--console=plain`，调用时不得重复传入。Windows 默认使用
+`gradlew.bat --no-daemon --max-workers=1 --console=plain runWebTestServer --args=17071`。
+测试源码中的启动器为每局注入 seed=4202，
 不改变生产 `runWeb` 随机行为，不新增种子 HTTP 参数，也不进入 Web 生产类路径或桌面 Fat JAR。
 如需其他 Gradle 入口，可通过
 `VOCR_WEB_SERVER_COMMAND` 指定完整启动命令，例如
 `gradle runWebTestServer --args=17071 --console=plain`，Java 环境由当前终端继承；
 覆盖命令仍须启动该测试入口，不能用随机生产服务声称通过固定种子中断验收。
 
-四十项测试连接真实后端，覆盖：
+五十五项测试使用真实固定种子后端，其中明确标注的展示边界用合成响应补充，覆盖：
 
 1. 配役选择、事件确认与刷新恢复游标；
 2. 浏览器指定投票至终局与刷新恢复身份揭晓；
@@ -101,6 +108,9 @@ npm run test:e2e
 19—24. 自由/灰区各自完整对局（GREY 耗尽时确实无按钮，使用 FREE 继续）、有序候补请求体、票型方法、未读禁用与刷新恢复；各自的409不重放及已执行失响应先同步。
 25—32. 全体占卜/护卫各4项：多目标预约/取消等待权威值、未读/在途禁用与刷新（含截图）；真实预约后完整投票跨日/终局；409只同步、已执行失响应先同步且不重放。预先设置另一技能预约验证互不串扰。
 33—40. 个体占卜/护卫各4项：公开行动者与CO顺位、等待权威值/多目标/取消/刷新、不修改其他或匿名预约；个体与全体设置/取消组合及其他目标保留、跨日与终局；409只同步及已执行失响应先同步，不重复提交。
+41. 运行中公开死因的值级安全与刷新恢复。
+42—48. 公开信息真实跨日至终局、刷新只读、技能报告/怀疑符号/死亡历史合成边界、空与缺失投影、失效新局、409与失响应恢复。
+49—55. 全日全轮票型对照真实HTTP、键盘展开/只读/刷新/终局、合成同票与全部首位/三种方式/零票/顺序、未知枚举兜底及不开放新动作、409/失响应不重复投票、CO中断不造历史、失效与新局清理。
 
 固定种子测试不代替生产组合根验收；WEB-038 内部试玩须另用生产 `runWeb` 执行无种子浏览器冒烟。
 
@@ -111,3 +121,24 @@ npm run test:e2e
 Ubuntu 22 x64 构建，确认 Chromium 156 可运行后，以
 `PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu22.04-x64` 运行；WEB-005 的八项测试亦以该环境验证。
 新环境推荐使用官方支持的系统；该覆盖参数不代表对所有 Ubuntu 20 环境的兼容保证。
+
+### 本机 Linux 缓存工具链复现
+
+在本目录执行以下命令（缓存已安装，无需重复下载）。不设置后端覆盖变量，验证默认安全入口：
+
+```sh
+export JAVA_HOME=/home/noeticuser/Desktop/.vocr-toolchain/java/jdk-21.0.12.1+1
+export PATH="/home/noeticuser/Desktop/.vocr-toolchain/node/bin:$JAVA_HOME/bin:$PATH"
+export VOCR_GRADLE=/home/noeticuser/Desktop/.vocr-toolchain/gradle-8.8/bin/gradle
+export GRADLE_USER_HOME=/home/noeticuser/Desktop/.vocr-toolchain/gradle-home
+export PLAYWRIGHT_BROWSERS_PATH=/home/noeticuser/Desktop/.vocr-toolchain/browsers
+export PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu22.04-x64
+unset VOCR_WEB_SERVER_COMMAND
+npm run test:e2e
+```
+
+`VOCR_GRADLE` 避开本机已有 CRLF 的 Wrapper，不修改用户文件；浏览器路径必须与安装缓存一致。
+如需离线启动，可显式设置
+`VOCR_WEB_SERVER_COMMAND='bash tools/run-gradle-safe.sh runWebTestServer --args=17071 --offline'`，
+但须在验收记录中注明用了覆盖命令，不能把它当作默认配置路径的证据。
+安全入口检查内存并串行启动 JVM；不要绕过监护、并行启动构建或附加未批准的全量任务。

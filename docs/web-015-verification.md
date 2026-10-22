@@ -26,4 +26,13 @@ Java/HTTP协议与桌面无改动，既有540项、七配役黄金轨迹/兼容/
 
 ## 后续
 
+### 复现性补记（c386717 review后）
+
+上述015浏览器通过时实际设置了
+`VOCR_WEB_SERVER_COMMAND='bash tools/run-gradle-safe.sh runWebTestServer --args=17071 --offline'`，
+并使用Desktop持久工具链的VOCR_GRADLE/GRADLE_USER_HOME/JAVA_HOME/Node PATH、
+PLAYWRIGHT_BROWSERS_PATH与PLAYWRIGHT_HOST_PLATFORM_OVERRIDE。原记录漏写这些条件；
+它证明经覆盖后的安全入口通过，不证明当时Linux默认配置可用。review的D1重复console属实，
+本轮016修复并unset覆盖变量实测默认路径；完整本机环境见web-client/README.md与web-016-verification.md。
+
 WEB-015完成，下一项016仅补多轮票型与历史浏览。047必须验证生产runWeb 256MiB堆与100会话组合，当前不是容量已获证明；017任何公网试玩前必须关闭诊断日志与按钮。核心CO顺位强化仅PROPOSED，不改规则或当前实现。

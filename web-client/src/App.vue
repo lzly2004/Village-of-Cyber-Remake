@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useGuestGame } from './useGuestGame'
 import PublicInformationPanel from './PublicInformationPanel.vue'
+import VoteHistoryPanel from './VoteHistoryPanel.vue'
 import { configurations, configurationName, roles, claimRoleNames, stages, results, eventLabel } from './labels'
 
 const {
@@ -23,7 +24,6 @@ const legalTargets = computed(() =>
 const revealed = computed(() => new Map(
   finished.value ? update.value.revealedRoles.map(player => [player.playerNumber, player.actualRole]) : [],
 ))
-const lastVote = computed(() => update.value?.voteHistory.at(-1))
 const claimedSkills = computed(() => (update.value?.legalTargetSelections || [])
   .filter(action => ['DIVINATION', 'GUARD'].includes(action.type))
   .map(action => {
@@ -35,7 +35,6 @@ const claimedSkills = computed(() => (update.value?.legalTargetSelections || [])
       })),
     }
   }))
-const lastRound = computed(() => lastVote.value?.rounds.at(-1))
 function name(number) {
   const player = players.value.find(item => item.playerNumber === number)
   return player ? number + ' · ' + player.character : String(number)
@@ -218,11 +217,7 @@ function name(number) {
         <PublicInformationPanel v-if="update.phase === 'DAY_DECISION' || finished"
           :information="update.publicInformation" :players="players" :finished="finished" :player-name="name" />
 
-        <section v-if="lastRound" class="panel vote-history" aria-label="最近投票结果">
-          <header class="panel-heading"><span class="eyebrow">03 / 最近投票</span><span>第 {{ lastVote.day }} 日 · {{ lastVote.rounds.length }} 轮</span></header>
-          <p class="vote-summary">{{ lastRound.maximumVotes }} 票 · {{ name(lastRound.leaders[0]) }} 被处刑</p>
-          <div class="vote-lines"><span v-for="line in lastRound.lines" :key="line.playerNumber">{{ name(line.playerNumber) }} <span aria-hidden="true">→</span> {{ name(line.targetPlayerNumber) }}<small>所得 {{ line.receivedVotes }} 票</small></span></div>
-        </section>
+        <VoteHistoryPanel :history="update.voteHistory" :player-name="name" />
 
         <footer class="session-footer">
           <span>临时会话 · 刷新页面可在本标签页恢复。</span>
