@@ -1,16 +1,10 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   event: { type: Object, default: null },
   stage: { type: String, default: '' },
 })
-const reading = ref(null)
-// A newly presented event starts at its first line without moving focus or the confirmation cursor.
-watch(() => props.event, () => {
-  if (reading.value) reading.value.scrollTop = 0
-}, { flush: 'post' })
-
 // Only the already-public event's character keys. This is NOT the final image mapping.
 const participants = computed(() => props.event?.eventname === 'wsw' ? []
   : [...new Set([props.event?.ch1, props.event?.ch2, props.event?.ch3]
@@ -39,7 +33,7 @@ const positions = computed(() => participants.value.map((character, index, all) 
         </g>
         <text v-if="!positions.length" x="640" y="270" text-anchor="middle" class="stage-empty">场景占位</text>
       </svg>
-      <div ref="reading" class="stage-text" role="region" aria-label="舞台文字阅读区" tabindex="0"
+      <div class="stage-text" role="region" aria-label="舞台文字阅读区" tabindex="0"
         aria-describedby="stage-reading-help" data-testid="stage-text">
         <slot />
       </div>

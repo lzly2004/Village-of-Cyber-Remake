@@ -115,6 +115,38 @@ test('WEB-021 synthetic long dialogue scrolls by keyboard; confirmation stays ou
     expect((await saved(page)).eventCursor).toBe(1)
     await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
     await expect.poll(() => reading.evaluate(node => node.scrollTop)).toBe(0)
+    // Verify the reset survives subsequent layout/anchoring frames, not just one transient zero.
+    const offsets = await reading.evaluate(async node => {
+      const samples = []
+      for (let frame = 0; frame < 8; frame++) {
+        await new Promise(resolve => requestAnimationFrame(resolve))
+        samples.push(node.scrollTop)
+      }
+      return samples
+    })
+    expect(offsets).toEqual(Array(8).fill(0))
+    // Independently simulate a late 4px content insertion above a visible line.
+    // Keep this AFTER the original immediate-confirm/reset path so it cannot mask its race.
+    const shift = await reading.evaluate(async node => {
+      const frames = async count => {
+        for (let frame = 0; frame < count; frame++) {
+          await new Promise(resolve => requestAnimationFrame(resolve))
+        }
+      }
+      node.scrollTo({ top: 240, behavior: 'instant' })
+      await frames(3)
+      const before = node.scrollTop
+      const marker = document.createElement('div')
+      marker.style.height = '4px'
+      marker.setAttribute('aria-hidden', 'true')
+      node.querySelector('.event-content').prepend(marker)
+      await frames(4)
+      const after = node.scrollTop
+      marker.remove()
+      await frames(2)
+      return { before, after }
+    })
+    expect(shift).toEqual({ before: 240, after: 240 })
     await page.keyboard.press('Enter')
     await expect(page.locator('.player-identity').first()).toContainText('真实身份')
     expect((await saved(page)).eventCursor).toBe(2)
@@ -135,7 +167,19 @@ test('WEB-021 synthetic long player list exposes scroll instructions and support
     await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeGreaterThan(0)
     await list.getByRole('checkbox').last().focus()
     await expect(list.getByRole('checkbox').last()).toBeFocused()
-    const before = await list.evaluate(node => node.scrollTop)
+    // Wheel scrolling is independent; finish native End animation first.
+    const before = await list.evaluate(async node => {
+      let previous = node.scrollTop
+      let stable = 0
+      for (let frame = 0; frame < 60; frame++) {
+        await new Promise(resolve => requestAnimationFrame(resolve))
+        const current = node.scrollTop
+        stable = current === previous ? stable + 1 : 0
+        previous = current
+        if (stable === 4) return current
+      }
+      throw new Error('End key scrolling did not settle before wheel input')
+    })
     await list.hover()
     await page.mouse.wheel(0, -1000)
     await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeLessThan(before)

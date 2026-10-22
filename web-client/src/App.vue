@@ -96,7 +96,8 @@ function name(number) {
         <div class="game-layout">
           <section class="journal panel" aria-label="事件展示">
             <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ currentEvent ? stages[currentEvent.stage] : finished ? '对局结束' : '白天决策' }}</span></header>
-            <GameStage :event="currentEvent?.event" :stage="currentEvent?.stage">
+            <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
+            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor" :event="currentEvent?.event" :stage="currentEvent?.stage">
               <div v-if="currentEvent" class="event-content" role="region" aria-label="当前事件" aria-live="polite">
                 <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
                 <EventDialogue :event="currentEvent.event" />

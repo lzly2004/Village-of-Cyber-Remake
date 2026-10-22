@@ -129,7 +129,8 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .stage-actor-label { fill: #f0efdc; font-size: 24px; }
 .stage-slot-label { fill: #4e6456; font-size: 32px; }
 .stage-empty { fill: #bccbb5; font-size: 32px; letter-spacing: 6px; }
-.stage-text { position: absolute; left: 3%; right: 3%; bottom: 4%; max-height: 46%; min-height: 24%; padding: clamp(10px, 1.5vw, 22px); color: #f1f3e6; background: #102d2bed; border: 1px solid #adbb9c; overflow: auto; scrollbar-gutter: stable; overflow-wrap: anywhere; }
+/* Reading position belongs to the current event, not an anchor in the previous content. */
+.stage-text { position: absolute; left: 3%; right: 3%; bottom: 4%; max-height: 46%; min-height: 24%; padding: clamp(10px, 1.5vw, 22px); color: #f1f3e6; background: #102d2bed; border: 1px solid #adbb9c; overflow: auto; scrollbar-gutter: stable; overflow-wrap: anywhere; overflow-anchor: none; }
 .stage-text:focus-visible, .player-list:focus-visible, .claimed-actor-list:focus-visible { outline: 3px solid #c28931; outline-offset: -3px; }
 .game-stage .event-content { padding: 0; min-height: 0; }
 .game-stage .event-dialogue { font-size: clamp(14px, 1.5vw, 20px); line-height: 1.7; margin: 8px 0; }
