@@ -88,6 +88,12 @@ public final class GuestGameServer implements AutoCloseable
                 SetAvoidanceCommand request = read(ctx, SetAvoidanceCommand.class);
                 send(ctx, session(ctx.pathParam("id")).setAvoidance(request));
             });
+            config.routes.put("/api/v1/games/{id}/target-selections", ctx -> {
+                SetAllTargetSelectionCommand request = read(ctx, SetAllTargetSelectionCommand.class);
+                if (request.type() != SelectionType.DIVINATION)
+                    throw new IllegalArgumentException("当前仅开放全体占卜目标预约");
+                send(ctx, session(ctx.pathParam("id")).setTargetSelection(request));
+            });
             config.routes.delete("/api/v1/games/{id}", ctx -> {
                 remove(ctx.pathParam("id"));
                 ctx.status(204);

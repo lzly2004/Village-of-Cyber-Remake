@@ -651,6 +651,142 @@ class GuestGameServerTest
         }
     }
 
+    @ParameterizedTest
+    @EnumSource(value = peiyi.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void divinationSelections_shouldMatchDirectAcrossDaysAndCompleteGames(peiyi configuration) throws Exception
+    {
+        long seed = 4200 + configuration.ordinal();
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, seed), 2).start(0))
+        {
+            GameSession direct = SeededGuestSession.create("divination-direct", seed);
+            direct.startGame(new StartGameCommand(0, configuration));
+            String path = create(server, configuration.name());
+            String other = create(server, configuration.name());
+            JsonNode isolated = json.readTree(request(server, "GET", other, null).body());
+            int turns = 0;
+            while (!direct.isFinished())
+            {
+                assertTrue(++turns <= 80, "fixed-seed scheduled game must finish");
+                GameUpdate before = direct.currentUpdate();
+                assertFalse(before.selections().divination().hasSelections(), "new day must not carry old reservations");
+                List<Integer> targets = before.legalTargetSelection(SelectionType.DIVINATION).orElseThrow().targets();
+                assertTrue(targets.size() >= 2);
+                int first = targets.get(0), second = targets.get(1);
+                for (var choice : List.of(Map.entry(first, true), Map.entry(first, true),
+                        Map.entry(second, true), Map.entry(first, false), Map.entry(first, false)))
+                {
+                    GameUpdate prior = direct.currentUpdate();
+                    var command = new SetAllTargetSelectionCommand(prior.revision(),
+                            SelectionType.DIVINATION, choice.getKey(), choice.getValue());
+                    GameUpdate expected = direct.setTargetSelection(command);
+                    HttpResponse<String> response = request(server, "PUT", path + "/target-selections", command);
+                    assertEquals(200, response.statusCode(), response.body());
+                    JsonNode actual = json.readTree(response.body());
+                    assertEquals(wireJson(expected), actual);
+                    GuestWireContract.assertUpdate(actual);
+                    assertEquals(prior.revision() + 1, expected.revision());
+                    assertTrue(expected.events().isEmpty(), "reservation must not invent dialogue");
+                    assertEquals(prior.selections().voteTargets(), expected.selections().voteTargets());
+                    assertEquals(prior.selections().guard(), expected.selections().guard());
+                    var selected = expected.selections().divination();
+                    assertEquals(choice.getValue(), selected.hiddenTargets().contains(choice.getKey()));
+                    for (var actor : selected.claimedActors())
+                        assertEquals(choice.getValue(), actor.targets().contains(choice.getKey()));
+                    String cursorPath = path + "?eventCursor=" + prior.nextEventCursor();
+                    assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
+                    assertEquals(actual, json.readTree(request(server, "GET", cursorPath, null).body()));
+                }
+                assertEquals(List.of(second), direct.currentUpdate().selections().divination().hiddenTargets());
+                GameUpdate selected = direct.currentUpdate();
+                var action = selected.legalVote(VotingMethod.FREE).orElseThrow();
+                var vote = new ExecuteVoteCommand(selected.revision(), action.method(), action.candidates());
+                VoteExecutionResult expected = direct.executeVote(vote);
+                HttpResponse<String> response = request(server, "POST", path + "/votes", vote);
+                assertEquals(200, response.statusCode(), response.body());
+                assertEquals(wireJson(expected), json.readTree(response.body()));
+                GuestWireContract.assertVoteResult(json.readTree(response.body()));
+            }
+            JsonNode finished = json.readTree(request(server, "GET", path, null).body());
+            HttpResponse<String> rejected = request(server, "PUT", path + "/target-selections",
+                    new SetAllTargetSelectionCommand(direct.currentRevision(), SelectionType.DIVINATION, 1, true));
+            assertEquals(409, rejected.statusCode(), rejected.body());
+            assertEquals("INVALID_STATE", json.readTree(rejected.body()).path("code").asText());
+            assertEquals(finished, json.readTree(request(server, "GET", path, null).body()));
+            assertEquals(isolated, json.readTree(request(server, "GET", other, null).body()));
+        }
+    }
+
+    @Test
+    void divinationSelections_shouldRejectMalformedInputsAndConcurrentStaleWrites() throws Exception
+    {
+        try (GuestGameServer server = new GuestGameServer(
+                id -> SeededGuestSession.create(id, 4202), 1).start(0))
+        {
+            String path = create(server, "tongchang");
+            JsonNode before = json.readTree(request(server, "GET", path, null).body());
+            long revision = before.path("revision").asLong();
+            int target = before.path("legalTargetSelections").get(0).path("targets").get(0).asInt();
+            var command = new SetAllTargetSelectionCommand(revision, SelectionType.DIVINATION, target, true);
+            String valid = json.writeValueAsString(command);
+            List<String> invalid = new java.util.ArrayList<>();
+            for (String field : List.of("expectedRevision", "type", "target", "selected"))
+            {
+                var missing = (com.fasterxml.jackson.databind.node.ObjectNode) json.readTree(valid);
+                missing.remove(field);
+                invalid.add(missing.toString());
+                var nil = (com.fasterxml.jackson.databind.node.ObjectNode) json.readTree(valid);
+                nil.putNull(field);
+                invalid.add(nil.toString());
+            }
+            for (String type : List.of("VOTE", "GUARD", "UNKNOWN"))
+                invalid.add(valid.replace("DIVINATION", type));
+            invalid.add(valid.replace("\"target\":" + target, "\"target\":999"));
+            invalid.add(valid.replace("\"target\":" + target, "\"target\":0"));
+            invalid.add(valid.replace("\"target\":" + target, "\"target\":-1"));
+            invalid.add(valid.replace("\"target\":" + target, "\"target\":1.5"));
+            invalid.add(valid.replace("\"expectedRevision\":" + revision, "\"expectedRevision\":-1"));
+            invalid.add(valid.replace("\"expectedRevision\":" + revision, "\"expectedRevision\":1.5"));
+            invalid.add(valid.replace("\"selected\":true", "\"selected\":{}"));
+            invalid.add(valid.substring(0, valid.length() - 1) + ",\"claimedPlayer\":2}");
+            invalid.add(valid + " {}");
+            invalid.add("{");
+            for (String payload : invalid)
+            {
+                assertNotEquals(valid, payload);
+                HttpResponse<String> response = raw(server, "PUT", path + "/target-selections", payload);
+                assertEquals(400, response.statusCode(), payload + ": " + response.body());
+                assertEquals("INVALID_REQUEST", json.readTree(response.body()).path("code").asText());
+                assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            }
+            assertEquals(404, request(server, "PUT", "/api/v1/games/missing/target-selections", command).statusCode());
+            HttpResponse<String> stale = request(server, "PUT", path + "/target-selections",
+                    new SetAllTargetSelectionCommand(revision - 1, SelectionType.DIVINATION, target, true));
+            assertEquals(409, stale.statusCode());
+            assertEquals("STALE_REVISION", json.readTree(stale.body()).path("code").asText());
+            assertEquals(before, json.readTree(request(server, "GET", path, null).body()));
+            var first = client.sendAsync(http(server, "PUT", path + "/target-selections", valid), HttpResponse.BodyHandlers.ofString());
+            var second = client.sendAsync(http(server, "PUT", path + "/target-selections", valid), HttpResponse.BodyHandlers.ofString());
+            CompletableFuture.allOf(first, second).join();
+            assertEquals(List.of(200, 409), List.of(first.join().statusCode(), second.join().statusCode()).stream().sorted().toList());
+            JsonNode selected = json.readTree(request(server, "GET", path, null).body());
+            assertEquals(revision + 1, selected.path("revision").asLong());
+            GuestWireContract.assertUpdate(selected);
+            JsonNode free = java.util.stream.StreamSupport.stream(selected.path("legalVoteActions").spliterator(), false)
+                    .filter(action -> action.path("method").asText().equals("FREE")).findFirst().orElseThrow();
+            HttpResponse<String> voted = request(server, "POST", path + "/votes", Map.of(
+                    "expectedRevision", selected.path("revision").asLong(), "method", "FREE", "candidates", free.path("candidates")));
+            assertEquals(200, voted.statusCode(), voted.body());
+            JsonNode after = json.readTree(request(server, "GET", path, null).body());
+            assertEquals("DAY_DECISION", after.path("phase").asText());
+            int dead = java.util.stream.StreamSupport.stream(after.path("view").path("players").spliterator(), false)
+                    .filter(player -> !player.path("alive").asBoolean()).findFirst().orElseThrow().path("playerNumber").asInt();
+            assertEquals(400, request(server, "PUT", path + "/target-selections",
+                    new SetAllTargetSelectionCommand(after.path("revision").asLong(), SelectionType.DIVINATION, dead, true)).statusCode());
+            assertEquals(after, json.readTree(request(server, "GET", path, null).body()));
+        }
+    }
+
     private JsonNode wireJson(Object value) throws Exception
     {
         // 经相同 JSON 文本边界比较，避免内存 LongNode 与解析后 IntNode 类型差异。

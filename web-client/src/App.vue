@@ -6,6 +6,7 @@ import { configurations, configurationName, roles, claimRoleNames, stages, resul
 const {
   sessionId, cursor, update, busy, uncertain, notice, storageWarning,
   pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
+  divinationTargets, selectedDivinationTargets, setDivinationTarget,
   start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
 const configuration = ref('jianyi')
@@ -134,6 +135,19 @@ function name(number) {
               @click="setAvoidance(!update.selections.avoidanceEnabled)">{{ update.selections.avoidanceEnabled ? '回避あり' : '回避なし' }}</button>
           </header>
           <p class="avoidance-help">指定投票時の回避CO。共有の回避は無効化されません。</p>
+        </section>
+
+        <section v-if="divinationTargets.length" class="panel claim-inquiry" aria-label="全員の占い予約" lang="ja">
+          <header class="panel-heading"><span>全員の占い予約</span><span>当日の予約です。結果は確約されません。</span></header>
+          <p class="avoidance-help">潜伏・公開COの占い候補をまとめて設定／解除します。チェックは公開された予約のいずれかに対象が含まれることを示します。</p>
+          <div class="claim-player-list">
+            <label v-for="target in divinationTargets" :key="target" class="claim-player">
+              <input type="checkbox" :aria-label="'全員占い対象 ' + target + '番 ' + name(target)"
+                :checked="selectedDivinationTargets.has(target)" :disabled="!canDecide"
+                @click.prevent="setDivinationTarget(target, !selectedDivinationTargets.has(target))">
+              <span>{{ name(target) }}</span>
+            </label>
+          </div>
         </section>
 
         <section v-if="claimRoles.length" class="panel claim-inquiry" aria-label="職業別CO確認" lang="ja">

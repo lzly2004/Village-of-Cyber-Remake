@@ -584,6 +584,130 @@ for (const method of ['FREE', 'GREY']) {
   })
 }
 
+test('全体占卜预约等待权威值，支持多目标、取消与刷新', async ({ page, request }, testInfo) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  let proceed = () => {}
+  try {
+    const panel = page.getByRole('region', { name: '全員の占い予約' })
+    await expect(panel.getByRole('checkbox').first()).toBeDisabled()
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    const targets = before.legalTargetSelections.find(action => action.type === 'DIVINATION').targets
+    expect(await panel.getByRole('checkbox').count()).toBe(targets.length)
+    const first = panel.getByRole('checkbox').nth(0)
+    const second = panel.getByRole('checkbox').nth(1)
+    const gate = new Promise(resolve => { proceed = resolve })
+    await page.route('**/target-selections', async route => { await gate; await route.continue() })
+    const sent = page.waitForRequest(req => req.method() === 'PUT' && req.url().endsWith('/target-selections'))
+    const response = page.waitForResponse(res => res.url().endsWith('/target-selections'))
+    await first.click()
+    expect((await sent).postDataJSON()).toEqual({ expectedRevision: before.revision,
+      type: 'DIVINATION', target: targets[0], selected: true })
+    await expect(first).not.toBeChecked()
+    await expect(second).toBeDisabled()
+    proceed()
+    const applied = await (await response).json()
+    expect(applied.selections.divination.hiddenTargets).toEqual([targets[0]])
+    for (const actor of applied.selections.divination.claimedActors) expect(actor.targets).toContain(targets[0])
+    await expect(first).toBeChecked()
+    await page.unroute('**/target-selections')
+    await second.click()
+    await expect(second).toBeChecked()
+    await first.click()
+    await expect(first).not.toBeChecked()
+    await expect(second).toBeChecked()
+    await page.reload()
+    await expect(first).not.toBeChecked()
+    await expect(second).toBeChecked()
+    expect(Object.keys(await saved(page)).sort()).toEqual(['eventCursor', 'sessionId'])
+    const after = await (await request.get('/api/v1/games/' + id)).json()
+    expect(after.selections.divination.hiddenTargets).toEqual([targets[1]])
+    expect(after.selections.guard).toEqual(before.selections.guard)
+    expect(after.selections.voteTargets).toEqual(before.selections.voteTargets)
+    await page.screenshot({ path: testInfo.outputPath('divination.png'), fullPage: true })
+  } finally { proceed(); await release(request, id) }
+})
+
+test('占卜预约随真实投票跨日更新，不把旧预约保留到次日或终局', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const panel = page.getByRole('region', { name: '全員の占い予約' })
+    await panel.getByRole('checkbox').first().click()
+    await expect(panel.getByRole('checkbox').first()).toBeChecked()
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    let turns = 0
+    while (true) {
+      const response = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/votes'))
+      await page.getByTestId('vote-FREE').click()
+      const voted = await (await response).json()
+      expect(++turns).toBeLessThan(80)
+      await readEvents(page)
+      if (voted.update.phase === 'FINISHED') break
+      expect(voted.update.view.gameDay).toBeGreaterThan(before.view.gameDay)
+      expect(voted.update.selections.divination.hiddenTargets).toEqual([])
+      for (const checkbox of await panel.getByRole('checkbox').all()) await expect(checkbox).not.toBeChecked()
+      await page.reload()
+      await expect(panel.getByRole('checkbox').first()).toBeEnabled()
+    }
+    await expect(panel).toHaveCount(0)
+    await page.reload()
+    await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
+    await expect(panel).toHaveCount(0)
+  } finally { await release(request, id) }
+})
+
+test('占卜预约409只同步权威目标，不重放', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    const targets = before.legalTargetSelections.find(action => action.type === 'DIVINATION').targets
+    expect((await request.put('/api/v1/games/' + id + '/target-selections', { data: {
+      expectedRevision: before.revision, type: 'DIVINATION', target: targets[1], selected: true,
+    } })).ok()).toBeTruthy()
+    const authority = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.method() === 'PUT' && req.url().endsWith('/target-selections')) writes++ })
+    const boxes = page.getByRole('region', { name: '全員の占い予約' }).getByRole('checkbox')
+    await boxes.nth(0).click()
+    await expect(page.getByRole('alert')).toContainText('已重新同步')
+    await expect(boxes.nth(0)).not.toBeChecked()
+    await expect(boxes.nth(1)).toBeChecked()
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
+    expect(writes).toBe(1)
+  } finally { await release(request, id) }
+})
+
+test('占卜预约已执行失响应后暂停，先同步不重复预约', async ({ page, request }) => {
+  await start(page, '通常')
+  const id = (await saved(page)).sessionId
+  try {
+    await readEvents(page)
+    const before = await (await request.get('/api/v1/games/' + id)).json()
+    let writes = 0
+    page.on('request', req => { if (req.method() === 'PUT' && req.url().endsWith('/target-selections')) writes++ })
+    await page.route('**/target-selections', async route => { await route.fetch(); await route.abort('failed') })
+    const checkbox = page.getByRole('region', { name: '全員の占い予約' }).getByRole('checkbox').first()
+    await checkbox.click()
+    await expect(page.getByRole('alert')).toContainText('连接未能确认')
+    await expect(checkbox).not.toBeChecked()
+    await expect(checkbox).toBeDisabled()
+    const authority = await (await request.get('/api/v1/games/' + id)).json()
+    expect(authority.revision).toBe(before.revision + 1)
+    expect(authority.selections.divination.hiddenTargets.length).toBe(1)
+    await page.unroute('**/target-selections')
+    await page.getByRole('button', { name: '重新同步' }).click()
+    await expect(checkbox).toBeChecked()
+    await expect(checkbox).toBeEnabled()
+    expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
+    expect(writes).toBe(1)
+  } finally { await release(request, id) }
+})
+
 test('手机视口无横向溢出，配役与主要操作仍可访问', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')

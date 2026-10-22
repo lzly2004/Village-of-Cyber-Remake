@@ -23,6 +23,13 @@ export function useGuestGame() {
   const alternativeVotes = computed(() => update.value?.legalVoteActions.filter(
     action => action.method === 'FREE' || action.method === 'GREY') || [])
   const claimRoles = computed(() => update.value?.claimInquiry.roles || [])
+  const divinationTargets = computed(() => update.value?.legalTargetSelections.find(
+    action => action.type === 'DIVINATION')?.targets || [])
+  const selectedDivinationTargets = computed(() => {
+    const selections = update.value?.selections.divination
+    return new Set(selections ? [...selections.hiddenTargets,
+      ...selections.claimedActors.flatMap(actor => actor.targets)] : [])
+  })
   const claimPlayers = computed(() => update.value?.claimInquiry.players || [])
   const claimPlayerDraft = ref([])
   const canAskClaimPlayers = computed(() => canDecide.value && claimPlayerDraft.value.length > 0
@@ -167,6 +174,17 @@ export function useGuestGame() {
     })
   }
 
+  function setDivinationTarget(target, selected) {
+    if (!canDecide.value || !divinationTargets.value.includes(target)) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/target-selections', {
+        method: 'PUT', body: {
+          expectedRevision: update.value.revision, type: 'DIVINATION', target, selected,
+        },
+      }))
+    })
+  }
+
   function refresh() { return run(sync) }
 
   function setAvoidance(enabled) {
@@ -221,6 +239,7 @@ export function useGuestGame() {
   return {
     sessionId, cursor, update, busy, uncertain, notice, storageWarning,
     pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
+    divinationTargets, selectedDivinationTargets, setDivinationTarget,
     start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
   }
 }
