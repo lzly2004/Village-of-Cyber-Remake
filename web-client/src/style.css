@@ -181,3 +181,6 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .player-identity .visual-diagnostic { color: #794b14; }
 .player-row .player-state { overflow-wrap: anywhere; }
 .player-row:focus-within { outline: 2px solid #c28931; outline-offset: -2px; }
+
+/* WEB-024 decoded artwork is atomic; text and external confirmation stay independent. */
+.stage-art-status { position: absolute; top: 10px; left: 10px; right: 10px; z-index: 2; padding: 7px 10px; background: #fff4dbee; color: #593c12; font-size: 12px; pointer-events: none; }

@@ -8,16 +8,18 @@ import GameStage from './GameStage.vue'
 import PlayerPortrait from './PlayerPortrait.vue'
 import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
+import { dialogueArtwork } from './eventArtwork.js'
 import { configurations, configurationName, roles, claimRoleNames, stages, results } from './labels'
 
 const {
-  sessionId, cursor, update, busy, uncertain, notice, storageWarning,
+  sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory,
   pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
   divinationTargets, selectedDivinationTargets, setDivinationTarget,
   guardTargets, selectedGuardTargets, setGuardTarget,
   setClaimedTarget,
   start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
+const artwork = computed(() => dialogueArtwork(presentationHistory.value, cursor.value, currentEvent.value))
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
 const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
@@ -100,7 +102,7 @@ function name(number) {
           <section class="journal panel" aria-label="事件展示">
             <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ currentEvent ? stages[currentEvent.stage] : finished ? '对局结束' : '白天决策' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
-            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor" :event="currentEvent?.event" :stage="currentEvent?.stage">
+            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
               <div v-if="currentEvent" class="event-content" role="region" aria-label="当前事件" aria-live="polite">
                 <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
                 <EventDialogue :event="currentEvent.event" />

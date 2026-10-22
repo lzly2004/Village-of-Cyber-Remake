@@ -2,6 +2,8 @@
 
 基线280613b；来源为仓库现有桌面调用和022图片清单，不是外部原版发行程序实机截图，也不声称逐像素复刻整个Swing布局。正式立绘/场景归024/025，终局彩色角色职业头像归025，全菜单/帮助日文化归029。A06/A07/A08仍未放行。
 
+024已接续[对话立绘与背景](web-event-artwork.md)，复用既有清单并验证逐事件舞台重建的冷/暖解码；不改变本文玩家卡片的公开字段与按需加载边界。其他阶段场景仍归025。
+
 ## 映射与边界
 
 - [PlayerStatusRenderer](../src/main/java/com/vocr/ui/PlayerStatusRenderer.java)与[UIHelpers](../src/main/java/com/vocr/ui/UIHelpers.java)的局内调用传`showActualRole=false`，经[ImageNames](../src/main/java/com/vocr/resources/ImageNames.java)只选`NNs/NNgs.png`。网页仅取VisiblePlayer的公开character/alive；即使FINISHED或揭晓后，023仍使用同一公开状态头像，不读取实际职业或请求cs/fs/hs/ws/ks等结果图。

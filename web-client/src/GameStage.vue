@@ -1,9 +1,11 @@
 <script setup>
 import { computed } from 'vue'
 import { characterKana } from './characterDisplay.js'
+import StageArtwork from './StageArtwork.vue'
 
 const props = defineProps({
   event: { type: Object, default: null },
+  artwork: { type: Object, default: () => ({ mode: 'deferred' }) },
   stage: { type: String, default: '' },
 })
 // Only the already-public event's character keys. This is NOT the final image mapping.
@@ -18,7 +20,8 @@ const positions = computed(() => participants.value.map((character, index, all) 
 <template>
   <div class="game-stage" :data-stage="stage" data-testid="game-stage">
     <div class="stage-surface" data-testid="stage-surface">
-      <svg class="stage-artwork" data-testid="stage-artwork" viewBox="0 0 1280 720"
+      <StageArtwork v-if="artwork.mode === 'dialogue'" :plan="artwork" />
+      <svg v-else class="stage-artwork" data-testid="stage-artwork" viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <rect class="stage-sky" width="1280" height="720" />
         <path class="stage-horizon" d="M0 360 L180 240 L330 330 L540 180 L760 320 L970 215 L1280 360 V720 H0 Z" />

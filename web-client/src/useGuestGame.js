@@ -1,5 +1,6 @@
 import { computed, onMounted, ref, shallowRef, watch } from 'vue'
 import { ApiError, request } from './api'
+import { mergePresentationHistory } from './eventArtwork.js'
 
 export const STORAGE_KEY = 'vocr.guest.v1'
 
@@ -7,6 +8,22 @@ export function useGuestGame() {
   const sessionId = ref('')
   const cursor = ref(0)
   const update = shallowRef(null)
+  const presentationHistory = shallowRef([])
+  let presentationVersion = 0
+  function rememberPresentation(snapshot) {
+    const version = ++presentationVersion
+    const merged = mergePresentationHistory(presentationHistory.value, snapshot)
+    if (merged) { presentationHistory.value = merged; return }
+    presentationHistory.value = []
+    const id = sessionId.value
+    // Presentation recovery is read-only and cannot delay/replace an authoritative game update.
+    request('/' + id + '?eventCursor=0').then(full => {
+      if (version !== presentationVersion || sessionId.value !== id) return
+      if (full.revision !== snapshot.revision || full.eventCursor !== 0) return
+      const recovered = mergePresentationHistory([], full)
+      if (recovered) presentationHistory.value = recovered
+    }).catch(() => { /* GameStage visibly diagnoses unavailable context; no command is retried. */ })
+  }
   const busy = ref(false)
   const uncertain = ref(false)
   const notice = ref('')
@@ -59,6 +76,8 @@ export function useGuestGame() {
     sessionId.value = ''
     cursor.value = 0
     update.value = null
+    presentationVersion++
+    presentationHistory.value = []
     uncertain.value = false
     persist()
   }
@@ -75,6 +94,7 @@ export function useGuestGame() {
       cursor.value = 0
     }
     update.value = snapshot
+    rememberPresentation(snapshot)
     uncertain.value = false
     persist()
   }
@@ -85,6 +105,7 @@ export function useGuestGame() {
       await sync()
     } else {
       update.value = snapshot
+      rememberPresentation(snapshot)
       persist()
     }
   }
@@ -136,6 +157,7 @@ export function useGuestGame() {
       sessionId.value = created.sessionId
       cursor.value = 0
       update.value = created.update
+      rememberPresentation(created.update)
       uncertain.value = false
       persist()
     })
@@ -267,7 +289,7 @@ export function useGuestGame() {
   })
 
   return {
-    sessionId, cursor, update, busy, uncertain, notice, storageWarning,
+    sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory,
     pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
     divinationTargets, selectedDivinationTargets, setDivinationTarget,
     guardTargets, selectedGuardTargets, setGuardTarget,

@@ -2,6 +2,8 @@
 
 实现基线9056eef。021只建立占位舞台及可读、可操作的页面布局；没有接入原PNG/WAV、图像映射、图片转换或音频。正式单/多角色、死亡/处刑/结算视觉仍由023—025完成，素材预算沿用[020目录](web-asset-source-catalog.md)。A06/A07/A08不因占位交付而放行。
 
+024接续：DAY_DIALOGUE/AFTERNOON_DIALOGUE已用[原事件立绘与背景](web-event-artwork.md)替换占位SVG；其他阶段仍保留占位，待025。下述等比缩放、原生阅读区、独立确认区和按事件重建约定继续适用。
+
 ## 舞台坐标与缩放
 
 - 设计坐标**1280×720、16:9**，与桌面[UIConstants](../src/main/java/com/vocr/ui/UIConstants.java)的窗口基准相同。Web用[GameStage.vue](../web-client/src/GameStage.vue)的SVG viewBox和`xMidYMid meet`等比缩放，不宣称复刻当前Swing的动态布局实现。

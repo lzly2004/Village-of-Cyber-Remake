@@ -7,6 +7,7 @@ import { resolve } from 'node:path'
 
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const key = 'vocr.guest.v1'
+const stageMapping = JSON.parse(readFileSync(resolve(root, 'src/main/resources/config/event_image_mapping.json'), 'utf8'))
 const roles = { zhan: '占い師', ling: '霊能者', lie: '狩人', gong: '共有', mao: '猫又' }
 const configurations = ['jianyi', 'tongchang', 'yaoohu', 'kuangxin', 'beide', 'maoyou', 'daxing']
 const names = ['简易', '通常', '妖狐', '狂信', '背德', '猫又', '大型']
@@ -41,6 +42,15 @@ async function drain(page, snapshot) {
     await expect(page.getByTestId('next-event')).toBeVisible()
     if (event.event.ch1 && event.event.ch1 !== 'NONE')
       await expect(page.getByRole('region', { name: '当前事件', exact: true })).toContainText(characterDisplayName(event.event.ch1))
+    if (['DAY_DIALOGUE', 'AFTERNOON_DIALOGUE'].includes(event.stage)) {
+      await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready', 'true')
+      await expect(page.getByTestId('stage-art-status')).toHaveCount(0)
+      const entry = stageMapping[event.event.ch1][event.event.eventname]
+      const name = Object.hasOwn(entry.special || {}, event.event.ch2) ? entry.special[event.event.ch2] : entry.default
+      const sources = await page.getByTestId('stage-character').evaluateAll(nodes => nodes.map(node => node.dataset.source))
+      expect(sources).toContain('images/' + name)
+      expect(sources.length).toBeLessThanOrEqual(2)
+    }
     await page.getByTestId('next-event').click()
   }
   await expect(page.getByTestId('next-event')).toHaveCount(0)

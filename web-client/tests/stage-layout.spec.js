@@ -81,7 +81,7 @@ test('WEB-021 real session stage scales uniformly at desktop widths without chan
       }
     }
     expect(media).toEqual([])
-    await expect(page.getByTestId('game-stage').locator('image, img, audio')).toHaveCount(0)
+    await expect(page.getByTestId('game-stage').locator('audio')).toHaveCount(0)
     await page.reload()
     await expect(page.getByTestId('event-dialogue')).toHaveJSProperty('textContent', text)
     expect(await saved(page)).toEqual(state)
