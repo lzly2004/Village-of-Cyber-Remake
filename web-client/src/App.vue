@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useGuestGame } from './useGuestGame'
+import PublicInformationPanel from './PublicInformationPanel.vue'
 import { configurations, configurationName, roles, claimRoleNames, stages, results, eventLabel } from './labels'
 
 const {
@@ -213,6 +214,9 @@ function name(number) {
           </div>
           <div class="claim-actions"><button class="primary-button" :disabled="!canAskClaimPlayers" @click="askClaimPlayers">選択したプレイヤーのCOを聞く</button></div>
         </section>
+
+        <PublicInformationPanel v-if="update.phase === 'DAY_DECISION' || finished"
+          :information="update.publicInformation" :players="players" :finished="finished" :player-name="name" />
 
         <section v-if="lastRound" class="panel vote-history" aria-label="最近投票结果">
           <header class="panel-heading"><span class="eyebrow">03 / 最近投票</span><span>第 {{ lastVote.day }} 日 · {{ lastVote.rounds.length }} 轮</span></header>

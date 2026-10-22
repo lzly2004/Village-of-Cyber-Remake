@@ -83,6 +83,16 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .player-row.selected { background: #eaf0e3; }
 .player-state { font-size: 10px; color: #7c8c70; }
 .vote-history { margin-top: 24px; }
+.public-information { margin-top: 24px; }
+.public-info-content { padding: 0 22px 20px; overflow-wrap: anywhere; }
+.public-info-content h3 { font-size: 16px; margin: 24px 0 8px; }
+.public-info-content h4 { font-size: 13px; margin: 12px 0 6px; font-weight: 500; }
+.public-info-content p, .public-report li, .suspicion-row { font-size: 13px; }
+.public-info-help { color: #70806c; }
+.public-report, .public-death-day { border-top: 1px solid #e9ece1; padding-bottom: 8px; }
+.public-report ol { padding-left: 22px; margin: 6px 0; }
+.report-exposed { color: #955425; }
+.suspicion-row { min-height: 1.6em; }
 .claim-inquiry { margin-top: 24px; }
 .avoidance-help { margin: 16px 22px; font-size: 12px; color: #70806c; }
 .claim-actions { display: flex; flex-wrap: wrap; gap: 12px; padding: 20px 22px; }
