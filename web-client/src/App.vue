@@ -3,7 +3,8 @@ import { computed, ref } from 'vue'
 import { useGuestGame } from './useGuestGame'
 import PublicInformationPanel from './PublicInformationPanel.vue'
 import VoteHistoryPanel from './VoteHistoryPanel.vue'
-import { configurations, configurationName, roles, claimRoleNames, stages, results, eventLabel } from './labels'
+import EventDialogue from './EventDialogue.vue'
+import { configurations, configurationName, roles, claimRoleNames, stages, results } from './labels'
 
 const {
   sessionId, cursor, update, busy, uncertain, notice, storageWarning,
@@ -96,13 +97,13 @@ function name(number) {
             <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ currentEvent ? stages[currentEvent.stage] : finished ? '对局结束' : '白天决策' }}</span></header>
             <div v-if="currentEvent" class="event-content" role="region" aria-label="当前事件" aria-live="polite">
               <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
-              <h2>{{ eventLabel(currentEvent.event) }}</h2>
-              <div class="event-participants">
+              <EventDialogue :event="currentEvent.event" />
+              <div v-if="currentEvent.event" class="event-participants">
                 <span v-if="currentEvent.event.ch1 && currentEvent.event.ch1 !== 'NONE'">{{ currentEvent.event.ch1 }}</span>
                 <span v-if="currentEvent.event.ch2 && currentEvent.event.ch2 !== 'NONE'"><small>关联玩家</small>{{ currentEvent.event.ch2 }}</span>
                 <span v-if="currentEvent.event.ch3 && currentEvent.event.ch3 !== 'NONE'"><small>关联玩家</small>{{ currentEvent.event.ch3 }}</span>
               </div>
-              <p class="event-hint">这里显示公开事件摘要。角色的 CO 和报告只代表其公开发言。</p>
+              <p class="event-hint">角色台词与叙述来自现有文本资源。CO 和报告只代表公开发言。</p>
               <div class="event-controls"><span>尚有 {{ pending.length }} 条待确认</span><button data-testid="next-event" class="primary-button" :disabled="busy" @click="nextEvent">{{ pending.length === 1 ? '读完，继续对局' : '继续阅读' }} <span aria-hidden="true">→</span></button></div>
             </div>
             <div v-else-if="finished" class="event-content settlement" role="status">

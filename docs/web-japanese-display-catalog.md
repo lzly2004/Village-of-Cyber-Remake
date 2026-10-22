@@ -14,7 +14,7 @@
 | 人物身份键/完整称号/短称号/片假名 | [English枚举](../src/main/java/com/vocr/domain/CharacterEnglishName.java)、[Kanji枚举](../src/main/java/com/vocr/domain/CharacterKanjiName.java)、[Katakana枚举](../src/main/java/com/vocr/domain/CharacterKatakanaName.java)、[UIComponentFactory](../src/main/java/com/vocr/ui/UIComponentFactory.java) | labels/App目前直接用英文键；019参数替换、023角色展示 |
 | 职业名称 | UIComponentFactory.ZY_NAMES/getZY；[Role](../src/main/java/com/vocr/domain/Role.java)只管枚举/编号 | labels.roles多为中文，claimRoleNames五项已有日文；023/025/029 |
 | 系统文字、胜负与票型 | [GameStrings](../src/main/java/com/vocr/ui/GameStrings.java)及实际调用者 | 公共信息/票型已有日文但样式不完全一致；019/023/025/029 |
-| 逐角色台词/特殊对象 | [event_lines.json](../src/main/resources/lines/event_lines.json)、[Resources.getEventText](../src/main/java/com/vocr/resources/Resources.java) | 当前eventLabel仅摘要；019负责真正台词与兜底，024接场景 |
+| 逐角色台词/特殊对象 | [event_lines.json](../src/main/resources/lines/event_lines.json)、[Resources.getEventText](../src/main/java/com/vocr/resources/Resources.java) | 018时eventLabel仅摘要；019现已接真正台词与兜底，见review-e3e67c2.md；024接场景 |
 | 按钮/配役内嵌文字 | [UiImage](../src/main/java/com/vocr/resources/UiImage.java)、[ImageNames](../src/main/java/com/vocr/resources/ImageNames.java)、[StartSceneHandler](../src/main/java/com/vocr/ui/StartSceneHandler.java)、[VoteButtonPanel](../src/main/java/com/vocr/ui/VoteButtonPanel.java) | 020/022核对图片，023/024/029接入，不把中文文件名当日文原文 |
 | 帮助 | [InfoSceneHandler](../src/main/java/com/vocr/ui/InfoSceneHandler.java)、[help目录](../src/main/resources/help) | 029待接；现存Info1-1-1.txt正文实际为中文，不能冒充现成日文帮助 |
 
@@ -115,7 +115,7 @@
 
 ## 事件键目录（44项含哨兵/系统特例）
 
-[EventName](../src/main/java/com/vocr/domain/EventName.java)的中文label/toString是开发说明，不能当作原版日文标题；JSON键和HTTP eventname都保持枚举name。Web [labels.js](../web-client/src/labels.js)当前44项中文摘要也不是原台词。下面按键分组列出全部44项，不另发明“原版日文事件标题”。019真正展示的是对应角色台词，摘要若保留为辅助UI须另有明确日文文案依据/审核。
+[EventName](../src/main/java/com/vocr/domain/EventName.java)的中文label/toString是开发说明，不能当作原版日文标题；JSON键和HTTP eventname都保持枚举name。018时Web labels.js中的44项中文摘要也不是原台词；019已移除该摘要映射，改由[台词解析器](../web-client/src/eventDialogue.js)消费原JSON。下面按键分组列出全部44项，不另发明“原版日文事件标题”。019真正展示的是对应角色台词，摘要若保留为辅助UI须另有明确日文文案依据/审核。
 
 | 分组 | 全部事件键 | 来源/显示方向 |
 |---|---|---|
@@ -150,3 +150,10 @@
 | 菜单/帮助/缺失来源 | 部分图片英文/中文、Info帮助正文中文、新游客失效/网络提示没有对应桌面原文 | 020/029区分保留设计、翻译提案和用户批准；不自行宣称原版出处 |
 
 019从本目录的键和真实Resources语义建立文本选择/替换及正负回归，再接浏览器显示；023消费人物名称映射，不修改wire键；029逐项迁移菜单/帮助并明确来源。不借018完成提前标记019或A06通过，49步顺序不变。
+
+
+## WEB-019 接入状态
+
+已直接复用上述JSON与枚举对照，未改源资源；ch1/eventname、精确special（空值不回退）、ch2三类参数、未知参数空串及系统wsw路径均有定向回归。异常以独立界面诊断标注，未伪装日文原文；换行及Unicode用纯文本显示。验收与018 reviewer简要交接集中见[review-e3e67c2.md](review-e3e67c2.md)。
+
+未读聚合信息仍显示服务最新公开状态；019只替换文本，不增加本地历史快照或调整事件/揭晓门槛。正式场景叙事及视觉继续归024/025；人物列表、菜单和帮助未在本轮全量日文化，A06保持未通过。
