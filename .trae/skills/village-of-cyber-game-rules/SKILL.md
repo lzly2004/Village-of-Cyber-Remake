@@ -133,10 +133,10 @@ for (int k = 1; k < ui.ctx.getGameDay(); ++k) {
 - 多人死亡：显示"名字1+名字2→"
 
 ### 3.5 技能结果显示规则
-- 占卜师(claimedRole=1): 从第1天开始显示技能结果
-- 灵能者(claimedRole=2): 从第1天开始显示技能结果
-- 猎人(claimedRole=3): 从第2天开始显示技能结果
-- 使用 `GameLogicUtils.appendSkillResultLog()` 方法统一处理
+- 当前局内：占卜师(claimedRole=1)从第1天开始，灵能者(claimedRole=2)与猎人(claimedRole=3)从第2天开始显示技能结果；护卫结果不带黑白球。
+- 实际调用位于 `src/main/java/com/vocr/ui/VoteInfoRenderer.java`，共用 `UIHelpers.appendSkillResultLog()`（`src/main/java/com/vocr/ui/UIHelpers.java`），不是旧的GameLogicUtils方法。
+- 只显示已完成日，死亡者在死亡日截断；公开CO可追溯CO前历史，不把当日预约当作结果。
+- Replay是独立兼容路径：`src/main/java/com/vocr/ui/ReplayTextFormatter.java`当前占卜/灵能从第1天、护卫从第2天开始。WEB-030/034核对兼容；本说明不授权统一两条路径或修改规则、快照偏移与旧录像。
 
 ---
 
