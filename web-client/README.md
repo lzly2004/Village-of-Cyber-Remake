@@ -142,3 +142,31 @@ npm run test:e2e
 `VOCR_WEB_SERVER_COMMAND='bash tools/run-gradle-safe.sh runWebTestServer --args=17071 --offline'`，
 但须在验收记录中注明用了覆盖命令，不能把它当作默认配置路径的证据。
 安全入口检查内存并串行启动 JVM；不要绕过监护、并行启动构建或附加未批准的全量任务。
+
+## WEB-017 七配役内部功能门
+
+这是本机回环自动试玩，不是公网发布或人工原版视听验收。先按上段设置同一工具链环境，
+在本目录**依次**执行（前一步成功才继续，不能并行 JVM）：
+
+```sh
+bash ../tools/run-gradle-safe.sh test --tests 'com.vocr.web.Web017JourneyTest' --offline && npm run test:gate
+```
+
+第一步用七配役4201—4207建立应用直连与真实HTTP逐命令对等，生成忽略目录
+`../build/web017/`中的15份临时公开DTO脚本：每配役全程指定/混合操作各一局，加通常村真实CO中断。
+第二步通过测试专用`--release-baseline`模式运行相同种子与命令；全部写操作均由页面发起，
+逐次核对请求体、响应、HTTP全量重读与终局。七配役混合策略必须实际执行全部三种投票方式，
+而不是靠FREE回退声称覆盖。妖狐4203无公开护卫者是显式断言的合法缺席，不删除该局或换种子。
+
+脚本带main/test/web全部Java源码SHA-256指纹；源码改变后必须重跑生成步骤。
+这些文件不提交、不替换黄金摘要、不进入桌面或生产Web产物，不含会话凭据。
+`npm run test:gate`缺产物或指纹不匹配会失败；不要手工刷新文件来掩盖对等断言失败。
+Gradle若显示UP-TO-DATE可复用同源成功结果；需强制重跑时可在同一定向命令末尾追加`--rerun-tasks`，
+不得删除用户存档或放宽黄金断言。
+
+基线模式仅测试进程关闭DebugLogger，不修改生产默认诊断开关或桌面按钮；生产日志治理与公网门禁仍待041/044。
+默认`npm run test:e2e`保持原4202模式及55项回归，不因内部功能门变更。截图在忽略的test-results，
+journey-summary作为Playwright附件由reporter管理，默认list不保证将内联附件单独落盘；需机器报告时可用
+`PLAYWRIGHT_JSON_OUTPUT_NAME=test-results/gate-report.json npm run test:gate -- --reporter=list,json`。
+后一次Playwright运行可能清理前一次产物，应在后续运行前先查看/保留需要的证据。
+逐项A/Q状态、差异及决策见`../docs/web-017-verification.md`；没有账号/Replay/音频等后续能力不能标首发已完成。

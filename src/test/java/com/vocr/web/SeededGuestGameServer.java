@@ -9,9 +9,13 @@ public final class SeededGuestGameServer
 
     public static void main(String[] args)
     {
+        boolean baseline = args.length == 2 && args[1].equals("--release-baseline");
+        int port = GuestGameServer.parsePort(baseline ? new String[] { args[0] } : args);
+        // Test-process scope only. Production logging defaults and desktop buttons are NOT changed.
+        if (baseline) com.vocr.logging.DebugLogger.getInstance().setEnabled(false);
         GuestGameServer server = new GuestGameServer(
-                id -> SeededGuestSession.create(id, 4202), 100)
-                .start(GuestGameServer.parsePort(args));
+                baseline ? SeededGuestSession::createReleaseBaseline
+                         : id -> SeededGuestSession.create(id, 4202), 100).start(port);
         Runtime.getRuntime().addShutdownHook(new Thread(server::close));
     }
 }
