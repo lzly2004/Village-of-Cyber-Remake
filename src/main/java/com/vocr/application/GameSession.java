@@ -33,6 +33,7 @@ public final class GameSession
     private final GameResultSink resultSink;
     private State state = State.NEW;
     private boolean resultRecorded;
+    private ReplayRecording finishedRecording;
 
     /**
      * @param gameLogic 必须已把领域事件投递到传入的 {@code eventBuffer}，否则更新无法携带事件
@@ -160,10 +161,41 @@ public final class GameSession
         return gameLogic.getGameContext();
     }
 
-    /** 桌面迁移期用于把本局录像写入 Replay 槽位；开局前为 {@code null}。 */
-    public synchronized GameRecorder recorder()
+    /** Desktop compatibility: old UI permits saving any nonempty recording. */
+    public synchronized boolean hasReplayRecording()
     {
-        return gameLogic.getRecorder();
+        if (state == State.NEW || state == State.CLOSED) return false;
+        GameRecorder recorder = gameLogic.getRecorder();
+        return recorder != null && !recorder.getRecords().isEmpty();
+    }
+
+    /**
+     * Desktop use case: persist the pre-stop snapshot, then retain the legacy end/stop action.
+     * A failing sink leaves the recorder active and unchanged so the caller may retry.
+     */
+    public synchronized void saveDesktopReplay(ReplaySaveSink sink)
+    {
+        requireOpen();
+        Objects.requireNonNull(sink, "Replay保存端口不能为空");
+        if (!hasReplayRecording()) throw new IllegalStateException("没有可保存的录像记录");
+        GameRecorder recorder = gameLogic.getRecorder();
+        ReplayRecording recording = new ReplayRecording(recorder.getRecords());
+        sink.save(recording);
+        recorder.endGame(0, 0);
+        recorder.setActive(false);
+    }
+
+    /**
+     * Future Web save boundary: finished authority AND all published events acknowledged.
+     * Capturing neither drains events nor writes a file, advances revision or stops recording.
+     */
+    public synchronized ReplayRecording completedReplay(long confirmedEventCursor)
+    {
+        requireState(State.FINISHED, "读取终局录像");
+        if (confirmedEventCursor != eventBuffer.currentCursor())
+            throw new IllegalArgumentException("必须确认全部终局事件后才能读取录像");
+        if (finishedRecording == null) throw new IllegalStateException("没有可保存的终局录像");
+        return finishedRecording;
     }
 
     public synchronized PresentedEvent pollNextPresentedEvent()
@@ -206,6 +238,12 @@ public final class GameSession
     {
         if (update.phase() == BusinessPhase.FINISHED)
         {
+            if (state != State.FINISHED)
+            {
+                GameRecorder recorder = gameLogic.getRecorder();
+                if (recorder != null && !recorder.getRecords().isEmpty())
+                    finishedRecording = new ReplayRecording(recorder.getRecords());
+            }
             state = State.FINISHED;
             recordResultOnce();
         }

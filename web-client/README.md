@@ -185,7 +185,7 @@ bash ../tools/run-gradle-safe.sh test --tests 'com.vocr.web.Web017JourneyTest' -
 
 脚本带main/test/web全部Java源码SHA-256指纹（包括生成器Web017JourneyTest）。任何这些源码变化的批次，必须同批重新生成oracle，或明确登记 **gate stale / 尚未验证**；不把旧对照的指纹失败计为产品行为失败，也不能说gate通过。真正运行gate前必须先按最终源码生成oracle，禁止放宽/排除测试源码指纹。
 
-当前从bc6f545新增Java测试起，旧build/web017对照已stale；下一次需要gate时生成新对照，本次不为恢复绿色而提前跑全门。031还会改变源码，故不在开工前重复生成。
+bc6f545新增Java测试后旧对照曾stale；WEB-031最终源码已在用户授权的全量验收中重新生成15份oracle，并通过15项gate，见保存端口验收记录。后续源码再变仍须依上述约定重新生成或标stale，不复用本次绿色状态。
 该指纹不包含`config/probability.json`、`build.gradle`或前端源码；概率/构建配置变化也必须重新生成，
 不能把指纹相同当作全部输入未变。前端变化须按影响验证浏览器；若同轮准备运行gate，先重新生成对照，
 不要把可能的响应差异只归咎于浏览器。不在本批扩展指纹或改游戏输入。

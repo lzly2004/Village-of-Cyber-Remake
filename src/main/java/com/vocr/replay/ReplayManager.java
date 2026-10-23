@@ -91,6 +91,30 @@ public class ReplayManager {
         }
     }
 
+    /** Checked port path: publish the new slot only after an atomic file replacement succeeds. */
+    public synchronized void saveToSlotChecked(int slotIndex, ReplaySave replay) throws java.io.IOException {
+        if (slotIndex < 0 || slotIndex >= MAX_SLOTS)
+            throw new IllegalArgumentException("Replay槽位越界");
+        if (slots == null || slots.length != MAX_SLOTS)
+            throw new IllegalStateException("Replay槽位结构不完整，未覆盖原文件");
+        java.util.Objects.requireNonNull(replay, "Replay数据不能为空");
+        ReplaySave[] candidate = slots.clone();
+        replay.slotIndex = slotIndex;
+        candidate[slotIndex] = replay;
+        java.nio.file.Path target = java.nio.file.Path.of(saveFile).toAbsolutePath();
+        java.nio.file.Files.createDirectories(target.getParent());
+        java.nio.file.Path temporary = java.nio.file.Files.createTempFile(target.getParent(), ".vocr-replay-", ".tmp");
+        try {
+            new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(temporary.toFile(), candidate);
+            java.nio.file.Files.move(temporary, target,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            slots = candidate;
+        } finally {
+            java.nio.file.Files.deleteIfExists(temporary);
+        }
+    }
+
     public ReplaySave getSlot(int slotIndex) {
         if (slotIndex < 0 || slotIndex >= MAX_SLOTS) return null;
         return slots[slotIndex];

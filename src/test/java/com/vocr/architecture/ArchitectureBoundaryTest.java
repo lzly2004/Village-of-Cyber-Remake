@@ -102,6 +102,19 @@ class ArchitectureBoundaryTest {
     }
 
     @Test
+    void uiAndWebShouldNotAcquireOrMutateTheLiveRecorder() {
+        noClasses().that().resideInAnyPackage("com.vocr.ui..", "com.vocr.web..")
+                .should().dependOnClassesThat().haveFullyQualifiedName("com.vocr.core.GameRecorder")
+                .because("Replay保存通过应用层不可变录制副本与保存端口，不把可变录制器交给界面或HTTP")
+                .check(productionClasses);
+        noClasses().that().resideInAPackage("com.vocr.web..")
+                .should().callMethod(com.vocr.application.GameSession.class, "saveDesktopReplay",
+                        com.vocr.application.ReplaySaveSink.class)
+                .because("HTTP只能使用终局及确认游标门控入口，不能借桌面兼容路径读取在途录像")
+                .check(productionClasses);
+    }
+
+    @Test
     void uiShouldStartGamesThroughApplicationLayer() {
         noClasses()
                 .that().resideInAPackage("com.vocr.ui..")

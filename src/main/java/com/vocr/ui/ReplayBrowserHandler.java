@@ -5,7 +5,6 @@ import com.vocr.resources.SoundEffect;
 import com.vocr.resources.UiImage;
 
 import com.vocr.logging.DebugLogger;
-import com.vocr.core.GameRecorder;
 
 import com.vocr.replay.ReplayManager;
 import com.vocr.replay.ReplaySave;
@@ -200,29 +199,28 @@ public class ReplayBrowserHandler implements SceneHandler {
     }
 
     private boolean checkReplayDataAvailable(UI ui) {
-        GameRecorder recorder = ui.currentRecorder();
-        if (recorder == null || recorder.getRecords().isEmpty()) {
-            JOptionPane.showMessageDialog(ui.getJFrame(), 
+        if (!ui.hasReplayRecording()) {
+            JOptionPane.showMessageDialog(ui.getJFrame(),
                 "没有可保存的对局数据。\n请先完成一局游戏后再保存。",
-                "无法保存",
-                JOptionPane.INFORMATION_MESSAGE
-            );
+                "无法保存", JOptionPane.INFORMATION_MESSAGE);
             return false;
         }
         return true;
     }
 
     private void saveReplayToSlot(UI ui, int slotIndex) {
-        GameRecorder recorder = ui.currentRecorder();
-        if (recorder == null) return;
-
-        ReplaySave save = ReplaySave.fromRecords(slotIndex, recorder.getRecords());
-        ui.replayManager.saveToSlot(slotIndex, save);
-        recorder.endGame(recorder.isActive() ? 0 : 0, 0);
-        recorder.setActive(false);
+        try {
+            ui.saveReplayToSlot(slotIndex);
+        } catch (RuntimeException error) {
+            DebugLogger.error("[ReplayBrowserHandler] 保存失败", error);
+            JOptionPane.showMessageDialog(ui.getJFrame(),
+                "录像未能保存。对局记录仍保留，可检查存储后重试。",
+                "保存失败", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         ui.resources.playSound(SoundEffect.CLICK);
         ui.run();
-        DebugLogger.info("[ReplayBrowserHandler] 已保存到槽位: " + slotIndex);
+        DebugLogger.info("[ReplayBrowserHandler] 已保存到槽位 " + slotIndex);
     }
 
     private void handleEmptySlotRightClick(UI ui, int slotIndex) {

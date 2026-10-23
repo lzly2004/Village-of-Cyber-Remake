@@ -9,7 +9,7 @@ import com.vocr.application.PresentedEvent;
 import com.vocr.application.StartGameCommand;
 import com.vocr.application.StartedGame;
 import com.vocr.logging.DebugLogger;
-import com.vocr.core.GameRecorder;
+import com.vocr.replay.ReplaySlotSink;
 import com.vocr.resources.ResourcesInterface;
 import com.vocr.resources.UiImage;
 
@@ -187,8 +187,13 @@ public class UI
         return started;
     }
 
-    GameRecorder currentRecorder() {
-        return gameSession == null ? null : gameSession.recorder();
+    boolean hasReplayRecording() {
+        return gameSession != null && gameSession.hasReplayRecording();
+    }
+
+    void saveReplayToSlot(int slotIndex) {
+        if (gameSession == null) throw new IllegalStateException("没有可保存的对局");
+        gameSession.saveDesktopReplay(new ReplaySlotSink(replayManager, slotIndex));
     }
 
     /** 获取玩家职业图标文本（便捷转发） */
