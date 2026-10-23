@@ -8,7 +8,8 @@ defineProps({
 </script>
 
 <template>
-  <section v-if="history.length" class="panel vote-history" aria-label="最近投票结果" lang="ja">
+  <section v-if="history.length" class="panel vote-history" aria-labelledby="vote-history-title" lang="ja">
+    <span id="vote-history-title" class="visually-hidden" lang="zh-CN">最近投票结果</span>
     <header class="panel-heading"><span>投票履歴</span><span>完了した投票・全日程 / 全ラウンド</span></header>
     <p class="history-help">回避COで中断された投票は含みません。閲覧しても投票は送信されません。</p>
     <details v-for="vote in history" :key="vote.day" :open="vote === history.at(-1)"

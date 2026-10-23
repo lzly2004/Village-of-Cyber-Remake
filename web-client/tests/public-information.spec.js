@@ -1,5 +1,13 @@
 import { characterDisplayName } from '../src/characterDisplay.js'
-import { test, expect } from '@playwright/test'
+import { test as base, expect } from '@playwright/test'
+import { publicInformationDiagnostics } from './public-information-diagnostics.js'
+const test = base.extend({
+  diagnostics: async ({ page }, use, testInfo) => {
+    const diagnostic = publicInformationDiagnostics(page, testInfo)
+    await use(diagnostic)
+    await diagnostic.finish()
+  },
+})
 
 const key = 'vocr.guest.v1'
 const name = (snapshot, number) => number + ' · ' + characterDisplayName(snapshot.view.players.find(player => player.playerNumber === number).character)
@@ -35,34 +43,36 @@ async function expectReports(page, snapshot) {
   }
 }
 
-test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再読込で書き込まない', async ({ page, request }, testInfo) => {
-  const id = await start(page)
+test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再読込で書き込まない', async ({ page, request, diagnostics }, testInfo) => {
+  const id = await diagnostics.step('start and first event visible', () => start(page))
   let sawDead = false, sawSuspicion = false, checkedRefresh = false
   try {
-    await expect(page.getByRole('region', { name: '疑い先', exact: true })).toContainText('第3日以降')
-    await drain(page)
+    if (process.env.VOCR_PUBLIC_INFO_DIAGNOSTIC_PROBE === '1') throw new Error('DIAGNOSTIC_PROBE: intentional failure to verify attachments')
+    await diagnostics.step('assert initial suspicion availability', () => expect(page.getByRole('region', { name: '疑い先', exact: true })).toContainText('第3日以降'))
+    await diagnostics.step('drain public events', () => drain(page))
     for (const role of ['占い師', '霊能者', '狩人']) {
-      await page.getByRole('button', { name: role + 'のCOを聞く', exact: true }).click()
-      await drain(page)
+      await diagnostics.step('CO inquiry ' + role, () => page.getByRole('button', { name: role + 'のCOを聞く', exact: true }).click())
+      await diagnostics.step('drain public events', () => drain(page))
     }
     let days = 0
     while (true) {
       expect(++days).toBeLessThan(30)
-      const snapshot = await read(request, id)
+      const snapshot = await diagnostics.step('read authoritative snapshot', () => read(request, id))
+      diagnostics.snapshot(snapshot)
       expect(snapshot.publicInformation).toBeTruthy()
       if (snapshot.phase === 'FINISHED') {
         // Authority has finished, but the browser must still read preceding events.
-        await expect(page.getByTestId('next-event')).toBeVisible()
+        await diagnostics.step('wait for current event', () => expect(page.getByTestId('next-event')).toBeVisible())
         await expect(page.getByRole('region', { name: '公開情報', exact: true })).toHaveCount(0)
         await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
-        await drain(page)
+        await diagnostics.step('drain public events', () => drain(page))
         await expect(page.getByRole('region', { name: '公開死亡履歴', exact: true })).toBeVisible()
         await expect(page.getByRole('region', { name: '公開技能報告', exact: true })).toHaveCount(0)
         await expect(page.getByRole('region', { name: '疑い先', exact: true })).toHaveCount(0)
         break
       }
-      await drain(page)
-      await expectReports(page, snapshot)
+      await diagnostics.step('drain public events', () => drain(page))
+      await diagnostics.step('assert public reports day ' + snapshot.view.gameDay, () => expectReports(page, snapshot))
       sawDead ||= snapshot.publicInformation.skillReports.some(report =>
         !snapshot.view.players.find(player => player.playerNumber === report.playerNumber).alive)
       if (snapshot.publicInformation.suspicion.available) {
@@ -72,7 +82,7 @@ test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再
           const expected = row.targets.length ? name(snapshot, row.playerNumber) + '：'
             + row.targets.map((target, index) => name(snapshot, target)
               + (index + 1 < row.targets.length ? symbols[row.comparisons[index]] : '')).join('') : ''
-          await expect(page.getByTestId('suspicion-' + row.playerNumber)).toHaveText(expected)
+          await diagnostics.step('assert suspicion day ' + snapshot.view.gameDay + ' player ' + row.playerNumber, () => expect(page.getByTestId('suspicion-' + row.playerNumber)).toHaveText(expected))
         }
         if (!checkedRefresh) {
           const beforeText = await page.getByRole('region', { name: '公開情報', exact: true }).textContent()
@@ -80,7 +90,7 @@ test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再
           let writes = 0
           const countWrite = req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ }
           page.on('request', countWrite)
-          await page.reload()
+          await diagnostics.step('reload', () => page.reload())
           await expect(page.getByRole('region', { name: '公開情報', exact: true })).toHaveText(beforeText)
           expect(await saved(page)).toEqual(beforeStorage)
           expect(Object.keys(beforeStorage).sort()).toEqual(['eventCursor', 'sessionId'])
@@ -88,18 +98,18 @@ test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再
           expect(await read(request, id)).toEqual(snapshot)
           page.off('request', countWrite)
           await page.screenshot({ path: testInfo.outputPath('public-information.png'), fullPage: true })
-          await page.getByRole('region', { name: '公開情報', exact: true })
-            .screenshot({ path: testInfo.outputPath('public-information-panel.png') })
+          await diagnostics.step('public information panel screenshot', () => page.getByRole('region', { name: '公開情報', exact: true })
+            .screenshot({ path: testInfo.outputPath('public-information-panel.png') }))
           checkedRefresh = true
         }
       }
-      await page.getByTestId('vote-FREE').click()
-      await expect(page.getByTestId('next-event')).toBeVisible()
+      await diagnostics.step('free vote day ' + snapshot.view.gameDay, () => page.getByTestId('vote-FREE').click())
+      await diagnostics.step('wait for current event', () => expect(page.getByTestId('next-event')).toBeVisible())
     }
     expect(sawDead).toBe(true)
     expect(sawSuspicion).toBe(true)
     expect(checkedRefresh).toBe(true)
-    await page.reload()
+    await diagnostics.step('reload', () => page.reload())
     await expect(page.getByRole('region', { name: '公開死亡履歴', exact: true })).toBeVisible()
   } finally { await request.delete('/api/v1/games/' + id) }
 })

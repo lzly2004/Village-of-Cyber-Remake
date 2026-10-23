@@ -99,3 +99,22 @@ test('failed lazy help chunk shows a bounded diagnosis and leaves game controls 
   await page.getByRole('button', { name: 'ヘルプを閉じる', exact: true }).click()
   await expect(page.getByRole('alert')).toHaveCount(0)
 })
+
+test('retained Chinese structural copy declares its language; Japanese player names override it', async ({ page, request }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: '対局を始める' }).click()
+  await expect(page.getByTestId('next-event')).toBeVisible()
+  const id = JSON.parse(await saved(page)).sessionId
+  try {
+  const reading = page.getByTestId('stage-text')
+  await expect(reading).toHaveAttribute('lang', 'zh-CN')
+  await expect(page.locator('#stage-reading-help')).toHaveAttribute('lang', 'zh-CN')
+  await expect(page.getByRole('region', { name: '公开玩家列表', exact: true })).toHaveAttribute('lang', 'zh-CN')
+  await expect(page.locator('.pill')).toHaveAttribute('lang', 'zh-CN')
+  await expect(page.locator('.player-identity').first()).toHaveAttribute('lang', 'ja')
+  await expect(page.getByTestId('event-dialogue')).toHaveAttribute('lang', 'ja')
+  await page.route('**/api/v1/games/*?eventCursor=*', r => r.abort())
+  await page.getByRole('button', { name: '再同期' }).click()
+  await expect(page.getByRole('alert')).toHaveAttribute('lang', 'zh-CN')
+  } finally { await request.delete('/api/v1/games/' + id) }
+})

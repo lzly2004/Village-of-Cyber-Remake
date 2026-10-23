@@ -10,7 +10,7 @@ const groupId = ref('1')
 const topicId = ref('1-1')
 const group = computed(() => helpGroups.find(item => item.id === groupId.value))
 const topic = computed(() => group.value.topics.find(item => item.id === topicId.value))
-const originals = import.meta.glob('../../src/main/resources/help/Info*.txt', { query: '?raw', import: 'default', eager: true })
+const originals = import.meta.glob('../../src/main/resources/help/Info*-*-1.txt', { query: '?raw', import: 'default', eager: true })
 const original = computed(() => originals['../../src/main/resources/help/' + topic.value.source])
 function chooseGroup(event) {
   groupId.value = event.target.value

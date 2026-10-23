@@ -84,8 +84,8 @@ function name(number) {
 
     <main>
       <header class="topbar"><span>電脳村リメイク / Web試遊版</span><span class="build-tag">TEXT EDITION · 01</span></header>
-      <div v-if="notice" class="notice" role="alert">{{ notice }}</div>
-      <div v-if="storageWarning" class="notice" role="status">{{ storageWarning }}</div>
+      <div v-if="notice" class="notice" role="alert" lang="zh-CN">{{ notice }}</div>
+      <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
       <section v-if="!update && !sessionId" class="lobby">
         <span class="eyebrow">WELCOME TO THE VILLAGE</span>
@@ -117,8 +117,9 @@ function name(number) {
         </section>
 
         <div class="game-layout">
-          <section class="journal panel" aria-label="事件展示">
-            <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
+          <section class="journal panel" aria-labelledby="journal-label">
+            <span id="journal-label" class="visually-hidden" lang="zh-CN">事件展示</span>
+            <header class="panel-heading"><span class="eyebrow" lang="zh-CN">01 / 村落纪事</span><span class="pill" :lang="currentEvent ? 'zh-CN' : 'ja'">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
             <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor" :event-key="sessionId + ':' + cursor" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
               <template #scene-overlay>
@@ -133,7 +134,8 @@ function name(number) {
                   </div>
                 </div>
               </template>
-              <div v-if="currentEvent" class="event-content" role="region" aria-label="当前事件" aria-live="polite">
+              <div v-if="currentEvent" class="event-content" role="region" aria-labelledby="current-event-label" lang="ja" aria-live="polite">
+                <span id="current-event-label" class="visually-hidden" lang="zh-CN">当前事件</span>
                 <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
                 <EventDialogue :event="currentEvent.event" />
                 <p v-if="artwork.consequence" class="event-consequence" lang="ja" data-testid="event-consequence">{{ artwork.consequence }}</p>
@@ -144,11 +146,11 @@ function name(number) {
                 </div>
                 <p class="event-hint">台詞・叙述は既存リソースを使用しています。COと報告は公開発言であり、真偽を保証しません。</p>
               </div>
-              <div v-else-if="finished" class="event-content settlement" role="status">
+              <div v-else-if="finished" class="event-content settlement" role="status" lang="ja">
                 <span class="event-number">THE FINAL VERDICT</span><AssetImage v-if="outcome" class="settlement-win-icon" :name="outcome.icon" /><h2 lang="ja">{{ outcome?.text || '勝敗不明（表示診断）' }}</h2><p>全イベントを確認しました。役職はサーバーの公開結果に従います。</p>
                 <p v-if="reveal.diagnostic" class="visual-diagnostic" role="status" data-testid="reveal-diagnostic">表示診断：身分情報が不完全です。人物の役職画像を表示できません。</p>
               </div>
-              <div v-else class="event-content decision">
+              <div v-else class="event-content decision" lang="ja">
                 <span class="event-number">YOUR DECISION</span><h2>今日は、誰に投票しますか？</h2><p>プレイヤー一覧で指定候補にチェックして、投票を確定してください。</p><p>回避COがあれば発言を読んで再検討してください。共有者の回避後は候補を選び直せます。</p>
               </div>
             </GameStage>
@@ -160,16 +162,16 @@ function name(number) {
             </footer>
           </section>
 
-          <section class="players panel" aria-label="公开玩家列表">
-            <header class="panel-heading"><span class="eyebrow">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
+          <section class="players panel" aria-label="公开玩家列表" lang="zh-CN">
+            <header class="panel-heading"><span class="eyebrow" lang="zh-CN">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
             <p id="player-list-help" class="list-help">名单较长时可在列表内滚动。按 Tab 聚焦列表后可用方向键；继续按 Tab 可逐个选择候补。</p>
-            <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" tabindex="0" aria-describedby="player-list-help">
+            <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" lang="zh-CN" tabindex="0" aria-describedby="player-list-help">
               <label v-for="player in players" :key="player.playerNumber" class="player-row" :data-player-number="player.playerNumber" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
                 <PlayerPortrait :player="player" :revealed="finished" :actual-role="finished ? reveal.roles.get(player.playerNumber) : null" />
                 <span class="player-number">{{ String(player.playerNumber).padStart(2, '0') }}</span>
-                <span class="player-identity"><strong lang="ja">{{ characterDisplayName(player.character) }}</strong><small>{{ finished ? '実際の役職 · ' + (roles[reveal.roles.get(player.playerNumber)] || '身分不明（表示診断）') : playerVisual(player).roleText + (playerVisual(player).orderText ? ' · ' + playerVisual(player).orderText : '') }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日離場</span></small><small v-if="playerVisual(player).claimDiagnostic" class="visual-diagnostic">表示診断：CO図なし</small><small v-if="playerVisual(player).deathDiagnostic" class="visual-diagnostic">表示診断：死因図なし</small></span>
+                <span class="player-identity" lang="ja"><strong lang="ja">{{ characterDisplayName(player.character) }}</strong><small>{{ finished ? '実際の役職 · ' + (roles[reveal.roles.get(player.playerNumber)] || '身分不明（表示診断）') : playerVisual(player).roleText + (playerVisual(player).orderText ? ' · ' + playerVisual(player).orderText : '') }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日離場</span></small><small v-if="playerVisual(player).claimDiagnostic" class="visual-diagnostic">表示診断：CO図なし</small><small v-if="playerVisual(player).deathDiagnostic" class="visual-diagnostic">表示診断：死因図なし</small></span>
                 <input v-if="!finished" type="checkbox" :aria-label="'指定 ' + characterDisplayName(player.character) + '（' + player.playerNumber + '号）'" :checked="voteTargets.includes(player.playerNumber)" :disabled="!canDecide || !legalTargets.includes(player.playerNumber)" @click.prevent="toggleTarget(player.playerNumber, !voteTargets.includes(player.playerNumber))">
-                <span v-else class="player-state">{{ player.alive ? '生存' : '離場' }}</span>
+                <span v-else class="player-state" lang="ja">{{ player.alive ? '生存' : '離場' }}</span>
               </label>
             </div>
           </section>

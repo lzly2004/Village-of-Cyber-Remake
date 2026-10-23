@@ -23,7 +23,7 @@ const positions = computed(() => participants.value.map((character, index, all) 
   <div class="game-stage" :data-stage="stage" data-testid="game-stage">
     <div class="stage-surface" data-testid="stage-surface">
       <StageArtwork v-if="artwork.mode === 'dialogue' || artwork.mode === 'scene'" :plan="artwork" @consequence="emit('consequence', eventKey)" />
-      <svg v-else class="stage-artwork" data-testid="stage-artwork" viewBox="0 0 1280 720"
+      <svg v-else lang="zh-CN" class="stage-artwork" data-testid="stage-artwork" viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <rect class="stage-sky" width="1280" height="720" />
         <path class="stage-horizon" d="M0 360 L180 240 L330 330 L540 180 L760 320 L970 215 L1280 360 V720 H0 Z" />
@@ -40,11 +40,11 @@ const positions = computed(() => participants.value.map((character, index, all) 
         <text v-if="!positions.length" x="640" y="270" text-anchor="middle" class="stage-empty">场景占位</text>
       </svg>
       <slot name="scene-overlay" />
-      <div class="stage-text" role="region" aria-label="舞台文字阅读区" tabindex="0"
+      <div class="stage-text" role="region" lang="zh-CN" aria-label="舞台文字阅读区" tabindex="0"
         aria-describedby="stage-reading-help" data-testid="stage-text">
         <slot />
       </div>
     </div>
-    <p id="stage-reading-help" class="stage-reading-help">文字较长时可在阅读区滚动；按 Tab 聚焦后，可用方向键阅读。确认按钮位于舞台下方。</p>
+    <p id="stage-reading-help" lang="zh-CN" class="stage-reading-help">文字较长时可在阅读区滚动；按 Tab 聚焦后，可用方向键阅读。确认按钮位于舞台下方。</p>
   </div>
 </template>
