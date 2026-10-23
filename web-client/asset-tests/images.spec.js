@@ -6,7 +6,7 @@ test('WEB-022/023 static manifest images decode at original dimensions; lobby re
   const imageRequests = []
   page.on('request', req => { if (req.url().endsWith('.webp')) imageRequests.push(req.url()) })
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /每一次发言/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /一つひとつの発言/ })).toBeVisible()
   await expect(page.locator('.player-row')).toHaveCount(0)
   expect(imageRequests).toEqual([])
   const response = await request.get('/assets/images/manifest.json')
@@ -55,7 +55,7 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
     sessionId: '00000000-0000-0000-0000-000000000023', update: snapshot,
   }}))
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /每一次发言/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /一つひとつの発言/ })).toBeVisible()
   await page.waitForLoadState('networkidle')
   expect(paths).toEqual([])
   const lobbyBytes = await page.evaluate(() => performance.getEntriesByType('navigation')[0].transferSize
@@ -63,7 +63,7 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
   expect(lobbyBytes).toBeGreaterThan(0)
   expect(lobbyBytes).toBeLessThanOrEqual(1.5 * 1024 ** 2)
   const firstGame = await page.evaluate(() => performance.now())
-  await page.getByRole('button', {name:'开始对局'}).click()
+  await page.getByRole('button', {name:'対局を始める'}).click()
   const rows = page.locator('.player-row')
   await expect(rows).toHaveCount(44)
   await rows.first().scrollIntoViewIfNeeded()

@@ -8,7 +8,7 @@ async function saved(page) { return page.evaluate(key => JSON.parse(sessionStora
 async function start(page) {
   await page.goto('/')
   await page.getByRole('radio', { name: '通常配役' }).check()
-  await page.getByRole('button', { name: '开始对局' }).click()
+  await page.getByRole('button', { name: '対局を始める' }).click()
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
@@ -54,7 +54,7 @@ test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再
         // Authority has finished, but the browser must still read preceding events.
         await expect(page.getByTestId('next-event')).toBeVisible()
         await expect(page.getByRole('region', { name: '公開情報', exact: true })).toHaveCount(0)
-        await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+        await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
         await drain(page)
         await expect(page.getByRole('region', { name: '公開死亡履歴', exact: true })).toBeVisible()
         await expect(page.getByRole('region', { name: '公開技能報告', exact: true })).toHaveCount(0)
@@ -189,10 +189,10 @@ for (const missing of [false, true]) {
 test('会話失効後は公開情報も消え、新局に持ち越さない', async ({ page, request }) => {
   const id = await start(page)
   await request.delete('/api/v1/games/' + id)
-  await page.getByRole('button', { name: '重新同步', exact: true }).click()
+  await page.getByRole('button', { name: '再同期', exact: true }).click()
   await expect(page.getByRole('region', { name: '公開情報', exact: true })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: '开始对局' })).toBeVisible()
-  await page.getByRole('button', { name: '开始对局' }).click()
+  await expect(page.getByRole('button', { name: '対局を始める' })).toBeVisible()
+  await page.getByRole('button', { name: '対局を始める' }).click()
   await expect(page.getByTestId('next-event')).toBeVisible()
   const nextId = (await saved(page)).sessionId
   try {
@@ -220,7 +220,7 @@ for (const lost of [false, true]) {
       })
       await page.getByRole('button', { name: '占い師のCOを聞く', exact: true }).click()
       await expect(page.getByRole('alert')).toContainText(lost ? '重新同步' : '已重新同步')
-      if (lost) await page.getByRole('button', { name: '重新同步', exact: true }).click()
+      if (lost) await page.getByRole('button', { name: '再同期', exact: true }).click()
       await expectReports(page, authority)
       expect(writes).toBe(1)
     } finally { await request.delete('/api/v1/games/' + id) }

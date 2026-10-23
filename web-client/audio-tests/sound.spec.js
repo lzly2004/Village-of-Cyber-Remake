@@ -44,8 +44,8 @@ test('WEB-028 live BGM/effect gain, keyboard volume, serial click cleanup and re
   const paths=await setup(page,{settings:JSON.stringify({version:1,bgmVolume:40,soundVolume:60,muted:false})})
   expect(paths).toEqual([]);expect((await probe(page)).contexts).toEqual([])
   await expect(page.getByRole('slider',{name:'BGM音量',exact:true})).toHaveValue('40')
-  await page.getByRole('button',{name:'开始对局'}).click();await enable(page)
-  await page.getByRole('button',{name:'结束本次试玩'}).click()
+  await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  await page.getByRole('button',{name:'試遊を終了'}).click()
   await expect(ui(page)).toHaveAttribute('data-sound-status','playing');await expect(ui(page)).toHaveAttribute('data-sound','CLICK')
   expect(await probe(page)).toMatchObject({contexts:['running'],bgm:1,effects:1,active:2})
   expect((await probe(page)).gains).toEqual([Math.fround(.1),Math.fround(.15)])
@@ -63,11 +63,11 @@ test('WEB-028 live BGM/effect gain, keyboard volume, serial click cleanup and re
 test('WEB-028 mute cancels a held effect and suppresses future/retroactive playback; no second context',async({page})=>{
   let held;const intercepted=new Promise(resolve=>{held=resolve})
   await page.route('**'+soundPath('CLICK'),r=>held(r))
-  const paths=await setup(page);await page.getByRole('button',{name:'开始对局'}).click();await enable(page)
-  await page.getByRole('button',{name:'结束本次试玩'}).click();const route=await intercepted
+  const paths=await setup(page);await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  await page.getByRole('button',{name:'試遊を終了'}).click();const route=await intercepted
   await page.getByRole('switch',{name:'消音',exact:true}).click();await route.abort('aborted')
   await expect(ui(page)).toHaveAttribute('data-sound-status','idle')
-  await page.getByRole('button',{name:'保留对局'}).click()
+  await page.getByRole('button',{name:'対局を残す'}).click()
   expect(paths.filter(p=>p===soundPath('CLICK'))).toHaveLength(1)
   await page.getByRole('switch',{name:'消音',exact:true}).click()
   expect(paths.filter(p=>p===soundPath('CLICK'))).toHaveLength(1)
@@ -77,7 +77,7 @@ test('WEB-028 mute cancels a held effect and suppresses future/retroactive playb
 for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])test('WEB-028 current night serial intro/result '+eventname+'; native ended releases and manual frame never replays death',async({page})=>{
   const snapshot=presented(publicSnapshot(),'NIGHT_RESULT',eventname)
   const paths=await setup(page,{snapshot});await enable(page)
-  await page.getByRole('button',{name:'开始对局'}).click()
+  await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(ui(page)).toHaveAttribute('data-sound','NIGHTFALL');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   expect(paths).not.toContain(soundPath('WOLF_HOWL'));await finishSound(page)
   await expect(ui(page)).toHaveAttribute('data-sound','WOLF_HOWL');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
@@ -92,7 +92,7 @@ for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])
 
 test('WEB-028 execution sound follows second displayed frame once and is canceled on confirmation',async({page})=>{
   const snapshot=presented(publicSnapshot(),'EXECUTION','cxs')
-  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'开始对局'}).click()
+  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
   expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','2')
@@ -104,23 +104,23 @@ test('WEB-028 execution sound follows second displayed frame once and is cancele
 for(const [result,effect] of [['VILLAGE_WIN','VILLAGE_VICTORY'],['WOLF_WIN','WOLF_VICTORY'],['FOX_WIN','FOX_VICTORY']])test('WEB-028 win effect gated by final confirmation '+result,async({page})=>{
   const snapshot=presented(publicSnapshot(),'SETTLEMENT',result==='VILLAGE_WIN'?'crsl':result==='WOLF_WIN'?'rlsl':'yhsl')
   snapshot.phase='FINISHED';snapshot.view.result=result
-  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'开始对局'}).click()
+  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('next-event')).toBeVisible();expect(paths).not.toContain(soundPath(effect))
   await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound',effect)
   await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
-  await page.getByRole('button',{name:'重新同步'}).click();expect(paths.filter(p=>p===soundPath(effect))).toHaveLength(1)
+  await page.getByRole('button',{name:'再同期'}).click();expect(paths.filter(p=>p===soundPath(effect))).toHaveLength(1)
   expect((await probe(page)).active).toBeLessThanOrEqual(2)
 })
 
 test('WEB-028 same-day refresh preserves pending playlist selection (027 array-getter observation)',async({page})=>{
   let held;const intercepted=new Promise(resolve=>{held=resolve})
   await page.route('**/assets/audio/manifest.json',r=>held(r))
-  await setup(page);await page.getByRole('button',{name:'开始对局'}).click()
+  await setup(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await page.getByRole('button',{name:'音楽を有効にする'}).click();const route=await intercepted
   await expect(ui(page)).toHaveAttribute('data-status','loading')
   await page.getByRole('button',{name:'曲を切替'}).click()
   await expect(page.getByRole('button',{name:'曲を切替'})).toBeDisabled()
-  await page.getByRole('button',{name:'重新同步'}).click()
+  await page.getByRole('button',{name:'再同期'}).click()
   await expect(page.getByRole('button',{name:'曲を切替'})).toBeDisabled()
   await route.fulfill({json:catalog})
   await expect(ui(page)).toHaveAttribute('data-track',catalog.playlists.NORMAL_GAME_PLAYLIST[0])
@@ -129,10 +129,10 @@ test('WEB-028 same-day refresh preserves pending playlist selection (027 array-g
 
 test('WEB-028 corrupt effect is diagnosed without stopping BGM or game sync',async({page})=>{
   await page.route('**'+soundPath('CLICK'),r=>r.fulfill({status:200,contentType:'text/html',body:'<html>SPA</html>'}))
-  await setup(page);await page.getByRole('button',{name:'开始对局'}).click();await enable(page)
-  await page.getByRole('button',{name:'结束本次试玩'}).click()
+  await setup(page);await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  await page.getByRole('button',{name:'試遊を終了'}).click()
   await expect(ui(page)).toContainText('AUDIO_INTEGRITY_FAILED');await expect(ui(page)).toHaveAttribute('data-status','playing')
-  expect((await probe(page)).active).toBe(1);await expect(page.getByRole('button',{name:'重新同步'})).toBeEnabled()
+  expect((await probe(page)).active).toBe(1);await expect(page.getByRole('button',{name:'再同期'})).toBeEnabled()
 })
 
 for(const denied of [false,true])test('WEB-028 invalid/blocked settings remain explicit and editable '+denied,async({page})=>{
@@ -146,21 +146,21 @@ for(const denied of [false,true])test('WEB-028 invalid/blocked settings remain e
 
 test('WEB-028 early confirmation cancels delayed execution sound; reduced motion emits second-frame sound immediately',async({page})=>{
   const snapshot=presented(publicSnapshot(),'EXECUTION','cxs')
-  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'开始对局'}).click()
+  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
   await page.getByTestId('next-event').click()
   // Deliberately outlive the 2000ms transition; no stale audio may arrive after confirmation.
   await page.waitForTimeout(2200);expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
   await page.emulateMedia({reducedMotion:'reduce'})
   await page.evaluate(()=>sessionStorage.clear());await page.reload();await enable(page)
-  await page.getByRole('button',{name:'开始对局'}).click()
+  await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','2')
   await expect(ui(page)).toHaveAttribute('data-sound','DAY_EXECUTION')
 })
 
 test('WEB-028 actual browser mix contains signal and master mute produces zero samples',async({page})=>{
-  await setup(page);await page.getByRole('button',{name:'开始对局'}).click();await enable(page)
-  await page.getByRole('button',{name:'结束本次试玩'}).click()
+  await setup(page);await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  await page.getByRole('button',{name:'試遊を終了'}).click()
   await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   await page.evaluate(()=>{
     const p=window.soundProbe,c=p.contexts[0],mix=c.createAnalyser(),silent=c.createGain()
@@ -192,7 +192,7 @@ test('WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK w
   const failures=[]
   page.on('requestfailed',request=>{if(new URL(request.url()).pathname===soundPath('CLICK'))failures.push(request.failure()?.errorText)})
   const paths=await setup(page,{snapshot})
-  await page.getByRole('button',{name:'开始对局'}).click();await enable(page)
+  await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
   const samples=[]
   try {
     for(const mode of ['mouse','keyboard']){

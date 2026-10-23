@@ -8,7 +8,7 @@ const playerName = (snapshot, number) => number + ' · ' + characterDisplayName(
 async function start(page) {
   await page.goto('/')
   await page.getByRole('radio', { name: '通常配役' }).check()
-  await page.getByRole('button', { name: '开始对局' }).click()
+  await page.getByRole('button', { name: '対局を始める' }).click()
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
@@ -150,7 +150,7 @@ for (const lost of [false, true]) {
       })
       await page.getByTestId('vote-FREE').click()
       await expect(page.getByRole('alert')).toContainText(lost ? '重新同步' : '已重新同步')
-      if (lost) await page.getByRole('button', { name: '重新同步', exact: true }).click()
+      if (lost) await page.getByRole('button', { name: '再同期', exact: true }).click()
       expect(authority.voteHistory.length).toBe(1)
       await expectHistory(page, authority)
       expect(writes).toBe(1)
@@ -170,7 +170,7 @@ test('CO中断は未完了の票型を追加せず、再読込でも同じ履歴
       data: { expectedRevision: snapshot.revision, target: 9, selected: true },
     })
     expect(selected.ok()).toBe(true)
-    await page.getByRole('button', { name: '重新同步', exact: true }).click()
+    await page.getByRole('button', { name: '再同期', exact: true }).click()
     await expect(page.getByTestId('vote')).toBeEnabled()
     const response = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/votes'))
     await page.getByTestId('vote').click()
@@ -198,9 +198,9 @@ test('失効と新局で前局の票型を持ち越さない', async ({ page, re
     expect(after.voteHistory[0].day).toBe(before.view.gameDay)
     await expectHistory(page, after)
     await request.delete('/api/v1/games/' + id)
-    await page.getByRole('button', { name: '重新同步', exact: true }).click()
+    await page.getByRole('button', { name: '再同期', exact: true }).click()
     await expect(page.getByRole('region', { name: '最近投票结果' })).toHaveCount(0)
-    await page.getByRole('button', { name: '开始对局' }).click()
+    await page.getByRole('button', { name: '対局を始める' }).click()
     await expect(page.getByTestId('next-event')).toBeVisible()
     nextId = (await saved(page)).sessionId
     expect(nextId).not.toBe(id)

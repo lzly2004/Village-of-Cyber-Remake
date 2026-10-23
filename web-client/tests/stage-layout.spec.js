@@ -6,7 +6,7 @@ const saved = page => page.evaluate(key => JSON.parse(sessionStorage.getItem(key
 async function start(page) {
   await page.goto('/')
   await page.getByRole('radio', { name: '通常配役' }).check()
-  await page.getByRole('button', { name: '开始对局' }).click()
+  await page.getByRole('button', { name: '対局を始める' }).click()
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
@@ -111,12 +111,12 @@ test('WEB-021 synthetic long dialogue scrolls by keyboard; confirmation stays ou
     await page.keyboard.press('PageDown')
     await expect.poll(() => reading.evaluate(node => node.scrollTop)).toBeGreaterThan(0)
     expect((await saved(page)).eventCursor).toBe(0)
-    await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
     await expect(reading.getByTestId('next-event')).toHaveCount(0)
     await page.getByTestId('next-event').focus()
     await page.keyboard.press('Enter')
     expect((await saved(page)).eventCursor).toBe(1)
-    await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
     await expect.poll(() => reading.evaluate(node => node.scrollTop)).toBe(0)
     // Verify the reset survives subsequent layout/anchoring frames, not just one transient zero.
     const offsets = await reading.evaluate(async node => {
@@ -151,7 +151,7 @@ test('WEB-021 synthetic long dialogue scrolls by keyboard; confirmation stays ou
     })
     expect(shift).toEqual({ before: 240, after: 240 })
     await page.keyboard.press('Enter')
-    await expect(page.locator('.player-identity').first()).toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).toContainText('実際の役職')
     expect((await saved(page)).eventCursor).toBe(2)
   } finally { await request.delete('/api/v1/games/' + id) }
 })
@@ -188,7 +188,7 @@ test('WEB-021 synthetic long player list exposes scroll instructions and support
     await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeLessThan(before)
     expect(writes).toBe(0)
     expect((await saved(page)).eventCursor).toBe(0)
-    await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
   } finally { await request.delete('/api/v1/games/' + id) }
 })
 

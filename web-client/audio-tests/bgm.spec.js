@@ -76,7 +76,7 @@ test('WEB-027 cold lobby is silent until keyboard gesture; real playback loops a
 test('WEB-027 day dialogue and CO keep one track; decision playlist cycles exact source order; refresh stays off',async({page})=>{
   const snapshot=events(publicSnapshot(),[['DAY_DIALOGUE','gyfo1'],['AFTERNOON_DIALOGUE','gyfo1r']])
   const paths=await setup(page,snapshot)
-  await page.getByRole('button',{name:'开始对局'}).click();await enable(page,'EMOTIONALLY_UNSTABLE')
+  await page.getByRole('button',{name:'対局を始める'}).click();await enable(page,'EMOTIONALLY_UNSTABLE')
   await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
   await page.getByTestId('next-event').click();await expect(page.getByRole('button',{name:'曲を切替'})).toBeEnabled()
   expect(paths.filter(p=>p.includes('/bgm/') && p.endsWith('.mp3'))).toEqual([path('EMOTIONALLY_UNSTABLE')])
@@ -95,7 +95,7 @@ test('WEB-027 execution/night are silent; settlement music waits for displayed s
   const snapshot=events(publicSnapshot(),[['EXECUTION','cxs'],['NIGHT_RESULT','wsw'],['DAY_DIALOGUE','gyfo1'],['SETTLEMENT','crsl']])
   snapshot.phase='FINISHED';snapshot.view.result='VILLAGE_WIN'
   const paths=await setup(page,snapshot)
-  await page.getByRole('button',{name:'开始对局'}).click()
+  await page.getByRole('button',{name:'対局を始める'}).click()
   await page.getByRole('button',{name:'音楽を有効にする'}).click();await expect(ui(page)).toHaveAttribute('data-status','silent')
   expect(paths).toEqual([])
   await page.getByTestId('next-event').click();expect(paths.filter(p=>p.includes('/bgm/'))).toEqual([])
@@ -112,7 +112,7 @@ test('WEB-027 execution/night are silent; settlement music waits for displayed s
 test('WEB-027 late playlist uses four survivors too; release selects lobby and hidden/pagehide require a new gesture',async({page})=>{
   const snapshot=publicSnapshot();snapshot.view.aliveCount=4
   const paths=await setup(page,snapshot)
-  await page.getByRole('button',{name:'开始对局'}).click();await enable(page,'LIGHTLESS_GAZE')
+  await page.getByRole('button',{name:'対局を始める'}).click();await enable(page,'LIGHTLESS_GAZE')
   await page.getByRole('button',{name:'曲を切替'}).click()
   await expect(ui(page)).toHaveAttribute('data-track',manifest.playlists.LATE_GAME_PLAYLIST[0])
   await expect(ui(page)).toHaveAttribute('data-status','playing')
@@ -126,8 +126,8 @@ test('WEB-027 late playlist uses four survivors too; release selects lobby and h
   await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true})))
   await expect(ui(page)).toHaveAttribute('data-status','off')
   await enable(page,'LAST_BOSS_02')
-  await page.getByRole('button',{name:'结束本次试玩'}).click()
-  await page.getByRole('button',{name:'确认释放'}).click()
+  await page.getByRole('button',{name:'試遊を終了'}).click()
+  await page.getByRole('button',{name:'解放を確定'}).click()
   await expect(ui(page)).toHaveAttribute('data-track','START_MENU')
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   expect((await probe(page)).active).toBe(1)
@@ -144,7 +144,7 @@ test('WEB-027 late cold request is canceled on new scene; no stale source, overl
   await page.getByRole('button',{name:'音楽を有効にする'}).click()
   const route=await intercepted
   await expect(ui(page)).toHaveAttribute('data-status','loading')
-  await page.getByRole('button',{name:'开始对局'}).click()
+  await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   await route.abort('aborted')
@@ -159,10 +159,10 @@ test('WEB-027 corruption and denied play are visible, silent failures; game cont
   await page.getByRole('button',{name:'音楽を有効にする'}).click()
   await expect(ui(page)).toHaveAttribute('data-status','error');await expect(ui(page)).toContainText('AUDIO_INTEGRITY_FAILED')
   expect((await probe(page)).active).toBe(0)
-  await page.getByRole('button',{name:'开始对局'}).click();await expect(page.locator('.player-row')).toHaveCount(44)
+  await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.locator('.player-row')).toHaveCount(44)
   // Simulate browser/device denial, preserving actual resource loading and the UI failure path.
   await page.evaluate(()=>{HTMLMediaElement.prototype.play=()=>Promise.reject(new DOMException('denied','NotAllowedError'))})
   await page.getByRole('button',{name:'音楽を有効にする'}).click()
   await expect(ui(page)).toContainText('BGM_GESTURE_REQUIRED');expect((await probe(page)).active).toBe(0)
-  await expect(page.getByRole('button',{name:'重新同步'})).toBeEnabled()
+  await expect(page.getByRole('button',{name:'再同期'})).toBeEnabled()
 })

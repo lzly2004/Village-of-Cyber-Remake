@@ -4,7 +4,7 @@ const saved=page=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.gues
 test('WEB-027/028 real session audio controls and settings never write game state or confirm an event',async({page,request})=>{
   const writes=[]
   page.on('request',r=>{if(r.url().includes('/api/v1/games')&&r.method()!=='GET')writes.push(r.method()+' '+new URL(r.url()).pathname)})
-  await page.goto('/');await page.getByRole('button',{name:'开始对局'}).click()
+  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('next-event')).toBeVisible()
   while(await page.getByTestId('next-event').count())await page.getByTestId('next-event').click()
   await expect(page.getByRole('button',{name:'曲を切替'})).toBeVisible()

@@ -58,7 +58,7 @@ test('WEB-025 night/death/execution frames follow ordered source, centered with 
       if(cursor>1)await expect(page.getByTestId('event-consequence')).toContainText('青年 アーベル')
       expect((await saved(page)).eventCursor).toBe(cursor)
       await expect(page.getByTestId('next-event')).toBeEnabled()
-      await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+      await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
     }
     expect(writes).toBe(0)
   }finally{await request.delete('/api/v1/games/'+id)}
@@ -88,12 +88,12 @@ for(const [outcome,background,text,event]of [['VILLAGE_WIN','endVillage.png','�
       await expect(row.locator('.portrait-image img')).toHaveAttribute('src',url('01s.png'))
       for(let cursor=0;cursor<2;cursor++){
         await expect(page.getByTestId('settlement-board')).toHaveCount(0)
-        await expect(row).not.toContainText('真实身份')
+        await expect(row).not.toContainText('実際の役職')
         expect(requests).not.toContain(url('01ws.png'));expect(requests).not.toContain(url('03fs.png'))
         if(cursor===1){await ready(page);await expect(page.getByTestId('stage-background')).toHaveAttribute('href',url(background));await image(page,mapping.Abel[event].default)}
         await page.getByTestId('next-event').click()
       }
-      await expect(row).toContainText('真实身份 · 人狼');await ready(page)
+      await expect(row).toContainText('実際の役職 · 人狼');await ready(page)
       await expect(page.getByTestId('stage-background')).toHaveAttribute('href',url('frame #19252.png'))
       await expect(page.locator('.settlement h2')).toHaveText(text)
       await expect(page.getByTestId('settlement-board').locator('.settlement-card')).toHaveCount(3)
@@ -106,7 +106,7 @@ for(const [outcome,background,text,event]of [['VILLAGE_WIN','endVillage.png','�
       await expect(page.getByTestId('stage-character')).toHaveCount(0)
       await page.locator('.players.panel').screenshot({path:info.outputPath('revealed-players.png')})
       await page.getByTestId('stage-surface').screenshot({path:info.outputPath('review-board.png')})
-      const before=await saved(page);await page.reload();await expect(row).toContainText('真实身份 · 人狼')
+      const before=await saved(page);await page.reload();await expect(row).toContainText('実際の役職 · 人狼')
       await row.scrollIntoViewIfNeeded()
       await expect(row.locator('.portrait-image img')).toHaveAttribute('src',url('01ws.png'))
       expect(await saved(page)).toEqual(before)
@@ -129,7 +129,7 @@ for(const mode of ['missing','duplicate','unknown-role','not-array']){
       await expect(page.locator('.player-identity')).toContainText(Array(3).fill('身分不明（表示診断）'))
       await expect(page.locator('.portrait-image img')).toHaveCount(0)
       await expect(page.locator('.player-list')).not.toContainText('undefined')
-      await expect(page.getByRole('button',{name:'新开一局'})).toBeEnabled()
+      await expect(page.getByRole('button',{name:'新しい対局'})).toBeEnabled()
       expect((await saved(page)).eventCursor).toBe(1)
     }finally{await request.delete('/api/v1/games/'+id)}
   })
@@ -187,8 +187,8 @@ test('WEB-025 corrupt transition image is diagnosed and cannot block confirmatio
   try{
     await expect(page.getByTestId('stage-art-status')).toContainText('読み込めません')
     await expect(page.getByTestId('decoded-stage-scene')).toHaveCount(0)
-    await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
     await page.getByTestId('next-event').click()
-    await expect(page.locator('.player-identity').first()).toContainText('真实身份 · 人狼')
+    await expect(page.locator('.player-identity').first()).toContainText('実際の役職 · 人狼')
   }finally{await request.delete('/api/v1/games/'+id)}
 })

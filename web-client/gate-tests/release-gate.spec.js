@@ -11,7 +11,7 @@ const stageMapping = JSON.parse(readFileSync(resolve(root, 'src/main/resources/c
 const imageManifest = JSON.parse(readFileSync(resolve(root, 'web-client/public/assets/images/manifest.json'), 'utf8'))
 const roles = { zhan: '占い師', ling: '霊能者', lie: '狩人', gong: '共有', mao: '猫又' }
 const configurations = ['jianyi', 'tongchang', 'yaoohu', 'kuangxin', 'beide', 'maoyou', 'daxing']
-const names = ['简易', '通常', '妖狐', '狂信', '背德', '猫又', '大型']
+const names = ['簡易', '通常', '妖狐', '狂信', '背徳', '猫又', '大型']
 const saved = page => page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), key)
 
 function sourceFingerprint() {
@@ -74,10 +74,10 @@ async function display(page, snapshot, beforeDrain = false) {
   const pending = beforeDrain && snapshot.presentedEvents.length > 0
   if (snapshot.phase === 'FINISHED') {
     if (pending) {
-      await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+      await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
       await expect(page.getByRole('region', { name: '公開情報', exact: true })).toHaveCount(0)
     } else {
-      await expect(page.locator('.player-identity').first()).toContainText('真实身份')
+      await expect(page.locator('.player-identity').first()).toContainText('実際の役職')
       await expect(page.getByTestId('reveal-diagnostic')).toHaveCount(0)
       const player = snapshot.view.players[0]
       const role = snapshot.revealedRoles.find(entry=>entry.playerNumber===player.playerNumber).actualRole
@@ -149,7 +149,7 @@ async function journey(page, request, testInfo, configuration, strategy) {
   await page.goto('/')
   await page.getByRole('radio', { name: names[configurations.indexOf(configuration)] + '配役' }).check()
   const createdResponse = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/api/v1/games'))
-  await page.getByRole('button', { name: '开始对局' }).click()
+  await page.getByRole('button', { name: '対局を始める' }).click()
   const created = await (await createdResponse).json()
   const id = created.sessionId
   const path = '/api/v1/games/' + id

@@ -31,7 +31,7 @@ async function expectImage(locator, name) {
 test('WEB-023 real public players use ordinal Japanese names and status images, refresh preserves cursor', async ({ page, request }, testInfo) => {
   await page.goto('/')
   const createdResponse = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/api/v1/games'))
-  await page.getByRole('button', { name: '开始对局' }).click()
+  await page.getByRole('button', { name: '対局を始める' }).click()
   const created = await (await createdResponse).json()
   try {
     const state = await saved(page)
@@ -48,7 +48,7 @@ test('WEB-023 real public players use ordinal Japanese names and status images, 
     await page.reload()
     await expect(page.getByTestId('event-dialogue')).toHaveText(text)
     expect(await saved(page)).toEqual(state)
-    await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
   } finally { await request.delete('/api/v1/games/' + created.sessionId) }
 })
 
@@ -72,7 +72,7 @@ test('WEB-023 all 44 appearances and public gray/death states are independent of
     }
     expect(writes).toBe(0)
     expect((await saved(page)).eventCursor).toBe(0)
-    await expect(page.locator('.player-list')).not.toContainText('真实身份')
+    await expect(page.locator('.player-list')).not.toContainText('実際の役職')
   } finally { await request.delete('/api/v1/games/' + id) }
 })
 
@@ -138,11 +138,11 @@ test('WEB-023 broken image retains explicit fallback and cannot skip terminal di
     await row.scrollIntoViewIfNeeded()
     await expect(row.locator('.portrait-image .asset-diagnostic')).toBeVisible()
     await expect(row.locator('.portrait-image img')).toHaveCount(0)
-    await expect(row).not.toContainText('真实身份')
+    await expect(row).not.toContainText('実際の役職')
     await page.getByTestId('next-event').click()
-    await expect(row).not.toContainText('真实身份')
+    await expect(row).not.toContainText('実際の役職')
     await page.getByTestId('next-event').click()
-    await expect(row).toContainText('真实身份 · 人狼')
+    await expect(row).toContainText('実際の役職 · 人狼')
     //025 changes to the role portrait only after every terminal event has been acknowledged.
     await expectImage(row.locator('.portrait-image img'),'01ws.png')
     expect((await saved(page)).eventCursor).toBe(2)

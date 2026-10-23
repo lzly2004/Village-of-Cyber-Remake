@@ -1,4 +1,4 @@
-:root { font-family: Inter, "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif; color: #1f3431; background: #f5f4ee; font-synthesis: none; line-height: 1.6; }
+:root { font-family: Inter, "Noto Sans CJK JP", "Yu Gothic", "Noto Sans CJK SC", system-ui, sans-serif; color: #1f3431; background: #f5f4ee; font-synthesis: none; line-height: 1.6; }
 * { box-sizing: border-box; }
 body { margin: 0; }
 button, input { font: inherit; }
@@ -203,3 +203,25 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 
 .bgm-control label { display: flex; flex-direction: column; gap: 4px; }
 .bgm-control input[type="range"] { width: 100%; accent-color: #d6e7dc; }
+
+/* WEB-029: native modal keeps the current game mounted and its focus/cursor intact. */
+.help-menu { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 22px; }
+.sidebar .help-menu .quiet-button { color: #dae6df; }
+.help-dialog { width: min(880px, calc(100vw - 48px)); max-height: calc(100dvh - 48px); border: 1px solid #35514b; background: #fbfcf7; color: #1f3431; padding: 24px; overflow: auto; }
+.help-dialog::backdrop { background: #102e2caa; }
+.help-dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.help-dialog-heading h2 { margin: 0; }
+.help-tabs { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+.help-tabs button { padding: 8px 16px; border: 1px solid #536a5d; background: transparent; color: #214f42; }
+.help-tabs button[aria-pressed="true"] { background: #214f42; color: white; }
+.help-provenance { font-size: 13px; }
+.help-selectors { display: flex; flex-wrap: wrap; gap: 20px; }
+.help-selectors label { display: grid; gap: 6px; }
+.help-selectors select { font: inherit; max-width: 100%; padding: 8px; }
+.help-dialog select:focus-visible, .help-article:focus-visible, .configuration-reference:focus-visible { outline: 3px solid #c28931; outline-offset: 3px; }
+.help-article { margin-top: 24px; overflow-wrap: anywhere; }
+.help-article pre { white-space: pre-wrap; font: inherit; }
+.help-article details { margin-top: 24px; }
+.configuration-reference article { border-top: 1px solid #d6dbd0; padding: 10px 0; }
+.configuration-reference dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 400px; }
+.configuration-reference dd { margin: 0; }

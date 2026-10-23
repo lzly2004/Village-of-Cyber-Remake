@@ -39,7 +39,7 @@ test('all normal role labels follow ZY_NAMES; NONE stays a public CO status', ()
     .match(/ZY_NAMES\s*=\s*\{([^}]+)\}/s)[1]
   const names = [...java.matchAll(/"([^"]*)"/g)].map(m => m[1]).slice(1)
   assert.deepEqual(Object.values(roles).slice(1), names)
-  assert.equal(playerVisual(publicPlayer()).roleText, '未 CO')
+  assert.equal(playerVisual(publicPlayer()).roleText, '未CO')
 })
 
 test('all public CO icon domains and positive overflow retain exact order without aliasing', () => {

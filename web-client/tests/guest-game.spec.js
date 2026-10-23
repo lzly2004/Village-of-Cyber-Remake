@@ -7,10 +7,10 @@ async function saved(page) {
   return page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), storageKey)
 }
 
-async function start(page, configuration = '简易') {
+async function start(page, configuration = '簡易') {
   await page.goto('/')
   await page.getByRole('radio', { name: configuration + '配役' }).check()
-  await page.getByRole('button', { name: '开始对局' }).click()
+  await page.getByRole('button', { name: '対局を始める' }).click()
   await expect(page.getByRole('region', { name: '当前事件' })).toBeVisible()
 }
 
@@ -40,7 +40,7 @@ test('选择配役、逐条阅读与刷新恢复已确认游标', async ({ page,
     expect((await saved(page)).sessionId).toBe(id)
     expect(Object.keys(await saved(page)).sort()).toEqual(['eventCursor', 'sessionId'])
     await readEvents(page)
-    await expect(page.getByRole('heading', { name: '今天，投给谁？' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '今日は、誰に投票しますか？' })).toBeVisible()
   } finally { await release(request, id) }
 })
 
@@ -71,12 +71,12 @@ test('真实对局从浏览器指定投票直至终局，并刷新恢复揭晓',
       await page.getByTestId('vote').click()
       await expect(page.getByTestId('next-event')).toBeVisible()
     }
-    await expect(page.locator('.player-identity').first()).toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).toContainText('実際の役職')
     await expect(page.getByRole('region', { name: '最近投票结果' })).toBeVisible()
     await page.screenshot({ path: testInfo.outputPath('finished.png'), fullPage: true })
     await page.reload()
     await expect(page.getByRole('heading', { name: /村人勝利|人狼勝利|妖狐勝利/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '新しい対局' })).toBeVisible()
     await expect(page.getByRole('region', { name: '職業別CO確認' })).toHaveCount(0)
     await expect(page.getByRole('region', { name: 'プレイヤー別CO確認' })).toHaveCount(0)
     await expect(page.getByRole('switch', { name: '投票回避CO' })).toHaveCount(0)
@@ -156,11 +156,11 @@ test('失效会话清除本地记录并可重新开局', async ({ page, request 
   await release(request, id)
   await page.reload()
   await expect(page.getByRole('alert')).toContainText('已失效')
-  await expect(page.getByRole('button', { name: '开始对局' })).toBeVisible()
+  await expect(page.getByRole('button', { name: '対局を始める' })).toBeVisible()
   expect(await saved(page)).toBeNull()
 })
 
-test('写入已完成但响应丢失时，重新同步恢复结果而不重复提交', async ({ page, request }) => {
+test('写入已完成但响应丢失时，再同期恢复结果而不重复提交', async ({ page, request }) => {
   await start(page)
   await readEvents(page)
   const id = (await saved(page)).sessionId
@@ -174,7 +174,7 @@ test('写入已完成但响应丢失时，重新同步恢复结果而不重复�
     await expect(page.getByRole('alert')).toContainText('连接未能确认')
     await expect(page.getByTestId('vote')).toBeDisabled()
     await page.unroute('**/api/v1/games/**')
-    await page.getByRole('button', { name: '重新同步' }).click()
+    await page.getByRole('button', { name: '再同期' }).click()
     await expect(page.getByRole('alert')).toHaveCount(0)
     await expect(target).toBeEnabled()
     await expect(target).toBeChecked()
@@ -184,9 +184,9 @@ test('写入已完成但响应丢失时，重新同步恢复结果而不重复�
 
 test('显式释放后回到配役选择', async ({ page }) => {
   await start(page)
-  await page.getByRole('button', { name: '结束本次试玩' }).click()
-  await page.getByRole('button', { name: '确认释放' }).click()
-  await expect(page.getByRole('button', { name: '开始对局' })).toBeVisible()
+  await page.getByRole('button', { name: '試遊を終了' }).click()
+  await page.getByRole('button', { name: '解放を確定' }).click()
+  await expect(page.getByRole('button', { name: '対局を始める' })).toBeVisible()
   expect(await saved(page)).toBeNull()
 })
 
@@ -269,7 +269,7 @@ test('职业 CO 已执行但响应丢失，先同步且不重复询问', async (
     const applied = await (await request.get('/api/v1/games/' + id)).json()
     expect(applied.revision).toBe(before.revision + 1)
     await page.unroute('**/claims/by-role')
-    await page.getByRole('button', { name: '重新同步' }).click()
+    await page.getByRole('button', { name: '再同期' }).click()
     await expect(page.getByTestId('next-event')).toBeVisible()
     await expect(ask).toBeDisabled()
     await readEvents(page)
@@ -387,7 +387,7 @@ test('按玩家 CO 已执行但丢失响应，先同步且不重复提交', asyn
     const applied = await (await request.get('/api/v1/games/' + id)).json()
     expect(applied.revision).toBe(before.revision + 1)
     await page.unroute('**/claims/by-players')
-    await page.getByRole('button', { name: '重新同步' }).click()
+    await page.getByRole('button', { name: '再同期' }).click()
     await expect(page.getByTestId('next-event')).toBeVisible()
     await expect(panel.getByRole('checkbox', { checked: true })).toHaveCount(0)
     await readEvents(page)
@@ -477,7 +477,7 @@ test('回避设置已执行但响应丢失，暂停操作并同步权威值', as
     expect(applied.revision).toBe(before.revision + 1)
     expect(applied.selections.avoidanceEnabled).toBe(false)
     await page.unroute('**/avoidance')
-    await page.getByRole('button', { name: '重新同步' }).click()
+    await page.getByRole('button', { name: '再同期' }).click()
     await expect(toggle).toHaveAttribute('aria-checked', 'false')
     await expect(toggle).toBeEnabled()
     expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(applied)
@@ -577,7 +577,7 @@ for (const method of ['FREE', 'GREY']) {
       expect(applied.revision).toBe(before.revision + 1)
       expect(applied.voteHistory.at(-1).method).toBe(method)
       await page.unroute('**/votes')
-      await page.getByRole('button', { name: '重新同步' }).click()
+      await page.getByRole('button', { name: '再同期' }).click()
       await expect(page.getByTestId('next-event')).toBeVisible()
       expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(applied)
       expect(writes).toBe(1)
@@ -663,7 +663,7 @@ for (const { type, skill, label } of [
       }
       await expect(panel).toHaveCount(0)
       await page.reload()
-      await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
+      await expect(page.getByRole('button', { name: '新しい対局' })).toBeVisible()
       await expect(panel).toHaveCount(0)
     } finally { await release(request, id) }
   })
@@ -709,7 +709,7 @@ for (const { type, skill, label } of [
       expect(authority.revision).toBe(before.revision + 1)
       expect(authority.selections[skill].hiddenTargets.length).toBe(1)
       await page.unroute('**/target-selections')
-      await page.getByRole('button', { name: '重新同步' }).click()
+      await page.getByRole('button', { name: '再同期' }).click()
       await expect(checkbox).toBeChecked()
       await expect(checkbox).toBeEnabled()
       expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
@@ -825,7 +825,7 @@ for (const { type, skill, label, allLabel } of [
       }
       await expect(page.getByRole('region', { name: label })).toHaveCount(0)
       await page.reload()
-      await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
+      await expect(page.getByRole('button', { name: '新しい対局' })).toBeVisible()
       await expect(page.getByRole('region', { name: label })).toHaveCount(0)
     } finally { await release(request, id) }
   })
@@ -867,7 +867,7 @@ for (const { type, skill, label, allLabel } of [
       const authority = await (await request.get('/api/v1/games/' + id)).json()
       expect(authority.revision).toBe(snapshot.revision + 1)
       await page.unroute('**/claimed-target-selections')
-      await page.getByRole('button', { name: '重新同步' }).click()
+      await page.getByRole('button', { name: '再同期' }).click()
       await expect(checkbox).toBeChecked()
       await expect(checkbox).toBeEnabled()
       expect(await (await request.get('/api/v1/games/' + id)).json()).toEqual(authority)
@@ -896,7 +896,7 @@ test('手机视口无横向溢出，配役与主要操作仍可访问', async ({
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
   await expect(page.getByRole('radio')).toHaveCount(7)
-  await expect(page.getByRole('button', { name: '开始对局' })).toBeVisible()
+  await expect(page.getByRole('button', { name: '対局を始める' })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
   await page.screenshot({ path: testInfo.outputPath('mobile.png'), fullPage: true })
 })

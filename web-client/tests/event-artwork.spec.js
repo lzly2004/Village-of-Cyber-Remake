@@ -51,7 +51,7 @@ test('WEB-024 exact special, previous-left/current-right and triple swap use sou
 
 test('WEB-024 actual API event images preserve geometry across widths and refresh without changing dialogue/cursor',async({page,request})=>{
  await page.goto('/');const created=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/api/v1/games'))
- await page.getByRole('button',{name:'开始对局'}).click();const data=await(await created).json()
+ await page.getByRole('button',{name:'対局を始める'}).click();const data=await(await created).json()
  try{
   let cursor=0
   while(data.update.presentedEvents[cursor]?.stage!=='DAY_DIALOGUE'){
@@ -107,7 +107,7 @@ test('WEB-024 afternoon and025 stages use source backgrounds without hidden role
   for(let i=1;i<list.length;i++){
    await page.getByTestId('next-event').click();await ready(page)
    await expect(page.getByTestId('stage-character')).toHaveCount(i===1?0:1)
-   await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+   await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
   }
  }finally{await request.delete('/api/v1/games/'+id)}
 })

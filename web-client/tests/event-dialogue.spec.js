@@ -37,7 +37,7 @@ test('WEB-019 real API events render desktop resources in order and survive refr
   await page.goto('/')
   await page.getByRole('radio', { name: '通常配役' }).check()
   const response = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/api/v1/games'))
-  await page.getByRole('button', { name: '开始对局' }).click()
+  await page.getByRole('button', { name: '対局を始める' }).click()
   const created = await (await response).json()
   try {
     const english = readFileSync(new URL('../../src/main/java/com/vocr/domain/CharacterEnglishName.java', import.meta.url), 'utf8')
@@ -114,14 +114,14 @@ test('WEB-019 synthetic terminal dialogue and diagnostic must be acknowledged be
   const id = await synthetic(page, request, [event('crsl'), event('NONE')], true)
   try {
     await expect(page.getByTestId('event-dialogue')).toHaveJSProperty('textContent', catalog.Abel.crsl.default)
-    await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
     await page.getByTestId('next-event').click()
     await page.reload()
     await expect(page.locator('[data-diagnostic="SENTINEL_EVENT"]')).toBeVisible()
-    await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
     expect((await saved(page)).eventCursor).toBe(1)
     await page.getByTestId('next-event').click()
-    await expect(page.locator('.player-identity').first()).toContainText('真实身份')
+    await expect(page.locator('.player-identity').first()).toContainText('実際の役職')
     expect((await saved(page)).eventCursor).toBe(2)
   } finally { await request.delete('/api/v1/games/' + id) }
 })
