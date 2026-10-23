@@ -1,3 +1,4 @@
+import { drainEvents as drain } from './drain-events.js'
 import { characterDisplayName } from '../src/characterDisplay.js'
 import { test, expect } from '@playwright/test'
 
@@ -12,13 +13,7 @@ async function start(page) {
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
-async function drain(page) {
-  let guard = 0
-  while (await page.getByTestId('next-event').count()) {
-    expect(++guard).toBeLessThan(120)
-    await page.getByTestId('next-event').click()
-  }
-}
+
 async function expectHistory(page, snapshot) {
   const panel = page.getByRole('region', { name: '最近投票结果', exact: true })
   if (!snapshot.voteHistory.length) { await expect(panel).toHaveCount(0); return }

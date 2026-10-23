@@ -9,7 +9,7 @@ function readConfig(path, override) {
   // Import configuration only. Never execute the configured command or start a server.
   return spawnSync(process.execPath, ['--input-type=module', '-e',
     `import config from ${JSON.stringify(new URL(path, import.meta.url).href)};
-     console.log(JSON.stringify({ command: config.webServer[0].command, workers: config.workers, testDir: config.testDir }));`],
+     console.log(JSON.stringify({ command: config.webServer[0].command, workers: config.workers, testDir: config.testDir, outputDir: config.outputDir }));`],
   { env, encoding: 'utf8', timeout: 10_000 })
 }
 
@@ -50,6 +50,7 @@ test('diagnostic probe has an independent directory, single worker and unchanged
   assert.equal(result.status, 0, result.stderr)
   const config = JSON.parse(result.stdout)
   assert.equal(config.testDir, './diagnostic-probes')
+  assert.ok(config.outputDir.replaceAll('\\','/').endsWith('/build/diagnostic-probe/results'))
   assert.equal(config.workers, 1)
   assert.equal(config.command, process.platform === 'win32'
     ? 'gradlew.bat --no-daemon --max-workers=1 --console=plain runWebTestServer --args=17071'

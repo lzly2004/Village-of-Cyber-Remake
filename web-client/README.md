@@ -164,7 +164,7 @@ npm run test:e2e
 
 ## 显式诊断探针（故意失败，默认回归不包含）
 
-`npm run test:diagnostic-probe`单独启动受监护测试服务并**故意退出1**，用于核验public-information诊断JSON/截图。产物在忽略目录`../build/web030-review/probe-results/`，不得将这个失败记为产品回归。正常`test:e2e`不发现`diagnostic-probes/`，也不再读取旧`VOCR_PUBLIC_INFO_DIAGNOSTIC_PROBE`环境变量；遗留变量不会触发默认回归故意失败。真实回归失败时的自动取证保持不变。
+`npm run test:diagnostic-probe`单独启动受监护测试服务并**故意退出1**，用于核验public-information诊断JSON/截图。产物在忽略目录`../build/diagnostic-probe/results/`，不得将这个失败记为产品回归。正常`test:e2e`不发现`diagnostic-probes/`，也不再读取旧`VOCR_PUBLIC_INFO_DIAGNOSTIC_PROBE`环境变量；遗留变量不会触发默认回归故意失败。真实回归失败时的自动取证保持不变。
 
 ## WEB-017 七配役内部功能门
 

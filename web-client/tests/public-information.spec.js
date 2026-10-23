@@ -1,3 +1,4 @@
+import { drainEvents as drain } from './drain-events.js'
 import { characterDisplayName } from '../src/characterDisplay.js'
 import { test as base, expect } from '@playwright/test'
 import { publicInformationDiagnostics } from './public-information-diagnostics.js'
@@ -20,13 +21,7 @@ async function start(page) {
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
-async function drain(page) {
-  let count = 0
-  while (await page.getByTestId('next-event').count()) {
-    expect(++count).toBeLessThan(120)
-    await page.getByTestId('next-event').click()
-  }
-}
+
 async function expectReports(page, snapshot) {
   const panel = page.getByRole('region', { name: '公開技能報告', exact: true })
   await expect(panel.locator('article')).toHaveCount(snapshot.publicInformation.skillReports.length)

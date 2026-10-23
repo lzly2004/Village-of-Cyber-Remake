@@ -120,14 +120,6 @@ public class ReplayManager {
         return slots[slotIndex];
     }
 
-    public void saveToSlot(int slotIndex, ReplaySave save) {
-        if (slotIndex < 0 || slotIndex >= MAX_SLOTS) return;
-        slots[slotIndex] = save;
-        slots[slotIndex].slotIndex = slotIndex;
-        save();
-        DebugLogger.info("[ReplayManager] 已保存到槽位 " + slotIndex);
-    }
-
     public int getUsedSlotCount() {
         int count = 0;
         for (int i = 0; i < MAX_SLOTS; i++) {

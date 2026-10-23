@@ -1,3 +1,4 @@
+import { drainEvents as readEvents } from './drain-events.js'
 import { characterDisplayName } from '../src/characterDisplay.js'
 import { test, expect } from '@playwright/test'
 
@@ -14,13 +15,7 @@ async function start(page, configuration = '簡易') {
   await expect(page.getByRole('region', { name: '当前事件' })).toBeVisible()
 }
 
-async function readEvents(page) {
-  let guard = 0
-  while (await page.getByTestId('next-event').count()) {
-    expect(++guard).toBeLessThan(120)
-    await page.getByTestId('next-event').click()
-  }
-}
+
 
 async function release(request, id) {
   if (id) await request.delete('/api/v1/games/' + id)
