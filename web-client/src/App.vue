@@ -5,6 +5,7 @@ import PublicInformationPanel from './PublicInformationPanel.vue'
 import VoteHistoryPanel from './VoteHistoryPanel.vue'
 import EventDialogue from './EventDialogue.vue'
 import GameStage from './GameStage.vue'
+import BgmControl from './BgmControl.vue'
 import PlayerPortrait from './PlayerPortrait.vue'
 import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
@@ -62,7 +63,8 @@ function name(number) {
         <span>已确认事件 {{ cursor }}</span>
         <button class="quiet-button" :disabled="busy" @click="refresh">重新同步</button>
       </div>
-      <div class="side-footer"><span class="status-dot"></span>本机试玩<p>会话临时保留，服务重启后失效。<br>已接玩家头像；音频与复盘待后续。</p></div>
+      <BgmControl :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
+      <div class="side-footer"><span class="status-dot"></span>本机试玩<p>会话临时保留，服务重启后失效。<br>已接场景与 BGM；音效与复盘待后续。</p></div>
     </aside>
 
     <main>

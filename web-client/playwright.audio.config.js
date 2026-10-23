@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test'
 
-// Audio artifact/loader acceptance only: no JVM, game rules or actual speaker playback.
+// Static resource + real BGM media lifecycle acceptance; one worker, no JVM or rule oracle.
+// Browser playback is measured; this suite is not human listening or a gapless-output certification.
 export default defineConfig({
   testDir: './audio-tests', workers: 1, retries: 0, timeout: 180_000, reporter: 'list',
   use: { baseURL:'http://127.0.0.1:5177', browserName:'chromium', trace:'retain-on-failure' },

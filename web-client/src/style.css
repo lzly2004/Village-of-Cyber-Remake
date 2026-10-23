@@ -194,3 +194,9 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .settlement-card { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; text-align: center; }
 .settlement-card strong { overflow-wrap: anywhere; }
 @media (max-width: 660px) { .settlement-board { max-height: 30%; } }
+
+/* WEB-027: controls stay reachable independently of stage remounts. */
+.bgm-control { display: flex; flex-direction: column; gap: 9px; overflow-wrap: anywhere; }
+.bgm-control small { line-height: 1.6; color: #c3d3c9; }
+.bgm-control .quiet-button { align-self: flex-start; margin: 0; color: #e0eee5; border-color: #8da69a; }
+@media (max-width: 660px) { .bgm-control { display: flex; max-width: 13rem; } }
