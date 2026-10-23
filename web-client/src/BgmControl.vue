@@ -5,7 +5,7 @@ import { bgmScene } from './bgmScene.js'
 import { createBgmPlayer } from './bgmPlayer.js'
 import { defaultAudioSettings, readAudioSettings, saveAudioSettings } from './audioSettings.js'
 import { enteringSounds, transitionSound } from './soundScene.js'
-const props = defineProps(['sessionId', 'update', 'currentEvent', 'finished', 'uncertain', 'canDecide', 'cursor'])
+const props = defineProps(['sessionId', 'update', 'currentEvent', 'finished', 'uncertain', 'canDecide', 'cursor', 'replaying'])
 const state = ref({ enabled: false, status: 'off', id: null, error: null })
 const scene = computed(() => bgmScene(props))
 const player = createBgmPlayer({ notify: next => { state.value = next } })
@@ -26,21 +26,22 @@ watch([() => props.sessionId, () => scene.value.key], () => {
 }, { immediate: true })
 watch([() => props.sessionId, () => props.cursor, () => props.currentEvent?.stage, () => props.finished, () => props.uncertain], () => {
   transitioned = false; player.cancelSounds({preserveClick:!props.uncertain})
-  if (props.uncertain) return
+  if (props.uncertain || props.replaying) return
   const group = props.sessionId + ':' + props.update?.view.gameDay
   const first = props.currentEvent?.stage === 'NIGHT_RESULT' && nightGroup !== group
   if (first) nightGroup = group
   player.effects(enteringSounds(props.currentEvent,props.finished,props.finished ? props.update?.view.result : null,first))
 }, {immediate:true})
 function transition(key) {
-  if (transitioned || props.uncertain || key !== props.sessionId + ':' + props.cursor) return
+  if (transitioned || props.uncertain || props.replaying || key !== props.sessionId + ':' + props.cursor) return
   transitioned = true
   const id = transitionSound(props.currentEvent)
   if (id) player.effects([id])
 }
-defineExpose({ click: () => player.click(), transition })
+watch(()=>props.replaying,()=>player.cancelSounds({preserveClick:true}))
+defineExpose({ status:state, enable:()=>player.enable(), stop:()=>stop(), click: () => player.click(), transition })
 async function nextTrack() {
-  if (!state.value.enabled || !props.canDecide || choosing.value || !scene.value.playlist) return
+  if (!state.value.enabled || props.replaying || !props.canDecide || choosing.value || !scene.value.playlist) return
   const token = ++selectionVersion
   choosing.value = true
   try {
@@ -71,7 +72,7 @@ const labels = { off: '停止中', unlocking: '音声を準備中', loading: '�
     <strong>BGM・効果音</strong>
     <button v-if="!state.enabled && state.status !== 'unlocking'" class="quiet-button" @click="player.enable">音楽を有効にする</button>
     <button v-else class="quiet-button" @click="stop">音楽を停止</button>
-    <button v-if="canDecide" class="quiet-button" :disabled="!state.enabled || choosing" @click="nextTrack">曲を切替</button>
+    <button v-if="canDecide && !replaying" class="quiet-button" :disabled="!state.enabled || choosing" @click="nextTrack">曲を切替</button>
     <span role="status">{{ labels[state.status] }}</span>
     <small v-if="state.error" class="visual-diagnostic">音楽の表示診断：{{ state.error }}。有効化を押して再試行できます。対局操作は続けられます。</small>
     <label>BGM音量 {{ settings.bgmVolume }}%

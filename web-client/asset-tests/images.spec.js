@@ -91,3 +91,14 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
   await expect(rows.last().locator('.portrait-image img')).toHaveAttribute('src',
     '/assets/images/'+manifest.images['images/44s.png'].file)
 })
+
+test('WEB-033 Replay code and database stay cold until explicit library entry',async({page})=>{
+  const chunks=[]
+  page.on('request',r=>{if(/ReplayLibrary-[^/]+\.js$/.test(new URL(r.url()).pathname))chunks.push(r.url())})
+  await page.addInitScript(()=>{window.replayDbOpens=0;const open=indexedDB.open.bind(indexedDB);indexedDB.open=(...args)=>{window.replayDbOpens++;return open(...args)}})
+  await page.goto('/');await page.waitForLoadState('networkidle')
+  expect(chunks).toHaveLength(0);expect(await page.evaluate(()=>window.replayDbOpens)).toBe(0)
+  await page.getByRole('button',{name:'Replay一覧',exact:true}).click()
+  await expect(page.getByRole('heading',{name:'Replay一覧',exact:true})).toBeVisible()
+  expect(chunks).toHaveLength(1);expect(await page.evaluate(()=>window.replayDbOpens)).toBeGreaterThan(0)
+})

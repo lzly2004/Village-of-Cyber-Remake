@@ -7,7 +7,7 @@ import EventDialogue from './EventDialogue.vue'
 import GameStage from './GameStage.vue'
 import BgmControl from './BgmControl.vue'
 import PlayerPortrait from './PlayerPortrait.vue'
-import ReplayLibrary from './ReplayLibrary.vue'
+import ReplayEntry from './ReplayEntry.vue'
 import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
@@ -25,6 +25,8 @@ const {
 } = useGuestGame()
 const artwork = computed(() => sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
 const audioControl = ref(null)
+const replayPlaying = ref(false)
+const replayAudio = { state:()=>audioControl.value?.status, enable:()=>audioControl.value?.enable(), stop:()=>audioControl.value?.stop() }
 function clickSound(event) {
   const button = event.target.closest('main button')
   if (button && !button.disabled) audioControl.value?.click()
@@ -79,7 +81,7 @@ function name(number) {
         <button class="quiet-button" :disabled="busy" @click="refresh">再同期</button>
       </div>
       <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button></nav>
-      <BgmControl ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
+      <BgmControl :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
       <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。サービス再起動後は無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
 
@@ -88,7 +90,7 @@ function name(number) {
       <div v-if="notice" class="notice" role="alert" lang="zh-CN">{{ notice }}</div>
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
-      <ReplayLibrary :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" />
+      <ReplayEntry :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" @playing="replayPlaying=$event" />
 
       <section v-if="!update && !sessionId" class="lobby">
         <span class="eyebrow">WELCOME TO THE VILLAGE</span>

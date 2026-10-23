@@ -233,3 +233,18 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .replay-entries { padding: 0; list-style: none; max-height: 24rem; overflow: auto; }
 .replay-entries li { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem; padding: 1rem 0; border-bottom: 1px solid #d5ddd5; }
 .replay-library p { overflow-wrap: anywhere; }
+
+.replay-player { width: min(94vw, 1280px); max-height: 92vh; overflow: auto; padding: 1.2rem; border: 1px solid #55756a; color: #173d32; background: #f8faf5; }
+.replay-player::backdrop { background: #102923ba; }
+.replay-player-header, .replay-navigation { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .7rem; }
+.replay-navigation { justify-content: flex-start; margin: 1rem 0; }
+.replay-navigation select { padding: .5rem; }
+.replay-surface { position: relative; min-height: 28rem; isolation: isolate; }
+.replay-background { position: absolute; inset: 0; z-index: -1; }
+.replay-background img { width: 100%; height: 100%; object-fit: cover; }
+.replay-record-content { padding: 1rem; background: #ffffffb0; }
+.replay-avatar-list { display: grid; grid-template-columns: repeat(var(--replay-columns), minmax(6.5rem, 1fr)); gap: .5rem; overflow: auto; padding: .5rem; max-height: 24rem; scrollbar-gutter: stable; }
+.replay-player-card { display: flex; flex-direction: column; align-items: center; gap: .4rem; padding: .7rem; font-size: .85rem; background: #fffffff0; }
+.replay-player-card .player-portrait { flex: 0 0 auto; }
+.replay-player-card:focus-visible, .replay-avatar-list:focus-visible { outline: 3px solid #c79235; outline-offset: -3px; }
+.replay-population { margin-top: 1rem; }

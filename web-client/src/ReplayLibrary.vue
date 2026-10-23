@@ -1,9 +1,12 @@
 <script setup>
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { configurationName } from './labels.js'
 import { createReplayStore } from './replayStore.js'
 import { readCompletedReplay } from './replayApi.js'
-const props = defineProps({ sessionId:String, cursor:Number, eligible:Boolean })
+import ReplayPlayer from './ReplayPlayer.vue'
+const props = defineProps({ sessionId:String, cursor:Number, eligible:Boolean,initialAction:String,initialIntent:Object,audioControls:Object })
+const emit=defineEmits(['playing'])
+const playing=ref(null)
 const store = createReplayStore()
 const opened = ref(false), working = ref(false), entries = ref([]), message = ref(''), problem = ref('')
 const query = ref(''), configuration = ref(''), result = ref(''), removing = ref(''), selected = ref('')
@@ -57,6 +60,14 @@ function save() {
     message.value = saved.duplicate ? 'このReplayは保存済みです。重複して追加していません。' : 'Replayをこのブラウザーに保存しました。'
   })
 }
+onMounted(()=>{
+  if(props.initialAction==='save') {
+    if(!props.eligible || props.sessionId!==props.initialIntent?.sessionId || props.cursor!==props.initialIntent?.cursor)
+      problem.value=errors.SESSION_CHANGED+'（SESSION_CHANGED）'
+    else save()
+  } else if(props.initialAction==='open')open()
+  else if(props.initialAction==='cancel')problem.value='読み込みが中断されたため、保存は実行していません。もう一度操作してください。'
+})
 function remove(id) {
   return run(async () => {
     await store.remove(id)
@@ -76,7 +87,7 @@ function remove(id) {
     <div v-if="opened">
       <h2>Replay一覧</h2>
       <p>このブラウザー・同じサイト内の保存です。別端末や別サイトには移りません。閲覧履歴の消去・プライベートモード等で失われる場合があります。</p>
-      <p>終局の全イベント確認後に保存できます。上限9局・合計64MiB。再生・ファイル入出力は準備中です。対局や戦績は再開・加算しません。</p>
+      <p>終局の全イベント確認後に保存できます。上限9局・合計64MiB。ファイル入出力は準備中です。対局や戦績は再開・加算しません。</p>
       <div class="replay-filters">
         <label>日時・配役・勝敗を検索<input v-model="query" type="search" maxlength="120"></label>
         <label>配役<select v-model="configuration"><option value="">すべて</option><option v-for="c in configurations" :key="c" :value="c">{{ configurationName(c) }}村</option></select></label>
@@ -90,6 +101,7 @@ function remove(id) {
           <strong>{{ configurationName(entry.replay.peiyiName) }}村 · {{ resultNames[entry.replay.endResult] }}</strong>
           <span>{{ entry.replay.saveTime }} · 第{{ entry.replay.totalDays }}日 · {{ entry.replay.totalEvents }}記録</span>
           <button class="quiet-button" :disabled="working" @click="selected = entry.id">詳細を確認</button>
+          <button class="quiet-button" :disabled="working" @click="playing=JSON.parse(JSON.stringify(entry.replay))">再生する</button>
           <button v-if="removing !== entry.id" class="quiet-button" :disabled="working" @click="removing = entry.id">削除</button>
           <span v-else>このReplayを削除しますか？<button class="quiet-button" :disabled="working" @click="removing = ''">残す</button><button class="danger-button" :disabled="working" @click="remove(entry.id)">削除を確定</button></span>
         </li>
@@ -101,5 +113,6 @@ function remove(id) {
         <button class="quiet-button" @click="selected = ''">詳細を閉じる</button>
       </section>
     </div>
+    <ReplayPlayer v-if="playing" :replay="playing" :audio-controls="audioControls" @close="playing=null" @playing="emit('playing',$event)" />
   </section>
 </template>
