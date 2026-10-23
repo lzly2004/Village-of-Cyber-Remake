@@ -11,13 +11,14 @@ async function setup(page,{snapshot=publicSnapshot(),settings,denied=false}={}) 
   await page.addInitScript(({key,settings,denied})=>{
     if(settings!==undefined && !localStorage.getItem(key))localStorage.setItem(key,settings)
     if(denied)Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError')}})
-    window.soundProbe={media:[],gains:[],contexts:[],urls:[],revoked:[]}
+    window.soundProbe={media:[],gains:[],contexts:[],urls:[],revoked:[],effectPlays:0,nextClicks:0}
+    document.addEventListener('click',event=>{if(event.target.closest?.('[data-testid="next-event"]'))window.soundProbe.nextClicks++},true)
     const p=window.soundProbe,Context=window.AudioContext,Audio=window.Audio
     window.AudioContext=class extends Context{
       constructor(...args){super(...args);p.contexts.push(this)}
       createGain(){const gain=super.createGain();p.gains.push(gain);return gain}
     }
-    window.Audio=function(...args){const m=new Audio(...args);p.media.push(m);return m}
+    window.Audio=function(...args){const m=new Audio(...args);m.addEventListener('playing',()=>{if(!m.loop)p.effectPlays++});p.media.push(m);return m}
     const create=URL.createObjectURL.bind(URL),revoke=URL.revokeObjectURL.bind(URL)
     URL.createObjectURL=blob=>{const url=create(blob);p.urls.push(url);return url}
     URL.revokeObjectURL=url=>{p.revoked.push(url);revoke(url)}
@@ -181,4 +182,38 @@ test('WEB-028 actual browser mix contains signal and master mute produces zero s
   expect(await peak()).toBe(0)
   console.info('WEB-028 sampled mix peak: '+audible+'; muted=0 (not physical speaker listening)')
   await page.screenshot({path:'/tmp/vocr-web028-audio.png',fullPage:true})
+})
+
+
+test('WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK without duplicate fetch',async({page},info)=>{
+  const snapshot=publicSnapshot()
+  snapshot.presentedEvents=['gyfo1','gyfo1r','gyho2'].map(eventname=>({stage:'DAY_DIALOGUE',event:{eventname,ch1:'Abel',ch2:'NONE',ch3:'NONE'}}))
+  snapshot.events=snapshot.presentedEvents.map(p=>p.event);snapshot.nextEventCursor=3
+  const failures=[]
+  page.on('requestfailed',request=>{if(new URL(request.url()).pathname===soundPath('CLICK'))failures.push(request.failure()?.errorText)})
+  const paths=await setup(page,{snapshot})
+  await page.getByRole('button',{name:'开始对局'}).click();await enable(page)
+  const samples=[]
+  try {
+    for(const mode of ['mouse','keyboard']){
+      if(mode==='mouse')await page.getByTestId('next-event').click()
+      else {await page.getByTestId('next-event').focus();await page.keyboard.press('Enter')}
+      await expect(ui(page)).toHaveAttribute('data-sound','CLICK')
+      await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
+      await expect(ui(page)).toHaveAttribute('data-status','playing')
+      await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
+      await expect(ui(page)).toHaveAttribute('data-sound-status','idle')
+      const counts=await page.evaluate(()=>({clicks:window.soundProbe.nextClicks,plays:window.soundProbe.effectPlays}))
+      const saved=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')))
+      samples.push({mode,...counts,cursor:saved.eventCursor,requests:paths.filter(p=>p===soundPath('CLICK')).length,failures:[...failures]})
+      expect(samples.at(-1)).toMatchObject({clicks:samples.length,plays:samples.length,cursor:samples.length,requests:samples.length,failures:[]})
+      expect((await probe(page)).effects).toBe(1)
+      expect((await probe(page)).active).toBe(1)
+    }
+  }finally{
+    const counts=await page.evaluate(()=>({clicks:window.soundProbe.nextClicks,plays:window.soundProbe.effectPlays}))
+    const evidence={samples,final:{...counts,requests:paths.filter(p=>p===soundPath('CLICK')).length,failures}}
+    console.info('review CLICK evidence: '+JSON.stringify(evidence))
+    await info.attach('review-click.json',{body:JSON.stringify(evidence),contentType:'application/json'})
+  }
 })

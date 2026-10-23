@@ -103,7 +103,7 @@ export function createBgmPlayer({ resources = audioResources, createContext = ()
     },
     effects(ids) { effects.enqueue(ids) },
     click() { effects.enqueue(['CLICK'],{click:true}) },
-    cancelSounds() { effects.reset() },
+    cancelSounds(options) { effects.reset(options) },
     settings(value) {
       if (!validAudioSettings(value)) return false
       settings = {...value}

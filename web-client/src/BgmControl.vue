@@ -25,7 +25,7 @@ watch([() => props.sessionId, () => scene.value.key], () => {
   player.select(scene.value.id)
 }, { immediate: true })
 watch([() => props.sessionId, () => props.cursor, () => props.currentEvent?.stage, () => props.finished, () => props.uncertain], () => {
-  transitioned = false; player.cancelSounds()
+  transitioned = false; player.cancelSounds({preserveClick:!props.uncertain})
   if (props.uncertain) return
   const group = props.sessionId + ':' + props.update?.view.gameDay
   const first = props.currentEvent?.stage === 'NIGHT_RESULT' && nightGroup !== group

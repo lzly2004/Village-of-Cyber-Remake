@@ -9,7 +9,12 @@ export function createSoundChannel({resources,getContext,allowed,createMedia,url
     if(url){urls.revokeObjectURL(url);url=null}
     active=null
   }
-  function reset() {queue=[];clear();emit()}
+  function reset({preserveClick=false}={}) {
+    queue=[]
+    // CLICK belongs to the user's interaction, not the old presentation cursor.
+    if(preserveClick && active==='CLICK')return
+    clear();emit()
+  }
   function disconnect() {
     source?.disconnect();gain?.disconnect();media=source=gain=null
   }
@@ -46,6 +51,8 @@ export function createSoundChannel({resources,getContext,allowed,createMedia,url
       if(disposed||!allowed())return
       // Scene sounds have priority; rapid clicks never build a backlog.
       if(click&&(active||queue.length))return
+      // Keep the three-item cap: a full scene queue may preempt feedback CLICK.
+      if(!click && Array.isArray(ids) && active==='CLICK' && ids.length+queue.length+1>3)clear()
       if(!Array.isArray(ids)||ids.length+queue.length+(active?1:0)>3){reset();emit('error','SOUND_QUEUE_INVALID');return}
       queue.push(...ids);if(!active)void next()
     },

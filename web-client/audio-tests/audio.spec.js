@@ -42,7 +42,7 @@ test('WEB-026 every unique MP3 fully decodes in Chromium with original channel/r
     // Close the document/context between files so a complete58-minute bank never accumulates decoded buffers.
     const page=await browser.newPage()
     try{
-      await page.goto('http://127.0.0.1:5177/')
+      await page.goto(info.project.use.baseURL)
       const result=await page.evaluate(async entry=>{
         const response=await fetch('/assets/audio/'+entry.file)
         if(!response.ok)throw Error('audio HTTP failure')
