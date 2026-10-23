@@ -3,9 +3,11 @@ import { computed } from 'vue'
 import { characterKana } from './characterDisplay.js'
 import StageArtwork from './StageArtwork.vue'
 
+const emit = defineEmits(['consequence'])
 const props = defineProps({
   event: { type: Object, default: null },
   artwork: { type: Object, default: () => ({ mode: 'deferred' }) },
+  eventKey: { type: String, default: '' },
   stage: { type: String, default: '' },
 })
 // Only the already-public event's character keys. This is NOT the final image mapping.
@@ -20,7 +22,7 @@ const positions = computed(() => participants.value.map((character, index, all) 
 <template>
   <div class="game-stage" :data-stage="stage" data-testid="game-stage">
     <div class="stage-surface" data-testid="stage-surface">
-      <StageArtwork v-if="artwork.mode === 'dialogue' || artwork.mode === 'scene'" :plan="artwork" />
+      <StageArtwork v-if="artwork.mode === 'dialogue' || artwork.mode === 'scene'" :plan="artwork" @consequence="emit('consequence', eventKey)" />
       <svg v-else class="stage-artwork" data-testid="stage-artwork" viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <rect class="stage-sky" width="1280" height="720" />

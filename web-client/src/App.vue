@@ -23,6 +23,11 @@ const {
   start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
 const artwork = computed(() => sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
+const audioControl = ref(null)
+function clickSound(event) {
+  const button = event.target.closest('main button')
+  if (button && !button.disabled) audioControl.value?.click()
+}
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
 const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
@@ -51,7 +56,7 @@ function name(number) {
 </script>
 
 <template>
-  <div class="app-shell">
+  <div class="app-shell" @click.capture="clickSound">
     <aside class="sidebar">
       <a class="brand" href="/" aria-label="电脑村首页"><span class="brand-mark">村</span><span>电脑村<small>VILLAGE OF CYBER</small></span></a>
       <div class="sidebar-caption">推理始于倾听。</div>
@@ -63,8 +68,8 @@ function name(number) {
         <span>已确认事件 {{ cursor }}</span>
         <button class="quiet-button" :disabled="busy" @click="refresh">重新同步</button>
       </div>
-      <BgmControl :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
-      <div class="side-footer"><span class="status-dot"></span>本机试玩<p>会话临时保留，服务重启后失效。<br>已接场景与 BGM；音效与复盘待后续。</p></div>
+      <BgmControl ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
+      <div class="side-footer"><span class="status-dot"></span>本机试玩<p>会话临时保留，服务重启后失效。<br>已接场景与音声；复盘待后续。</p></div>
     </aside>
 
     <main>
@@ -105,7 +110,7 @@ function name(number) {
           <section class="journal panel" aria-label="事件展示">
             <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ currentEvent ? stages[currentEvent.stage] : finished ? '对局结束' : '白天决策' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
-            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
+            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor" :event-key="sessionId + ':' + cursor" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
               <template #scene-overlay>
                 <div v-if="finished" class="settlement-board" role="region" aria-label="結算役職一覧" tabindex="0" data-testid="settlement-board" lang="ja">
                   <p>配役一覧 · {{ players.length }}人 · 一覧内をスクロールして確認できます。</p>

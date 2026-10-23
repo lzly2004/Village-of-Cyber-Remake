@@ -36,10 +36,10 @@ async function enable(page,id) {
 }
 async function probe(page) {
   return page.evaluate(()=>{
-    const p=window.bgmProbe,m=p.media.at(-1)
-    return{contexts:p.contexts.map(c=>c.state),media:p.media.length,src:m?.getAttribute('src'),
-      paused:m?.paused,time:m?.currentTime,gain:p.gains.at(-1)?.gain.value,loop:m?.loop,
-      active:p.urls.filter(url=>!p.revoked.includes(url)).length}
+    const p=window.bgmProbe,m=p.media.find(m=>m.loop)
+    return{contexts:p.contexts.map(c=>c.state),media:p.media.filter(m=>m.loop).length,soundMedia:p.media.filter(m=>!m.loop).length,src:m?.getAttribute('src'),
+      paused:m?.paused,time:m?.currentTime,gain:p.gains[0]?.gain.value,loop:m?.loop,
+      active:m?.getAttribute('src') && !p.revoked.includes(m.getAttribute('src')) ? 1 : 0,totalActive:p.urls.filter(url=>!p.revoked.includes(url)).length}
   })
 }
 function events(snapshot,list) {
@@ -79,7 +79,7 @@ test('WEB-027 day dialogue and CO keep one track; decision playlist cycles exact
   await page.getByRole('button',{name:'开始对局'}).click();await enable(page,'EMOTIONALLY_UNSTABLE')
   await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
   await page.getByTestId('next-event').click();await expect(page.getByRole('button',{name:'曲を切替'})).toBeEnabled()
-  expect(paths.filter(p=>p.endsWith('.mp3'))).toEqual([path('EMOTIONALLY_UNSTABLE')])
+  expect(paths.filter(p=>p.includes('/bgm/') && p.endsWith('.mp3'))).toEqual([path('EMOTIONALLY_UNSTABLE')])
   for(const id of manifest.playlists.NORMAL_GAME_PLAYLIST.slice(0,2)){
     await page.getByRole('button',{name:'曲を切替'}).click()
     await expect(ui(page)).toHaveAttribute('data-status','playing');await expect(ui(page)).toHaveAttribute('data-track',id)
@@ -98,15 +98,15 @@ test('WEB-027 execution/night are silent; settlement music waits for displayed s
   await page.getByRole('button',{name:'开始对局'}).click()
   await page.getByRole('button',{name:'音楽を有効にする'}).click();await expect(ui(page)).toHaveAttribute('data-status','silent')
   expect(paths).toEqual([])
-  await page.getByTestId('next-event').click();expect(paths).toEqual([])
+  await page.getByTestId('next-event').click();expect(paths.filter(p=>p.includes('/bgm/'))).toEqual([])
   await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   expect(paths).not.toContain(path('VICTORY_SCREEN'))
   await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','VICTORY_SCREEN')
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   expect((await probe(page)).active).toBe(1)
-  const count=paths.length;await page.getByTestId('next-event').click()
-  await expect(page.getByTestId('settlement-board')).toBeVisible();expect(paths.length).toBe(count)
+  const count=paths.filter(p=>p.includes('/bgm/')).length;await page.getByTestId('next-event').click()
+  await expect(page.getByTestId('settlement-board')).toBeVisible();expect(paths.filter(p=>p.includes('/bgm/')).length).toBe(count)
 })
 
 test('WEB-027 late playlist uses four survivors too; release selects lobby and hidden/pagehide require a new gesture',async({page})=>{
@@ -149,7 +149,7 @@ test('WEB-027 late cold request is canceled on new scene; no stale source, overl
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   await route.abort('aborted')
   expect((await probe(page)).active).toBe(1);expect((await probe(page)).media).toBe(1)
-  expect(paths.filter(p=>p.endsWith('.mp3'))).toEqual([path('START_MENU'),path('EMOTIONALLY_UNSTABLE')])
+  expect(paths.filter(p=>p.includes('/bgm/') && p.endsWith('.mp3'))).toEqual([path('START_MENU'),path('EMOTIONALLY_UNSTABLE')])
   expect(errors).toEqual([])
 })
 

@@ -1,5 +1,7 @@
 # WEB-027：BGM、浏览器解锁与生命周期
 
+本节记录027交付时边界。028已在同一上下文接单音效、音量/静音与设置恢复；当前差异、混音上界和验收见[音效契约](web-audio-settings.md)。
+
 基线aad8ed3，直接复用[026音频](web-audio-assets.md)，不重新转码或改变manifest。本轮只接BGM；音效、音量/静音及设置恢复归028，A08尚未放行。实际命令/失败与结果集中见[review-aad8ed3.md](review-aad8ed3.md)。
 
 ## 展示来源与切换

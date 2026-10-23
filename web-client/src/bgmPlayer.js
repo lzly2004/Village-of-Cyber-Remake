@@ -1,7 +1,9 @@
 import { audioResources } from './audioAssets.js'
+import { createSoundChannel } from './soundChannel.js'
+import { defaultAudioSettings, validAudioSettings } from './audioSettings.js'
 
 // -12.04dB: measured +3.86dBFS decoded peak leaves >8dB headroom for BGM alone.
-// No crossfade, second voice, decoded bank, settings storage or effect playback.
+// At most one BGM plus one effect voice, sharing the gesture-unlocked context.
 export const BGM_GAIN = 0.25
 const errorCode = error => /^[A-Z][A-Z0-9_]*$/.test(error?.code) ? error.code : 'BGM_PLAY_FAILED'
 export function createBgmPlayer({ resources = audioResources, createContext = () => new AudioContext(),
@@ -9,7 +11,11 @@ export function createBgmPlayer({ resources = audioResources, createContext = ()
   let context, media, source, gain, url, aborter, timer, cancelUnlock
   let version = 0, enabled = false, disposed = false, selected = null, playing = null
   let status = 'off', error = null
-  const emit = () => notify({ enabled, status, id: playing, error })
+  let settings = defaultAudioSettings(), sound = {status:'idle',id:null,error:null}
+  const emit = () => notify({ enabled, status, id: playing, error, sound })
+  const effects = createSoundChannel({resources,getContext:()=>context,createMedia,urls,timeoutMs,
+    allowed:()=>enabled&&!disposed&&!settings.muted&&settings.soundVolume>0,
+    notify:next=>{sound=next;emit()} })
   function clearTrack() {
     clearTimeout(timer); timer = null
     aborter?.abort(); aborter = null
@@ -18,7 +24,7 @@ export function createBgmPlayer({ resources = audioResources, createContext = ()
     playing = null
   }
   function disable(reason = null) {
-    ++version; enabled = false; cancelUnlock?.(); clearTrack()
+    ++version; enabled = false; cancelUnlock?.(); clearTrack(); effects.reset()
     status = reason ? 'error' : 'off'; error = reason; emit()
     if (context && context.state !== 'closed') context.suspend().catch(() => {
       if (!disposed && !enabled) { status = 'error'; error = 'BGM_SUSPEND_FAILED'; emit() }
@@ -71,7 +77,7 @@ export function createBgmPlayer({ resources = audioResources, createContext = ()
             context = createContext()
             media = createMedia(); media.preload = 'none'; media.loop = true
             source = context.createMediaElementSource(media)
-            gain = context.createGain(); gain.gain.value = BGM_GAIN
+            gain = context.createGain(); gain.gain.value = settings.muted ? 0 : BGM_GAIN*settings.bgmVolume/100
             source.connect(gain); gain.connect(context.destination)
             context.onstatechange = () => {
               if (enabled && context.state !== 'running') disable('BGM_GESTURE_REQUIRED')
@@ -95,10 +101,20 @@ export function createBgmPlayer({ resources = audioResources, createContext = ()
         await play()
       } catch { fail(token, context ? 'BGM_GESTURE_REQUIRED' : 'BGM_UNAVAILABLE') }
     },
+    effects(ids) { effects.enqueue(ids) },
+    click() { effects.enqueue(['CLICK'],{click:true}) },
+    cancelSounds() { effects.reset() },
+    settings(value) {
+      if (!validAudioSettings(value)) return false
+      settings = {...value}
+      if (gain) gain.gain.value = settings.muted ? 0 : BGM_GAIN*settings.bgmVolume/100
+      effects.level(settings.soundVolume/100)
+      return true
+    },
     disable,
     dispose() {
       if (disposed) return
-      disable(); disposed = true
+      disable(); effects.dispose(); disposed = true
       closeGraph()
     },
   }

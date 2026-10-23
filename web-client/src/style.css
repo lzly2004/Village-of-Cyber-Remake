@@ -200,3 +200,6 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .bgm-control small { line-height: 1.6; color: #c3d3c9; }
 .bgm-control .quiet-button { align-self: flex-start; margin: 0; color: #e0eee5; border-color: #8da69a; }
 @media (max-width: 660px) { .bgm-control { display: flex; max-width: 13rem; } }
+
+.bgm-control label { display: flex; flex-direction: column; gap: 4px; }
+.bgm-control input[type="range"] { width: 100%; accent-color: #d6e7dc; }

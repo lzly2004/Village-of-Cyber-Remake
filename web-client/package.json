@@ -16,7 +16,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test:e2e": "playwright test",
     "test:gate": "playwright test --config playwright.gate.config.js",
-    "test:unit": "node --test --test-concurrency=1 unit/public-information-text.test.js unit/vote-history.test.js unit/gate-config.test.js unit/event-dialogue.test.js unit/player-visual.test.js unit/event-artwork.test.js unit/scene-artwork.test.js unit/audio-assets.test.js unit/bgm.test.js"
+    "test:unit": "node --test --test-concurrency=1 unit/public-information-text.test.js unit/vote-history.test.js unit/gate-config.test.js unit/event-dialogue.test.js unit/player-visual.test.js unit/event-artwork.test.js unit/scene-artwork.test.js unit/audio-assets.test.js unit/bgm.test.js unit/sound.test.js"
   },
   "dependencies": { "vue": "3.5.44" },
   "devDependencies": {

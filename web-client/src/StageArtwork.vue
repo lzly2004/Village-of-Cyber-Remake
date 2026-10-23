@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, shallowRef, watch } from 'vue'
 import { stageImageCache } from './stageImageCache.js'
+const emit = defineEmits(['consequence'])
 const props = defineProps({ plan: { type: Object, required: true } })
 const frames = computed(() => props.plan.frames || [props.plan.actors])
 const names = computed(() => [...new Set([props.plan.background, ...frames.value.flat().map(actor => actor.name)])])
@@ -9,19 +10,24 @@ const failed = shallowRef(false)
 const frame = shallowRef(0)
 let timer
 let version = 0
+let notified = false
+function showFrame(value) {
+  frame.value = value
+  if (value === frames.value.length - 1 && !notified && !failed.value && !props.plan.diagnostic) { notified = true; emit('consequence') }
+}
 function startTransition(current) {
   if (frames.value.length < 2) return
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { frame.value = frames.value.length - 1; return }
-  timer = setTimeout(() => { if (current === version) frame.value = 1 }, props.plan.transitionMs)
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { showFrame(frames.value.length - 1); return }
+  timer = setTimeout(() => { if (current === version) showFrame(1) }, props.plan.transitionMs)
 }
 function toggleFrame() {
   clearTimeout(timer)
-  frame.value = (frame.value + 1) % frames.value.length
+  showFrame((frame.value + 1) % frames.value.length)
 }
 watch(names, list => {
   const current = ++version
   clearTimeout(timer)
-  frame.value = 0
+  frame.value = 0; notified = false
   failed.value = false
   assets.value = stageImageCache.ready(list)
   if (assets.value) { startTransition(current); return }
