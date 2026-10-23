@@ -32,7 +32,7 @@ Replay BGM映射BgmTrack.REPLAY_PLAYER，仍是原单个HTMLAudioElement/AudioCo
 
 日志集中于忽略目录build/web033。
 
-- Java定向兼容10/10（3s），经run-gradle-safe.sh、单worker；无Swing修改，不另启桌面或全量构建。
+- Java选择：`bash tools/run-gradle-safe.sh test --tests com.vocr.replay.ReplayExchangeContractTest --tests com.vocr.replay.ReplayCompatibilityTest --tests com.vocr.ui.ReplayTextFormatterTest --offline`；交换4+兼容2+文本4，不含ReplaySlotSinkTest。定向兼容10/10（3s），经run-gradle-safe.sh、单worker；无Swing修改，不另启桌面或全量构建。
 - 首版新JS单测6/7：测试错误地把Role当数值构造枚举，改为读取真实无参枚举声明，生产映射未改；随后7/7，新+旧完整137/137（约2.1s）。最终弹窗诊断/加载超时取消防护后完整137/137通过（unit-complete.log）。
 - 首版定向浏览器17/17（17.9s），含032既有11项与033初始6项：固定样本/真实活局只读、日期与画像、缺日期、44人键盘/滚动、他处删除、模块错误/换局晚到；不把此结果当后来补充的加载超时及音频错误用例通过。
 - 原/tmp FFmpeg已丢失，固定imageio-ffmpeg 0.6.0 wheel下载到忽略目录，仅提取开发二进制；SHA-256 e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99与026 manifest精确一致。系统Python3.8初次不满足包元数据，改为仅按目标Python3.9下载，不安装/执行Python包、不改系统。工具不入提交。
@@ -58,3 +58,7 @@ A09仍待034信息/技能与035互通；A10及A06/A07/A08、046/049人工门槛�
 强化已有三人/44人用例：1440/1280/1024视口检查scrollHeight不超过clientHeight+1、全部人物卡片纵向在人物区内、头像/姓名等直接子项在卡片内；44人聚焦末项后再次检查，并保存横向起点与末端截图。修复前两项均失败：三人530px、44人660px对比容器384px（clipping-before.log），证实测试能捕获原缺陷；修复后Replay定向7/7（10.1s，clipping-targeted.log）。本批最终结果如下。
 
 补修最终状态（clipping-*.log）：前端单测137/137（2.18s）；构建前后图片/音频门禁通过，代码560,134字节/gzip150,608，全站77,733,166字节；Replay相关音频2/2（2.6s，未重跑其余25项）；静态4/4（7.1s，冷大厅130,882字节，首局397,068字节）；默认浏览器119/119（2.4min、retries=0，包含强化Replay7项）。再次查看最终三人截图和44人横向起点/末端截图，第二排姓名和两排头像保持完整纵向显示；横向窗口边缘仍可能显示下一张卡片的一部分，可左右浏览，不声称44张同时全屏。无生产Java变动，本补修不重跑兼容10项/全量Java/七配役gate，原批次结果不能冒充补修重跑。退出后宿主未见本轮测试进程残留，MemAvailable约4.7GiB。034未开始。
+
+## 034后续状态
+
+034已接只读信息/技能历史、票型轮次与末日职业分组，见[034验收](web-replay-information.md)。本文件各批实跑数字保留来源，不当作034重跑；原两行裁切补修与几何断言继续保留。

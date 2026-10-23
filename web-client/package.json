@@ -17,7 +17,7 @@
     "test:e2e": "playwright test",
     "test:diagnostic-probe": "playwright test --config playwright.probe.config.js",
     "test:gate": "playwright test --config playwright.gate.config.js",
-    "test:unit": "node --test --test-concurrency=1 unit/public-information-text.test.js unit/vote-history.test.js unit/gate-config.test.js unit/event-dialogue.test.js unit/player-visual.test.js unit/event-artwork.test.js unit/scene-artwork.test.js unit/audio-assets.test.js unit/bgm.test.js unit/sound.test.js unit/help.test.js unit/public-information-diagnostics.test.js unit/replay.test.js unit/replay-playback.test.js"
+    "test:unit": "node --test --test-concurrency=1 unit/public-information-text.test.js unit/vote-history.test.js unit/gate-config.test.js unit/event-dialogue.test.js unit/player-visual.test.js unit/event-artwork.test.js unit/scene-artwork.test.js unit/audio-assets.test.js unit/bgm.test.js unit/sound.test.js unit/help.test.js unit/public-information-diagnostics.test.js unit/replay.test.js unit/replay-playback.test.js unit/replay-information.test.js"
   },
   "dependencies": { "vue": "3.5.44" },
   "devDependencies": {

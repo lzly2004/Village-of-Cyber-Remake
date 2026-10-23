@@ -1,13 +1,14 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AssetImage from './AssetImage.vue'
+import ReplayInformation from './ReplayInformation.vue'
 import { replayDay, replayFrame, replayBackground } from './replayPlayback.js'
 import { validateReplay } from './replayValidation.js'
 import { characterDisplayName } from './characterDisplay.js'
 import { configurationName, roles } from './labels.js'
 const props = defineProps(['replay','audioControls'])
 const emit = defineEmits(['close','playing'])
-const dialog = ref(null), selectedDay = ref(2), valid = ref(false)
+const dialog = ref(null), selectedDay = ref(2), valid = ref(false), dateLocked=ref(false)
 let recording
 try { recording=validateReplay(props.replay); selectedDay.value=replayDay(recording); valid.value=true } catch { /* Bounded diagnostic below, never substitute a new game. */ }
 const audioState=computed(()=>props.audioControls?.state?.() || {status:'off'})
@@ -26,9 +27,9 @@ onBeforeUnmount(()=>{emit('playing',false);dialog.value?.close()})
     <p v-if="!valid" role="alert">録画を表示できません（INVALID_REPLAY）。元の保存データは変更していません。</p>
     <template v-else>
       <nav class="replay-navigation" aria-label="Replay日付切替">
-        <button class="quiet-button" :disabled="frame.day<=frame.firstDay" @click="selectedDay=frame.day-1">前の日</button>
-        <label>再生日<select :value="frame.day" @change="selectedDay=Number($event.target.value)"><option v-for="day in days" :key="day" :value="day">第{{ day }}日</option></select></label>
-        <button class="quiet-button" :disabled="frame.day>=frame.lastDay" @click="selectedDay=frame.day+1">次の日</button>
+        <button class="quiet-button" :disabled="dateLocked || frame.day<=frame.firstDay" @click="selectedDay=frame.day-1">前の日</button>
+        <label>再生日<select :disabled="dateLocked" :value="frame.day" @change="selectedDay=Number($event.target.value)"><option v-for="day in days" :key="day" :value="day">第{{ day }}日</option></select></label>
+        <button class="quiet-button" :disabled="dateLocked || frame.day>=frame.lastDay" @click="selectedDay=frame.day+1">次の日</button>
         <span role="status" data-testid="replay-day">第{{ frame.day }}日 / {{ frame.lastDay }}日</span>
       </nav>
       <div class="replay-surface">
@@ -55,6 +56,8 @@ onBeforeUnmount(()=>{emit('playing',false);dialog.value?.close()})
           </section>
         </div>
       </div>
+      <ReplayInformation :replay="recording" :day="frame.day" @date-lock="dateLocked=$event" />
+      <p>Replayを閉じると現在の場面の既定曲に戻ります。対局で選んだ曲は再選択してください。</p>
       <p role="status" data-testid="replay-audio-status">録画BGM：{{ audioState.status==='playing'?'再生中':audioState.status==='error'?'再生できません':'停止・準備中' }}</p>
       <p v-if="audioState.error" role="alert">音声診断：{{ audioState.error }}。有効化で再試行できます。録画の閲覧は続けられます。</p>
       <div class="claim-actions"><button class="quiet-button" @click="audioControls?.enable()">録画の音楽を有効にする</button><button class="quiet-button" @click="audioControls?.stop()">録画の音楽を停止</button></div>

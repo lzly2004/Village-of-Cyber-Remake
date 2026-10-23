@@ -1,0 +1,4081 @@
+[
+  {
+    "name": "exchange-day2-index-types-and-abstention",
+    "day": 2,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [
+                0,
+                5
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [
+                0,
+                1
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 1,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 双姉●\n[霊能者]\n[処刑]\n\n[死体]\n平和\n[護衛先]\n音楽 : \n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n",
+    "vote": {
+      "request": 0,
+      "index": 0,
+      "round": 1,
+      "rule": 1,
+      "candidates": [
+        "双弟",
+        "音楽"
+      ],
+      "rows": [
+        [
+          "双弟",
+          1,
+          "双姉"
+        ],
+        [
+          "双姉",
+          1,
+          "双弟"
+        ],
+        [
+          "音楽",
+          0,
+          "棄権"
+        ]
+      ],
+      "left": "-投票結果/2日目-第1轮グレラン：\n双弟音楽\n双弟：1票  投票先→双姉\n双姉：1票  投票先→双弟\n音楽：0票  投票先→棄権\n",
+      "right": "\n\n"
+    }
+  },
+  {
+    "name": "exchange-day3-explicit-zero-and-late-guard",
+    "day": 3,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [
+                0,
+                5
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [
+                0,
+                1
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 1,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 音楽○\n[霊能者]\n[処刑]\n双姉\n[死体]\n平和→平和\n[護衛先]\n音楽 : 双弟\n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n"
+  },
+  {
+    "name": "exchange-final-day-exposure",
+    "day": 4,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [
+                0,
+                5
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [
+                0,
+                1
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 1,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 音楽○\n[霊能者]\n[処刑]\n双姉\n[死体]\n平和→平和→平和\n[護衛先]\n音楽 : 双弟→破绽\n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n"
+  },
+  {
+    "name": "legacy-st-only",
+    "day": 3,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 1,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 双姉●→音楽○\n[霊能者]\n[処刑]\n双姉\n[死体]\n平和→平和\n[護衛先]\n音楽 : \n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n"
+  },
+  {
+    "name": "replay-medium-starts-day1",
+    "day": 3,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 2,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [
+                0,
+                5
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 2,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [
+                0,
+                1
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 1,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 2,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 2,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 音楽○\n[霊能者]\n音楽 : 双姉○→双弟○\n[処刑]\n双姉\n[死体]\n平和→平和\n[護衛先]\n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n"
+  },
+  {
+    "name": "death-cutoff-and-same-day-exposure",
+    "day": 3,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [
+                0,
+                5
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [
+                0,
+                1
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 1,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 1,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": true
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 1,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": true
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 破绽\n[霊能者]\n[処刑]\n双弟双姉\n[死体]\n平和→平和\n[護衛先]\n音楽 : 双弟\n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n"
+  },
+  {
+    "name": "positional-snapshot-fallback",
+    "day": 2,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 双姉●\n[霊能者]\n[処刑]\n\n[死体]\n平和\n[護衛先]\n音楽 : \n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n"
+  },
+  {
+    "name": "free-vote",
+    "day": 2,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [
+                0,
+                5
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [
+                0,
+                1
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 0,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 双姉●\n[霊能者]\n[処刑]\n\n[死体]\n平和\n[護衛先]\n音楽 : \n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n",
+    "vote": {
+      "request": 0,
+      "index": 0,
+      "round": 1,
+      "rule": 0,
+      "candidates": [],
+      "rows": [
+        [
+          "双弟",
+          1,
+          "双姉"
+        ],
+        [
+          "双姉",
+          1,
+          "双弟"
+        ],
+        [
+          "音楽",
+          0,
+          "棄権"
+        ]
+      ],
+      "left": "-投票結果/2日目-第1轮自由投票\n\n双弟：1票  投票先→双姉\n双姉：1票  投票先→双弟\n音楽：0票  投票先→棄権\n",
+      "right": "\n\n"
+    }
+  },
+  {
+    "name": "designated-character-number",
+    "day": 2,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [
+                0,
+                5
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [
+                0,
+                1
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 2,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 双姉●\n[霊能者]\n[処刑]\n\n[死体]\n平和\n[護衛先]\n音楽 : \n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n",
+    "vote": {
+      "request": 0,
+      "index": 0,
+      "round": 1,
+      "rule": 2,
+      "candidates": [
+        "双姉"
+      ],
+      "rows": [
+        [
+          "双弟",
+          1,
+          "双姉"
+        ],
+        [
+          "双姉",
+          1,
+          "双弟"
+        ],
+        [
+          "音楽",
+          0,
+          "棄権"
+        ]
+      ],
+      "left": "-投票結果/2日目-第1轮指定投票：\n双姉\n双弟：1票  投票先→双姉\n双姉：1票  投票先→双弟\n音楽：0票  投票先→棄権\n",
+      "right": "\n\n"
+    }
+  },
+  {
+    "name": "clamped-vote-round",
+    "day": 2,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 4,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 3,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 5,
+              "skillTargets": [
+                0,
+                5
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 1,
+              "skillTargets": [
+                0,
+                1
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [
+            {
+              "round": 1,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "round": 2,
+              "votes": [
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  3,
+                  2
+                ]
+              ]
+            }
+          ],
+          "dailyVotingRule": 1,
+          "greyTargetCharNums": [
+            1,
+            3
+          ],
+          "designatedTargetCharNums": [
+            28
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 3,
+              "skillTargets": [
+                0,
+                5,
+                3
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 27,
+              "actualRole": 1,
+              "claimedRole": 1,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                3,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 28,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 44,
+              "actualRole": 8,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 3,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                2,
+                1,
+                0
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": true
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=3"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n双弟 : 双姉●\n[霊能者]\n[処刑]\n\n[死体]\n平和\n[護衛先]\n音楽 : \n",
+    "roleText": "一役職一\n[占卜师]\n双弟\n[人狼]\n双姉\n[狂人]\n音楽\n",
+    "vote": {
+      "request": 99,
+      "index": 1,
+      "round": 2,
+      "rule": 1,
+      "candidates": [
+        "双弟",
+        "音楽"
+      ],
+      "rows": [
+        [
+          "双弟",
+          1,
+          "双姉"
+        ],
+        [
+          "双姉",
+          2,
+          "双弟"
+        ],
+        [
+          "音楽",
+          0,
+          "双姉"
+        ]
+      ],
+      "left": "-投票結果/2日目-第2轮グレラン：\n双弟音楽\n双弟：1票  投票先→双姉\n双姉：2票  投票先→双弟\n音楽：0票  投票先→双姉\n",
+      "right": "\n\n"
+    }
+  },
+  {
+    "name": "late-guard-full-history",
+    "day": 9,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 10,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 5,
+          "aliveCount": 1,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 4,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 6,
+          "aliveCount": 1,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 4,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 7,
+          "aliveCount": 1,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 4,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 8,
+          "aliveCount": 1,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 4,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 9,
+          "aliveCount": 1,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 4,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 10,
+          "aliveCount": 1,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 7,
+              "claimedRole": 3,
+              "claimedRoleOrder": 1,
+              "comingOutDay": 9,
+              "skillTarget": 0,
+              "skillTargets": [
+                0,
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 4,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=10"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n[霊能者]\n[処刑]\n\n[死体]\n平和→平和→平和→研究→平和→平和→平和→平和\n[護衛先]\n青年 : 研究→研究→研究→研究→研究→研究→研究\n",
+    "roleText": "一役職一\n[村人]\n研究\n[人狼]\n青年\n"
+  },
+  {
+    "name": "cat-fox-deviant-and-night-deaths",
+    "day": 5,
+    "replay": {
+      "version": 3,
+      "slotIndex": 0,
+      "saveTime": "2026/01/02 03:04:05",
+      "peiyiName": "jianyi",
+      "peiyiOrdinal": 1,
+      "peiyiVillageCount": 3,
+      "totalVillageCount": 9,
+      "totalDays": 5,
+      "endResult": 1,
+      "totalEvents": 17,
+      "daySnapshots": [
+        {
+          "dayNumber": 1,
+          "aliveCount": 5,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 5,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 10,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 3,
+              "actualRole": 11,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 4,
+              "characterNumber": 4,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 5,
+              "characterNumber": 5,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 2,
+          "aliveCount": 4,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 5,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 10,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 3,
+              "actualRole": 11,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 1,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 4,
+              "characterNumber": 4,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 5,
+              "characterNumber": 5,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 3,
+          "aliveCount": 2,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 5,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 10,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 3,
+              "actualRole": 11,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 1,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 4,
+              "characterNumber": 4,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 2,
+              "deathReason": 2,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 5,
+              "characterNumber": 5,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 0,
+              "deathReason": 0,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 4,
+          "aliveCount": 0,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 5,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 10,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 3,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 3,
+              "actualRole": 11,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 1,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 4,
+              "characterNumber": 4,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 2,
+              "deathReason": 2,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 5,
+              "characterNumber": 5,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 3,
+              "deathReason": 3,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        },
+        {
+          "dayNumber": 5,
+          "aliveCount": 0,
+          "players": [
+            {
+              "playerIndex": 1,
+              "characterNumber": 1,
+              "actualRole": 5,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 2,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 2,
+              "characterNumber": 2,
+              "actualRole": 10,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 3,
+              "deathReason": 1,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 3,
+              "characterNumber": 3,
+              "actualRole": 11,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 1,
+              "deathReason": 4,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 4,
+              "characterNumber": 4,
+              "actualRole": 6,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 2,
+              "deathReason": 2,
+              "nonHumanMarked": false
+            },
+            {
+              "playerIndex": 5,
+              "characterNumber": 5,
+              "actualRole": 7,
+              "claimedRole": 0,
+              "claimedRoleOrder": 0,
+              "comingOutDay": -1,
+              "skillTarget": 0,
+              "skillTargets": [],
+              "deathDay": 3,
+              "deathReason": 3,
+              "nonHumanMarked": false
+            }
+          ],
+          "voteRounds": [],
+          "dailyVotingRule": -1,
+          "greyTargetCharNums": [],
+          "designatedTargetCharNums": []
+        }
+      ],
+      "rawRecords": [
+        "# Peiyi: jianyi (ordinal=1)",
+        "# VillageCount: 3/9",
+        "JSON|{\n  \"type\": \"GAME_METADATA\",\n  \"version\": 3,\n  \"peiyiName\": \"jianyi\",\n  \"peiyiOrdinal\": 1,\n  \"peiyiVillageCount\": 3,\n  \"totalVillageCount\": 9,\n  \"seed\": 9007199254740993,\n  \"playerCount\": 3\n}",
+        "# 交換サンプル：双生児 ä/ü\n原文の改行を保持",
+        "INIT|roles|1:27:1,2:28:7,3:44:8",
+        "DAILY_SNAPSHOT|day=1|alive=3",
+        "STATE|day=1|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0}",
+        "DAILY_SNAPSHOT|day=2|alive=3",
+        "STATE|day=2|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=5,sh=0/5}{2:n=28,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=44,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=1,sh=0/1}",
+        "VOTE_METHOD|day=2|rule=1|grey=1,3|design=28",
+        "VOTE_DETAIL|day=2|round=1|1->2,2->1,3->0",
+        "VOTE_DETAIL|day=2|round=2|1->2,2->1,3->2",
+        "DAILY_SNAPSHOT|day=3|alive=2",
+        "STATE|day=3|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=3,sh=0/5/3}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=3,st=0,sh=0/1/0}",
+        "DAILY_SNAPSHOT|day=4|alive=2",
+        "STATE|day=4|{1:n=27,r=1,cr=1,cro=1,dd=0,wd=0,nm=0,cod=1,st=0,sh=0/0/3/0}{2:n=28,r=7,cr=0,cro=0,dd=2,wd=1,nm=0,cod=-1,st=0,sh=0/0/0/0}{3:n=44,r=8,cr=3,cro=1,dd=0,wd=0,nm=1,cod=3,st=0,sh=0/2/1/0}",
+        "END|result=VILLAGE_WIN|day=5"
+      ],
+      "peiyiDisplayName": "简易村",
+      "resultDisplayName": "村人勝利"
+    },
+    "normalText": "[占い師]\n[霊能者]\n[処刑]\n青年+教師(猫呪)→研究研究+情報(後追)\n[死体]\n傭兵→平和→平和→平和\n[護衛先]\n",
+    "roleText": "一役職一\n[猫又]\n青年\n[村人]\n教師\n[人狼]\n情報\n[妖狐]\n研究\n[背德者]\n傭兵\n"
+  }
+]

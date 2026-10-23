@@ -7,3 +7,7 @@
 - `node --test tools/tests/replay-exchange.test.mjs`是独立JS读写检查，不是生产浏览器导入器。真实文件选择/写库/双向UI交换仍归035，A09/A10不放行。
 
 格式/边界及入口缺口见`docs/web-replay-exchange.md`。所有Java读写测试只用TempDir；禁止试用真实data目录。
+
+## WEB-034展示样本
+
+`web034-display-cases.json`为12组独立固定期望的合成快照，不是交换入口/真实对局样本，不用于从rawRecords重建：多数组沿用030样本再明确变更已知展示字段。Java `ReplayWebDisplayContractTest`用实际ReplayTextFormatter逐项核对normalText、职业分组与投票左右列；网页单测读同一份期望核对文本与结构化表格行。包含晚到history/显式0、空history旧st、Replay灵能日1、死亡与破绽、位置回退、三种投票/弃权/多轮、晚CO护卫日记、猫咒/后追与狐/背德死亡条件。只进测试资源，不打入页面或生产录像；原030文件不改。
