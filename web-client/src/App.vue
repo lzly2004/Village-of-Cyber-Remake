@@ -7,6 +7,7 @@ import EventDialogue from './EventDialogue.vue'
 import GameStage from './GameStage.vue'
 import BgmControl from './BgmControl.vue'
 import PlayerPortrait from './PlayerPortrait.vue'
+import ReplayLibrary from './ReplayLibrary.vue'
 import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
@@ -79,13 +80,15 @@ function name(number) {
       </div>
       <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button></nav>
       <BgmControl ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
-      <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。サービス再起動後は無効になります。<br>画像・音声に対応。Replayは準備中です。</p></div>
+      <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。サービス再起動後は無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
 
     <main>
       <header class="topbar"><span>電脳村リメイク / Web試遊版</span><span class="build-tag">TEXT EDITION · 01</span></header>
       <div v-if="notice" class="notice" role="alert" lang="zh-CN">{{ notice }}</div>
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
+
+      <ReplayLibrary :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" />
 
       <section v-if="!update && !sessionId" class="lobby">
         <span class="eyebrow">WELCOME TO THE VILLAGE</span>

@@ -14,7 +14,7 @@
 
 `ReplaySlotSink`仍调用原`ReplaySave.fromRecords`构造v3，`ReplayManager.saveToSlotChecked`保留九槽JSON和派生显示字段。其他槽位不重建，槽位在0—8校验后才使用。
 
-为使端口确实能报告写入失败，新增checked路径：同目录临时文件完整序列化→ATOMIC_MOVE/REPLACE_EXISTING→发布内存candidate槽位；失败只清理本次临时文件，不替换已发布槽位、不停止录制。文件系统不支持原子替换时明确失败，不静默降级覆盖。原load/save/saveToSlot旧入口与历史迁移不借此重构；旧破坏性加载、导入校验仍归035，不宣称本批已解决所有存储异常。
+为使端口确实能报告写入失败，新增checked路径：同目录临时文件完整序列化→ATOMIC_MOVE/REPLACE_EXISTING→发布内存candidate槽位；失败只清理本次临时文件，不替换已发布槽位、不停止录制。文件系统不支持原子替换时明确失败，不静默降级覆盖。031原批未重构load/save/saveToSlot与历史迁移；后续评审补修9df0b1b已删除无调用者的saveToSlot，见review-52291bf.md；旧破坏性加载、导入校验仍归035，不宣称本批已解决所有存储异常。
 
 CLOSED会话不再可保存；桌面正常路径不会持有CLOSED会话，此项不是对035关闭会话保存能力的兼容承诺。
 

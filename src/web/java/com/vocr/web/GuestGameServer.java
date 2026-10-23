@@ -9,6 +9,8 @@ import com.vocr.domain.SelectionType;
 import com.vocr.domain.peiyi;
 import com.vocr.history.GameRecordManager;
 import com.vocr.logging.DebugLogger;
+import com.vocr.replay.ReplaySave;
+import java.nio.charset.StandardCharsets;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
@@ -65,6 +67,27 @@ public final class GuestGameServer implements AutoCloseable
                 String cursor = ctx.queryParam("eventCursor");
                 long value = cursor == null ? 0 : Long.parseLong(cursor);
                 send(ctx, session(ctx.pathParam("id")).currentUpdate(value));
+            });
+            config.routes.get("/api/v1/games/{id}/replay", ctx -> {
+                String cursor = ctx.queryParam("eventCursor");
+                if (cursor == null || !cursor.matches("0|[1-9][0-9]{0,15}")
+                        || ctx.queryParams("eventCursor").size() != 1)
+                    throw new IllegalArgumentException("录像读取必须提供有效确认游标");
+                ReplayRecording recording = session(ctx.pathParam("id")).completedReplay(Long.parseLong(cursor));
+                // Immutable application snapshot: parsing/serialization is outside the session monitor.
+                if (recording.records().size() > 20_000
+                        || recording.records().stream().anyMatch(line -> line.getBytes(StandardCharsets.UTF_8).length > 65_536)
+                        || recording.records().stream().mapToLong(line -> line.getBytes(StandardCharsets.UTF_8).length).sum() > 8 * 1024 * 1024)
+                    throw new ApiException(413, "REPLAY_LIMIT", "录像超出保存上限，未写入存储");
+                ReplaySave replay = ReplaySave.fromRecords(0, recording.records());
+                if (replay.endResult < 1 || replay.endResult > 3 || replay.totalDays < 1
+                        || replay.totalDays > 50 || replay.daySnapshots.isEmpty() || replay.daySnapshots.size() > 50)
+                    throw new ApiException(409, "REPLAY_UNAVAILABLE", "终局录像不完整，未写入存储");
+                ReplaySave[] slots = new ReplaySave[9]; slots[0] = replay;
+                byte[] document = json.writeValueAsBytes(slots);
+                if (document.length > 8 * 1024 * 1024)
+                    throw new ApiException(413, "REPLAY_LIMIT", "录像超出保存上限，未写入存储");
+                ctx.contentType("application/json; charset=utf-8").result(document);
             });
             config.routes.put("/api/v1/games/{id}/vote-target", ctx -> {
                 VoteTarget request = read(ctx, VoteTarget.class);

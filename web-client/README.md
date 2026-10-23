@@ -185,7 +185,7 @@ bash ../tools/run-gradle-safe.sh test --tests 'com.vocr.web.Web017JourneyTest' -
 
 脚本带main/test/web全部Java源码SHA-256指纹（包括生成器Web017JourneyTest）。任何这些源码变化的批次，必须同批重新生成oracle，或明确登记 **gate stale / 尚未验证**；不把旧对照的指纹失败计为产品行为失败，也不能说gate通过。真正运行gate前必须先按最终源码生成oracle，禁止放宽/排除测试源码指纹。
 
-bc6f545新增Java测试后旧对照曾stale；WEB-031最终源码已在用户授权的全量验收中重新生成15份oracle，并通过15项gate，见保存端口验收记录。后续源码再变仍须依上述约定重新生成或标stale，不复用本次绿色状态。
+bc6f545新增Java测试后旧对照曾stale；WEB-031最终源码曾同源通过15项gate；WEB-032已按其最终源码/输入重新生成15份oracle并通过15项gate，见本地Replay库验收记录。后续源码再变仍须依上述约定重新生成或标stale，不复用本次绿色状态。
 该指纹不包含`config/probability.json`、`build.gradle`或前端源码；概率/构建配置变化也必须重新生成，
 不能把指纹相同当作全部输入未变。前端变化须按影响验证浏览器；若同轮准备运行gate，先重新生成对照，
 不要把可能的响应差异只归咎于浏览器。不在本批扩展指纹或改游戏输入。
@@ -200,3 +200,7 @@ journey-summary作为Playwright附件由reporter管理，默认list不保证将�
 `PLAYWRIGHT_JSON_OUTPUT_NAME=test-results/gate-report.json npm run test:gate -- --reporter=list,json`。
 后一次Playwright运行可能清理前一次产物，应在后续运行前先查看/保留需要的证据。
 逐项A/Q状态、差异及决策见`../docs/web-017-verification.md`；没有账号/Replay/音频等后续能力不能标首发已完成。
+
+### WEB-032 本地Replay库
+
+终局全部事件确认后，“この対局をReplayに保存”将只读取得旧格式v3并写入当前origin的IndexedDB（vocr.replays.v1）。大厅/失效/释放后可打开“Replay一覧”查询、查看汇总与确认删除；上限9局、录像JSON合计64MiB、单件8MiB，实际浏览器配额可能更低。重复保存不覆盖、不累计战绩。坏库/配额/网络失败明确提示，不自动清库、降级或重放命令。请先确认保存成功再释放会话；清浏览器数据/私密模式/换origin可丢失或隔离数据，文件导入导出救援仍待035。播放与日期/技能历史未接入，见[032验收](../docs/web-replay-library.md)。
