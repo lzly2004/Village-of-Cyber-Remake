@@ -28,7 +28,7 @@
 | 层 | 字段 / 语义 |
 | --- | --- |
 | ReplaySave | version=3；slotIndex 0—8；saveTime为无时区`yyyy/MM/dd HH:mm:ss`显示值，不当唯一ID或可靠时间线 |
-| 配役/计数 | peiyiName为jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing，ordinal为1—7，NONE=0不算正常配役；拼写yaoohu保留。peiyiVillageCount/totalVillageCount在v1迁移/fromRecords时未知归-1；直接v2/v3缺失或零会保留Java默认0，界面均按未知处理，不合并入浏览器累计战绩 |
+| 配役/计数 | peiyiName为jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing，peiyiOrdinal为1—7，NONE=0不算正常配役；拼写yaoohu保留。peiyiVillageCount/totalVillageCount在v1迁移/fromRecords时未知归-1；直接v2/v3缺失或零会保留Java默认0，界面均按未知处理，不合并入浏览器累计战绩 |
 | 汇总 | totalDays、endResult（0未完/1村/2狼/3狐）、totalEvents。totalEvents=rawRecords.size，是**字符串条目数**而非HTTP事件数/可显示台词数。当前录制不是HTTP presentedEvents/确认流的副本，不能据此保证逐条台词/本地动画重放 |
 | 内容 | daySnapshots有序数组、rawRecords有序字符串数组；rawRecords一项可含多行JSON、Unicode、特殊符号，不能用`split('\n')`拆成新条目 |
 | 派生字段 | Java Jackson还可输出getPeiyiDisplayName/getResultDisplayName产生的peiyiDisplayName/resultDisplayName；仅显示缓存，不作为枚举/结果来源 |

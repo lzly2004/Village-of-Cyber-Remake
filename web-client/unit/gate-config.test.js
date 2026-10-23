@@ -44,3 +44,14 @@ test('default e2e still permits its documented override', () => {
   assert.equal(result.status, 0, result.stderr)
   assert.equal(JSON.parse(result.stdout).command, 'CUSTOM_COMMAND_NOT_EXECUTED')
 })
+
+test('diagnostic probe has an independent directory, single worker and unchanged guarded server', () => {
+  const result = readConfig('../playwright.probe.config.js')
+  assert.equal(result.status, 0, result.stderr)
+  const config = JSON.parse(result.stdout)
+  assert.equal(config.testDir, './diagnostic-probes')
+  assert.equal(config.workers, 1)
+  assert.equal(config.command, process.platform === 'win32'
+    ? 'gradlew.bat --no-daemon --max-workers=1 --console=plain runWebTestServer --args=17071'
+    : 'bash tools/run-gradle-safe.sh runWebTestServer --args=17071')
+})

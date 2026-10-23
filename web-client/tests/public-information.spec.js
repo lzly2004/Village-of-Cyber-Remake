@@ -47,7 +47,6 @@ test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再
   const id = await diagnostics.step('start and first event visible', () => start(page))
   let sawDead = false, sawSuspicion = false, checkedRefresh = false
   try {
-    if (process.env.VOCR_PUBLIC_INFO_DIAGNOSTIC_PROBE === '1') throw new Error('DIAGNOSTIC_PROBE: intentional failure to verify attachments')
     await diagnostics.step('assert initial suspicion availability', () => expect(page.getByRole('region', { name: '疑い先', exact: true })).toContainText('第3日以降'))
     await diagnostics.step('drain public events', () => drain(page))
     for (const role of ['占い師', '霊能者', '狩人']) {
