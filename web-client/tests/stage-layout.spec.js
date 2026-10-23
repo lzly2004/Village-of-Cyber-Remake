@@ -102,7 +102,8 @@ test('WEB-021 synthetic long dialogue scrolls by keyboard; confirmation stays ou
     snapshot.revealedRoles = snapshot.view.players.map(player => ({ playerNumber: player.playerNumber, actualRole: 'wu' }))
   })
   try {
-    await expect(page.getByTestId('stage-actor')).toHaveCount(3)
+    //025 uses source settlement artwork, not three placeholder silhouettes from ch1/ch2/ch3.
+    await expect(page.getByTestId('stage-character')).toHaveCount(1)
     await expect(page.getByTestId('event-dialogue')).toHaveJSProperty('textContent', text)
     const reading = page.getByRole('region', { name: '舞台文字阅读区', exact: true })
     expect(await reading.evaluate(node => node.scrollHeight > node.clientHeight)).toBe(true)

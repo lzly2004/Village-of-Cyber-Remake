@@ -51,7 +51,7 @@ test('真实对局从浏览器指定投票直至终局，并刷新恢复揭晓',
     let rounds = 0
     while (true) {
       await readEvents(page)
-      if (await page.getByRole('heading', { name: /阵营胜利|妖狐胜利/ }).count()) break
+      if (await page.getByRole('heading', { name: /村人勝利|人狼勝利|妖狐勝利/ }).count()) break
       expect(++rounds).toBeLessThan(60)
       // 只根据页面的公开 CO 选择候补；共有者回避后取消该目标。
       for (const checkbox of await page.locator('.player-row').filter({ hasText: '共有者' })
@@ -75,7 +75,7 @@ test('真实对局从浏览器指定投票直至终局，并刷新恢复揭晓',
     await expect(page.getByRole('region', { name: '最近投票结果' })).toBeVisible()
     await page.screenshot({ path: testInfo.outputPath('finished.png'), fullPage: true })
     await page.reload()
-    await expect(page.getByRole('heading', { name: /阵营胜利|妖狐胜利/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /村人勝利|人狼勝利|妖狐勝利/ })).toBeVisible()
     await expect(page.getByRole('button', { name: '新开一局' })).toBeVisible()
     await expect(page.getByRole('region', { name: '職業別CO確認' })).toHaveCount(0)
     await expect(page.getByRole('region', { name: 'プレイヤー別CO確認' })).toHaveCount(0)

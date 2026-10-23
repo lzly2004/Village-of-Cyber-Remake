@@ -20,7 +20,7 @@ const positions = computed(() => participants.value.map((character, index, all) 
 <template>
   <div class="game-stage" :data-stage="stage" data-testid="game-stage">
     <div class="stage-surface" data-testid="stage-surface">
-      <StageArtwork v-if="artwork.mode === 'dialogue'" :plan="artwork" />
+      <StageArtwork v-if="artwork.mode === 'dialogue' || artwork.mode === 'scene'" :plan="artwork" />
       <svg v-else class="stage-artwork" data-testid="stage-artwork" viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <rect class="stage-sky" width="1280" height="720" />
@@ -37,6 +37,7 @@ const positions = computed(() => participants.value.map((character, index, all) 
         </g>
         <text v-if="!positions.length" x="640" y="270" text-anchor="middle" class="stage-empty">场景占位</text>
       </svg>
+      <slot name="scene-overlay" />
       <div class="stage-text" role="region" aria-label="舞台文字阅读区" tabindex="0"
         aria-describedby="stage-reading-help" data-testid="stage-text">
         <slot />

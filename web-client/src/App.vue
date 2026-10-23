@@ -6,10 +6,12 @@ import VoteHistoryPanel from './VoteHistoryPanel.vue'
 import EventDialogue from './EventDialogue.vue'
 import GameStage from './GameStage.vue'
 import PlayerPortrait from './PlayerPortrait.vue'
+import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
-import { dialogueArtwork } from './eventArtwork.js'
-import { configurations, configurationName, roles, claimRoleNames, stages, results } from './labels'
+import { sceneArtwork, outcomes } from './sceneArtwork.js'
+import { settlementReveal } from './settlementVisual.js'
+import { configurations, configurationName, roles, claimRoleNames, stages } from './labels'
 
 const {
   sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory,
@@ -19,7 +21,7 @@ const {
   setClaimedTarget,
   start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
-const artwork = computed(() => dialogueArtwork(presentationHistory.value, cursor.value, currentEvent.value))
+const artwork = computed(() => sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
 const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
@@ -28,9 +30,8 @@ const claimCandidates = computed(() => players.value.filter(player => claimPlaye
 const voteTargets = computed(() => update.value?.selections.voteTargets || [])
 const legalTargets = computed(() =>
   update.value?.legalTargetSelections.find(action => action.type === 'VOTE')?.targets || [])
-const revealed = computed(() => new Map(
-  finished.value ? update.value.revealedRoles.map(player => [player.playerNumber, player.actualRole]) : [],
-))
+const reveal = computed(() => settlementReveal(finished.value, players.value, finished.value ? update.value.revealedRoles : null))
+const outcome = computed(() => finished.value && typeof update.value.view.result === 'string' && Object.hasOwn(outcomes, update.value.view.result) ? outcomes[update.value.view.result] : null)
 const claimedSkills = computed(() => (update.value?.legalTargetSelections || [])
   .filter(action => ['DIVINATION', 'GUARD'].includes(action.type))
   .map(action => {
@@ -103,9 +104,22 @@ function name(number) {
             <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ currentEvent ? stages[currentEvent.stage] : finished ? '对局结束' : '白天决策' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
             <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
+              <template #scene-overlay>
+                <div v-if="finished" class="settlement-board" role="region" aria-label="結算役職一覧" tabindex="0" data-testid="settlement-board" lang="ja">
+                  <p>配役一覧 · {{ players.length }}人 · 一覧内をスクロールして確認できます。</p>
+                  <div class="settlement-grid">
+                    <div v-for="player in players" :key="player.playerNumber" class="settlement-card">
+                      <PlayerPortrait :player="player" revealed :actual-role="reveal.roles.get(player.playerNumber)" />
+                      <strong>{{ player.playerNumber }} · {{ characterDisplayName(player.character) }}</strong>
+                      <small>{{ roles[reveal.roles.get(player.playerNumber)] || '身分不明（表示診断）' }}</small>
+                    </div>
+                  </div>
+                </div>
+              </template>
               <div v-if="currentEvent" class="event-content" role="region" aria-label="当前事件" aria-live="polite">
                 <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
                 <EventDialogue :event="currentEvent.event" />
+                <p v-if="artwork.consequence" class="event-consequence" lang="ja" data-testid="event-consequence">{{ artwork.consequence }}</p>
                 <div v-if="currentEvent.event" class="event-participants">
                   <span v-if="currentEvent.event.ch1 && currentEvent.event.ch1 !== 'NONE'">{{ characterDisplayName(currentEvent.event.ch1) }}</span>
                   <span v-if="currentEvent.event.ch2 && currentEvent.event.ch2 !== 'NONE'"><small>关联玩家</small>{{ characterDisplayName(currentEvent.event.ch2) }}</span>
@@ -114,7 +128,8 @@ function name(number) {
                 <p class="event-hint">角色台词与叙述来自现有文本资源。CO 和报告只代表公开发言。</p>
               </div>
               <div v-else-if="finished" class="event-content settlement" role="status">
-                <span class="event-number">THE FINAL VERDICT</span><h2>{{ results[update.view.result] || '对局结束' }}</h2><p>本局身份现已揭晓，查看玩家列表回顾各自阵营。</p>
+                <span class="event-number">THE FINAL VERDICT</span><AssetImage v-if="outcome" class="settlement-win-icon" :name="outcome.icon" /><h2 lang="ja">{{ outcome?.text || '勝敗不明（表示診断）' }}</h2><p>本局事件已确认完毕，身份以服务器揭晓数据为准。</p>
+                <p v-if="reveal.diagnostic" class="visual-diagnostic" role="status" data-testid="reveal-diagnostic">表示診断：身分情報が不完全です。人物の役職画像を表示できません。</p>
               </div>
               <div v-else class="event-content decision">
                 <span class="event-number">YOUR DECISION</span><h2>今天，投给谁？</h2><p>从玩家列表勾选指定投票候补，再确认投票。</p><p>遇到回避 CO 时，先听完发言，再重新判断。共有者回避后可取消其目标，另选候补。</p>
@@ -133,9 +148,9 @@ function name(number) {
             <p id="player-list-help" class="list-help">名单较长时可在列表内滚动。按 Tab 聚焦列表后可用方向键；继续按 Tab 可逐个选择候补。</p>
             <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" tabindex="0" aria-describedby="player-list-help">
               <label v-for="player in players" :key="player.playerNumber" class="player-row" :data-player-number="player.playerNumber" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
-                <PlayerPortrait :player="player" />
+                <PlayerPortrait :player="player" :revealed="finished" :actual-role="finished ? reveal.roles.get(player.playerNumber) : null" />
                 <span class="player-number">{{ String(player.playerNumber).padStart(2, '0') }}</span>
-                <span class="player-identity"><strong lang="ja">{{ characterDisplayName(player.character) }}</strong><small>{{ finished ? '真实身份 · ' + roles[revealed.get(player.playerNumber)] : playerVisual(player).roleText + (playerVisual(player).orderText ? ' · ' + playerVisual(player).orderText : '') }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日离场</span></small><small v-if="playerVisual(player).claimDiagnostic" class="visual-diagnostic">表示診断：CO図なし</small><small v-if="playerVisual(player).deathDiagnostic" class="visual-diagnostic">表示診断：死因図なし</small></span>
+                <span class="player-identity"><strong lang="ja">{{ characterDisplayName(player.character) }}</strong><small>{{ finished ? '真实身份 · ' + (roles[reveal.roles.get(player.playerNumber)] || '身分不明（表示診断）') : playerVisual(player).roleText + (playerVisual(player).orderText ? ' · ' + playerVisual(player).orderText : '') }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日离场</span></small><small v-if="playerVisual(player).claimDiagnostic" class="visual-diagnostic">表示診断：CO図なし</small><small v-if="playerVisual(player).deathDiagnostic" class="visual-diagnostic">表示診断：死因図なし</small></span>
                 <input v-if="!finished" type="checkbox" :aria-label="'指定 ' + characterDisplayName(player.character) + '（' + player.playerNumber + '号）'" :checked="voteTargets.includes(player.playerNumber)" :disabled="!canDecide || !legalTargets.includes(player.playerNumber)" @click.prevent="toggleTarget(player.playerNumber, !voteTargets.includes(player.playerNumber))">
                 <span v-else class="player-state">{{ player.alive ? '存活' : '离场' }}</span>
               </label>

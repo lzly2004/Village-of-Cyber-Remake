@@ -2,6 +2,8 @@
 
 基线d743b22。对照仓库桌面真实调用与原素材，不宣称外部原版程序或全量日文化已验收。仅接DAY_DIALOGUE/AFTERNOON_DIALOGUE的背景和立绘；其余阶段/决策/终局暂保留021占位，死亡、处刑、结算与数组切换由025接续。A06/A07/A08未放行。
 
+025接续状态：死亡/处刑的有序单人前后图、终局背景及门槛后的职业头像已由[025场景契约](web-settlement-scenes.md)承接；024对话解析、前缀恢复、缓存上限和事件确认约定保持。本文后续“归025”表述保留024当时范围，不再表示025尚未实施。
+
 ## 选图与布局
 
 - [eventArtwork.js](../web-client/src/eventArtwork.js)直接import原`event_image_mapping.json`，不复制或重译。沿Resources：ch1找角色、eventname找事件，special按ch2精确键存在优先；空/null special不再回default。ch3不参与查找/布局。字符串为单图，数组顺序完整保留给025；错标为对话的数组显示诊断和frame，不静默丢第二张。

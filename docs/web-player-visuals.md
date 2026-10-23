@@ -4,6 +4,8 @@
 
 024已接续[对话立绘与背景](web-event-artwork.md)，复用既有清单并验证逐事件舞台重建的冷/暖解码；不改变本文玩家卡片的公开字段与按需加载边界。其他阶段场景仍归025。
 
+025接续：全部事件确认后的职业头像及异常揭晓校验见[终局契约](web-settlement-scenes.md)。门槛前仍使用本文公开外观；PlayerPortrait仅在门槛后接收显式揭晓职业，不从VisiblePlayer读取实际身份。按需加载及失败诊断继续适用。
+
 ## 映射与边界
 
 - [PlayerStatusRenderer](../src/main/java/com/vocr/ui/PlayerStatusRenderer.java)与[UIHelpers](../src/main/java/com/vocr/ui/UIHelpers.java)的局内调用传`showActualRole=false`，经[ImageNames](../src/main/java/com/vocr/resources/ImageNames.java)只选`NNs/NNgs.png`。网页仅取VisiblePlayer的公开character/alive；即使FINISHED或揭晓后，023仍使用同一公开状态头像，不读取实际职业或请求cs/fs/hs/ws/ks等结果图。

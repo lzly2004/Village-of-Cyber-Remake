@@ -8,6 +8,7 @@ import { resolve } from 'node:path'
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const key = 'vocr.guest.v1'
 const stageMapping = JSON.parse(readFileSync(resolve(root, 'src/main/resources/config/event_image_mapping.json'), 'utf8'))
+const imageManifest = JSON.parse(readFileSync(resolve(root, 'web-client/public/assets/images/manifest.json'), 'utf8'))
 const roles = { zhan: '占い師', ling: '霊能者', lie: '狩人', gong: '共有', mao: '猫又' }
 const configurations = ['jianyi', 'tongchang', 'yaoohu', 'kuangxin', 'beide', 'maoyou', 'daxing']
 const names = ['简易', '通常', '妖狐', '狂信', '背德', '猫又', '大型']
@@ -42,14 +43,20 @@ async function drain(page, snapshot) {
     await expect(page.getByTestId('next-event')).toBeVisible()
     if (event.event.ch1 && event.event.ch1 !== 'NONE')
       await expect(page.getByRole('region', { name: '当前事件', exact: true })).toContainText(characterDisplayName(event.event.ch1))
-    if (['DAY_DIALOGUE', 'AFTERNOON_DIALOGUE'].includes(event.stage)) {
+    if (['DAY_DIALOGUE', 'AFTERNOON_DIALOGUE', 'NIGHT_RESULT', 'EXECUTION', 'SETTLEMENT'].includes(event.stage)) {
       await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready', 'true')
       await expect(page.getByTestId('stage-art-status')).toHaveCount(0)
-      const entry = stageMapping[event.event.ch1][event.event.eventname]
-      const name = Object.hasOwn(entry.special || {}, event.event.ch2) ? entry.special[event.event.ch2] : entry.default
       const sources = await page.getByTestId('stage-character').evaluateAll(nodes => nodes.map(node => node.dataset.source))
-      expect(sources).toContain('images/' + name)
-      expect(sources.length).toBeLessThanOrEqual(2)
+      if (event.event.eventname === 'wsw') expect(sources).toEqual([])
+      else {
+        const entry = stageMapping[event.event.ch1][event.event.eventname]
+        const name = Object.hasOwn(entry.special || {}, event.event.ch2) ? entry.special[event.event.ch2] : entry.default
+        if (Array.isArray(name)) {
+          expect(sources).toHaveLength(1)
+          expect(name.map(n=>'images/'+n)).toContain(sources[0])
+        } else expect(sources).toContain('images/' + name)
+        expect(sources.length).toBeLessThanOrEqual(2)
+      }
     }
     await page.getByTestId('next-event').click()
   }
@@ -71,6 +78,15 @@ async function display(page, snapshot, beforeDrain = false) {
       await expect(page.getByRole('region', { name: '公開情報', exact: true })).toHaveCount(0)
     } else {
       await expect(page.locator('.player-identity').first()).toContainText('真实身份')
+      await expect(page.getByTestId('reveal-diagnostic')).toHaveCount(0)
+      const player = snapshot.view.players[0]
+      const role = snapshot.revealedRoles.find(entry=>entry.playerNumber===player.playerNumber).actualRole
+      const number = Object.keys(stageMapping).indexOf(player.character)+1
+      const suffix = !player.alive ? 'gs' : ({mao:'cs',yaohu:'fs',beidezhe:'hs',renlang:'ws',kuangren:'ks',kuangxinzhe:'ks'}[role]||'s')
+      const name = 'images/'+String(number).padStart(2,'0')+suffix+'.png'
+      await page.locator('.player-row').first().scrollIntoViewIfNeeded()
+      await expect(page.locator('.player-row').first().locator('.portrait-image img')).toHaveAttribute('src','/assets/images/'+imageManifest.images[name].file)
+      await expect(page.getByTestId('stage-background')).toHaveAttribute('href','/assets/images/'+imageManifest.images['images/frame #19252.png'].file)
       await expect(page.getByRole('region', { name: '公開死亡履歴', exact: true })).toBeVisible()
     }
   } else {

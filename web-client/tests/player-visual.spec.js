@@ -143,8 +143,8 @@ test('WEB-023 broken image retains explicit fallback and cannot skip terminal di
     await expect(row).not.toContainText('真实身份')
     await page.getByTestId('next-event').click()
     await expect(row).toContainText('真实身份 · 人狼')
-    // Even after reveal, role-specific colored portraits belong to025; status assets stay public-only.
-    await expect(row.locator('.portrait-image .asset-diagnostic')).toHaveCount(1)
+    //025 changes to the role portrait only after every terminal event has been acknowledged.
+    await expectImage(row.locator('.portrait-image img'),'01ws.png')
     expect((await saved(page)).eventCursor).toBe(2)
     expect(writes).toBe(0)
   }finally{await request.delete('/api/v1/games/'+id)}

@@ -98,15 +98,15 @@ test('WEB-024 unavailable or late prefix cannot replace authoritative state or r
  }finally{release();await request.delete('/api/v1/games/'+id)}
 })
 
-test('WEB-024 afternoon uses correct background; system/death/execution/settlement stay in025 without hidden art',async({page,request})=>{
+test('WEB-024 afternoon and025 stages use source backgrounds without hidden role portraits',async({page,request})=>{
  const list=[presented(e('hblr'),'AFTERNOON_DIALOGUE'),presented(e('wsw','NONE'),'NIGHT_RESULT'),
   presented(e('yjsw'),'NIGHT_RESULT'),presented(e('cxs'),'EXECUTION'),presented(e('crsl'),'SETTLEMENT')]
  const id=await synthetic(page,request,list)
  try{
   await ready(page);await expect(page.getByTestId('stage-background')).toHaveAttribute('href',url('haikei.png'))
   for(let i=1;i<list.length;i++){
-   await page.getByTestId('next-event').click();await expect(page.getByTestId('stage-character')).toHaveCount(0)
-   await expect(page.getByTestId('decoded-stage-scene')).toHaveCount(0)
+   await page.getByTestId('next-event').click();await ready(page)
+   await expect(page.getByTestId('stage-character')).toHaveCount(i===1?0:1)
    await expect(page.locator('.player-identity').first()).not.toContainText('真实身份')
   }
  }finally{await request.delete('/api/v1/games/'+id)}
