@@ -1,0 +1,4 @@
+# Development conversion/validation executable; not shipped to the browser or Java service.
+# Linux x86_64 wheel SHA256: c7e46fcec401dd990405049d2e2f475e2b397779df2519b544b8aab515195282
+# https://pypi.org/project/imageio-ffmpeg/0.6.0/
+imageio-ffmpeg==0.6.0

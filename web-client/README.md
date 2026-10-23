@@ -27,12 +27,18 @@ npm run dev
 `http://127.0.0.1:7070`；后端改端口时可用 `VOCR_API_URL` 指定代理地址。
 页面读取真实 Java 服务，不包含本地规则引擎。
 
-日常校验及`npm run build`门禁只需Python3与能解码WebP的Pillow（reviewer已实测系统Python3.8/Pillow7）。
+图片日常校验只需Python3与能解码WebP的Pillow（reviewer已实测系统Python3.8/Pillow7）。
 重新生成图片才需[固定编码依赖](../tools/requirements-web-images.txt)及同版libwebp，详见资源契约。
 `npm run assets:check`验证当前1171条图片清单、源/输出哈希、解码与预算；
 `npm run build`前后自动核对public/dist资源，并统计含台词的全部代码预算，任何缺失或漂移都会失败。
 生成、边界和画质约定见[图片资源契约](../docs/web-image-assets.md)。
 `npm run test:assets`只启动静态preview，验证全部唯一图片解码、大厅无玩家素材请求以及开村后仅按可视名单加载和传输预算，不需要Java。
+
+026已交付23首BGM/9音效的独立MP3、13份说明、内容哈希和按需资源接口，尚未接入App播放。
+`npm run audio:check`及`npm run build`音频前后门禁还需要**完整FFmpeg**（含MP3解码、astats/asdr；重新生成需libmp3lame），以`FFMPEG`指定路径；Playwright自带视频FFmpeg不可替代。
+可用Python≥3.9隔离安装[固定开发工具](../tools/requirements-web-audio.txt)，不需要系统安装或生产依赖变更；安装/复现及预算见[音频资源契约](../docs/web-audio-assets.md)。
+`npm run test:audio`仅静态preview，逐文件完整解码并验证按需请求、哈希异常和取消，不启动JVM，也不实际播放。
+资源模块导入不请求网络；页面播放、解锁/切换/释放、音量及实际听感仍由027/028接续，A08未通过。
 
 `npm run build` 输出 `dist/`。这是客户端静态产物；本批只配置开发期代理，
 生产部署仍需同源 API 反向代理，不能单独双击 HTML 游玩。
