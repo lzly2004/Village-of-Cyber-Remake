@@ -36,7 +36,7 @@ onBeforeUnmount(()=>{emit('playing',false);dialog.value?.close()})
         <div class="replay-record-content">
           <p>人物・CO：第{{ frame.avatarDay ?? '不明' }}日の記録（次の日を優先）。死亡印は選択日より前の離場を示します。</p>
           <p v-for="d in frame.diagnostics" :key="d.section+':'+d.code" class="visual-diagnostic" role="status">表示診断 {{ d.section==='data'?'人数':'人物' }}：{{ d.code }}<span v-if="d.sourceDay!==null">（第{{ d.sourceDay }}日の記録を代替表示）</span></p>
-          <p id="replay-player-scroll">人物が多い場合は枠内をスクロールできます。Tabで枠や各人物に移動できます。</p>
+          <p id="replay-player-scroll">人物は上下2段です。人数が多い場合は左右にスクロールできます。Tabで枠や各人物に移動できます。</p>
           <div class="replay-avatar-list" role="region" aria-label="Replay人物一覧" aria-describedby="replay-player-scroll" tabindex="0" :style="{'--replay-columns':Math.ceil(frame.players.length/2)||1}">
             <article v-for="player in frame.players" :key="player.playerIndex" class="replay-player-card" :data-player-index="player.playerIndex" :data-portrait="player.portrait" :data-departed="player.departed" tabindex="0">
               <span class="player-portrait"><AssetImage class="portrait-image" :name="player.portrait" />

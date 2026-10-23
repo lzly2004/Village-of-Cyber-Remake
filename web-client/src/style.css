@@ -243,8 +243,12 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .replay-background { position: absolute; inset: 0; z-index: -1; }
 .replay-background img { width: 100%; height: 100%; object-fit: cover; }
 .replay-record-content { padding: 1rem; background: #ffffffb0; }
-.replay-avatar-list { display: grid; grid-template-columns: repeat(var(--replay-columns), minmax(6.5rem, 1fr)); gap: .5rem; overflow: auto; padding: .5rem; max-height: 24rem; scrollbar-gutter: stable; }
-.replay-player-card { display: flex; flex-direction: column; align-items: center; gap: .4rem; padding: .7rem; font-size: .85rem; background: #fffffff0; }
-.replay-player-card .player-portrait { flex: 0 0 auto; }
+.replay-avatar-list { display: grid; grid-template-columns: repeat(var(--replay-columns), minmax(16rem, 1fr)); gap: .5rem; overflow-x: auto; padding: .5rem; }
+.replay-avatar-list::-webkit-scrollbar { height: 12px; }
+.replay-avatar-list::-webkit-scrollbar-track { background: #e2e8da; }
+.replay-avatar-list::-webkit-scrollbar-thumb { background: #72866d; border: 3px solid #e2e8da; border-radius: 8px; }
+.replay-player-card { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-content: start; align-items: start; column-gap: .7rem; row-gap: .4rem; padding: .7rem; font-size: .85rem; background: #fffffff0; overflow-wrap: anywhere; }
+.replay-player-card .player-portrait { grid-row: 1 / span 5; }
+.replay-player-card > :not(.player-portrait) { grid-column: 2; min-width: 0; }
 .replay-player-card:focus-visible, .replay-avatar-list:focus-visible { outline: 3px solid #c79235; outline-offset: -3px; }
 .replay-population { margin-top: 1rem; }

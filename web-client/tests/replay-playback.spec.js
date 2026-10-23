@@ -19,6 +19,21 @@ async function play(page) {
   await rows(page).getByRole('button',{name:'再生する',exact:true}).click()
   await expect(dialog(page)).toBeVisible()
 }
+// All cards keep their entire vertical content; horizontal browsing must never hide a row.
+async function completeCards(page) {
+  const metrics=await dialog(page).locator('.replay-avatar-list').evaluate(el=>{
+    const region=el.getBoundingClientRect()
+    return {height:el.clientHeight,contentHeight:el.scrollHeight,cards:[...el.children].map(card=>{
+      const box=card.getBoundingClientRect()
+      return {inside:box.top>=region.top && box.bottom<=region.bottom,children:[...card.children].map(child=>{
+        const r=child.getBoundingClientRect()
+        return r.top>=box.top && r.bottom<=box.bottom && r.left>=box.left && r.right<=box.right
+      })}
+    })}
+  })
+  expect(metrics.contentHeight).toBeLessThanOrEqual(metrics.height+1)
+  expect(metrics.cards.every(card=>card.inside && card.children.every(Boolean))).toBe(true)
+}
 const saved=page=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')))
 
 test('frozen desktop dates/portraits play read-only beside a real running game, Escape and refresh preserve authority and local records',async({page,request},info)=>{
@@ -50,6 +65,10 @@ test('frozen desktop dates/portraits play read-only beside a real running game, 
     await dialog(page).getByRole('combobox',{name:'再生日',exact:true}).selectOption('4')
     await expect(dialog(page).getByRole('button',{name:'次の日',exact:true})).toBeDisabled()
     await expect(dialog(page).locator('.visual-diagnostic')).toHaveCount(0)
+    for(const width of [1440,1280,1024]) {
+      await page.setViewportSize({width,height:1000});await completeCards(page)
+    }
+    await page.setViewportSize({width:1440,height:1000})
     await dialog(page).screenshot({path:info.outputPath('replay-day4.png')})
     expect(await saved(page)).toEqual(credentials)
     expect(writes).toBe(0);expect(reads).toBe(0);expect(audio).toBe(0)
@@ -89,8 +108,14 @@ test('44-player synthetic boundary keeps both desktop rows, keyboard access and 
   await seed(page,large);await play(page)
   await dialog(page).getByRole('combobox',{name:'再生日',exact:true}).selectOption('50')
   await expect(dialog(page).locator('.replay-player-card')).toHaveCount(44)
+  for(const width of [1440,1280,1024]) {
+    await page.setViewportSize({width,height:1000});await completeCards(page)
+  }
+  await page.setViewportSize({width:1440,height:1000})
+  await dialog(page).screenshot({path:info.outputPath('replay-44-start.png')})
   const last=dialog(page).locator('.replay-player-card').last()
   await last.focus();await expect(last).toBeFocused()
+  await completeCards(page)
   const region=dialog(page).getByRole('region',{name:'Replay人物一覧',exact:true})
   expect(await region.evaluate(el=>el.scrollLeft)).toBeGreaterThan(0)
   expect(await dialog(page).evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true)
