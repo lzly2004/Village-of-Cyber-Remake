@@ -25,6 +25,7 @@
       "guarded-tests",
       "audit-tests",
       "verify-tests",
+      "ci-tests",
       "image-tool-tests",
       "audio-tool-tests",
       "exchange-contract",
@@ -62,6 +63,15 @@
         "tools/tests/test_verify.py"
       ],
       "tier": "tooling"
+    },
+    {
+      "patterns": [
+        "tools/tests/test_ci_workflow.py"
+      ],
+      "tier": "tooling",
+      "extra": [
+        "ci-tests"
+      ]
     },
     {
       "patterns": [

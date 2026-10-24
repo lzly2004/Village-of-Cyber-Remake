@@ -24,6 +24,7 @@ COMMANDS = {
     'guarded-tests': ['python3', '-B', 'tools/tests/test_guarded_process.py', '-v'],
     'audit-tests': ['python3', '-B', 'tools/tests/test_ci_inputs.py', '-v'],
     'verify-tests': ['python3', '-B', 'tools/tests/test_verify.py', '-v'],
+    'ci-tests': ['python3', '-B', 'tools/tests/test_ci_workflow.py', '-v'],
     'image-tool-tests': ['python3', '-B', 'tools/tests/test_web_images.py', '-v'],
     'audio-tool-tests': ['python3', '-B', 'tools/tests/test_web_audio.py', '-v'],
     'exchange-contract': ['node', '--test', 'tools/tests/replay-exchange.test.mjs'],
@@ -38,7 +39,7 @@ COMMANDS = {
     'gate': ['npm', '--prefix', 'web-client', 'run', 'test:gate'],
     'desktop-exchange': ['npm', '--prefix', 'web-client', 'run', 'test:e2e', '--', '--config=../tools/playwright.exchange.config.mjs'],
 }
-SEQUENCE = ['diff-check', 'guarded-tests', 'audit-tests', 'verify-tests', 'image-tool-tests',
+SEQUENCE = ['diff-check', 'guarded-tests', 'audit-tests', 'verify-tests', 'ci-tests', 'image-tool-tests',
             'audio-tool-tests', 'exchange-contract', 'frontend-unit', 'web-build', 'assets',
             'audio', 'files-repeat', 'default-e2e', 'browser-file', 'java-full', 'java-results',
             'oracle-generate', 'oracle-audit', 'gate', 'desktop-exchange']
@@ -64,7 +65,7 @@ def policy():
             raise Refused('UNKNOWN_SUITE_IN_POLICY')
     required = {'docs': {'diff-check'}, 'tooling': {'diff-check', 'audit-tests', 'verify-tests'},
                 'frontend': {'frontend-unit', 'web-build', 'default-e2e'},
-                'full': {'browser-file', 'java-full', 'java-results', 'oracle-audit', 'gate', 'desktop-exchange'}}
+                'full': {'ci-tests', 'browser-file', 'java-full', 'java-results', 'oracle-audit', 'gate', 'desktop-exchange'}}
     if any(not suites <= set(value['tiers'][tier]) for tier, suites in required.items()):
         raise Refused('REQUIRED_SUITE_REMOVED_FROM_POLICY')
     for rule in value['rules']:
@@ -103,7 +104,7 @@ def plan(paths, full=False):
         selected.discard('oracle-generate')  # Full test already regenerates these artifacts.
     return {'tier': tier, 'paths': matches, 'unknown_paths': unknown,
             'requires_full_java_approval': 'java-full' in selected,
-            'requires_lfs': bool(selected - {'diff-check', 'audit-tests', 'verify-tests', 'guarded-tests', 'exchange-contract', 'frontend-unit'}),
+            'requires_lfs': bool(selected - {'diff-check', 'audit-tests', 'verify-tests', 'ci-tests', 'guarded-tests', 'exchange-contract', 'frontend-unit'}),
             'sensitive_paths_requiring_review': [p for p in sorted(set(paths)) if any(g in ('frozen', 'inputs') for g in AUDIT.groups(p))],
             'suites': [{'id': name, 'argv': COMMANDS.get(name), 'internal': name in INTERNAL} for name in SEQUENCE if name in selected],
             'skipped': [{'id': name, 'reason': 'not_triggered_by_changed_paths'} for name in SEQUENCE if name not in selected]}

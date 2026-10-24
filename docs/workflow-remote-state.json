@@ -246,11 +246,26 @@
   },
   "cost_estimate": {
     "known_added_storage_payload_bytes": 584372132,
-    "known_payload_download_bytes_at_least": 605302710,
+    "known_payload_download_bytes_at_least": 611166724,
     "account_billed_storage": null,
     "account_billed_bandwidth": null,
     "account_remaining_quota": null,
-    "exclusions": "historical objects, other users/runs, failed requests, protocol overhead and actual GitHub accounting are not measured"
+    "exclusions": "historical objects, other users/runs, failed requests, protocol overhead and actual GitHub accounting are not measured",
+    "scope": "Known WF-002 current-tree and WF-004 extra-history payload reads; not GitHub account usage"
   },
-  "oid_size_aggregate_definition": "按OID ASCII升序，每条为 oid + U+0009(TAB) + 十进制bytes(无前导零) + U+000A(LF)，包括最后一条LF；以ASCII编码对拼接结果取SHA-256。"
+  "oid_size_aggregate_definition": "按OID ASCII升序，每条为 oid + U+0009(TAB) + 十进制bytes(无前导零) + U+000A(LF)，包括最后一条LF；以ASCII编码对拼接结果取SHA-256。",
+  "historical_lfs_read_check": {
+    "oid": "343e86f074747e48b63755456e69a149625c99772bc8f3d355e9fa2a18e0432b",
+    "bytes": 5864014,
+    "path": "src/main/resources/BGM/Info (1).wav",
+    "commit": "07af4170d1d05b98db61bbe00b21075283882d20",
+    "fetch_exit_code": 0,
+    "remote_verified": true,
+    "date": "2026-10-24",
+    "all_history_unique_objects": 32,
+    "current_tree_unique_objects": 31,
+    "current_tree_proof": "WF-002; not downloaded again in WF-004",
+    "new_payload_uploaded": false,
+    "known_additional_payload_download_bytes": 5864014
+  }
 }

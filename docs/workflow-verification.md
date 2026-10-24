@@ -37,7 +37,7 @@ bash tools/verify.sh --base <上次评审SHA> --full --dry-run --json
 
 Java始终调用原 `bash tools/run-gradle-safe.sh`，单worker与2GiB门槛保持。未修改进程监护/清理，不增加独立的kill/超时重试逻辑。每个入口调用串行执行套件；不要并行运行多个入口或与其他JVM/浏览器验收叠加。
 
-完整执行先检查本轮用户授权对应的 `VOCR_APPROVED_FULL_CHECK=1`，再检查DISPLAY；工具不会自行设置批准变量，不复用旧轮授权。需要时应先按AGENTS向用户申请具体完整命令；CI预授权范围留给WF-004另定。带JVM浏览器套件拒绝`VOCR_WEB_SERVER_COMMAND`覆盖，gate直接调用原`test:gate`，保留release-baseline，不接入缩减服务器。
+完整执行先检查本轮用户授权对应的 `VOCR_APPROVED_FULL_CHECK=1`，再检查DISPLAY；工具不会自行设置批准变量，不复用旧轮授权。需要时应先按AGENTS向用户申请具体完整命令；CI预授权范围及启用状态见[WF-004约定](workflow-ci.md)，未获授权不推送启用。带JVM浏览器套件拒绝`VOCR_WEB_SERVER_COMMAND`覆盖，gate直接调用原`test:gate`，保留release-baseline，不接入缩减服务器。
 
 完整路径固定为：
 
@@ -60,3 +60,5 @@ manual_gates保持not_covered：A06/A07/A08、046正式浏览器/DPI/辅助技�
 本轮具体命令、发现与最终实测集中见[19339f4复评处置](review-19339f4.md)。
 
 WF-004前置补修：无效base统一报INVALID_BASE_REF；真实Git差异为空时即使附加--paths也报NO_CHANGES_TO_VERIFY。仅显式--full允许同SHA重新验收（仍需完整授权），用于以后稳定性观察。新增跳过测试须同时修改并评审XML零skip契约，不能静默接受。远端账本聚合算法的TAB/LF定义已写入JSON，不能按空格或JSON序列化猜测。
+
+CI配置及CI辅助工具变动默认为full，包含ci-tests（事件SHA/缓存/权限/命令/失败等纯工具契约）。只有ci-tests用例本身的独立改动可在tooling层追加该套件，所需PyYAML为开发依赖，不启动JVM。
