@@ -44,7 +44,7 @@ WF-003获接受，无阻断。reviewer独立复现计划器18组路径、缺git�
 
 ## WF-004首次完整云端通过（6346c7d）
 
-[run 40076634386](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076634386) / attempt 1，2026-10-24 16:04:50—16:19:35（北京时间），真实base=f6a1679592be40d125b17ad33ca92e2c3f2e3f76、tested/head=6346c7d5f55b1a36fde12bd1d662314209f25f22。统一入口full，20个计划步骤全部passed；oracle-generate由本次java-full生成覆盖，并非跳过Java测试。没有靠重试、放宽断言或替换黄金通过。
+[run 40076634386](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076634386) / attempt 1，2026-10-24 16:04:50—16:19:35（北京时间），真实base=f6a1679592be40d125b17ad33ca92e2c3f2e3f76、tested/head=6346c7d5f55b1a36fde12bd1d662314209f25f22。统一入口full，统一验证入口的20项suite/internal校验全部passed（不是GitHub job执行步骤数）；oracle-generate由本次java-full生成覆盖，并非跳过Java测试。没有靠重试、放宽断言或替换黄金通过。
 
 | 当次云端实际执行 | 结果 |
 |---|---|

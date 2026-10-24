@@ -118,7 +118,12 @@ class WorkflowTest(unittest.TestCase):
         self.assertEqual('45', self.job['timeout-minutes'])
         self.assertEqual('true', FLOW['concurrency']['cancel-in-progress'])
         self.assertNotIn('strategy', self.job)
-        self.assertEqual('1', self.job['env']['VOCR_APPROVED_FULL_CHECK'])
+        self.assertNotIn('VOCR_APPROVED_FULL_CHECK', self.job['env'])
+        for step in self.steps:
+            if step['name'].startswith('Execute once'):
+                self.assertEqual('1', step['env']['VOCR_APPROVED_FULL_CHECK'])
+            else:
+                self.assertNotIn('VOCR_APPROVED_FULL_CHECK', step.get('env', {}))
         self.assertNotIn('pull_request_target', FLOW['on'])
         self.assertNotIn('workflow_run', FLOW['on'])
 

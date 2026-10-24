@@ -24,7 +24,7 @@ browser-export.json、完整Java、desktop-actual.json与反向浏览器交换�
 
 始终上传context、plan、tools、outcome、现有result/log、XML、失败trace及测试交换JSON，保留14天。日志路径相对run，保留hash/tail。缓存/浏览器二进制/完整724MB级FatJAR不上传；FatJAR存在性、桌面类边界、字节数与hash写入outcome。artifact名为verify-<run_id>-<attempt>。任何步骤失败仍上传已存在证据；不存在的结果不制造成功。
 
-发布此工作流会允许上述事件在临时runner自动执行确定性测试和必要Java全量/check/FatJAR；它不是本机逐轮全量授权，也不授权AI发帖、修复、合并、发布或改仓库设置。首次推送前必须由用户明确批准这个具体范围。未来变更权限/触发范围或生产发布另行批准。
+发布此工作流会允许上述事件在临时runner自动执行确定性测试和必要Java全量/check/FatJAR；VOCR_APPROVED_FULL_CHECK仅设置在Execute once step env，不在job env；其子进程仍会继承，拒绝夹具继续显式清理。它不是本机逐轮全量授权，也不授权AI发帖、修复、合并、发布或改仓库设置。首次推送前必须由用户明确批准这个具体范围。未来变更权限/触发范围或生产发布另行批准。
 
 ## 首次同步的实际范围与历史边界
 

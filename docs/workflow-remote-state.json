@@ -7,7 +7,8 @@
     "main": "616362073999cb280ef8891a8f69272541904357",
     "git_refs_pushed": true,
     "remote_settings_changed": false,
-    "workflow/baseline-input-audit": "6346c7d5f55b1a36fde12bd1d662314209f25f22"
+    "workflow/baseline-input-audit": "6346c7d5f55b1a36fde12bd1d662314209f25f22",
+    "as_of": "在6346c7d补修推送之后、9e5d17a纯归档推送之前的观察快照；不是实时分支指针。最新远端HEAD须另读GitHub。"
   },
   "writes": [
     {

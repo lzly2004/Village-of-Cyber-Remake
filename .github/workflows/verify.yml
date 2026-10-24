@@ -32,10 +32,6 @@ jobs:
       GIT_LFS_SKIP_SMUDGE: '1'
       GRADLE_USER_HOME: ${{ github.workspace }}/build/ci/gradle-home
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/build/ci/browsers
-      # Owner approved this CI scope on 2026-10-24; local full runs remain separately approved.
-      # Negative authorization fixtures explicitly clear this inherited variable.
-      # This applies only to this ephemeral CI job, never to the user's local shell.
-      VOCR_APPROVED_FULL_CHECK: '1'
     steps:
       - name: Checkout the exact event head, never a synthetic PR merge
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -134,6 +130,9 @@ jobs:
         run: bash tools/run-gradle-safe.sh testClasses
 
       - name: Execute once, same job for both exchange files and all suites
+        # Owner-approved cloud execution only; preparation and upload do not inherit it.
+        env:
+          VOCR_APPROVED_FULL_CHECK: '1'
         run: |
           if [[ "$CI_NEEDS_JAVA" == true ]]; then
             xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' python3 -B tools/ci/run.py
