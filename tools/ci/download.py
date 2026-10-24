@@ -89,12 +89,16 @@ def validate(zip_path, run, artifact, expected_head, repository):
                                         'web-client/test-results/', 'tools/test-results/')):
                     raise ValueError('UNEXPECTED_ARTIFACT_CONTENT')
                 names.append(name)
+        stored = (evidence.load_json(archive.read('build/ci/evidence.json'))
+                  if 'build/ci/evidence.json' in names else None)
+        # Absent revision identifies the original, published WF-005 assembly rule.
+        revision = stored.get('assembly_revision', 1) if stored is not None else 2
         report = evidence.assemble(archive.read, names, {'CI_EXPECTED_HEAD': expected_head,
                   'GITHUB_REPOSITORY': repository, 'GITHUB_RUN_ID': str(run['id']),
                   'GITHUB_RUN_ATTEMPT': str(run['run_attempt']),
-                  'CI_JOB_STATUS': 'success' if run['conclusion'] == 'success' else 'failure'})
-        if 'build/ci/evidence.json' in names:
-            stored = evidence.load_json(archive.read('build/ci/evidence.json'))
+                  'CI_JOB_STATUS': 'success' if run['conclusion'] == 'success' else 'failure'},
+                  assembly_revision=revision)
+        if stored is not None:
             if stored != report:
                 raise ValueError('STORED_EVIDENCE_DOES_NOT_RECOMPUTE')
         # Known WF-004 bundles without evidence.json can also be independently recomputed.

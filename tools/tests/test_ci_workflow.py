@@ -1,4 +1,9 @@
-"""Local CI contracts, event fixtures and hash/extraction failures; no JVM or network."""
+"""Local CI contracts, event fixtures and hash/extraction failures; no JVM or network.
+
+Run by script path: python3 -B tools/tests/test_ci_workflow.py.
+The ci-tests command deliberately uses this entry; -m unittest is unsupported
+because the sibling test_ci_evidence import depends on the script directory.
+"""
 import copy
 import hashlib
 import importlib.util

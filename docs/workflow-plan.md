@@ -87,3 +87,5 @@ WF-003已完成：入口用法见[统一验证入口](workflow-verification.md)�
 WF-004本地草案、两步首次同步方案与权限范围见[CI约定](workflow-ci.md)，本轮评审补修及具体验证见[复评记录](review-f2e748e.md)。首次CI的授权夹具前提补修6346c7d已通过完整云端run40076634386，WF-004完成；失败和通过证据均已归档，WF-005转READY但未实施。WEB-036仍暂停。
 
 WF-005接续：复评处置见[9e5d17a归档](review-9e5d17a.md)，证据/进度/一方下载与CR/PR契约见[证据交接](workflow-evidence.md)。本地工具与真实push CI（00dd98f/run40080861974）的证据重算、回执通过；WF-005仍DOING，仅真实PR事件待授权验证，不声称PR/fork通过；WF-006/007不提前实施。
+
+WF-005复评补修：三条P3与历史证据兼容见[2fb4edf归档](review-2fb4edf.md)；本轮仅本地工具/文档补修，真实PR仍待授权，状态不变。

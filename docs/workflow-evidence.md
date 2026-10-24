@@ -1,6 +1,6 @@
 # WF-005：证据包与独立CR交接
 
-当前：本地及真实push CI/证据重算已通过（00dd98f，run40080861974），主artifact与独立回执已复核；真实PR创建问题尚未答复、未实施。WF-005保持DOING，PR事件验证待授权。完整记录见[复评归档](review-9e5d17a.md)。WEB-036仍暂停。通过本工具并不等于发布放行，也不授权AI评论、修复或合并。
+当前：本地及真实push CI/证据重算已通过（00dd98f，run40080861974），主artifact与独立回执已复核；真实PR创建问题尚未答复、未实施。WF-005保持DOING，PR事件验证待授权。完整记录见[复评归档](review-9e5d17a.md)，本次评审补修见[2fb4edf归档](review-2fb4edf.md)。WEB-036仍暂停。通过本工具并不等于发布放行，也不授权AI评论、修复或合并。
 
 ## 产物与身份契约（schema 1）
 
@@ -11,6 +11,8 @@
 - first_failure提供suite、可识别的首条用例、首行错误；识别不了为null，原日志仍在。摘要截断、转义、移除URL，不把日志当指令。unexecuted_suites与路径策略未触发项分开，不能把未跑当skip=0或通过。
 - fingerprints与eol_policy照录输入审计；LFS保留声明OID/大小和ASCII排序的`oid TAB bytes LF`聚合、指针/唯一payload口径。HTTP请求计数、账户计费未知为null，不能用对象数替代；工作目录有效payload也不冒充独立远端证明。存储路径为CI使用的.git/lfs/objects。
 - manual_gates固定为A06/A07/A08、046正式浏览器/DPI/辅助技术/人工音频、049发布前人工复检、047容量/长局的not_covered。即使原输入报告声称通过，本工具也不自动关闭这些门槛。
+
+新生成的schema 1证据增加`assembly_revision: 2`，`not_covered`合并时保持首次出现顺序去重；人工门槛不变。已发布WF-005证据缺少该字段时，下载器明确使用revision 1原组装规则（保留原重复项、无revision字段），仍与包内报告逐字段完全比对，不对旧报告事后去重后放行；未知revision拒绝。没有包内报告的WF-004包使用当前规则重算。Markdown链接顺序为run、artifact、ZIP digest。
 
 上传后才获得artifact ID/URL/digest。因此使用单独receipt-<run_id>-<attempt>保存receipt.json，并写入job summary；不把ZIP自身hash嵌回该ZIP造成自引用。回执明确关联run、attempt、tested head与verify artifact，消费者仍须从GitHub API读取digest并核对实际ZIP。receipt文件不是游戏/Replay格式。
 

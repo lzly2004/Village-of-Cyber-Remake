@@ -130,8 +130,11 @@ def xml_counts(read, names):
             'xml_files': len(names), 'source': 'build/test-results/test/TEST-*.xml'}, failure
 
 
-def assemble(read, names, environment):
+def assemble(read, names, environment, *, assembly_revision=2):
     """read(names) can be filesystem or a bounded ZIP reader; no extraction/execution."""
+    # Revision 1 reproduces published WF-005 reports field-for-field, duplicates included.
+    if type(assembly_revision) is not int or assembly_revision not in (1, 2):
+        raise ValueError("UNSUPPORTED_ASSEMBLY_REVISION")
     names = set(map(safe_path, names))
     files = {}
     def get(name):
@@ -158,6 +161,8 @@ def assemble(read, names, environment):
               'not_covered': ['real PR/fork event unless separately evidenced', 'release approval',
                               'physical output/listening/DPI', 'capacity/long game'],
               'files': files, 'first_failure': None, 'fat_jar': (outcome or {}).get('fat_jar')}
+    if assembly_revision == 2:
+        report['assembly_revision'] = 2
     repo, run = report['ci']['repository'], report['ci']['run_id']
     if repo and re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repo) and run and str(run).isdigit():
         report['ci']['run_url'] = 'https://github.com/' + repo + '/actions/runs/' + str(run)
@@ -196,6 +201,8 @@ def assemble(read, names, environment):
     report.update({'tested_sha': result['tested_sha'], 'plan': result['plan'], 'eol_policy': result.get('eol_policy'),
                    'fingerprints': result.get('input_audit', {}).get('fingerprints'),
                    'lfs': result.get('input_audit', {}).get('lfs'), 'not_covered': report['not_covered'] + result.get('not_covered', [])})
+    if assembly_revision == 2:
+        report['not_covered'] = list(dict.fromkeys(report['not_covered']))
     planned = [s['id'] for s in result['plan']['suites']]
     actual = [s['id'] for s in result.get('suites', [])]
     if actual != planned[:len(actual)] or len(actual) != len(set(actual)):
@@ -262,11 +269,12 @@ def markdown(report):
     ci = report.get('ci') or {}
     repo, run = ci.get('repository'), ci.get('run_id')
     if repo and re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+',repo) and run and str(run).isdigit():
-        lines[6:6] = ['[GitHub run](https://github.com/'+repo+'/actions/runs/'+str(run)+')', '']
+        links = ['[GitHub run](https://github.com/'+repo+'/actions/runs/'+str(run)+')', '']
         proof = report.get('download_proof') or {}
         if type(proof.get('artifact_id')) is int:
-            lines[6:6] = ['[Evidence artifact](https://github.com/'+repo+'/actions/runs/'+str(run)+'/artifacts/'+str(proof['artifact_id'])+')',
+            links += ['[Evidence artifact](https://github.com/'+repo+'/actions/runs/'+str(run)+'/artifacts/'+str(proof['artifact_id'])+')',
                           'ZIP digest: `'+md(proof.get('artifact_digest'))+'`', '']
+        lines[6:6] = links
     for s in report['suites']:
         c = s['counts']
         lines.append('| ' + ' | '.join(map(md, [s['id'], s['status'], str(c['tests'])+'; '+', '.join(k+'='+str(c[k]) for k in ('passed','failures','errors','skipped','cancelled','flaky','interrupted') if k in c) if c else 'unknown/not a test suite',

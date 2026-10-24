@@ -57,6 +57,21 @@ class EvidenceTest(Fixture, unittest.TestCase):
         self.assertTrue(all(x=='not_covered' for x in r['manual_gates'].values()))
         self.assertEqual(HEAD,r['tested_sha']);self.assertEqual('gate',r['policy_skipped_suites'][0]['id'])
 
+    def test_not_covered_deduplicates_without_reordering_or_closing_gates(self):
+        self.result['not_covered']=['release approval','extra check','release approval','capacity/long game','last check'];self.sync()
+        r=self.report()
+        self.assertEqual(2,r['assembly_revision'])
+        self.assertEqual(['real PR/fork event unless separately evidenced','release approval',
+                          'physical output/listening/DPI','capacity/long game','extra check','last check'],r['not_covered'])
+        self.assertTrue(all(x=='not_covered' for x in r['manual_gates'].values()))
+
+    def test_markdown_links_are_run_then_artifact_then_digest_before_suites(self):
+        r=self.report();r['download_proof']={'artifact_id':7,'artifact_digest':'sha256:fixture'}
+        s=E.markdown(r)
+        self.assertLess(s.index('[GitHub run]'),s.index('[Evidence artifact]'))
+        self.assertLess(s.index('[Evidence artifact]'),s.index('ZIP digest:'))
+        self.assertLess(s.index('ZIP digest:'),s.index('| Suite |'))
+
     def test_unittest_playwright_and_tap_failure_counts_and_case_detail(self):
         self.assertEqual({'tests':3,'passed':1,'failures':1,'errors':0,'skipped':1,'source':'python-unittest-log'},E.counts('Ran 3 tests in 0.1s\n\nFAILED (failures=1, skipped=1)\n'))
         self.assertEqual(2,E.counts('  2 passed (1.0s)\n  1 skipped\n')['passed'])
@@ -168,6 +183,25 @@ class DownloadTest(Fixture, unittest.TestCase):
             self.assertIn('https://github.com/owner/repo/actions/runs/123/artifacts/7',E.markdown(value))
             self.assertIn(a['digest'],E.markdown(value))
             self.assertEqual([p],list(Path(t).iterdir()))
+
+    def test_legacy_report_recomputes_exactly_and_revision_or_content_tampering_fails(self):
+        self.result['not_covered']=['release approval','release approval'];self.sync()
+        legacy=E.assemble(self.files.__getitem__,self.files,ENV,assembly_revision=1)
+        self.assertNotIn('assembly_revision',legacy)
+        self.assertEqual(3,legacy['not_covered'].count('release approval'))
+        with tempfile.TemporaryDirectory() as t:
+            self.files['build/ci/evidence.json']=json.dumps(legacy).encode()
+            p,r,a=self.proof(t);value=D.validate(p,r,a,HEAD,'owner/repo')
+            value.pop('download_proof');self.assertEqual(legacy,value)
+            for revision in [0,3,True,None]:
+                self.files['build/ci/evidence.json']=json.dumps({**legacy,'assembly_revision':revision}).encode()
+                p,r,a=self.proof(t)
+                with self.subTest(revision=revision),self.assertRaisesRegex(ValueError,'UNSUPPORTED_ASSEMBLY_REVISION'):
+                    D.validate(p,r,a,HEAD,'owner/repo')
+            for changed in [{**legacy,'status':'failed'},{**legacy,'not_covered':['release approval']},
+                            {**legacy,'assembly_revision':2}]:
+                self.files['build/ci/evidence.json']=json.dumps(changed).encode();p,r,a=self.proof(t)
+                with self.assertRaisesRegex(ValueError,'DOES_NOT_RECOMPUTE'):D.validate(p,r,a,HEAD,'owner/repo')
 
     def test_wrong_attempt_run_head_digest_size_expiry_or_stored_report_refused(self):
         with tempfile.TemporaryDirectory() as t:
