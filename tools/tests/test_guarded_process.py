@@ -166,6 +166,8 @@ class IsolatedProcessTest(unittest.TestCase):
     def test_shell_entry_with_noop_command_releases_lock_and_preserves_sibling(self):
         with tempfile.TemporaryDirectory(prefix="vocr-guard-test-") as directory:
             env = dict(os.environ, VOCR_GRADLE="/bin/true", XDG_RUNTIME_DIR=directory)
+            # The rejection fixture must not inherit the CI job's approved full scope.
+            env.pop("VOCR_APPROVED_FULL_CHECK", None)
             for _ in range(2):
                 result = subprocess.run(["bash", str(TOOLS / "run-gradle-safe.sh"), "test", "--tests", "fake"],
                                         env=env, capture_output=True, text=True, timeout=6)
@@ -174,6 +176,11 @@ class IsolatedProcessTest(unittest.TestCase):
             rejected = subprocess.run(["bash", str(TOOLS / "run-gradle-safe.sh"), "test"],
                                       env=env, capture_output=True, text=True, timeout=6)
             self.assertEqual(64, rejected.returncode)
+            approved = dict(env, VOCR_APPROVED_FULL_CHECK="1")
+            accepted = subprocess.run(["bash", str(TOOLS / "run-gradle-safe.sh"), "test"],
+                                      env=approved, capture_output=True, text=True, timeout=6)
+            self.assertEqual(0, accepted.returncode, accepted.stderr)
+            self.assertIsNone(self.sentinel.poll())
 
 
 if __name__ == "__main__":

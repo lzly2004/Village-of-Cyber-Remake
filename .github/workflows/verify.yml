@@ -32,7 +32,8 @@ jobs:
       GIT_LFS_SKIP_SMUDGE: '1'
       GRADLE_USER_HOME: ${{ github.workspace }}/build/ci/gradle-home
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/build/ci/browsers
-      # Initial publication requires explicit owner approval of this CI authorization scope.
+      # Owner approved this CI scope on 2026-10-24; local full runs remain separately approved.
+      # Negative authorization fixtures explicitly clear this inherited variable.
       # This applies only to this ephemeral CI job, never to the user's local shell.
       VOCR_APPROVED_FULL_CHECK: '1'
     steps:

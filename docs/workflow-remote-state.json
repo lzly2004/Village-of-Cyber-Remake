@@ -5,8 +5,9 @@
   "time_precision": "date; exact upload timestamp not retained",
   "git_refs": {
     "main": "616362073999cb280ef8891a8f69272541904357",
-    "git_refs_pushed": false,
-    "remote_settings_changed": false
+    "git_refs_pushed": true,
+    "remote_settings_changed": false,
+    "workflow/baseline-input-audit": "f6a1679592be40d125b17ad33ca92e2c3f2e3f76"
   },
   "writes": [
     {
@@ -101,6 +102,22 @@
       "upload_log_tail": "Uploading LFS objects: 100% (20/20), 584 MB | 14 MB/s, done.",
       "first_attempt": "SSH host verification failed; 0/20 objects sent",
       "success": true
+    },
+    {
+      "kind": "preparation branch bootstrap and fast-forward",
+      "authorization": "2026-10-24 用户明确回复：授权两步推送并启用该CI",
+      "ref": "refs/heads/workflow/baseline-input-audit",
+      "bootstrap_sha": "f2e748eb0ad048803bc3f2f2d6623835632ffe04",
+      "head_sha": "f6a1679592be40d125b17ad33ca92e2c3f2e3f76",
+      "push_exit_codes": [
+        0,
+        0
+      ],
+      "main_changed": false,
+      "settings_changed": false,
+      "secrets_changed": false,
+      "pull_request_created": false,
+      "lfs_note": "pre-push显示20/20、584MB、0B/s；不据此宣称本轮重传584MB，实际新上传字节未单独采集。全部历史32个对象此前已核对远端存在。"
     }
   ],
   "remote_proof": {
@@ -267,5 +284,18 @@
     "current_tree_proof": "WF-002; not downloaded again in WF-004",
     "new_payload_uploaded": false,
     "known_additional_payload_download_bytes": 5864014
+  },
+  "ci_first_run": {
+    "run_id": 40076072948,
+    "head_sha": "f6a1679592be40d125b17ad33ca92e2c3f2e3f76",
+    "base_sha": "f2e748eb0ad048803bc3f2f2d6623835632ffe04",
+    "conclusion": "failure",
+    "first_failure": "guarded-tests: inherited approval invalidated rejection fixture",
+    "artifact_id": 12552864540,
+    "artifact_zip_sha256": "2b1c27b341e98e350dee5758f468743c8d618167cc310615e4072c16d3aca916",
+    "lfs_step_conclusion": "success",
+    "input_audit_payloads_valid": 31,
+    "raw_job_log_download": "403: not independently obtained",
+    "complete_java_package_gate_executed": false
   }
 }

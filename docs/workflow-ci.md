@@ -1,6 +1,6 @@
 # WF-004：确定性CI最小闭环
 
-当前状态：本地配置与契约验证完成，远端推送/启用/完整CI尚待用户明确授权。不是云端通过，也没有改main、远端设置、secret或启用AI评论/修复。WEB-036仍暂停。
+当前状态：用户于2026-10-24明确回复“授权两步推送并启用该CI”。两次准备分支推送已成功，首次完整CI在安全测试夹具的授权环境前提处失败，补修已完成本地验证，待确认推送后云端复验；未记为云端通过。没有改main、远端设置、secret或启用AI评论/修复。WEB-036仍暂停。
 
 ## 触发、身份和执行
 
@@ -30,10 +30,10 @@ browser-export.json、完整Java、desktop-actual.json与反向浏览器交换�
 
 2026-10-24只读核对：远端main仍616362073999cb280ef8891a8f69272541904357，准备分支workflow/baseline-input-audit不存在。本地b38da1e时有159个未推送提交。直接新分支一次性推送会把CI base设为旧main；该长区间存在历史尾随空白，严格diff-check会首先拒绝，不能用CI搭建偷偷改生产Java或放宽门槛。
 
-拟申请的具体方案（**尚未执行**）：
+已获授权并执行的首次同步：
 
-1. 把最近已接受的f2e748eb0ad048803bc3f2f2d6623835632ffe04推为同名准备分支，建立已评审基线；该提交不含.github工作流，不会启动本配置。
-2. 再快进推送本轮CI最终提交（包含独立补修b38da1e），由真实push.before=f2e748e触发完整CI。本轮范围包含.github，因此按full执行，不会因只比较准备阶段而缩减首次完整套件。
+1. 已把最近已接受的f2e748eb0ad048803bc3f2f2d6623835632ffe04推为同名准备分支，建立已评审基线；该提交不含.github工作流，不会启动本配置。
+2. 已快进推送本轮CI提交f6a1679592be40d125b17ad33ca92e2c3f2e3f76（包含独立补修b38da1e），由真实push.before=f2e748e触发完整CI。本轮范围包含.github，因此按full执行，不会因只比较准备阶段而缩减首次完整套件。
 3. 不创建PR、不合并、不更新main或master。未来向仍旧的main提PR会按真实PR base检测出历史空白；届时需另行授权处理或决定主线同步，不能伪造PR base。这项历史问题保留为后续主线整合前置，不影响本次准备分支CI机制验证。
 
 已读核对全部历史32个唯一LFS身份：当前31个使用WF-002的远端证明，额外历史Info (1).wav对象343e86f0…432b（5864014字节）本轮从空目录远端实际下载核对。没有补传新对象；当前31与历史额外1的口径分开，详见远端账本。推送时仍需核对目标分支未被他人创建/更新，并只做快进，不force；原137项工作区差异不进提交。
@@ -41,3 +41,5 @@ browser-export.json、完整Java、desktop-actual.json与反向浏览器交换�
 官方语义与接口核对来源：[Actions触发](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)、[缓存作用域](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching)、[setup-java固定版本](https://github.com/actions/setup-java/tree/b843ebf9b913146b38da2eaa7aeddf76074ae1ad)、[setup-node固定版本](https://github.com/actions/setup-node/tree/949feb2413d6458794dcd2491c4babbbce0c15c1)。Action tag仅作说明，执行依据完整SHA。
 
 本轮具体本地验证与外部执行状态集中见[复评处置](review-f2e748e.md)。A06/A07/A08、046/049人工和047容量门槛均未放行。
+
+首次云端运行：[40076072948](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076072948)，event=push，head=f6a1679；结论为failure：diff-check通过，安全测试14/15，其他套件尚未执行；补修与实际验证见复评记录。用户授权涵盖本配置所列事件下临时runner的自动完整验收/打包与所需依赖安装，不复用为本机全量授权。

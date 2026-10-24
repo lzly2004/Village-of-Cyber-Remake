@@ -29,3 +29,15 @@ WF-003获接受，无阻断。reviewer独立复现计划器18组路径、缺git�
 - 远端只读：准备分支不存在，main仍6163620；历史额外LFS对象5864014字节从空目录实际下载并核对，32个历史唯一身份与当前31分开记录。新增对象上传0，Git refs推送0。
 
 源码日志：build/wf004；候选dry-run与缺授权负例：隔离树build/wf004。Java/frozen/input指纹与已审基线一致，政策因新增CI工具改变；不声称候选整提交等于最终含文档提交。完成状态保持WF-004 DOING，只有具体推送/CI授权与实际云端结果具备后才转DONE。
+
+## 获准推送与首次云端失败（2026-10-24）
+
+用户明确回复“授权两步推送并启用该CI”；f2e748e建准备分支、f6a1679快进均exit 0，main未变。授权包括该配置所列事件下GitHub临时runner的完整验收/打包与依赖安装，不是本机全量授权。
+
+首次[run 40076072948](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076072948)，真实base=f2e748e、head=f6a1679、full。工具链、LFS fetch/checkout/fsck、npm ci、正式dry-run、Chromium/Xvfb/字体安装及testClasses预热均成功；实际执行diff-check通过，guarded-tests为14/15，随后按fail-closed停止，其他套件与完整Java/FatJAR/gate尚未执行。不能把job环境准备成功称为全量通过。
+
+原因为拒绝路径夹具继承了job的VOCR_APPROVED_FULL_CHECK=1，却断言无授权时exit 64，实际0。本机使用/bin/true夹具、同授权环境反向复现1/1失败；修正测试env显式移除继承授权，同时新增同夹具显式批准后exit 0及外部哨兵存活断言。无生产安全入口/监护逻辑、内存门槛或游戏改动。修后带继承授权的完整隔离监护回归15/15（6.569s）、CI契约24/24（0.025s）、actionlint通过。本机未启动JVM或全量验收。
+
+公开REST日志下载403（需更高认证），未读取/提取用户浏览器凭据。通过nightly.link下载公开artifact，只作为入站数据；ZIP SHA256与GitHub artifact API公布的2b1c27b341e98e350dee5758f468743c8d618167cc310615e4072c16d3aca916一致。artifact verify-40076072948-1（ID12552864540，14天）；原包/元数据保存build/wf004。已读取context/tools/result/失败日志，未运行其中代码。新runner输入审计确认干净LF树、225 Java/9冻结/1979输入指纹与候选相同、32指针/31唯一LFS payload全部长度与SHA有效；不把审计里的remote_verified=false改写为该工具完成了远端逐对象证明。GitHub步骤结果仅证明该次fetch/fsck命令成功。
+
+该补修尚未推送。此前批准的两次具体SHA推送已执行完毕，新提交需另行确认推送范围后才触发云端复验。WF-004保持DOING；WF-005与WEB-036均未开始。

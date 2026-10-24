@@ -78,10 +78,10 @@ WF-002已完成：干净LF检出与真实远端LFS证明、工具链、完整桌
 
 权威验证树为干净LF检出，ref/worktree原始字节及Java指纹必须相等；不为方便添加脏树执行例外。入口由实际Git提交差异确定最低分级，--paths仅可增加触发，未知路径全量。只读dry-run显示计划和跳过理由，不代表套件通过。
 
-远端状态账本见[OID/字节与授权记录](workflow-remote-state.json)：WF-002仅补传20个对象，Git refs未推送。WF-004第一次推refs前核对该集合和授权分支/提交范围，按缺失OID补传而非重传整包；推送后需fresh clone/fetch/fsck佐证。账本估算不是账户计费或剩余额度。
+远端状态账本见[OID/字节与授权记录](workflow-remote-state.json)：WF-002仅补传20个对象；WF-004按2026-10-24明确授权已完成两次准备分支推送，main未改。云端新检出已执行LFS fetch/fsck并通过输入校验；具体证据及无法独立读取的日志边界见复评记录。账本估算不是账户计费或剩余额度。
 
 WF-005证据须保留排序OID/大小列表或聚合hash、fetch HTTP状态计数（未采集则null，不能以对象数冒充请求数）、fsck摘要、storage相对路径；日志用run相对路径+artifact名、保留hash/tail。发布产物一律记录干净LF检出的eol_policy、tested SHA；Java数量直接来源当次XML，并记录失败/错误/跳过。未覆盖人工门槛不得因自动化全绿关闭。WF-003先复用审计JSON和最小结果记录，不宣称已交付完整CI证据平台。
 
-WF-003已完成：入口用法见[统一验证入口](workflow-verification.md)，本轮具体验证/失败处置见[19339f4复评](review-19339f4.md)。WF-004现已接续准备本地CI配置；Actions、分支推送和CI全量预授权仍须在具体方案中另获授权。
+WF-003已完成：入口用法见[统一验证入口](workflow-verification.md)，本轮具体验证/失败处置见[19339f4复评](review-19339f4.md)。WF-004已获具体两步推送及CI临时runner全量预授权并执行首次CI；本机全量仍逐轮申请。
 
-WF-004本地草案、两步首次同步方案与权限范围见[CI约定](workflow-ci.md)，本轮评审补修及具体验证见[复评记录](review-f2e748e.md)。远端未授权/未执行前保持DOING，不将本地契约测试标为云端通过；WEB-036仍暂停。
+WF-004本地草案、两步首次同步方案与权限范围见[CI约定](workflow-ci.md)，本轮评审补修及具体验证见[复评记录](review-f2e748e.md)。首次CI在授权拒绝测试的环境前提处失败，补修本地已验证，待确认补修推送后云端复验；保持DOING，不将本地契约测试标为云端通过。WEB-036仍暂停。
