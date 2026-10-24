@@ -9,7 +9,12 @@ const fileInput=page=>library(page).getByLabel('録画ファイルを選ぶ')
 const preview=page=>library(page).getByRole('group',{name:'取り込みの確認（未保存）'})
 async function open(page){await page.goto('/');await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click()}
 async function upload(page,buffer){await fileInput(page).setInputFiles({name:'recording.json',mimeType:'application/json',buffer:Buffer.from(buffer)})}
-async function selectAll(page){const checks=preview(page).getByRole('checkbox');for(let i=0;i<await checks.count();i++)await checks.nth(i).check()}
+async function selectAll(page,expected){
+  const checks=preview(page).getByRole('checkbox')
+  await expect(checks).toHaveCount(expected)
+  for(let i=0;i<expected;i++)await checks.nth(i).check()
+  await expect(preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true})).toBeEnabled()
+}
 async function submit(page){await preview(page).getByRole('checkbox').first().check();await preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click()}
 async function imported(page,expected){
   // Existing-count/duplicate imports also need completion, not only a matching old row count.
@@ -67,13 +72,13 @@ test('legacy versions migrate only known defaults, preserve unknown ordinary fie
 test('multi-slot import is atomic under capacity failure and deduplicates within a successful batch without overwriting',async({page})=>{
   await open(page)
   const duplicated=structuredClone(fixture);duplicated[8]=structuredClone(duplicated[0]);duplicated[8].slotIndex=8
-  await upload(page,JSON.stringify(duplicated));await selectAll(page);await preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click();await expect(entries(page)).toHaveCount(1);await expect(library(page)).toContainText('重複1局')
+  await upload(page,JSON.stringify(duplicated));await selectAll(page,2);await preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click();await expect(entries(page)).toHaveCount(1);await expect(library(page)).toContainText('重複1局')
   await entries(page).getByRole('button',{name:'削除',exact:true}).click();await entries(page).getByRole('button',{name:'削除を確定',exact:true}).click();await expect(entries(page)).toHaveCount(0)
   const full=Array.from({length:9},(_,i)=>{const r=structuredClone(fixture[0]);r.slotIndex=i;r.rawRecords=[`unique:${i}`,...r.rawRecords];r.totalEvents=r.rawRecords.length;return r})
-  await upload(page,JSON.stringify(full));await selectAll(page);await preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click();await expect(entries(page)).toHaveCount(9)
+  await upload(page,JSON.stringify(full));await selectAll(page,9);await preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click();await expect(entries(page)).toHaveCount(9)
   const before=await raw(page),more=structuredClone(fixture);more[0].rawRecords.unshift('not-in-library');more[0].totalEvents++
   more[1]=structuredClone(full[0]);more[1].slotIndex=1
-  await upload(page,JSON.stringify(more));await selectAll(page);await preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click()
+  await upload(page,JSON.stringify(more));await selectAll(page,2);await preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click()
   await expect(library(page).getByRole('alert')).toContainText('LIBRARY_FULL');expect(await raw(page)).toEqual(before)
 })
 
@@ -123,11 +128,35 @@ test('import completion waits for a controlled pending digest before reading com
     }
   })
   await upload(page,desktop);await submit(page)
-  await page.waitForFunction(()=>typeof globalThis.releaseImportDigest==='function')
+  await page.waitForFunction(()=>typeof globalThis.releaseImportDigest==='function',null,{timeout:5000})
   await expect(preview(page)).toBeVisible()
   await expect(preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true})).toBeDisabled()
   expect(await raw(page)).toEqual([])
   await page.evaluate(()=>globalThis.releaseImportDigest())
   await imported(page,1)
   expect((await raw(page))[0].replay).toEqual(JSON.parse(desktop)[0])
+})
+
+
+test('multi-slot selection waits for controlled file parsing before counting and checking candidates',async({page})=>{
+  await open(page)
+  await page.evaluate(()=>{
+    const original=File.prototype.arrayBuffer
+    File.prototype.arrayBuffer=function(...args){
+      File.prototype.arrayBuffer=original
+      return new Promise(resolve=>{globalThis.releaseCandidateRead=()=>resolve(original.apply(this,args))})
+    }
+  })
+  const duplicated=structuredClone(fixture);duplicated[8]=structuredClone(duplicated[0]);duplicated[8].slotIndex=8
+  await upload(page,JSON.stringify(duplicated))
+  await page.waitForFunction(()=>typeof globalThis.releaseCandidateRead==='function',null,{timeout:5000})
+  await expect(preview(page)).toHaveCount(0)
+  const selecting=selectAll(page,2)
+  await page.evaluate(()=>globalThis.releaseCandidateRead())
+  await selecting
+  const checks=preview(page).getByRole('checkbox')
+  await expect(checks).toHaveCount(2)
+  await expect(checks.nth(0)).toBeChecked();await expect(checks.nth(1)).toBeChecked()
+  await preview(page).getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click()
+  await imported(page,1);await expect(library(page)).toContainText('重複1局')
 })
