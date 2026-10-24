@@ -45,3 +45,5 @@ browser-export.json、完整Java、desktop-actual.json与反向浏览器交换�
 首次云端运行：[40076072948](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076072948)，event=push，head=f6a1679；结论为failure：diff-check通过，安全测试14/15，其他套件尚未执行；补修与实际验证见复评记录。用户授权涵盖本配置所列事件下临时runner的自动完整验收/打包与所需依赖安装，不复用为本机全量授权。
 
 完整云端通过：[run 40076634386](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076634386)，base=f6a1679、tested/head=6346c7d。20步验证链通过，Java617/617、默认浏览器136/136、gate15/15、真实文件交换与打包均完成。失败及完整数量/工具/产物哈希集中见[复评归档](review-f2e748e.md)，后续纯文档提交不重复记作全量运行。PR事件仍只有夹具验证，未创建真实PR。
+
+WF-005在同job验证后新增独立证据摘要、逐suite进度和上传后回执，原result与双向交换前提不变；实施/真实云端与PR验证状态及读取方法见[证据交接](workflow-evidence.md)。

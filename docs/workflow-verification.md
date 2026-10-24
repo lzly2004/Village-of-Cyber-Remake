@@ -51,7 +51,7 @@ Java始终调用原 `bash tools/run-gradle-safe.sh`，单worker与2GiB门槛保�
 
 ## 结果与失败
 
-正常执行仅在Git忽略且不越界的`build/verify/<UTC时间>-<随机ID>/`写日志和result.json。`--json`的stdout为最终JSON，子命令输出进入各suite日志；log是run相对路径，含hash/tail、exit_code和耗时。XML有明确来源；其他套件此阶段只记录进程退出状态，不虚构测试数量。WF-005再统一解析数量、关联CI artifact/run并打包证据。
+正常执行仅在Git忽略且不越界的`build/verify/<UTC时间>-<随机ID>/`写日志和result.json。`--json`的stdout为最终JSON，子命令输出进入各suite日志；log是run相对路径，含hash/tail、exit_code和耗时。XML有明确来源；其他套件此阶段只记录进程退出状态，不虚构测试数量。WF-005以独立evidence.json解析数量、关联CI artifact/run，不改变本result格式；契约与状态见[证据交接](workflow-evidence.md)。
 
 返回0：执行的所选套件与最终审计通过，或dry-run的准入/计划成功（`status=planned`，不代表测试通过）。返回1：套件或最终输入审计失败；首个失败进`first_failure`并立即停止，后续不执行、不自动重试。返回2：准入/参数/授权/工具问题，stderr为JSON，不创建运行目录。缺git保留TOOL_MISSING诊断。正常中断仍须按AGENTS检查本次工具链退出状态，不能把超时/中断计作通过。
 

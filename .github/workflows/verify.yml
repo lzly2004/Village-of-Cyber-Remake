@@ -140,7 +140,15 @@ jobs:
             python3 -B tools/ci/run.py
           fi
 
+      - name: Assemble evidence and failure summary without running tests
+        if: always()
+        env:
+          CI_JOB_STATUS: ${{ job.status }}
+          CI_EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python3 -B tools/ci/evidence.py
+
       - name: Upload existing verification evidence even on failure
+        id: evidence_upload
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -155,8 +163,29 @@ jobs:
             build/ci/verify.stdout
             build/ci/verify.stderr
             build/ci/outcome.json
+            build/ci/evidence.json
+            build/ci/summary.md
             build/verify/**
             build/test-results/test/**
             build/web035/*.json
             web-client/test-results/**
             tools/test-results/**
+
+      - name: Record the uploaded artifact identity and digest
+        id: receipt
+        if: ${{ always() && steps.evidence_upload.outputs.artifact-id != '' }}
+        env:
+          CI_EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          CI_ARTIFACT_ID: ${{ steps.evidence_upload.outputs.artifact-id }}
+          CI_ARTIFACT_URL: ${{ steps.evidence_upload.outputs.artifact-url }}
+          CI_ARTIFACT_DIGEST: ${{ steps.evidence_upload.outputs.artifact-digest }}
+        run: python3 -B tools/ci/evidence.py --receipt
+
+      - name: Preserve the separate post-upload receipt
+        if: ${{ always() && steps.receipt.outcome == 'success' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: error
+          path: build/ci/receipt.json

@@ -193,6 +193,9 @@ def execute(argv, root, env, log):
 
 def run_suites(root, result, directory, runner=execute, env=None):
     env = dict(os.environ if env is None else env)
+    def progress(event, **values):
+        if env.get('VOCR_VERIFY_PROGRESS') == '1':
+            print(json.dumps({'event': event, **values}), file=sys.stderr, flush=True)
     start = time.time_ns()
     result['suites'] = []
     result['status'] = 'running'
@@ -203,6 +206,8 @@ def run_suites(root, result, directory, runner=execute, env=None):
         name = suite['id']
         entry = {'id': name, 'status': 'running'}
         result['suites'].append(entry)
+        save()
+        progress('suite_started', suite=name)
         tick = time.monotonic()
         try:
             if name == 'oracle-audit':
@@ -237,9 +242,11 @@ def run_suites(root, result, directory, runner=execute, env=None):
             result['status'], result['first_failure'] = 'failed', {'suite': name, 'reason': str(error)}
             entry['seconds'] = round(time.monotonic() - tick, 3)
             save()
+            progress('suite_finished', suite=name, status=entry['status'], seconds=entry['seconds'])
             return 1
         entry['seconds'] = round(time.monotonic() - tick, 3)
         save()
+        progress('suite_finished', suite=name, status=entry['status'], seconds=entry['seconds'])
     # Catch writes/input changes and HEAD drift even if all child exit codes were zero.
     try:
         final = inventory(root, 'HEAD')
@@ -251,6 +258,7 @@ def run_suites(root, result, directory, runner=execute, env=None):
     except (Refused, OSError, ValueError, subprocess.SubprocessError) as error:
         result['status'], result['first_failure'] = 'failed', {'suite': 'final-input-audit', 'reason': str(error)}
     save()
+    progress('verification_finished', status=result['status'])
     return 0 if result['status'] == 'passed' else 1
 
 

@@ -66,7 +66,8 @@
     },
     {
       "patterns": [
-        "tools/tests/test_ci_workflow.py"
+        "tools/tests/test_ci_workflow.py",
+        "tools/tests/test_ci_evidence.py"
       ],
       "tier": "tooling",
       "extra": [

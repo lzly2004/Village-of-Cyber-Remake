@@ -1,5 +1,7 @@
 """Planner/gate fixtures. No ffmpeg, JVM, browser, network or global config needed."""
 import copy
+import contextlib
+import io
 import hashlib
 import importlib.util
 import json
@@ -79,6 +81,31 @@ class VerifyTest(unittest.TestCase):
         for name in VERIFY.AUDIT.ORACLE_FILES:
             (directory / name).write_text(json.dumps({'sourceFingerprint': value}))
         return directory
+
+    def test_opt_in_progress_is_stderr_json_and_running_entry_is_saved_before_child(self):
+        directory = self.root / 'build/progress'
+        directory.mkdir(parents=True)
+        result = self.result(['diff-check'])
+        def execute(argv, root, env, log):
+            running = json.loads((directory/'result.json').read_text())
+            self.assertEqual('running', running['suites'][0]['status'])
+            return 0
+        with contextlib.redirect_stderr(io.StringIO()) as err, contextlib.redirect_stdout(io.StringIO()) as out:
+            code = VERIFY.run_suites(self.root, result, directory, runner=execute, env={'VOCR_VERIFY_PROGRESS':'1'})
+        self.assertEqual(0, code)
+        self.assertEqual('', out.getvalue())
+        self.assertEqual(['suite_started','suite_finished','verification_finished'], [json.loads(s)['event'] for s in err.getvalue().splitlines()])
+
+    def test_progress_failure_does_not_start_later_suite(self):
+        directory = self.root/'build/progress-failure'
+        directory.mkdir(parents=True)
+        result = self.result(['diff-check','frontend-unit'])
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            code = VERIFY.run_suites(self.root,result,directory,runner=lambda *args:1,env={'VOCR_VERIFY_PROGRESS':'1'})
+        self.assertEqual(1,code)
+        events=[json.loads(s) for s in err.getvalue().splitlines()]
+        self.assertEqual(2,len(events));self.assertEqual('failed',events[-1]['status'])
+        self.assertEqual(1,len(result['suites']))
 
     def test_document_only_real_wrapper_executes_diff_and_emits_reusable_audit(self):
         self.write('docs/guide.md', b'Updated\n')

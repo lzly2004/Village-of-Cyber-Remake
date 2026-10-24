@@ -37,6 +37,16 @@ def jar_report(file):
     return {'path': file.relative_to(ROOT).as_posix(), 'bytes': file.stat().st_size, 'sha256': digest(file)}
 
 
+def execute(argv, cwd, stdout, stderr):
+    """Stream only verifier stderr/progress; suite output stays in its original log."""
+    with subprocess.Popen(argv, cwd=cwd, stdout=stdout, stderr=subprocess.PIPE,
+                          env={**os.environ, 'VOCR_VERIFY_PROGRESS': '1'}) as process:
+        for line in iter(process.stderr.readline, b''):
+            stderr.write(line); stderr.flush()
+            print(line.decode('utf-8', errors='replace').rstrip(), file=sys.stderr, flush=True)
+        return subprocess.CompletedProcess(argv, process.wait())
+
+
 def main():
     directory = ROOT / 'build/ci'
     outcome = {'schema': 1, 'status': 'failed', 'run_id': os.environ.get('GITHUB_RUN_ID'),
@@ -52,7 +62,7 @@ def main():
         if context['force_full']:
             argv.append('--full')
         with (directory / 'verify.stdout').open('wb') as out, (directory / 'verify.stderr').open('wb') as err:
-            code = subprocess.run(argv, cwd=ROOT, stdout=out, stderr=err).returncode
+            code = execute(argv, cwd=ROOT, stdout=out, stderr=err).returncode
         outcome['verification_exit_code'] = code
         if code:
             raise ValueError('VERIFICATION_FAILED: see verify.stdout/stderr and first_failure in result.json')

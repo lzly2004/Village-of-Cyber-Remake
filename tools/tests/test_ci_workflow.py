@@ -3,6 +3,7 @@ import copy
 import hashlib
 import importlib.util
 import io
+import sys
 import json
 from pathlib import Path
 import subprocess
@@ -184,6 +185,21 @@ class WorkflowTest(unittest.TestCase):
         self.assertNotIn('build/libs', paths)
         self.assertEqual('14', s['with']['retention-days'])
 
+    def test_evidence_before_upload_and_separate_receipt_after_upload(self):
+        names=[s['name'] for s in self.steps]
+        report=self.step('Assemble evidence')
+        upload=self.step('Upload existing')
+        receipt=self.step('Record the uploaded')
+        preserve=self.step('Preserve the separate')
+        self.assertEqual('always()',report['if'])
+        self.assertEqual('evidence_upload',upload['id'])
+        self.assertLess(names.index(report['name']),names.index(upload['name']))
+        self.assertLess(names.index(upload['name']),names.index(receipt['name']))
+        self.assertIn('outputs.artifact-digest',receipt['env']['CI_ARTIFACT_DIGEST'])
+        self.assertNotIn('receipt.json',upload['with']['path'])
+        self.assertEqual('build/ci/receipt.json',preserve['with']['path'])
+        self.assertEqual('14',preserve['with']['retention-days'])
+
     def test_requirements_are_exact_hash_locked_ci_only_wheels(self):
         lines = (ROOT / 'tools/ci/requirements-linux-x64.txt').read_text().splitlines()
         requirements = [x for x in lines if x and not x.startswith('#')]
@@ -298,7 +314,7 @@ class RunTest(unittest.TestCase):
                     kwargs['stdout'].write(json.dumps(result).encode())
                     return subprocess.CompletedProcess(argv, 0)
                 env = {'GITHUB_ACTIONS': 'true', 'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '2'}
-                with patch.object(RUN, 'ROOT', root), patch.object(RUN.subprocess, 'run', side_effect=execute), patch.dict(RUN.os.environ, env, clear=True):
+                with patch.object(RUN, 'ROOT', root), patch.object(RUN, 'execute', side_effect=execute), patch.dict(RUN.os.environ, env, clear=True):
                     code = RUN.main()
                 self.assertEqual(1, len(calls))
                 self.assertEqual(['bash', 'tools/verify.sh', '--base', BASE, '--json'], calls[0])
@@ -324,6 +340,12 @@ class RunTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'CONTENT_BOUNDARY'):
                     RUN.jar_report(file)
 
+
+# unittest discovers the focused evidence/reader contracts in this existing CI suite.
+import test_ci_evidence
+EvidenceTest = test_ci_evidence.EvidenceTest
+DownloadTest = test_ci_evidence.DownloadTest
+ProgressTest = test_ci_evidence.ProgressTest
 
 if __name__ == '__main__':
     unittest.main()
