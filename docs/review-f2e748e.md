@@ -40,4 +40,30 @@ WF-003获接受，无阻断。reviewer独立复现计划器18组路径、缺git�
 
 公开REST日志下载403（需更高认证），未读取/提取用户浏览器凭据。通过nightly.link下载公开artifact，只作为入站数据；ZIP SHA256与GitHub artifact API公布的2b1c27b341e98e350dee5758f468743c8d618167cc310615e4072c16d3aca916一致。artifact verify-40076072948-1（ID12552864540，14天）；原包/元数据保存build/wf004。已读取context/tools/result/失败日志，未运行其中代码。新runner输入审计确认干净LF树、225 Java/9冻结/1979输入指纹与候选相同、32指针/31唯一LFS payload全部长度与SHA有效；不把审计里的remote_verified=false改写为该工具完成了远端逐对象证明。GitHub步骤结果仅证明该次fetch/fsck命令成功。
 
-该补修尚未推送。此前批准的两次具体SHA推送已执行完毕，新提交需另行确认推送范围后才触发云端复验。WF-004保持DOING；WF-005与WEB-036均未开始。
+补修6346c7d在用户明确回复“授权本补修及本轮必要CI补修推送”后快进推送成功；授权仅准备分支、本轮必要CI配置/测试夹具补修，不包括游戏/main/设置/secret/PR或本机全量。[第二次CI 40076634386](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076634386)使用真实push.before=f6a1679、head=6346c7d，结果success，具体证据如下；此前首次失败记录保持。
+
+## WF-004首次完整云端通过（6346c7d）
+
+[run 40076634386](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076634386) / attempt 1，2026-10-24 16:04:50—16:19:35（北京时间），真实base=f6a1679592be40d125b17ad33ca92e2c3f2e3f76、tested/head=6346c7d5f55b1a36fde12bd1d662314209f25f22。统一入口full，20个计划步骤全部passed；oracle-generate由本次java-full生成覆盖，并非跳过Java测试。没有靠重试、放宽断言或替换黄金通过。
+
+| 当次云端实际执行 | 结果 |
+|---|---|
+| 隔离监护 / 输入审计 / 统一入口 / CI契约 | 15/15、14/14、30/30、24/24 |
+| 图片工具 / 音频工具 / 交换契约 | 17/17、18/18、3/3 |
+| 前端单测 | 189/189 |
+| 图片+音频prebuild/postbuild、Vite生产构建 | 通过；代码580082字节/gzip157269，全站77753114字节 |
+| 静态资产 / 音频浏览器 | 4/4、27/27 |
+| Replay文件重复 / 默认浏览器 | 30/30（repeat-each=3）、136/136 |
+| 完整Java test/check/概率/运行时资源/FatJAR | 通过；61份XML独立重算617 tests，failure/error/skip均0 |
+| 当次oracle审计 / 七配役gate | 通过 / 15/15 |
+| 浏览器→桌面→浏览器真实文件交换 | browser-file、Java读取、desktop-exchange 1/1通过；两文件在同job产生 |
+
+桌面FatJAR为724197819字节，SHA256 d7232b8cc37d0c761924936b496c3b055866021aef372ae18681d31bd94d18a0；CI检查Game.class存在且没有Web/Javalin/Jetty类。大JAR未上传，本地没有下载或重新构建该JAR，因此字节/hash/类边界来自当次CI wrapper报告。构建中的字体mtime恢复警告未导致失败，不据此声明正式字体/DPI验收。
+
+证据artifact verify-40076634386-1（ID12553728300，14天），ZIP SHA256 2acb5f0778bc31e6220aa8c1d0c63cb018d192bda501adb213dda91d1c976091，与GitHub artifact API digest一致；通过公开nightly.link入站读取，原包/元数据/解析摘要在build/wf004。逐份核对suite日志hash、result hash（6fa8f2ceb9c556a56770f89c79768f112ed9868dd61b94938b1848eb9aece93d）、context/base/head，61份XML重新统计。没有把nightly.link当新的正确性来源，也没有运行下载包中的代码。
+
+工具报告Python3.12.12、Node22.23.0、Microsoft21.0.11+10-LTS、固定Gradle/LFS/FFmpeg归档与二进制SHA；runner image 20261012.322.1（与首次失败运行的20261023.322.3不同，不能把ubuntu标签视为不可变镜像）。干净LF权威检出、225 Java与9冻结/1979输入指纹仍与已审基线相同；LFS fetch/checkout/fsck步骤成功，输入审计32路径/31唯一payload全部长度和SHA匹配。没有再做本机重复冷拉31对象，也不把缓存/网络下载量猜作账户计费。
+
+WF-004完成：已真实推送触发full、读取成功和失败证据、验证单job双向交换与完整桌面/Web/资源链。后续仅含归档文档的提交按docs层验证，完整证据仍绑定6346c7d，不冒称后续文档SHA重新跑完整链。本机本轮未启动JVM/浏览器或执行完整验收。原137项工作区差异及136份文件内容保留，main/设置/secret/PR未修改。WF-005转READY，尚未实施；WEB-036仍暂停。
+
+仍开放：真实PR事件未创建/运行（只做事件夹具与工作流契约验证）；未来面向旧main的PR仍会严格报告历史空白，需独立决定主线整合。A06/A07/A08、046/049人工、047容量不因CI全绿关闭。自动化AI评审/修复/发帖/合并没有启用。
