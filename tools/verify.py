@@ -84,6 +84,8 @@ def valid_path(path):
 
 
 def plan(paths, full=False):
+    if not paths and not full:
+        raise Refused('NO_CHANGES_TO_VERIFY')
     config = policy()
     matches, unknown, rank, extras = [], [], 0, set()
     for path in sorted(set(map(valid_path, paths))):
@@ -142,7 +144,10 @@ def eol_policy(root):
 def changes(root, base, head):
     if not base or base.startswith('-'):
         raise Refused('INVALID_BASE_REF')
-    base_sha = AUDIT.git(root, 'rev-parse', '--verify', base + '^{commit}').decode().strip()
+    try:
+        base_sha = AUDIT.git(root, 'rev-parse', '--verify', base + '^{commit}').decode().strip()
+    except subprocess.CalledProcessError as error:
+        raise Refused('INVALID_BASE_REF') from error
     paths = AUDIT.git(root, 'diff', '--name-only', '--no-renames', '-z', base_sha, head, '--').decode().split('\0')
     return base_sha, [p for p in paths if p]
 
@@ -266,6 +271,8 @@ def main(argv=None):
             raise Refused('LINUX_SAFE_ENTRY_REQUIRED')
         eol = eol_policy(root)
         base_sha, paths = changes(root, args.base, report['sha'])
+        if not paths and not args.full:
+            raise Refused('NO_CHANGES_TO_VERIFY')
         selected = plan(paths + args.paths, args.full)
         require_inputs(report, lfs=selected['requires_lfs'])
         result = {'schema': 1, 'base_ref': args.base, 'base_sha': base_sha, 'tested_sha': report['sha'],

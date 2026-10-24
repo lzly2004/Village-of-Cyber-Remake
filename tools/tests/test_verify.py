@@ -295,6 +295,8 @@ class VerifyTest(unittest.TestCase):
             VERIFY.java_results(self.root, time.time_ns() + 10**9)
 
     def test_unsafe_run_directory_refused_and_outside_files_not_touched(self):
+        self.write('docs/guide.md', b'Updated\n')
+        self.commit()
         outside = Path(self.temp.name) / 'outside'
         outside.mkdir()
         (self.root / 'build').symlink_to(outside, target_is_directory=True)
@@ -340,6 +342,43 @@ class VerifyTest(unittest.TestCase):
         self.assertEqual(2, p.returncode)
         self.assertIn('unrecognized arguments', p.stderr)
         self.assertFalse((self.root / 'build').exists())
+
+    def test_missing_base_has_specific_diagnostic(self):
+        r = self.cli('--base=missing-ref', '--dry-run')
+        self.assertEqual(2, r.returncode)
+        self.assertEqual('INVALID_BASE_REF', json.loads(r.stderr)['error'])
+
+    def test_empty_actual_diff_refused_even_with_manual_paths_explicit_full_allowed(self):
+        for paths in ([], ['--paths', 'docs/guide.md']):
+            r = self.cli('--dry-run', *paths)
+            self.assertEqual(2, r.returncode)
+            self.assertEqual('NO_CHANGES_TO_VERIFY', json.loads(r.stderr)['error'])
+        with self.assertRaisesRegex(VERIFY.Refused, 'NO_CHANGES'):
+            VERIFY.plan([])
+        r = self.cli('--dry-run', '--full', '--json')
+        self.assertEqual(0, r.returncode, r.stderr)
+        self.assertEqual('full', json.loads(r.stdout)['plan']['tier'])
+
+    def test_exchange_self_changes_require_fresh_full_chain(self):
+        for path in ('tools/playwright.exchange.config.mjs', 'tools/workflow-tests/replay-roundtrip.spec.mjs'):
+            with self.subTest(path=path):
+                r = VERIFY.plan([path])
+                self.assertEqual('full', r['tier'])
+                self.assertTrue(r['requires_full_java_approval'])
+                self.assertIn('desktop-exchange', [s['id'] for s in r['suites']])
+                self.assertIn('java-full', [s['id'] for s in r['suites']])
+
+    def test_leaf_frontend_changes_do_not_force_gate_shared_flow_still_does(self):
+        for path in ('web-client/src/HelpDialog.vue', 'web-client/src/labels.js', 'web-client/src/style.css',
+                     'web-client/src/BgmControl.vue', 'web-client/src/ReplayLibrary.vue'):
+            with self.subTest(path=path):
+                r = VERIFY.plan([path])
+                self.assertEqual('frontend', r['tier'])
+                self.assertNotIn('gate', [s['id'] for s in r['suites']])
+                self.assertIn('default-e2e', [s['id'] for s in r['suites']])
+        for path in ('web-client/src/characterDisplay.js', 'web-client/src/useGuestGame.js', 'web-client/src/App.vue',
+                     'web-client/gate-tests/release-gate.spec.js'):
+            self.assertIn('gate', [s['id'] for s in VERIFY.plan([path])['suites']])
 
     def test_invalid_policy_suite_never_runs(self):
         bad = copy.deepcopy(VERIFY.policy())

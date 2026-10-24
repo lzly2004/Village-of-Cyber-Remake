@@ -30,10 +30,10 @@ bash tools/verify.sh --base <上次评审SHA> --full --dry-run --json
 |---|---|---|
 | docs | 文档/任务索引 | 提交差异空白检查及输入前后审计；内容事实与链接仍须人工核对 |
 | tooling | 已明确列出的验证工具/测试配置 | 审计工具与入口测试；资源工具/监护/Node测试按相关路径追加 |
-| frontend | 前端功能/浏览器测试 | 单测、build资源门、assets/audio、文件重复3次、默认回归；共享src另加定向oracle生成与gate |
+| frontend | 前端功能/浏览器测试 | 单测、build资源门、assets/audio、文件重复3次、默认回归；明确列出的共享会话/人物/舞台路径另加定向oracle生成与gate |
 | full | Java/资源/概率/共享构建或未知路径 | 工具/资源/前端/兼容/完整Java与FatJAR/oracle/gate及桌面文件反向网页交换 |
 
-只认最保守的匹配分级，附加套件取并集。所选/未选套件和`not_triggered_by_changed_paths`理由均进JSON；冻结与输入变动另外列为`sensitive_paths_requiring_review`，只报告，不自动授权更改。`AGENTS.md`/未知工具默认full；未来细化规则须有正负例，不靠排除未知文件降级。
+只认最保守的匹配分级，附加套件取并集。所选/未选套件和`not_triggered_by_changed_paths`理由均进JSON；冻结与输入变动另外列为`sensitive_paths_requiring_review`，只报告，不自动授权更改。`AGENTS.md`/未知工具默认full；帮助/音频/Replay/独立样式由默认回归覆盖，不固定跑gate；App.vue等关键文件内即便只改一行文案，路径级判定仍保守追加gate。交换spec/config自身改动分级full，确保执行它并生成当次前置产物。未来细化规则须有正负例，不靠排除未知文件降级。
 
 Java始终调用原 `bash tools/run-gradle-safe.sh`，单worker与2GiB门槛保持。未修改进程监护/清理，不增加独立的kill/超时重试逻辑。每个入口调用串行执行套件；不要并行运行多个入口或与其他JVM/浏览器验收叠加。
 
@@ -58,3 +58,5 @@ Java始终调用原 `bash tools/run-gradle-safe.sh`，单worker与2GiB门槛保�
 manual_gates保持not_covered：A06/A07/A08、046正式浏览器/DPI/辅助技术/听审与物理设备/循环接缝、049人工发布复核、047容量与长局。本地自动化通过不是发布放行、远端LFS证明或完整CI工作流已启用。
 
 本轮具体命令、发现与最终实测集中见[19339f4复评处置](review-19339f4.md)。
+
+WF-004前置补修：无效base统一报INVALID_BASE_REF；真实Git差异为空时即使附加--paths也报NO_CHANGES_TO_VERIFY。仅显式--full允许同SHA重新验收（仍需完整授权），用于以后稳定性观察。新增跳过测试须同时修改并评审XML零skip契约，不能静默接受。远端账本聚合算法的TAB/LF定义已写入JSON，不能按空格或JSON序列化猜测。

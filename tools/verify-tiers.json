@@ -68,7 +68,7 @@
         "tools/playwright.exchange.config.mjs",
         "tools/workflow-tests/*"
       ],
-      "tier": "tooling"
+      "tier": "full"
     },
     {
       "patterns": [
@@ -128,7 +128,24 @@
     },
     {
       "patterns": [
-        "web-client/src/*",
+        "web-client/src/App.vue",
+        "web-client/src/main.js",
+        "web-client/src/api.js",
+        "web-client/src/useGuestGame.js",
+        "web-client/src/characterDisplay.js",
+        "web-client/src/characterNames.js",
+        "web-client/src/playerVisual.js",
+        "web-client/src/eventDialogue.js",
+        "web-client/src/eventArtwork.js",
+        "web-client/src/sceneArtwork.js",
+        "web-client/src/settlementVisual.js",
+        "web-client/src/GameStage.vue",
+        "web-client/src/EventDialogue.vue",
+        "web-client/src/StageArtwork.vue",
+        "web-client/src/PlayerPortrait.vue",
+        "web-client/src/AssetImage.vue",
+        "web-client/src/imageAssets.js",
+        "web-client/src/stageImageCache.js",
         "web-client/gate-tests/*",
         "web-client/playwright.gate.config.js"
       ],

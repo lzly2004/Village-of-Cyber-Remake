@@ -251,5 +251,6 @@
     "account_billed_bandwidth": null,
     "account_remaining_quota": null,
     "exclusions": "historical objects, other users/runs, failed requests, protocol overhead and actual GitHub accounting are not measured"
-  }
+  },
+  "oid_size_aggregate_definition": "按OID ASCII升序，每条为 oid + U+0009(TAB) + 十进制bytes(无前导零) + U+000A(LF)，包括最后一条LF；以ASCII编码对拼接结果取SHA-256。"
 }
