@@ -15,8 +15,15 @@ ORACLE_FILES = {c + '-' + s + '.json' for c in
 LFS = re.compile(rb'version https://git-lfs.github.com/spec/v1\noid sha256:([0-9a-f]{64})\nsize ([0-9]+)\n?\Z')
 
 
+class ToolMissingError(OSError):
+    pass
+
+
 def git(root, *args):
-    return subprocess.check_output(['git', '--no-optional-locks', '-C', str(root), *args], stderr=subprocess.PIPE)
+    try:
+        return subprocess.check_output(['git', '--no-optional-locks', '-C', str(root), *args], stderr=subprocess.PIPE)
+    except FileNotFoundError as error:
+        raise ToolMissingError(str(error)) from error
 
 
 def file_hash(path):
@@ -144,12 +151,14 @@ def audit(root, ref, oracle_dir):
             except (OSError, ValueError, AttributeError):
                 value, state = None, 'invalid'
             oracles.append({'file': file.name, 'fingerprint': value, 'state': state})
-    return {'schema': 1, 'sha': sha, 'tracked_files': len(tree),
+    return {'schema': 1, 'ref': ref, 'sha': sha, 'tracked_files': len(tree),
             'worktree': {'git_status_clean': not status, 'matches_ref_bytes': not differences,
                          'differences': differences},
             'fingerprints': {'java_ref': expected, 'java_worktree': actual, 'java_files': len(records),
                              **{name: {'files': len(items), 'sha256': aggregate(items)} for name, items in fingerprints.items()}},
-            'lfs': {'files': len(lfs), 'bytes': sum(x['bytes'] for x in lfs), 'entries': lfs},
+            'lfs': {'files': len(lfs), 'bytes': sum(x['bytes'] for x in lfs),
+                    'unique_payloads': len({x['sha256'] for x in lfs}),
+                    'unique_payload_bytes': sum({x['sha256']: x['bytes'] for x in lfs}.values()), 'entries': lfs},
             'oracle': {'files': len(oracles), 'entries': oracles},
             'not_covered': ['remote LFS availability', 'tests/build/runtime behavior',
                             'desktop/DPI/audio/manual release acceptance']}
@@ -176,6 +185,9 @@ def main():
         result['failures'] = failures
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 1 if failures else 0
+    except ToolMissingError as error:
+        print(json.dumps({'error': 'TOOL_MISSING', 'tool': 'git', 'reason': str(error)}), file=sys.stderr)
+        return 2
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         reason = str(error) if isinstance(error, ValueError) else ('GIT_READ_FAILED' if isinstance(error, subprocess.SubprocessError) else 'FILESYSTEM_READ_FAILED')
         print(json.dumps({'error': 'INPUT_AUDIT_FAILED', 'kind': type(error).__name__, 'reason': reason}), file=sys.stderr)

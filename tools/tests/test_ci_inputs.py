@@ -2,6 +2,8 @@
 import hashlib
 import importlib.util
 import json
+import os
+import sys
 from pathlib import Path
 import subprocess
 import tempfile
@@ -167,7 +169,32 @@ class InputAuditTest(unittest.TestCase):
         self.assertEqual(first['fingerprints']['java_ref'], self.audit()['fingerprints']['java_ref'])
         self.commit()
         self.assertNotEqual(first['fingerprints']['java_ref'], self.audit()['fingerprints']['java_ref'])
-        self.assertEqual(first['fingerprints']['java_ref'], self.audit(ref='HEAD^')['fingerprints']['java_ref'])
+        previous = self.audit(ref='HEAD^')
+        self.assertEqual('HEAD^', previous['ref'])
+        self.assertEqual(first['fingerprints']['java_ref'], previous['fingerprints']['java_ref'])
+
+    def test_missing_git_is_tool_error_not_filesystem_failure(self):
+        empty = Path(self.temp.name) / 'empty-path'
+        empty.mkdir()
+        result = subprocess.run([sys.executable, '-B', str(SCRIPT), '--repo', str(self.root)],
+                                env={**os.environ, 'PATH': str(empty)}, capture_output=True, text=True)
+        self.assertEqual(2, result.returncode)
+        self.assertEqual('', result.stdout)
+        problem = json.loads(result.stderr)
+        self.assertEqual('TOOL_MISSING', problem['error'])
+        self.assertEqual('git', problem['tool'])
+        self.assertIn('git', problem['reason'])
+
+    def test_unique_payload_count_is_not_pointer_or_object_directory_count(self):
+        data, digest, pointer = self.pointer()
+        self.write('src/main/resources/one.wav', pointer)
+        self.write('src/main/resources/two.wav', pointer)
+        self.commit()
+        result = self.audit()['lfs']
+        self.assertEqual(2, result['files'])
+        self.assertEqual(1, result['unique_payloads'])
+        self.assertEqual(len(data), result['unique_payload_bytes'])
+        self.assertEqual(2 * len(data), result['bytes'])
 
     def test_invalid_pointer_fails_without_repair(self):
         p = self.write('src/main/resources/music.wav', b'version https://git-lfs.github.com/spec/v1\ninvalid\n')
