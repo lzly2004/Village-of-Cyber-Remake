@@ -7,8 +7,8 @@
     "main": "616362073999cb280ef8891a8f69272541904357",
     "git_refs_pushed": true,
     "remote_settings_changed": false,
-    "workflow/baseline-input-audit": "6346c7d5f55b1a36fde12bd1d662314209f25f22",
-    "as_of": "在6346c7d补修推送之后、9e5d17a纯归档推送之前的观察快照；不是实时分支指针。最新远端HEAD须另读GitHub。"
+    "workflow/baseline-input-audit": "00dd98fe7cf6d2cad6e42cae443eabf27c4ac605",
+    "as_of": "WF-005源码推送及run40080861974成功后、本轮纯归档推送前的观察快照；不是实时HEAD。"
   },
   "writes": [
     {
@@ -127,6 +127,18 @@
       "head_sha": "6346c7d5f55b1a36fde12bd1d662314209f25f22",
       "push_exit_code": 0,
       "main_changed": false
+    },
+    {
+      "kind": "WF-005 preparation branch fast-forward",
+      "authorization": "2026-10-24 用户明确回复：授权推送及本轮必要CI补修",
+      "ref": "refs/heads/workflow/baseline-input-audit",
+      "from": "9e5d17aba848fd6320af3ab832b94f4db3b54129",
+      "to": "00dd98fe7cf6d2cad6e42cae443eabf27c4ac605",
+      "push_exit_code": 0,
+      "main_changed": false,
+      "settings_changed": false,
+      "secrets_changed": false,
+      "pull_request_created": false
     }
   ],
   "remote_proof": {
@@ -330,5 +342,22 @@
     },
     "local_full_rerun": false,
     "real_pull_request_event_tested": false
+  },
+  "wf005_ci_evidence_success": {
+    "run_id": 40080861974,
+    "attempt": 1,
+    "base_sha": "9e5d17aba848fd6320af3ab832b94f4db3b54129",
+    "tested_sha": "00dd98fe7cf6d2cad6e42cae443eabf27c4ac605",
+    "conclusion": "success",
+    "artifact_id": 12554724256,
+    "artifact_zip_sha256": "5b2df9ca3538d8d9d384d19183cb72fcc0f56ecbe8fbd8751a6cd7b95775d17e",
+    "receipt_artifact_id": 12555885524,
+    "receipt_zip_sha256": "71817fd20152dcf4f92b6bca4dce4ab1bad679ce26c8d954c2320b173dd73352",
+    "stored_evidence_recomputed_equal": true,
+    "receipt_fields_verified": true,
+    "read_path": "GitHub REST metadata + local ZIP; ZIP inbound from nightly.link matched API digest",
+    "authenticated_github_zip_download": false,
+    "real_pull_request_event_tested": false,
+    "local_jvm_full_run": false
   }
 }
