@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "tiers": {
+    "docs": [
+      "diff-check"
+    ],
+    "tooling": [
+      "diff-check",
+      "audit-tests",
+      "verify-tests"
+    ],
+    "frontend": [
+      "diff-check",
+      "audit-tests",
+      "verify-tests",
+      "frontend-unit",
+      "web-build",
+      "assets",
+      "audio",
+      "files-repeat",
+      "default-e2e"
+    ],
+    "full": [
+      "diff-check",
+      "guarded-tests",
+      "audit-tests",
+      "verify-tests",
+      "image-tool-tests",
+      "audio-tool-tests",
+      "exchange-contract",
+      "frontend-unit",
+      "web-build",
+      "assets",
+      "audio",
+      "files-repeat",
+      "default-e2e",
+      "browser-file",
+      "java-full",
+      "java-results",
+      "oracle-audit",
+      "gate",
+      "desktop-exchange"
+    ]
+  },
+  "rules": [
+    {
+      "patterns": [
+        "docs/*.md",
+        "docs/*.json",
+        "README.md",
+        "开发任务清单.md"
+      ],
+      "tier": "docs"
+    },
+    {
+      "patterns": [
+        "tools/verify.sh",
+        "tools/verify.py",
+        "tools/verify-tiers.json",
+        "tools/audit-ci-inputs.py",
+        "tools/tests/test_ci_inputs.py",
+        "tools/tests/test_verify.py"
+      ],
+      "tier": "tooling"
+    },
+    {
+      "patterns": [
+        "tools/playwright.exchange.config.mjs",
+        "tools/workflow-tests/*"
+      ],
+      "tier": "tooling"
+    },
+    {
+      "patterns": [
+        "tools/tests/test_guarded_process.py",
+        "tools/tests/fake-workload.py"
+      ],
+      "tier": "tooling",
+      "extra": [
+        "guarded-tests"
+      ]
+    },
+    {
+      "patterns": [
+        "tools/tests/test_web_images.py"
+      ],
+      "tier": "tooling",
+      "extra": [
+        "image-tool-tests"
+      ]
+    },
+    {
+      "patterns": [
+        "tools/tests/test_web_audio.py"
+      ],
+      "tier": "tooling",
+      "extra": [
+        "audio-tool-tests"
+      ]
+    },
+    {
+      "patterns": [
+        "tools/tests/replay-exchange.test.mjs"
+      ],
+      "tier": "tooling",
+      "extra": [
+        "exchange-contract"
+      ]
+    },
+    {
+      "patterns": [
+        "web-client/unit/*"
+      ],
+      "tier": "tooling",
+      "extra": [
+        "frontend-unit"
+      ]
+    },
+    {
+      "patterns": [
+        "web-client/src/*",
+        "web-client/tests/*",
+        "web-client/asset-tests/*",
+        "web-client/audio-tests/*",
+        "web-client/index.html"
+      ],
+      "tier": "frontend"
+    },
+    {
+      "patterns": [
+        "web-client/src/*",
+        "web-client/gate-tests/*",
+        "web-client/playwright.gate.config.js"
+      ],
+      "tier": "frontend",
+      "extra": [
+        "oracle-generate",
+        "oracle-audit",
+        "gate"
+      ]
+    },
+    {
+      "patterns": [
+        "src/*",
+        "config/*",
+        "web-client/public/*",
+        "build.gradle",
+        "settings.gradle",
+        "gradle.properties",
+        "gradle/*",
+        "gradlew",
+        "gradlew.bat",
+        ".gitattributes",
+        ".gitignore",
+        "AGENTS.md",
+        ".github/*",
+        "web-client/package*.json",
+        "web-client/playwright*.js",
+        "tools/run-gradle-safe.sh",
+        "tools/guarded-process.py",
+        "tools/build-web-*.py",
+        "tools/requirements-*.txt"
+      ],
+      "tier": "full"
+    }
+  ],
+  "unknown": "full"
+}

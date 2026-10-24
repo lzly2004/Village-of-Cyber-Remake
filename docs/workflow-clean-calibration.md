@@ -63,3 +63,5 @@ FatJAR `build/libs/vocr-1.0.3.4-all.jar`：724197819字节，SHA256 `2e9a5959416
 not_covered/manual_gates：A06/A07/A08正式放行、046浏览器/DPI/辅助技术/音频听审和物理设备/循环接缝、049发布前人工复核、047容量与超长局均未覆盖。单次全绿不是无flake证明；尚未证明从全新操作系统镜像自动安装全部运行时，也没有做逐字节可复现构建。此环境支持下一步WF-003统一验证入口与机器可读分级；WF-004才设计/启用Actions，推送分支/设置/AI自动修复仍须具体授权。WEB-036及以后继续暂停。
 
 最终 require-clean/require-lfs/require-oracle 与本地 fsck 全通过，Java/冻结/输入/政策指纹前后相同；Xvfb父进程收到stop后已回收自身子进程。原工作区保护按初始137条porcelain及原件hash另行核对，未将其CRLF/私人差异纳入本批。
+
+WF-003评审澄清：git-lfs checkout进度曾显示34/34；该进度计数的来源未独立追踪，不用于树内对象计数。当前提交树始终按32条pointer路径/31个唯一OID核验。外部报告观察到LF/CRLF环境JAR相差415字节、冷大厅相差1字节，但未隔离全部环境变量，不据此认定EOL是唯一原因；发布哈希仍只采用干净LF检出。远端对象账本与可携带OID集合见[远端状态](workflow-remote-state.json)。

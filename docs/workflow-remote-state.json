@@ -1,0 +1,255 @@
+{
+  "schema": 1,
+  "remote": "https://github.com/lzly2004/Village-of-Cyber-Remake.git",
+  "observed_at": "2026-10-24",
+  "time_precision": "date; exact upload timestamp not retained",
+  "git_refs": {
+    "main": "616362073999cb280ef8891a8f69272541904357",
+    "git_refs_pushed": false,
+    "remote_settings_changed": false
+  },
+  "writes": [
+    {
+      "kind": "LFS object repair",
+      "authorization": "用户明确回复：授权补传这20个缺失对象",
+      "unique_objects": 20,
+      "referencing_paths": 21,
+      "payload_bytes": 584372132,
+      "objects": [
+        {
+          "oid_sha256": "016f93981c9007af587110033c938a560d611cf2e999f6393f06b8b1be36d539",
+          "bytes": 39993788
+        },
+        {
+          "oid_sha256": "0cb0f8eb874d3a1588413c922cf3e9efb8187f38537b71894f3cf223d3ef21fa",
+          "bytes": 28129338
+        },
+        {
+          "oid_sha256": "0d6f7209fc6727fbff1496b50ac9cdc6e22816ecb2e3b0113cafe932eb3c604d",
+          "bytes": 36709108
+        },
+        {
+          "oid_sha256": "1d66e388d72d1cb9b77013b5334bb96c7f7dd0d380c236f5aca5127ef70eb6e9",
+          "bytes": 25774234
+        },
+        {
+          "oid_sha256": "20f5853087c66992abf3517016eaeac1c79db886d0ea7b4af3c94f7ba4300e45",
+          "bytes": 56155240
+        },
+        {
+          "oid_sha256": "2f6d257225296f5291060dda3d481be8bd72c5aaabb6f855a0f4e9c1000c4f61",
+          "bytes": 26101616
+        },
+        {
+          "oid_sha256": "36358f93da1116325a20bed3a20509e288d3363a6d3eea7a45a46796544c1395",
+          "bytes": 45303006
+        },
+        {
+          "oid_sha256": "591a5db753593cf8195e9c80dbe72debf35a4d3ccdc208f1bdcb8068d9144311",
+          "bytes": 20139166
+        },
+        {
+          "oid_sha256": "5b9a8da83c4b1cef27503a053a9a5d13823412cd4577bba9ed6d437a4da29481",
+          "bytes": 23305428
+        },
+        {
+          "oid_sha256": "601cf057045f6bec2824e9ddac37642a01dbca038ca02349deda7c2100c8123b",
+          "bytes": 42755122
+        },
+        {
+          "oid_sha256": "61fd645e5c26a724e35b91a827c11c4fc6f7c8e1a27fe72ba297e41cd26c9eda",
+          "bytes": 29097968
+        },
+        {
+          "oid_sha256": "687966127c30411acf496ca1512f02bab5345e55bbc791a9f3a9ddc81351fdf4",
+          "bytes": 23866540
+        },
+        {
+          "oid_sha256": "7dd1dc1a3f4120b880651f47cd8cfa619b9cd9a0b52ac789338c3faae5c88a09",
+          "bytes": 39764092
+        },
+        {
+          "oid_sha256": "889912053f6d2cbd12e74be7bddac98f5ba7c78f631bfab9d3ea256c70a22ff7",
+          "bytes": 33465474
+        },
+        {
+          "oid_sha256": "98a347506f2c5f23757f2dd0fe06f060932ad3fd6ac931e142f14e896bc5e1b1",
+          "bytes": 16250014
+        },
+        {
+          "oid_sha256": "a6821456170d1c0ae49bfa72d48503a7a18cbda66e26d22f7be92de82177c34e",
+          "bytes": 27871360
+        },
+        {
+          "oid_sha256": "b0c5929e6fc8b6c34b5eb7befb35b32593182636a2a2c464fa134b0fb33675c4",
+          "bytes": 11804104
+        },
+        {
+          "oid_sha256": "bfe9145ec95536bc85e8b2326aa6c6ab596db8997899b255ece3e3a8174545fe",
+          "bytes": 25689732
+        },
+        {
+          "oid_sha256": "cf246abcfea099557d0c08fbed7d87abcb0c93028771c651b93f8307526aa028",
+          "bytes": 17361392
+        },
+        {
+          "oid_sha256": "ed76001264313002082ddebde8ba0a1008c70bbcee990d5850f9491a68c85d0b",
+          "bytes": 14835410
+        }
+      ],
+      "oid_size_aggregate_sha256": "2fbae9ffbae567607f97c5d31fcfe655b8ce1c016079209f7c9418c89a7393bc",
+      "upload_log_tail": "Uploading LFS objects: 100% (20/20), 584 MB | 14 MB/s, done.",
+      "first_attempt": "SSH host verification failed; 0/20 objects sent",
+      "success": true
+    }
+  ],
+  "remote_proof": {
+    "pointer_paths": 32,
+    "unique_payloads": 31,
+    "payload_bytes": 605302710,
+    "objects": [
+      {
+        "oid_sha256": "016f93981c9007af587110033c938a560d611cf2e999f6393f06b8b1be36d539",
+        "bytes": 39993788
+      },
+      {
+        "oid_sha256": "0cb0f8eb874d3a1588413c922cf3e9efb8187f38537b71894f3cf223d3ef21fa",
+        "bytes": 28129338
+      },
+      {
+        "oid_sha256": "0d6f7209fc6727fbff1496b50ac9cdc6e22816ecb2e3b0113cafe932eb3c604d",
+        "bytes": 36709108
+      },
+      {
+        "oid_sha256": "1d66e388d72d1cb9b77013b5334bb96c7f7dd0d380c236f5aca5127ef70eb6e9",
+        "bytes": 25774234
+      },
+      {
+        "oid_sha256": "20f5853087c66992abf3517016eaeac1c79db886d0ea7b4af3c94f7ba4300e45",
+        "bytes": 56155240
+      },
+      {
+        "oid_sha256": "24c4bea7535209fcdce9da7cd9a11b21fd5bab3ab141414c106a34014a62cbb2",
+        "bytes": 7357348
+      },
+      {
+        "oid_sha256": "29e0dc3aa869fa964a099e32aee564f5d8f8b1425ef74a47499d9de3a1378361",
+        "bytes": 553812
+      },
+      {
+        "oid_sha256": "2f6d257225296f5291060dda3d481be8bd72c5aaabb6f855a0f4e9c1000c4f61",
+        "bytes": 26101616
+      },
+      {
+        "oid_sha256": "36358f93da1116325a20bed3a20509e288d3363a6d3eea7a45a46796544c1395",
+        "bytes": 45303006
+      },
+      {
+        "oid_sha256": "44f5e9d3681c2247c5055cfdbc637b4d803357d1256ed96efe312b1ef3dbd10e",
+        "bytes": 127054
+      },
+      {
+        "oid_sha256": "591a5db753593cf8195e9c80dbe72debf35a4d3ccdc208f1bdcb8068d9144311",
+        "bytes": 20139166
+      },
+      {
+        "oid_sha256": "5b9a8da83c4b1cef27503a053a9a5d13823412cd4577bba9ed6d437a4da29481",
+        "bytes": 23305428
+      },
+      {
+        "oid_sha256": "601cf057045f6bec2824e9ddac37642a01dbca038ca02349deda7c2100c8123b",
+        "bytes": 42755122
+      },
+      {
+        "oid_sha256": "61fd645e5c26a724e35b91a827c11c4fc6f7c8e1a27fe72ba297e41cd26c9eda",
+        "bytes": 29097968
+      },
+      {
+        "oid_sha256": "67096f601d608bc48cc66d57e272e79c2b55d98b9038dc165982e9f741b0ec11",
+        "bytes": 371024
+      },
+      {
+        "oid_sha256": "687966127c30411acf496ca1512f02bab5345e55bbc791a9f3a9ddc81351fdf4",
+        "bytes": 23866540
+      },
+      {
+        "oid_sha256": "748026c08fc548bae008ecfd6aa7d3c927a40870b25f7351915e17f4ef4fce34",
+        "bytes": 243216
+      },
+      {
+        "oid_sha256": "7dd1dc1a3f4120b880651f47cd8cfa619b9cd9a0b52ac789338c3faae5c88a09",
+        "bytes": 39764092
+      },
+      {
+        "oid_sha256": "889912053f6d2cbd12e74be7bddac98f5ba7c78f631bfab9d3ea256c70a22ff7",
+        "bytes": 33465474
+      },
+      {
+        "oid_sha256": "8fd61fc61d5e2110abc28ce24594b38db43f9cbfb432d4da9309e3f959726aa2",
+        "bytes": 272600
+      },
+      {
+        "oid_sha256": "98a347506f2c5f23757f2dd0fe06f060932ad3fd6ac931e142f14e896bc5e1b1",
+        "bytes": 16250014
+      },
+      {
+        "oid_sha256": "9e40a81a0750576a44daf534fefa77d38f2b1743a552c6d052fabacf67b3f032",
+        "bytes": 126316
+      },
+      {
+        "oid_sha256": "a00887c5e049199e58aeda641136c949d6d0fda33410f961dd66e8dafabd19a6",
+        "bytes": 436072
+      },
+      {
+        "oid_sha256": "a6821456170d1c0ae49bfa72d48503a7a18cbda66e26d22f7be92de82177c34e",
+        "bytes": 27871360
+      },
+      {
+        "oid_sha256": "b0c5929e6fc8b6c34b5eb7befb35b32593182636a2a2c464fa134b0fb33675c4",
+        "bytes": 11804104
+      },
+      {
+        "oid_sha256": "ba9e23d0b88d0e9f5b0c23d24b20a2dcced5ca94be4dca6f19fc012ccbdc010f",
+        "bytes": 9890524
+      },
+      {
+        "oid_sha256": "bfe9145ec95536bc85e8b2326aa6c6ab596db8997899b255ece3e3a8174545fe",
+        "bytes": 25689732
+      },
+      {
+        "oid_sha256": "ce09ca674fdba5eb33700b01a3599465e5ecf773c957652916a419a0957d5af1",
+        "bytes": 1116772
+      },
+      {
+        "oid_sha256": "cf246abcfea099557d0c08fbed7d87abcb0c93028771c651b93f8307526aa028",
+        "bytes": 17361392
+      },
+      {
+        "oid_sha256": "ed76001264313002082ddebde8ba0a1008c70bbcee990d5850f9491a68c85d0b",
+        "bytes": 14835410
+      },
+      {
+        "oid_sha256": "f918d9b09db630aa800212b8df3c2505b0fc41f6f5d2a7efdc259d38a0f56383",
+        "bytes": 435840
+      }
+    ],
+    "oid_size_aggregate_sha256": "50bf47b6466be13757f2774a52e7482da566373c6e5c71efe543ebcbef1b0dae",
+    "initial_downloaded_objects": 11,
+    "initial_missing_unique_oids": 20,
+    "downloaded_after_repair": 20,
+    "missing_local_objects_seeded_into_proof_store": 0,
+    "fsck_excerpt": "Fetching reference HEAD\nGit LFS fsck OK\n",
+    "git_lfs_storage_path": ".git/lfs-remote-proof (relative to WF-002 clean checkout)",
+    "http_200_count": null,
+    "http_404_request_count": null,
+    "http_counts_note": "HTTP request counts were not captured; object counts are not request counts. Initial log explicitly reports missing OIDs."
+  },
+  "cost_estimate": {
+    "known_added_storage_payload_bytes": 584372132,
+    "known_payload_download_bytes_at_least": 605302710,
+    "account_billed_storage": null,
+    "account_billed_bandwidth": null,
+    "account_remaining_quota": null,
+    "exclusions": "historical objects, other users/runs, failed requests, protocol overhead and actual GitHub accounting are not measured"
+  }
+}

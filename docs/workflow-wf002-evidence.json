@@ -542,5 +542,11 @@
     "original_file_hashes_verified": 136,
     "hashes_unchanged": true,
     "untracked_directory_entries_preserved": true
+  },
+  "eol_policy": {
+    "autocrlf": false,
+    "eol": "lf",
+    "tree": "clean-clone",
+    "note": "metadata clarification in WF-003; no WF-002 tests rerun"
   }
 }
