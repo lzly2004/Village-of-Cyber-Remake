@@ -1,0 +1,546 @@
+{
+  "schema": 1,
+  "scope": "WF-002 local clean checkout calibration; not a CI run",
+  "base_sha": "82615c0a200df44426c702cca3504bb112d28723",
+  "tested_sha": "ee9905c92286516a358e1376cdabf895794cd757",
+  "final_commit_scope": "subsequent documentation only; no program/input/tool changes",
+  "ref": "workflow/baseline-input-audit (clean detached tested checkout)",
+  "remote_git_baseline": "616362073999cb280ef8891a8f69272541904357",
+  "unpublished_local_git_overlay": true,
+  "worktree": {
+    "git_status_clean": true,
+    "matches_ref_bytes": true,
+    "differences": []
+  },
+  "fingerprints": {
+    "java_ref": "9ffa8d2d8714a555f856ee19f4b86ace466df6c1aade366df0b5701211b967b7",
+    "java_worktree": "9ffa8d2d8714a555f856ee19f4b86ace466df6c1aade366df0b5701211b967b7",
+    "java_files": 225,
+    "frozen": {
+      "files": 9,
+      "sha256": "6ce8aa549a2f49923b763b04d819d3ed29870c9bbd0c30745e97c08c3beca8b8"
+    },
+    "inputs": {
+      "files": 1979,
+      "sha256": "3d4c43fae21fbb7db0a68cdaa44db66aeaa8478760853479f6a539abfcabbe4a"
+    },
+    "build_policy": {
+      "files": 28,
+      "sha256": "f325f9eac22e1675884066a3c0668f5f33a6d8fc30e3d908267e081c4cde65fb"
+    }
+  },
+  "toolchain": {
+    "schema": 1,
+    "downloads": {
+      "git_lfs": {
+        "tag": "v3.8.1",
+        "archive_sha256": "sha256:e72cf723a4a660438862282e8aecf3885fc8123e88bfcad534cf6b941a354b75",
+        "binary_sha256": "8bf08ae98ff83773430ce8f45b9156dcf7699ee1de65ae4a388e746e9dd7597c",
+        "source": "https://github.com/git-lfs/git-lfs/releases/download/v3.8.1/git-lfs-linux-amd64-v3.8.1.tar.gz"
+      },
+      "xvfb": {
+        "version": "2:1.20.13-1ubuntu1~20.04.20",
+        "sha256": "b671759ad2b8280723b0b55361368dc69c12cb301ea9a6a5e443e4f8d2745a2d",
+        "source": "https://mirrors.tuna.tsinghua.edu.cn/ubuntu/pool/universe/x/xorg-server/xvfb_1.20.13-1ubuntu1~20.04.20_amd64.deb"
+      }
+    },
+    "java": {
+      "release": "IMPLEMENTOR=\"Microsoft\"\nIMPLEMENTOR_VERSION=\"Microsoft-14941483\"\nJAVA_RUNTIME_VERSION=\"21.0.12.1+1-LTS\"\nJAVA_VERSION=\"21.0.12.1\"\nJAVA_VERSION_DATE=\"2026-08-18\"\nLIBC=\"gnu\"\nMODULES=\"java.base java.compiler java.datatransfer java.xml java.prefs java.desktop java.instrument java.logging java.management java.security.sasl java.naming java.rmi java.management.rmi java.net.http java.scripting java.security.jgss java.transaction.xa java.sql java.sql.rowset java.xml.crypto java.se java.smartcardio jdk.accessibility jdk.internal.jvmstat jdk.attach jdk.charsets jdk.internal.opt jdk.zipfs jdk.compiler jdk.crypto.ec jdk.crypto.cryptoki jdk.dynalink jdk.internal.ed jdk.editpad jdk.hotspot.agent jdk.httpserver jdk.incubator.vector jdk.internal.le jdk.internal.vm.ci jdk.internal.vm.compiler jdk.internal.vm.compiler.management jdk.jartool jdk.javadoc jdk.jcmd jdk.management jdk.management.agent jdk.jconsole jdk.jdeps jdk.jdwp.agent jdk.jdi jdk.jfr jdk.jlink jdk.jpackage jdk.jshell jdk.jsobject jdk.jstatd jdk.localedata jdk.management.jfr jdk.naming.dns jdk.naming.rmi jdk.net jdk.nio.mapmode jdk.random jdk.sctp jdk.security.auth jdk.security.jgss jdk.unsupported jdk.unsupported.desktop jdk.xml.dom\"\nOS_ARCH=\"x86_64\"\nOS_NAME=\"Linux\"\nSOURCE=\".:git:6f26c6b2b098\"\n",
+      "launcher": {
+        "path": "/home/noeticuser/Desktop/.vocr-toolchain/java/jdk-21.0.12.1+1/bin/java",
+        "sha256": "3282b9858bee1ffd212a1a640236699494235d106e3b8bccbf726f9ac02cb0aa"
+      },
+      "provenance": "existing versioned user runtime; not redownloaded"
+    },
+    "node": {
+      "version": "v22.23.0",
+      "binary": {
+        "path": "/home/noeticuser/Desktop/.vocr-toolchain/node/bin/node",
+        "sha256": "b587d8a062552ab52ecae2a7b0bcd079351d1dc61cf2555fd5994f558274ae58"
+      }
+    },
+    "gradle": {
+      "version": "8.8",
+      "home": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home",
+      "cache_started_empty": true,
+      "dependency_jars": [
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.17.1/fca7ef6192c9ad05d07bc50da991bf937a84af3a/jackson-annotations-2.17.1.jar",
+          "sha256": "fccad82e13172c0e4384db71577219c9b8631c0820f4b18daaa57016fb661c76"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.17.1/5e52a11644cd59a28ef79f02bddc2cc3bab45edb/jackson-core-2.17.1.jar",
+          "sha256": "ddb26c8a1f1a84535e8213c48b35b253370434e3287b3cf15777856fc4e58ce6"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.17.1/524dcbcccdde7d45a679dfc333e4763feb09079/jackson-databind-2.17.1.jar",
+          "sha256": "b6ca2f7d5b1ab245cec5495ec339773d2d90554c48592590673fb18f4400a948"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/com.tngtech.archunit/archunit/1.5.0/5076957a58007dd5c512facb5c179d3dd7c3c2b8/archunit-1.5.0.jar",
+          "sha256": "5ab139643fa5090af181ff8dc9eab48cb38ca306d3e03e66acacc75831a08fe9"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/io.javalin/javalin/7.2.3/9c8b8706752fadb99437cabf42ca6a2fb5550b41/javalin-7.2.3.jar",
+          "sha256": "c27b5052e8fb259acd8fd1d9f598c8543e43fe4df9271c7697a9c832c9a66e17"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/jakarta.annotation/jakarta.annotation-api/2.1.1/48b9bda22b091b1f48b13af03fe36db3be6e1ae3/jakarta.annotation-api-2.1.1.jar",
+          "sha256": "5f65fdaf424eee2b55e1d882ba9bb376be93fb09b37b808be6e22e8851c909fe"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/jakarta.enterprise/jakarta.enterprise.cdi-api/4.0.1/2012f388c6de83e29101cbf82c3ed2bd37931c64/jakarta.enterprise.cdi-api-4.0.1.jar",
+          "sha256": "beaf74c4f2618189309e3f4a09c43effab633dd96aa1f6dc58a6ba7ee0042717"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/jakarta.enterprise/jakarta.enterprise.lang-model/4.0.1/2b195781faad31c1724d8122136909c34c3ae79e/jakarta.enterprise.lang-model-4.0.1.jar",
+          "sha256": "53acafe65b6ef0195fa1b8a0ef2650e5aa024c32cb4059c4df372d6b32089cd3"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/jakarta.inject/jakarta.inject-api/2.0.1/4c28afe1991a941d7702fe1362c365f0a8641d1e/jakarta.inject-api-2.0.1.jar",
+          "sha256": "f7dc98062fccf14126abb751b64fab12c312566e8cbdc8483598bffcea93af7c"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/jakarta.interceptor/jakarta.interceptor-api/2.1.0/1d06a662708601400af4556577ee514c4ad01549/jakarta.interceptor-api-2.1.0.jar",
+          "sha256": "ef787d3f713fc6ff4f02cd4b0dbed08f93d8af3400c90cbb43fb4b5c0583710b"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/jakarta.servlet/jakarta.servlet-api/6.0.0/abecc699286e65035ebba9844c03931357a6a963/jakarta.servlet-api-6.0.0.jar",
+          "sha256": "c034eb1afb158987dbb53a5fea0cadf611c8dae8daadd59c44d9d5ab70129cef"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/jakarta.transaction/jakarta.transaction-api/2.0.1/51a520e3fae406abb84e2e1148e6746ce3f80a1a/jakarta.transaction-api-2.0.1.jar",
+          "sha256": "50c0a7c760c13ae6c042acf182b28f0047413db95b4636fb8879bcffab5ba875"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/a231e0d844d2721b0fa1b238006d15c6ded6842a/apiguardian-api-1.1.2.jar",
+          "sha256": "b509448ac506d607319f182537f0b35d71007582ec741832a1f111e5b5b70b38"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-annotations/12.1.12/394bf358ca370c7df917954f25714d6c8865d1c6/jetty-annotations-12.1.12.jar",
+          "sha256": "ce51d231435cdd774336abcb44a7817195fd12487ed213327e8d43db172af467"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-http/12.1.12/18e79d9da43b31fe7004621f5dbf4ba92b9edd19/jetty-http-12.1.12.jar",
+          "sha256": "5476e16ef7e28883dba3669ee06491021e4a9aeba9a76f901a3f5c2bb5252a3e"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-io/12.1.12/99703c1359bc6114b30fefdd0fa6db2fa26355f5/jetty-io-12.1.12.jar",
+          "sha256": "a809a6a534adccfaa08bca94aa54328e3ac858973ccddbda770f7e9e0f5099fc"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-jndi/12.1.12/10c9118cf90e9bf1c697513bee2dc8beb7e6a72f/jetty-jndi-12.1.12.jar",
+          "sha256": "a701368f9810433103836f0f2c0c0f6a2ca49f951d25d155e4e507821cb54b43"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-plus/12.1.12/8a2dca49e0c27ea08767205a6c435eec1597bfa4/jetty-plus-12.1.12.jar",
+          "sha256": "0e29a87abf5b651f77e5c3e7c726f0ecef30a9bc57a5e0aa5aa3f784cfc0a7bd"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-security/12.1.12/336bf8d287b649400d9fad16ecf39593b17b23a4/jetty-security-12.1.12.jar",
+          "sha256": "fcc0206c1ac66b632ef29a59ccf76c3f3737a62ef54694b1d111eeb2e6efe804"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-server/12.1.12/ff303f5274bf4f9ba91588de595ce8689cb1f34c/jetty-server-12.1.12.jar",
+          "sha256": "9ba04bb8d011444a10873a51b1cb8297c04f70db55c8a8d9efcc3a9b97896787"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-session/12.1.12/df924fc0f60f96b6acd1cd267c24c8679f10ffea/jetty-session-12.1.12.jar",
+          "sha256": "73aea4cdd91f2027da1a09cd5953b661625017971d53d8e1ff342f8547752b06"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-util/12.1.12/1f6c7ee04775b812ebf35cbea57abecbd6c70903/jetty-util-12.1.12.jar",
+          "sha256": "f6fbfa61cfcca032ff82ad8ff3b66a14374047f15486521dbc89a6c0df19ccf2"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-xml/12.1.12/93b96de8663bd9065f22e894d5c4929dc900e822/jetty-xml-12.1.12.jar",
+          "sha256": "1c7b6320e3ad4ccca861ecfd1347f10ac6130ca2c2eb788a6b5dff3ab0c0f532"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.ee/jetty-ee-webapp/12.1.12/a8dc02828144d6327090e915a00e11246e3d052f/jetty-ee-webapp-12.1.12.jar",
+          "sha256": "f70d9b30fdfd970e8bbc462b9d6b4cb85f850428d8640529fcc1f1912b2941b4"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.ee10/jetty-ee10-annotations/12.1.12/893d44e8b2d19a19a244896e90ba009624478e9/jetty-ee10-annotations-12.1.12.jar",
+          "sha256": "c45ba9ff724845ef5848f86cf164c87824d4be18095216b9cba66a94a72b83b6"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.ee10/jetty-ee10-plus/12.1.12/c89a138a99c7a82e9c14f55fa83826c4ef5351d/jetty-ee10-plus-12.1.12.jar",
+          "sha256": "80d050384ef31c921e0fbeeded3c70fc8d35a29b7951511a9ccfaeb06b5e29c7"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.ee10/jetty-ee10-servlet/12.1.12/617e81d9b9112f83057bf3dea5dc7bb8e652e52d/jetty-ee10-servlet-12.1.12.jar",
+          "sha256": "021375ea80d84b5f9d46260916fc0450dc4fae5a95ce80f8289e87a0db07de47"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.ee10/jetty-ee10-webapp/12.1.12/13e353e3eb349dae826ddbb66181b03e3ff46c39/jetty-ee10-webapp-12.1.12.jar",
+          "sha256": "84de1014bb79f957f0fc66d3db9b2bc7eec19f01c8ace4e250b4707af0eed0f3"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.ee10.websocket/jetty-ee10-websocket-jetty-server/12.1.12/48ace9c89531130b910a32055abf2e29df06557f/jetty-ee10-websocket-jetty-server-12.1.12.jar",
+          "sha256": "bce3641addd34a0d9a3ce8080f31f3b7f45b2bbdf3e7d5655ccd5f4d529c7816"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.ee10.websocket/jetty-ee10-websocket-servlet/12.1.12/6491d85c636ace2715f232f70982583bb8ee844b/jetty-ee10-websocket-servlet-12.1.12.jar",
+          "sha256": "83a58b4ee3bf6d0284c50304725cf93b694a67b1b1cc139af72500296dbf7359"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/jetty-websocket-core-common/12.1.12/7b17a921a090495e0dc86f82bbff0cf8e9af466/jetty-websocket-core-common-12.1.12.jar",
+          "sha256": "a1ef0c79a4b8b9e4ce969e70d8de9fbed4776625863bdbd5eb5f69fb70208399"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/jetty-websocket-core-server/12.1.12/dfc760fe022a18b7f227ba3552a9a7494afdda34/jetty-websocket-core-server-12.1.12.jar",
+          "sha256": "d91becae70e7b15e6200f40d02239d8315f8b26c90d4ab38348fcdad41c0ebf5"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/jetty-websocket-jetty-api/12.1.12/14cb6ada7d514f8818868c88898f04343642f36/jetty-websocket-jetty-api-12.1.12.jar",
+          "sha256": "887090638bf758dce9268478a3ccf168929de52dcdecdddb4eaff62263cbd961"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/jetty-websocket-jetty-common/12.1.12/bfd146470e20a1cfaf07367bb8dc5f13ee2c79ed/jetty-websocket-jetty-common-12.1.12.jar",
+          "sha256": "933d05b566effad97f84b5d986be810a2928685c875d7fb90f301163f24d2718"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/jetty-websocket-jetty-server/12.1.12/45c37acef6e93a5afdc00eff5fb25772f8e63237/jetty-websocket-jetty-server-12.1.12.jar",
+          "sha256": "0b189ffab87b02a4da1187dc4022410c5f235b5a1a7ccfeea3cc4846a8e80664"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar",
+          "sha256": "ace2a10dc8e2d5fd34925ecac03e4988b2c0f851650c94b8cef49ba1bd111478"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.2.20/5380b19fa1924399b62ce3a1faffebb2b4f82272/kotlin-stdlib-2.2.20.jar",
+          "sha256": "8836ccffd3585fadda9901244b20d42901d2f3cd581058d8434e2ffabcf3a3e7"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter/5.11.0/7ded0835a2522be8e559ac09baff3e9fb2607b27/junit-jupiter-5.11.0.jar",
+          "sha256": "234fe3f9118628d6de625ecc3d69140515e786fdf3cef037fc6ec94823c23ab6"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.11.0/2093fd814e940224cfa5a1882d87cc9d81e25c3/junit-jupiter-api-5.11.0.jar",
+          "sha256": "42aa202fc862f76cc5af65b47b1c0b1961cdd79cd2216405a6dfa2bd20b20974"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.11.0/e0ef3a2222e000e0b5ab76fda0d38d011526f54c/junit-jupiter-engine-5.11.0.jar",
+          "sha256": "7012423383d0c79d0347c5cf2bd1996c30a12240fb729e0cdfa954852ec693cc"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-params/5.11.0/97068da5f462c9a9212516ab58aee632a93c349f/junit-jupiter-params-5.11.0.jar",
+          "sha256": "92ccae2d72e8cc7ac4d3a912fd1a8fecc5e3040a62ac6c667a07a6f55b8023eb"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.11.0/9bb41eff52781584798c487b68782ae3b4126f14/junit-platform-commons-1.11.0.jar",
+          "sha256": "609333a4545f9018eb0c59071efd30663a9e9fdce528121b65a04c27e5fc26a7"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.11.0/b981f322be92fe343d4a79f28208bb4475806019/junit-platform-engine-1.11.0.jar",
+          "sha256": "a7e67279c651c516949512b506916475a6d9e284cd4f4c30d029b4ad73a944d8"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.junit.platform/junit-platform-launcher/1.11.0/605624a277ab3b02317765e1111ad577676648e1/junit-platform-launcher-1.11.0.jar",
+          "sha256": "a44535e639814236844e2247204f89247d13af0cebdea53a42314100dfde19ce"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.3.0/152ea56b3a72f655d4fd677fc0ef2596c3dd5e6e/opentest4j-1.3.0.jar",
+          "sha256": "48e2df636cab6563ced64dcdff8abb2355627cb236ef0bf37598682ddf742f1b"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.ow2.asm/asm/9.10.1/ada2141c0cc52ee8f5c48cd5fa4ce0e794f22236/asm-9.10.1.jar",
+          "sha256": "ed825d10ab1399c8c0cb669e688cf0c8c82629b4c8399b58352b68e92ca10fcb"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.ow2.asm/asm-commons/9.10.1/4229e4c55fd8e01c23f9fe9884075cc628aacc50/asm-commons-9.10.1.jar",
+          "sha256": "6d0abefb7cbf972ea16edb37ec14835372505063a45f976ab7ea889ed9497895"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.ow2.asm/asm-tree/9.10.1/e244332a17564c1d1572449399a842de35881be2/asm-tree-9.10.1.jar",
+          "sha256": "3dfb0d5b6a106cd40b5b250e39935fbf2f927f4477546a5369a3ac609cf0506b"
+        },
+        {
+          "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/gradle-home/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.18/78a9e7a37cd6360e0b818e86341b24123d28d4df/slf4j-api-2.0.18.jar",
+          "sha256": "44508fd1576500688c790b190acdd16fec4f8c79a3e0b900afd70503cf055f55"
+        }
+      ]
+    },
+    "playwright": {
+      "version": "1.64.1",
+      "registry": {
+        "comment": "Do not edit this file, use utils/roll_browser.js",
+        "browsers": [
+          {
+            "name": "chromium",
+            "revision": "1248",
+            "installByDefault": true,
+            "browserVersion": "156.0.8078.4",
+            "title": "Chrome for Testing"
+          },
+          {
+            "name": "chromium-headless-shell",
+            "revision": "1248",
+            "installByDefault": true,
+            "browserVersion": "156.0.8078.4",
+            "title": "Chrome Headless Shell"
+          },
+          {
+            "name": "firefox",
+            "revision": "1555",
+            "installByDefault": true,
+            "browserVersion": "157.0",
+            "title": "Firefox"
+          },
+          {
+            "name": "webkit",
+            "revision": "2370",
+            "installByDefault": true,
+            "revisionOverrides": {
+              "mac14": "2251",
+              "mac14-arm64": "2251"
+            },
+            "browserVersion": "27.2",
+            "title": "WebKit"
+          },
+          {
+            "name": "ffmpeg",
+            "revision": "1013",
+            "installByDefault": true
+          },
+          {
+            "name": "winldd",
+            "revision": "1007",
+            "installByDefault": false
+          },
+          {
+            "name": "android",
+            "revision": "1001",
+            "installByDefault": false
+          }
+        ]
+      },
+      "binaries": []
+    },
+    "ffmpeg": {
+      "binary": {
+        "path": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-toolchain/bin/ffmpeg",
+        "sha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99"
+      },
+      "version": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+    },
+    "python": {
+      "version": "Python 3.8.10",
+      "pillow": "7.0.0",
+      "webp_decoder_version": 1537,
+      "scope": "daily check/distribution only; no regeneration"
+    },
+    "fonts": {
+      "package": "1:20190410+repack1-2",
+      "files": [
+        {
+          "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc",
+          "sha256": "9b77c163e7a87d212d0971ab0124b0e573fdc4a7347f01a08d9e5243092e9be0"
+        },
+        {
+          "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+          "sha256": "0c066cc1f22541fd9e138190de26dc480a4b8221bef5321e27e7b7802b26ee5e"
+        },
+        {
+          "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-DemiLight.ttc",
+          "sha256": "afcfd0361271f5214d3d0fd9224abbed916db2dca2e3bde7b08c87c1f1a5c1bf"
+        },
+        {
+          "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Light.ttc",
+          "sha256": "352ffeb89cb954e2609cb8676f1d2a9663318dc155863212b288375b65c99d62"
+        },
+        {
+          "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Medium.ttc",
+          "sha256": "fad9e409749406abc69ac32e1d013451a610d43c8afdd2ca238295c223e5567e"
+        },
+        {
+          "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+          "sha256": "5dcd1c336cc9344cb77c03a0cd8982ca8a7dc97d620fd6c9c434e02dcb1ceeb3"
+        },
+        {
+          "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Thin.ttc",
+          "sha256": "6bfa4ee1638a394c328e876ecd93e98050e84f75480316350c7e7c58f833f3c7"
+        }
+      ]
+    },
+    "display": {
+      "display": ":2",
+      "pid": 89903
+    },
+    "global_configuration_changed": false
+  },
+  "suites": [
+    {
+      "name": "audit-tool",
+      "command": "python3 -B tools/tests/test_ci_inputs.py -v",
+      "status": "passed",
+      "tests": 14,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/tool-tests.log",
+      "log_sha256": "e626c76c8911c4624f9ca8ddc028c87d7f169b23745d2c13d7c262ee6a29b61b",
+      "tail": ". ok\ntest_invalid_pointer_fails_without_repair (__main__.InputAuditTest) ... ok\ntest_missing_git_is_tool_error_not_filesystem_failure (__main__.InputAuditTest) ... ok\ntest_missing_invalid_oracle_and_unknown_ref_fail_explicitly (__main__.InputAuditTest) ... ok\ntest_non_eol_and_missing_source_never_claim_semantic_equivalence (__main__.InputAuditTest) ... ok\ntest_oracle_matches_ref_not_dirty_worktree_and_requires_exact_names (__main__.InputAuditTest) ... ok\ntest_pointer_is_not_hydrated_and_remote_is_never_assumed (__main__.InputAuditTest) ... ok\ntest_ref_selects_committed_tree_not_index (__main__.InputAuditTest) ... ok\ntest_symlink_cannot_supply_source_or_lfs_payload (__main__.InputAuditTest) ... ok\ntest_unique_payload_count_is_not_pointer_or_object_directory_count (__main__.InputAuditTest) ... ok\ntest_untracked_file_fails_clean_even_if_committed_bytes_match (__main__.InputAuditTest) ... ok\n\n----------------------------------------------------------------------\nRan 14 tests in 0.689s\n\nOK\n"
+    },
+    {
+      "name": "unit",
+      "command": "npm --prefix web-client run test:unit",
+      "status": "passed",
+      "tests": 189,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/unit.log",
+      "log_sha256": "628b828979cfd31cc395b61d893bf71d05df00e71fbb3c0ae6b42817191fb14f",
+      "tail": "ding CLICK survives scene reset; full stop still cancels it and rejects late completion\nok 185 - review F1 pending CLICK survives scene reset; full stop still cancels it and rejects late completion\n  ---\n  duration_ms: 0.964654\n  type: 'test'\n  ...\n# Subtest: review F1 current-scene capacity preempts CLICK without losing scene queue or adding another voice\nok 186 - review F1 current-scene capacity preempts CLICK without losing scene queue or adding another voice\n  ---\n  duration_ms: 0.780349\n  type: 'test'\n  ...\n# Subtest: 投票方式の既知値と未知値を区別する\nok 187 - 投票方式の既知値と未知値を区別する\n  ---\n  duration_ms: 0.847296\n  type: 'test'\n  ...\n# Subtest: 同票の全首位と権威の票数を順序どおり表示する\nok 188 - 同票の全首位と権威の票数を順序どおり表示する\n  ---\n  duration_ms: 0.122911\n  type: 'test'\n  ...\n# Subtest: Linuxの既定e2eコマンドは安全入口のconsole引数を重複しない\nok 189 - Linuxの既定e2eコマンドは安全入口のconsole引数を重複しない\n  ---\n  duration_ms: 161.868727\n  type: 'test'\n  ...\n1..189\n# tests 189\n# suites 0\n# pass 189\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 2185.460903\n"
+    },
+    {
+      "name": "build",
+      "command": "npm --prefix web-client run build",
+      "status": "passed",
+      "tests": null,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/build.log",
+      "log_sha256": "6484435d966936316b329a30a53baa85e8fc3e9f7699bffce78060f8b7267667",
+      "tail": "     0.61 kB │ gzip:   0.44 kB\ndist/assets/index-DKOwz9F-.css          21.49 kB │ gzip:   5.48 kB\ndist/assets/HelpDialog-RhpXirLw.js      32.93 kB │ gzip:  13.54 kB\ndist/assets/ReplayLibrary-tQ1ICU0Y.js   40.96 kB │ gzip:  15.28 kB\ndist/assets/index-BWxbmRri.js          484.07 kB │ gzip: 124.79 kB\n\n✓ built in 307ms\n\n> village-of-cyber-client@0.1.0 postbuild\n> python3 -B ../tools/build-web-images.py distribution && python3 -B ../tools/build-web-audio.py distribution\n\n{\"codeBytes\": 580082, \"codeGzipBytes\": 157269, \"encodingCounts\": {\"lossless\": 586, \"lossy\": 585}, \"imageBytes\": 21291852, \"images\": 1171, \"largestImageBytes\": 374554, \"manifestBytes\": 464258, \"minCompositePsnr\": 35.0113, \"sourceBytes\": 81214776, \"totalStaticBytes\": 77753114, \"uniqueFiles\": 1164}\n{\"allTextBytes\": 492691, \"bgmBytes\": 54890214, \"bgmTracks\": 23, \"descriptionBytes\": 264, \"effectBytes\": 498275, \"effects\": 9, \"largestBgmBytes\": 5093249, \"manifestBytes\": 28169, \"totalStaticBytes\": 77753114, \"uniqueAudioFiles\": 31}\n"
+    },
+    {
+      "name": "assets",
+      "command": "npm --prefix web-client run test:assets",
+      "status": "passed",
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/assets.log",
+      "log_sha256": "254351bde586b502dc39e2704eeab029134868f4769e9c76ab4206d3e6a410c0",
+      "tail": "e 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n\nRunning 4 tests using 1 worker\n\n(node:92512) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ✓  1 asset-tests/images.spec.js:5:1 › WEB-022/023 static manifest images decode at original dimensions; lobby requests no player assets (3.8s)\n  ✓  2 asset-tests/images.spec.js:34:1 › WEB-022 unknown hashed image cannot decode as a valid image (108ms)\nWEB-023 static transfer: {\"lobbyBytes\":131273,\"firstGameBytes\":397068,\"initiallyRequestedImages\":17,\"logicalPlayerImages\":88,\"currentStageImages\":2}\n  ✓  3 asset-tests/images.spec.js:45:1 › WEB-023 cold lobby and first game obey transfer budgets; only visible public player images load (993ms)\n  ✓  4 asset-tests/images.spec.js:95:1 › WEB-033 Replay code and database stay cold until explicit library entry (659ms)\n\n  4 passed (6.3s)\n"
+    },
+    {
+      "name": "audio",
+      "command": "npm --prefix web-client run test:audio",
+      "status": "passed",
+      "tests": 27,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/audio.log",
+      "log_sha256": "c5ada01e05e488faf0d84497a8da0051a4e491c1b58bd6045f824695c26d3e46",
+      "tail": ":138:34 › WEB-028 invalid/blocked settings remain explicit and editable false (143ms)\n  ✓  24 audio-tests/sound.spec.js:138:34 › WEB-028 invalid/blocked settings remain explicit and editable true (159ms)\n  ✓  25 audio-tests/sound.spec.js:147:1 › WEB-028 early confirmation cancels delayed execution sound; reduced motion emits second-frame sound immediately (3.6s)\nWEB-028 sampled mix peak: 0.17271098494529724; muted=0 (not physical speaker listening)\n  ✓  26 audio-tests/sound.spec.js:161:1 › WEB-028 actual browser mix contains signal and master mute produces zero samples (1.2s)\nreview CLICK evidence: {\"samples\":[{\"mode\":\"mouse\",\"clicks\":1,\"plays\":1,\"cursor\":1,\"requests\":1,\"failures\":[]},{\"mode\":\"keyboard\",\"clicks\":2,\"plays\":2,\"cursor\":2,\"requests\":2,\"failures\":[]}],\"final\":{\"clicks\":2,\"plays\":2,\"requests\":2,\"failures\":[]}}\n  ✓  27 audio-tests/sound.spec.js:188:1 › WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK without duplicate fetch (2.2s)\n\n  27 passed (36.0s)\n"
+    },
+    {
+      "name": "files-repeat",
+      "command": "npm --prefix web-client run test:e2e -- tests/replay-files.spec.js --repeat-each=3",
+      "status": "passed",
+      "tests": 30,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/files-repeat.log",
+      "log_sha256": "f93c912203d4c0a7bb5e9b0b1f976fbe8b902b70ea9b861165dabc09db53640c",
+      "tail": "thin a successful batch without overwriting (1.3s)\n  ✓  25 tests/replay-files.spec.js:85:1 › duplicate decoded keys, unsupported/missing versions, invalid UTF-8, path keys and over-8MiB files never modify storage (1.1s)\n  ✓  26 tests/replay-files.spec.js:92:1 › unfinished historical file remains read-only material and cannot be imported or resume a game (256ms)\n  ✓  27 tests/replay-files.spec.js:99:1 › storage quota aborts the whole selected batch and a corrupt library can be backed up without validation, deletion or repair (476ms)\n  ✓  28 tests/replay-files.spec.js:110:1 › timed-out file read never publishes late preview or saves automatically; a new explicit selection works (286ms)\n  ✓  29 tests/replay-files.spec.js:121:1 › import completion waits for a controlled pending digest before reading committed storage (407ms)\n  ✓  30 tests/replay-files.spec.js:141:1 › multi-slot selection waits for controlled file parsing before counting and checking candidates (422ms)\n\n  30 passed (32.7s)\n"
+    },
+    {
+      "name": "default",
+      "command": "npm --prefix web-client run test:e2e",
+      "status": "passed",
+      "tests": 136,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/default.log",
+      "log_sha256": "69d1f91abad0da2527a2a362a91d18911ff3237f0a3bd6a67d1720fcaea030c5",
+      "tail": "age-layout.spec.js:159:1 › WEB-021 synthetic long player list exposes scroll instructions and supports keyboard and wheel (584ms)\n  ✓  128 tests/stage-layout.spec.js:195:1 › WEB-021 synthetic many public actors remain bounded, fold with keyboard, and reset browsing on refresh (1.2s)\n  ✓  129 tests/stage-layout.spec.js:232:1 › WEB-021 CSS zoom stress keeps stage ratio, readable text and controls within the viewport (501ms)\n  ✓  130 tests/vote-history.spec.js:42:1 › 実対局の全日全ラウンドを権威と照合し、閲覧と再読込では書き込まない (7.0s)\n  ✓  131 tests/vote-history.spec.js:112:3 › 合成表示境界：全方式・同票の全首位・再投票・ゼロ票・候補順序 (719ms)\n  ✓  132 tests/vote-history.spec.js:112:3 › 未知の投票方式は既知方式に偽装せず、公開票型は閲覧できる (695ms)\n  ✓  133 tests/vote-history.spec.js:129:3 › 旧版投票は同期して既存の履歴を表示し再投票しない (1.2s)\n  ✓  134 tests/vote-history.spec.js:129:3 › 投票実行後の応答喪失は同期で履歴を復元し再投票しない (1.2s)\n  ✓  135 tests/vote-history.spec.js:157:1 › CO中断は未完了の票型を追加せず、再読込でも同じ履歴を保つ (1.1s)\n  ✓  136 tests/vote-history.spec.js:182:1 › 失効と新局で前局の票型を持ち越さない (1.5s)\n\n  136 passed (2.7m)\n"
+    },
+    {
+      "name": "java-full",
+      "command": "VOCR_APPROVED_FULL_CHECK=1 VOCR_WEB035_BROWSER_EXPORT=$PWD/build/web035/browser-export.json bash tools/run-gradle-safe.sh fatJar --offline",
+      "status": "passed",
+      "tests": 617,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/full-final.log",
+      "log_sha256": "f4cef700a55b25652ea24eb494adbca916775ab9c7687d973f3de441d7f18d63",
+      "tail": "No Gradle daemons are running.\n              总计         已用        空闲      共享    缓冲/缓存    可用\n内存：        15Gi       8.4Gi       1.6Gi       103Mi       5.4Gi       6.6Gi\n交换：         9Gi       1.1Gi       8.9Gi\nTo honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.8/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \n> Task :compileJava UP-TO-DATE\n> Task :processResources UP-TO-DATE\n> Task :classes UP-TO-DATE\n> Task :compileWebJava UP-TO-DATE\n> Task :processWebResources NO-SOURCE\n> Task :webClasses UP-TO-DATE\n> Task :compileTestJava UP-TO-DATE\n> Task :processTestResources UP-TO-DATE\n> Task :testClasses UP-TO-DATE\n> Task :test\n> Task :verifyProbabilityConfig\n> Task :check\n> Task :verifyRuntimeAssets\n> Task :fatJar\n\nBUILD SUCCESSFUL in 29s\n9 actionable tasks: 4 executed, 5 up-to-date\n"
+    },
+    {
+      "name": "gate",
+      "command": "npm --prefix web-client run test:gate",
+      "status": "passed",
+      "tests": 15,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/gate.log",
+      "log_sha256": "a00af222b2a1e65c2173af954e2199d02ed8697aa7671d0c7048fea7ad99f262",
+      "tail": "14:5 › yaoohu / designated：应用直连・HTTP・浏览器逐命令对等 (13.9s)\n  ✓   6 gate-tests/release-gate.spec.js:214:5 › yaoohu / mixed：应用直连・HTTP・浏览器逐命令对等 (14.7s)\n  ✓   7 gate-tests/release-gate.spec.js:214:5 › kuangxin / designated：应用直连・HTTP・浏览器逐命令对等 (14.9s)\n  ✓   8 gate-tests/release-gate.spec.js:214:5 › kuangxin / mixed：应用直连・HTTP・浏览器逐命令对等 (20.3s)\n  ✓   9 gate-tests/release-gate.spec.js:214:5 › beide / designated：应用直连・HTTP・浏览器逐命令对等 (13.4s)\n  ✓  10 gate-tests/release-gate.spec.js:214:5 › beide / mixed：应用直连・HTTP・浏览器逐命令对等 (18.7s)\n  ✓  11 gate-tests/release-gate.spec.js:214:5 › maoyou / designated：应用直连・HTTP・浏览器逐命令对等 (11.8s)\n  ✓  12 gate-tests/release-gate.spec.js:214:5 › maoyou / mixed：应用直连・HTTP・浏览器逐命令对等 (20.0s)\n  ✓  13 gate-tests/release-gate.spec.js:214:5 › daxing / designated：应用直连・HTTP・浏览器逐命令对等 (20.3s)\n  ✓  14 gate-tests/release-gate.spec.js:214:5 › daxing / mixed：应用直连・HTTP・浏览器逐命令对等 (21.8s)\n  ✓  15 gate-tests/release-gate.spec.js:218:1 › tongchang / interruption：真实CO中断与同日事件确认 (1.7s)\n\n  15 passed (3.9m)\n"
+    },
+    {
+      "name": "desktop-current-roundtrip",
+      "command": "ephemeral copy of existing first replay-files test; input=build/web035/desktop-actual.json; same repository Playwright config",
+      "status": "passed",
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0,
+      "log": "/home/noeticuser/Documents/Codex/2026-10-22/village-of-cyber-remake-web-019/wf002-clean/build/wf002/desktop-roundtrip.log",
+      "log_sha256": "a5de8d240d4745f17964c0886ff08b2af7bc89d8246e7b07efc03055756ffc89",
+      "tail": "his is to add 'slf4j-simple':\n[WebServer] \n[WebServer] pom.xml:\n[WebServer] <dependency>\n[WebServer]     <groupId>org.slf4j</groupId>\n[WebServer]     <artifactId>slf4j-simple</artifactId>\n[WebServer]     <version>2.0.18</version>\n[WebServer] </dependency>\n[WebServer] \n[WebServer] build.gradle or build.gradle.kts:\n[WebServer] implementation(\"org.slf4j:slf4j-simple:2.0.18\")\n[WebServer] \n[WebServer] Visit https://javalin.io/documentation#logging if you need more help\n[WebServer] #########################################################################\n[WebServer] SLF4J(W): No SLF4J providers were found.\n[WebServer] SLF4J(W): Defaulting to no-operation (NOP) logger implementation\n[WebServer] SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.\n  ✓  1 tests/wf002-desktop-roundtrip.spec.js:29:1 › desktop actual saved game imports only after confirmation, plays, exports through browser and preserves raw records; live authority is untouched (1.4s)\n\n  1 passed (6.9s)\n"
+    }
+  ],
+  "remote_lfs": {
+    "schema": 1,
+    "remote": "https://github.com/lzly2004/Village-of-Cyber-Remake.git",
+    "pointer_paths": 32,
+    "unique_payloads": 31,
+    "seeded_from_initial_remote_download": 11,
+    "downloaded_after_repair": 20,
+    "local_copied_missing_objects_seeded": 0,
+    "all_size_sha256_verified": true,
+    "git_lfs_fsck": true,
+    "branch_push": false
+  },
+  "jvm_live_observation": [
+    {
+      "pid": 100593,
+      "oom_score_adj": "500"
+    }
+  ],
+  "artifact": {
+    "file": "build/libs/vocr-1.0.3.4-all.jar",
+    "bytes": 724197819,
+    "sha256": "2e9a59594169287ba97efb14a055fa62d16eaf0ac4dc6d82fe9925347a0af57c",
+    "web_server_classes": []
+  },
+  "browser_to_desktop_input": {
+    "path": "build/web035/browser-export.json",
+    "sha256": "323ef3dd104bdc78c76c442a4c89905a3955927a79875e26f55d2e67bfa15c47"
+  },
+  "desktop_to_browser_input": {
+    "path": "build/web035/desktop-actual.json",
+    "sha256": "0f2ff1731804829523dce2d8d62513f8ccfb27bf2a21af63b610622d52a51b3e"
+  },
+  "inputs_unchanged_after_run": true,
+  "manual_gates": {
+    "A06": "not_covered",
+    "A07": "not_covered",
+    "A08": "not_covered",
+    "046 formal browser DPI accessibility listening physical devices loop seams": "not_covered",
+    "049 pre-release manual review": "not_covered",
+    "047 capacity and long game": "not_covered"
+  },
+  "not_covered": [
+    "fresh OS fully automated toolchain installation",
+    "byte-for-byte reproducible builds",
+    "flake-free proof",
+    "GitHub Actions",
+    "Auto-Fix"
+  ],
+  "git_branch_push": false,
+  "ci_job_timeout_minutes": null,
+  "future_ci_timeout_candidate_minutes": 45,
+  "cleanup": {
+    "runtime_process_candidates_after_shutdown": [],
+    "xvfb_owner_exited": true
+  },
+  "original_workspace": {
+    "porcelain_entries": 137,
+    "original_file_hashes_verified": 136,
+    "hashes_unchanged": true,
+    "untracked_directory_entries_preserved": true
+  }
+}
