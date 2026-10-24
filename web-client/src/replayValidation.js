@@ -1,4 +1,4 @@
-// WEB-032 consumes only freshly generated v3 recordings. Historical migration belongs to WEB-035.
+// Fresh API recordings remain strict. File migrations are isolated in replayFiles.js.
 export const REPLAY_LIMITS = Object.freeze({ fileBytes: 8 * 1024 * 1024, entries: 9, libraryBytes: 64 * 1024 * 1024 })
 const configurations = ['jianyi', 'tongchang', 'yaoohu', 'kuangxin', 'beide', 'maoyou', 'daxing']
 export class ReplayError extends Error {
@@ -6,9 +6,9 @@ export class ReplayError extends Error {
 }
 const fail = () => { throw new ReplayError('INVALID_REPLAY') }
 const integer = (n, min, max) => { if (!Number.isSafeInteger(n) || n < min || n > max) fail() }
-const fields = (object, required, optional = []) => {
+const schemaFields = (object, required, optional = [], extensions = false) => {
   if (!object || typeof object !== 'object' || Array.isArray(object)) fail()
-  if (required.some(k => !Object.hasOwn(object, k)) || Object.keys(object).some(k => !required.includes(k) && !optional.includes(k))) fail()
+  if (required.some(k => !Object.hasOwn(object, k)) || (!extensions && Object.keys(object).some(k => !required.includes(k) && !optional.includes(k)))) fail()
 }
 const bytes = text => new TextEncoder().encode(text).byteLength
 const array = (a, min, max) => { if (!Array.isArray(a) || a.length < min || a.length > max) fail() }
@@ -17,22 +17,43 @@ const uniqueIntegers = (a, min, max) => {
   for (const n of a) integer(n, min, max)
   if (new Set(a).size !== a.length) fail()
 }
-export function validateReplay(replay) {
+export function validateReplay(replay, { extensions=false, unfinished=false } = {}) {
+  const fields=(object,required,optional=[])=>schemaFields(object,required,optional,extensions)
+  let nodes=0
+  function safe(value,depth=0,key='') {
+    if(depth>32 || ++nodes>1000000 || (value!==null && !['object','string','number','boolean'].includes(typeof value))) fail()
+    if(value && typeof value==='object' && !Array.isArray(value) && ![Object.prototype,null].includes(Object.getPrototypeOf(value)))fail()
+    if(typeof value==='number' && (!Number.isFinite(value) || (Number.isInteger(value) && !Number.isSafeInteger(value))))fail()
+    if(typeof value==='string' && key!=='rawRecords' && (bytes(value)>65536 || /^(?:[a-z][a-z0-9+.-]*:|[/\\]|\.\.[/\\])/i.test(value)))fail()
+    if(Array.isArray(value))value.forEach(v=>safe(v,depth+1,key))
+    else if(value && typeof value==='object') for(const k of Object.keys(value)) {
+      if(/^(?:__proto__|prototype|constructor|sessionid|sessiontoken|accesstoken|authorization|password|cookie|url|href|src|path)$/i.test(k))fail()
+      safe(value[k],depth+1,k)
+    }
+  }
+  safe(replay)
   fields(replay, ['version','slotIndex','saveTime','peiyiName','peiyiOrdinal','peiyiVillageCount','totalVillageCount','totalDays','endResult','totalEvents','daySnapshots','rawRecords'], ['peiyiDisplayName','resultDisplayName'])
   if (replay.version !== 3 || replay.slotIndex !== 0) fail()
   if (typeof replay.saveTime !== 'string' || !/^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}$/.test(replay.saveTime)) fail()
   if (!configurations.includes(replay.peiyiName) || configurations[replay.peiyiOrdinal - 1] !== replay.peiyiName) fail()
   integer(replay.peiyiOrdinal, 1, 7)
   for (const key of ['peiyiVillageCount','totalVillageCount']) integer(replay[key], -1, Number.MAX_SAFE_INTEGER)
-  integer(replay.totalDays, 1, 50); integer(replay.endResult, 1, 3)
+  integer(replay.totalDays, 1, 50); integer(replay.endResult, unfinished ? 0 : 1, 3)
   array(replay.rawRecords, 1, 20000)
   if (replay.totalEvents !== replay.rawRecords.length) fail()
   for (const line of replay.rawRecords) if (typeof line !== 'string' || bytes(line) > 65536) fail()
   const end = replay.rawRecords.filter(line => line.startsWith('END|')).at(-1)
   const result = ['VILLAGE_WIN','WOLF_WIN','FOX_WIN'][replay.endResult - 1]
   const endMatch = end?.match(/^END\|result=(VILLAGE_WIN|WOLF_WIN|FOX_WIN)\|day=([1-9][0-9]*)$/)
-  if (!endMatch || endMatch[1] !== result) fail()
-  const endDay = Number(endMatch[2]); integer(endDay, 1, replay.totalDays)
+  let endDay=0
+  if(replay.endResult===0) {
+    const partial=end?.match(/^END\|result=UNFINISHED\|day=(0|[1-9][0-9]*)$/)
+    if(end && !partial)fail()
+    endDay=partial?Number(partial[1]):0;integer(endDay,0,replay.totalDays)
+  } else {
+    if(!endMatch || endMatch[1]!==result)fail()
+    endDay=Number(endMatch[2]);integer(endDay,1,replay.totalDays)
+  }
   array(replay.daySnapshots, 1, 50)
   let lastDay = 0, identities
   for (const day of replay.daySnapshots) {

@@ -90,3 +90,11 @@ test('source locks both skill starts, history zero precedence and independent ic
   assert.match(handler,/if \(!ps.isAlive\(d\)\) continue/)
   assert.match(handler,/if \(day >= totalDays\)/)
 })
+
+test('034 O-1 missing exposure array entry produces a bounded diagnosis; public validation still rejects the malformed recording',()=>{
+  const r=structuredClone(fixture)
+  r.daySnapshots.forEach(s=>{s.players[0].claimedRole=0})
+  r.daySnapshots[1].players=[]
+  assert.throws(()=>validateReplay(r),/INVALID_REPLAY/)
+  assert.ok(replayInformation(r,3).diagnostics.some(d=>d.section==='exposure'&&d.code==='SKILL_RECORD_MISSING'))
+})

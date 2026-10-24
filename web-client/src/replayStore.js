@@ -5,7 +5,7 @@ const encode = text => new TextEncoder().encode(text)
 const canonical = value => Array.isArray(value) ? value.map(canonical)
   : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(k => [k, canonical(value[k])])) : value
 export async function replayId(replay) {
-  const { saveTime, peiyiDisplayName, resultDisplayName, ...content } = validateReplay(replay)
+  const { saveTime, peiyiDisplayName, resultDisplayName, ...content } = validateReplay(replay,{extensions:true})
   if (!globalThis.crypto?.subtle) throw new ReplayError('HASH_UNAVAILABLE')
   const hash = await crypto.subtle.digest('SHA-256', encode(JSON.stringify(canonical(content))))
   return [...new Uint8Array(hash)].map(n => n.toString(16).padStart(2,'0')).join('')
@@ -18,7 +18,7 @@ function entryValid(entry) {
   if (!entry || Object.keys(entry).sort().join(',') !== 'bytes,id,replay,savedAt'
       || !/^[0-9a-f]{64}$/.test(entry.id) || typeof entry.savedAt !== 'string'
       || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(entry.savedAt)) throw new ReplayError('INVALID_LIBRARY')
-  try { validateReplay(entry.replay) } catch { throw new ReplayError('INVALID_LIBRARY') }
+  try { validateReplay(entry.replay,{extensions:true}) } catch { throw new ReplayError('INVALID_LIBRARY') }
   if (entry.bytes !== encode(JSON.stringify(entry.replay)).length) throw new ReplayError('INVALID_LIBRARY')
 }
 export function createReplayStore(indexedDB) {
@@ -78,35 +78,56 @@ export function createReplayStore(indexedDB) {
     if (total > REPLAY_LIMITS.libraryBytes) throw new ReplayError('INVALID_LIBRARY')
     return entries.sort((a,b) => b.savedAt.localeCompare(a.savedAt) || a.id.localeCompare(b.id))
   }
-  async function save(replay) {
-    replay = structuredClone(validateReplay(replay))
-    const id = await replayId(replay)
-    const entry = { id, savedAt: new Date().toISOString(), bytes: encode(JSON.stringify(replay)).length, replay }
-    for (let attempt = 0; attempt < 5; attempt++) {
-      // Hash verification cannot await inside an IDB transaction. Verify a detached snapshot,
-      // then compare it under the write lock; competing tabs cause a bounded fresh retry.
-      const verified = new Map((await list()).map(e => [e.id,JSON.stringify(e)]))
-      try { return await transaction('readwrite',(store,done,fail) => {
-        const get = store.getAll()
-        get.onsuccess = () => {
-          try {
-            const entries = get.result
-            if (entries.length !== verified.size || entries.some(e => verified.get(e.id) !== JSON.stringify(e)))
-              throw new ReplayError('LIBRARY_CHANGED')
-            const duplicate = entries.find(e => e.id === id)
-            if (duplicate) { done({ duplicate:true, id }); return }
-            if (entries.length >= REPLAY_LIMITS.entries) throw new ReplayError('LIBRARY_FULL')
-            if (entries.reduce((sum,e) => sum+e.bytes,entry.bytes) > REPLAY_LIMITS.libraryBytes) throw new ReplayError('LIBRARY_FULL')
-            store.add(entry); done({ duplicate:false,id })
-          } catch (error) { fail(error) }
+  async function saveMany(replays) {
+    if(!Array.isArray(replays) || !replays.length || replays.length>9)throw new ReplayError('INVALID_REPLAY')
+    const incoming=[]
+    for(let replay of replays){
+      replay=structuredClone(validateReplay(replay,{extensions:true}))
+      const id=await replayId(replay)
+      incoming.push({id,savedAt:new Date().toISOString(),bytes:encode(JSON.stringify(replay)).length,replay})
+    }
+    for(let attempt=0;attempt<5;attempt++){
+      const verified=new Map((await list()).map(e=>[e.id,JSON.stringify(e)]))
+      try{return await transaction('readwrite',(store,done,fail)=>{
+        const get=store.getAll()
+        get.onsuccess=()=>{
+          try{
+            const entries=get.result
+            if(entries.length!==verified.size || entries.some(e=>verified.get(e.id)!==JSON.stringify(e)))throw new ReplayError('LIBRARY_CHANGED')
+            const additions=new Map()
+            for(const entry of incoming)if(!verified.has(entry.id))additions.set(entry.id,entry)
+            if(entries.length+additions.size>REPLAY_LIMITS.entries || entries.reduce((n,e)=>n+e.bytes,0)+[...additions.values()].reduce((n,e)=>n+e.bytes,0)>REPLAY_LIMITS.libraryBytes)throw new ReplayError('LIBRARY_FULL')
+            for(const entry of additions.values())store.add(entry)
+            done({added:additions.size,duplicates:incoming.length-additions.size,ids:incoming.map(e=>e.id)})
+          }catch(error){fail(error)}
         }
-      }) } catch (error) { if (error.code !== 'LIBRARY_CHANGED') throw error }
+      })}catch(error){if(error.code!=='LIBRARY_CHANGED')throw error}
     }
     throw new ReplayError('LIBRARY_CHANGED')
+  }
+  async function save(replay) {
+    const result=await saveMany([replay])
+    return {duplicate:result.added===0,id:result.ids[0]}
+  }
+  async function backup() {
+    // Recovery data is the existing IDB entry array, explicitly not an exchange file.
+    return transaction('readonly',(store,done,fail)=>{
+      const values=[];let size=0
+      const cursor=store.openCursor()
+      cursor.onsuccess=()=>{
+        try{
+          const entry=cursor.result
+          if(!entry){done(values);return}
+          size+=encode(JSON.stringify(entry.value)).length
+          if(size>REPLAY_LIMITS.libraryBytes+1024*1024)throw new ReplayError('REPLAY_TOO_LARGE')
+          values.push(entry.value);entry.continue()
+        }catch(error){fail(error)}
+      }
+    })
   }
   async function remove(id) {
     if (!/^[0-9a-f]{64}$/.test(id)) throw new ReplayError('INVALID_LIBRARY')
     return transaction('readwrite',(store,done) => { store.delete(id); done(null) })
   }
-  return { list, save, remove }
+  return { list, save, saveMany, remove, backup }
 }

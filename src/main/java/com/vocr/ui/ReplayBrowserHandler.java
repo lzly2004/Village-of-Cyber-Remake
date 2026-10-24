@@ -107,6 +107,8 @@ public class ReplayBrowserHandler implements SceneHandler {
         });
         ui.jPanel.add(btnTitle);
 
+        ReplayFileDialogs.addButtons(ui);
+
         UIHelpers.addBackground(ui, UiImage.REPLAY_BACKGROUND);
 
         UIHelpers.finishRender(ui);

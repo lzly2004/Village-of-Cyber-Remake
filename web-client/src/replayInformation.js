@@ -28,6 +28,11 @@ export function replayInformation(replay,requestedDay) {
     const key=[section,code,requestedDay,sourceDay].join(':')
     if(!seen.has(key)){seen.add(key);diagnostics.push({key,section,code,requestedDay,sourceDay})}
   }
+  function marked(s,index,d) {
+    const p=s?.players?.[index]
+    if(!p)diagnose('exposure','SKILL_RECORD_MISSING',d,s?.dayNumber ?? null)
+    return !!p?.nonHumanMarked
+  }
   function snapshot(d,section) {
     const result=replaySnapshot(replay,d)
     if(result.diagnostic) diagnose(section,result.diagnostic,d,result.snapshot?.dayNumber ?? null)
@@ -54,9 +59,9 @@ export function replayInformation(replay,requestedDay) {
         line+=playerName(next,position)+(actor.claimedRole===3?'':black?'●':'○')+'→'
       }
       // Exposure is read from the same day, never from the next-day skill record.
-      if(!exposed) exposed=!!snapshot(skillDay,'exposure')?.players[index].nonHumanMarked
+      if(!exposed) exposed=marked(snapshot(skillDay,'exposure'),index,skillDay)
     }
-    if(!exposed) exposed=!!snapshot(day,'exposure')?.players[index].nonHumanMarked
+    if(!exposed) exposed=marked(snapshot(day,'exposure'),index,day)
     if(exposed) line+='破绽→'
     sections[actor.claimedRole]+=trimArrow(line)+'\n'
   }

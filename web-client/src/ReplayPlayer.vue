@@ -10,7 +10,7 @@ const props = defineProps(['replay','audioControls'])
 const emit = defineEmits(['close','playing'])
 const dialog = ref(null), selectedDay = ref(2), valid = ref(false), dateLocked=ref(false)
 let recording
-try { recording=validateReplay(props.replay); selectedDay.value=replayDay(recording); valid.value=true } catch { /* Bounded diagnostic below, never substitute a new game. */ }
+try { recording=validateReplay(props.replay,{extensions:true}); selectedDay.value=replayDay(recording); valid.value=true } catch { /* Bounded diagnostic below, never substitute a new game. */ }
 const audioState=computed(()=>props.audioControls?.state?.() || {status:'off'})
 const frame = computed(()=>valid.value ? replayFrame(recording,selectedDay.value) : null)
 const days = computed(()=>frame.value ? Array.from({length:frame.value.lastDay-frame.value.firstDay+1},(_,i)=>frame.value.firstDay+i) : [])

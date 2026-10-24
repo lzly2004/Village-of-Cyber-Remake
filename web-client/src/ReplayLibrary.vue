@@ -4,13 +4,14 @@ import { configurationName } from './labels.js'
 import { createReplayStore } from './replayStore.js'
 import { readCompletedReplay } from './replayApi.js'
 import ReplayPlayer from './ReplayPlayer.vue'
+import { readReplayFile, exportReplayFile, downloadReplayBytes } from './replayFiles.js'
 const props = defineProps({ sessionId:String, cursor:Number, eligible:Boolean,initialAction:String,initialIntent:Object,audioControls:Object })
 const emit=defineEmits(['playing'])
-const playing=ref(null)
+const playing=ref(null), importFile=ref(null), candidates=ref([]), chosen=ref([])
 const store = createReplayStore()
 const opened = ref(false), working = ref(false), entries = ref([]), message = ref(''), problem = ref('')
 const query = ref(''), configuration = ref(''), result = ref(''), removing = ref(''), selected = ref('')
-const resultNames = { 1:'村人勝利', 2:'人狼勝利', 3:'妖狐勝利' }
+const resultNames = { 0:'未完（資料のみ）', 1:'村人勝利', 2:'人狼勝利', 3:'妖狐勝利' }
 const filtered = computed(() => entries.value.filter(e => {
   const r = e.replay
   return (!configuration.value || r.peiyiName === configuration.value)
@@ -22,6 +23,11 @@ const configurations = computed(() => [...new Set(entries.value.map(e => e.repla
 let controller
 onBeforeUnmount(() => controller?.abort())
 const errors = {
+  LEGACY_COMPATIBILITY_DIAGNOSTIC:'旧形式の記録を安全に確定できません。索引を推測して補いません。原本を保管してください。保存はしていません。',
+  INVALID_JSON:'JSONが不正です。重複キー、過大な数値、深すぎる構造も受け付けません。',
+  INVALID_UTF8:'UTF-8の録画ファイルを選択してください。',
+  UNSUPPORTED_VERSION:'未対応の版または版の記載がないため読み込めません。',
+  FILE_TIMEOUT:'ファイル読み取りが完了しませんでした。保存はしていません。',
   QUOTA_EXCEEDED:'ブラウザーの保存容量が不足しています。既存のReplayは変更していません。不要な録画を削除してから再試行してください。',
   LIBRARY_FULL:'Replayの保存上限（9局・合計64MiB）です。不要な録画を削除してから再試行してください。',
   LIBRARY_CHANGED:'別タブでReplay一覧が更新され続けています。一覧を再読込して再試行してください。',
@@ -68,6 +74,34 @@ onMounted(()=>{
   } else if(props.initialAction==='open')open()
   else if(props.initialAction==='cancel')problem.value='読み込みが中断されたため、保存は実行していません。もう一度操作してください。'
 })
+function previewFile(event) {
+  const file=event.target.files?.[0]
+  event.target.value='';candidates.value=[];chosen.value=[];importFile.value=file || null
+  if(!file)return
+  return run(async()=>{
+    candidates.value=await readReplayFile(file)
+    message.value='検証しました。取り込む終局録画を選び、確認してください。まだ保存していません。'
+  })
+}
+function importChosen() {
+  if(!chosen.value.length)return
+  return run(async()=>{
+    const selected=candidates.value.filter(c=>chosen.value.includes(c.fileSlot) && !c.readOnly).map(c=>JSON.parse(JSON.stringify(c.replay)))
+    const result=await store.saveMany(selected)
+    candidates.value=[];chosen.value=[];importFile.value=null;await reload()
+    message.value=`${result.added}局を取り込みました。重複${result.duplicates}局は追加していません。対局と戦績は変更していません。`
+  })
+}
+function exportEntries(values) {
+  return run(async()=>{downloadReplayBytes(exportReplayFile(values.map(e=>JSON.parse(JSON.stringify(e.replay)))));message.value='交換ファイルを生成しました。ブラウザーのダウンロード先を確認してください。'})
+}
+function backupLibrary() {
+  return run(async()=>{
+    const entries=await store.backup()
+    downloadReplayBytes(new TextEncoder().encode(JSON.stringify(entries)),'vocr-library-recovery.json')
+    message.value='修復資料を生成しました。これは交換用Replayではありません。取り込みには使用できません。'
+  })
+}
 function remove(id) {
   return run(async () => {
     await store.remove(id)
@@ -87,7 +121,26 @@ function remove(id) {
     <div v-if="opened">
       <h2>Replay一覧</h2>
       <p>このブラウザー・同じサイト内の保存です。別端末や別サイトには移りません。閲覧履歴の消去・プライベートモード等で失われる場合があります。</p>
-      <p>終局の全イベント確認後に保存できます。上限9局・合計64MiB。ファイル入出力は準備中です。対局や戦績は再開・加算しません。</p>
+      <p>終局の全イベント確認後に保存できます。上限9局・合計64MiB。交換ファイルはUTF-8 JSON・最大8MiBです。対局や戦績は再開・加算しません。</p>
+      <div class="replay-file-actions">
+        <label>録画ファイルを選ぶ<input type="file" accept=".json,application/json" :disabled="working" @change="previewFile"></label>
+        <p>ファイルには役職・技能・seedを含みます。選択後に全体を検証し、終局録画を確認してから保存します。未完録画は資料表示のみです。</p>
+        <button class="quiet-button" :disabled="working || !entries.length" @click="exportEntries(entries)">一覧の全録画をエクスポート</button>
+        <button class="quiet-button" :disabled="working" @click="backupLibrary">ローカル庫の修復資料を保存</button>
+        <p>修復資料は未検証のローカル保存内容です。交換・再取り込みには使えません。第三者に共有せず保管してください。</p>
+        <template v-if="importFile">
+          <p>選択ファイル：{{ importFile.name }}</p>
+          <button class="quiet-button" :disabled="working" @click="downloadReplayBytes(importFile,'vocr-selected-original.json')">選択ファイルの原本を保存</button>
+          <p>原本は検証に失敗した内容もそのまま保管します。交換可能と判定したことにはなりません。</p>
+        </template>
+        <fieldset v-if="candidates.length" :disabled="working">
+          <legend>取り込みの確認（未保存）</legend>
+          <label v-for="c in candidates" :key="c.fileSlot"><input v-model="chosen" type="checkbox" :value="c.fileSlot" :disabled="c.readOnly">ファイル位置{{ c.fileSlot }} · {{ configurationName(c.replay.peiyiName) }}村 · {{ resultNames[c.replay.endResult] }} · {{ c.replay.totalDays }}日 · v{{ c.sourceVersion }}<span v-if="c.sourceVersion<3">→v3（技能履歴は補完しません）</span></label>
+          <p>既存の録画を上書きしません。重複は追加せず、容量不足なら選択分を一括で取り消します。</p>
+          <button class="primary-button" :disabled="!chosen.length" @click="importChosen">選択した録画の取り込みを確定</button>
+          <button class="quiet-button" @click="candidates=[];chosen=[];importFile=null">取り込みを取り消す</button>
+        </fieldset>
+      </div>
       <div class="replay-filters">
         <label>日時・配役・勝敗を検索<input v-model="query" type="search" maxlength="120"></label>
         <label>配役<select v-model="configuration"><option value="">すべて</option><option v-for="c in configurations" :key="c" :value="c">{{ configurationName(c) }}村</option></select></label>
@@ -101,6 +154,7 @@ function remove(id) {
           <strong>{{ configurationName(entry.replay.peiyiName) }}村 · {{ resultNames[entry.replay.endResult] }}</strong>
           <span>{{ entry.replay.saveTime }} · 第{{ entry.replay.totalDays }}日 · {{ entry.replay.totalEvents }}記録</span>
           <button class="quiet-button" :disabled="working" @click="selected = entry.id">詳細を確認</button>
+          <button class="quiet-button" :disabled="working" @click="exportEntries([entry])">この録画をエクスポート</button>
           <button class="quiet-button" :disabled="working" @click="playing=JSON.parse(JSON.stringify(entry.replay))">再生する</button>
           <button v-if="removing !== entry.id" class="quiet-button" :disabled="working" @click="removing = entry.id">削除</button>
           <span v-else>このReplayを削除しますか？<button class="quiet-button" :disabled="working" @click="removing = ''">残す</button><button class="danger-button" :disabled="working" @click="remove(entry.id)">削除を確定</button></span>

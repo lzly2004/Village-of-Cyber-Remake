@@ -263,3 +263,9 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .replay-skill-icon { display: inline-flex; flex: 0 0 auto; }
 .replay-votes table { border-collapse: collapse; width: 100%; }
 .replay-votes th, .replay-votes td { padding: .5rem; text-align: left; border-bottom: 1px solid #d5ddd5; overflow-wrap: anywhere; }
+
+.replay-file-actions { border: 1px solid #b1beb0; padding: .8rem; margin: .8rem 0; }
+.replay-file-actions fieldset label { display: block; margin: .7rem 0; overflow-wrap: anywhere; }
+.replay-file-actions input[type=file] { max-width: 100%; }
+
+.replay-file-actions > button, .replay-file-actions > fieldset > button { margin: .3rem .7rem .3rem 0; }

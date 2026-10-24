@@ -1,0 +1,493 @@
+[
+  {
+    "name": "current-v3",
+    "ok": true,
+    "patches": []
+  },
+  {
+    "name": "version-0",
+    "ok": true,
+    "patches": [
+      {
+        "path": "/0/version",
+        "value": 0
+      },
+      {
+        "path": "/0/daySnapshots/0/players/0/skillTargets",
+        "remove": true
+      },
+      {
+        "path": "/0/peiyiVillageCount",
+        "remove": true
+      },
+      {
+        "path": "/0/totalVillageCount",
+        "remove": true
+      }
+    ]
+  },
+  {
+    "name": "version-1",
+    "ok": true,
+    "patches": [
+      {
+        "path": "/0/version",
+        "value": 1
+      },
+      {
+        "path": "/0/daySnapshots/0/players/0/skillTargets",
+        "remove": true
+      },
+      {
+        "path": "/0/peiyiVillageCount",
+        "remove": true
+      },
+      {
+        "path": "/0/totalVillageCount",
+        "remove": true
+      }
+    ]
+  },
+  {
+    "name": "version-2",
+    "ok": true,
+    "patches": [
+      {
+        "path": "/0/version",
+        "value": 2
+      },
+      {
+        "path": "/0/daySnapshots/0/players/0/skillTargets",
+        "remove": true
+      },
+      {
+        "path": "/0/peiyiVillageCount",
+        "remove": true
+      },
+      {
+        "path": "/0/totalVillageCount",
+        "remove": true
+      }
+    ]
+  },
+  {
+    "name": "ordinary-unknown-fields",
+    "ok": true,
+    "patches": [
+      {
+        "path": "/0/notes",
+        "value": {
+          "text": "ä/ü <b>not markup</b>",
+          "nested": [
+            1,
+            true,
+            null
+          ],
+          "decimal": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "name": "future-version",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/version",
+        "value": 4
+      }
+    ]
+  },
+  {
+    "name": "negative-version",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/version",
+        "value": -1
+      }
+    ]
+  },
+  {
+    "name": "string-version",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/version",
+        "value": "3"
+      }
+    ]
+  },
+  {
+    "name": "wrong-slot",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/slotIndex",
+        "value": 8
+      }
+    ]
+  },
+  {
+    "name": "wrong-config",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/peiyiOrdinal",
+        "value": 3
+      }
+    ]
+  },
+  {
+    "name": "bad-raw-count",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/totalEvents",
+        "value": 99
+      }
+    ]
+  },
+  {
+    "name": "unsafe-counter",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/peiyiVillageCount",
+        "value": 9007199254740992
+      }
+    ]
+  },
+  {
+    "name": "unknown-role",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/0/players/0/actualRole",
+        "value": 12
+      }
+    ]
+  },
+  {
+    "name": "unknown-death",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/0/players/0/deathReason",
+        "value": 8
+      }
+    ]
+  },
+  {
+    "name": "wrong-target",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/0/players/0/skillTarget",
+        "value": 7
+      }
+    ]
+  },
+  {
+    "name": "large-history",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/0/players/0/skillTargets",
+        "value": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "duplicate-identity",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/1/players/0/characterNumber",
+        "value": 28
+      }
+    ]
+  },
+  {
+    "name": "duplicate-day",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/1/dayNumber",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "name": "grey-is-not-character",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/1/greyTargetCharNums",
+        "value": [
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "name": "invalid-voter",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/1/voteRounds/0/votes",
+        "value": [
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            0
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "name": "URL-reference",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/notes",
+        "value": "https://example.invalid/x"
+      }
+    ]
+  },
+  {
+    "name": "path-reference",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/notes",
+        "value": "../private"
+      }
+    ]
+  },
+  {
+    "name": "credential",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/sessionId",
+        "value": "DO_NOT_STORE"
+      }
+    ]
+  },
+  {
+    "name": "prototype-key",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/notes",
+        "value": {
+          "__proto__": {}
+        }
+      }
+    ]
+  },
+  {
+    "name": "constructor-key",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/notes",
+        "value": {
+          "constructor": {}
+        }
+      }
+    ]
+  },
+  {
+    "name": "missing-player-list",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/daySnapshots/0/players",
+        "value": null
+      }
+    ]
+  },
+  {
+    "name": "deep-structure",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/notes",
+        "value": [
+          [
+            [
+              [
+                [
+                  [
+                    [
+                      [
+                        [
+                          [
+                            [
+                              [
+                                [
+                                  [
+                                    [
+                                      [
+                                        [
+                                          [
+                                            [
+                                              [
+                                                [
+                                                  [
+                                                    [
+                                                      [
+                                                        [
+                                                          [
+                                                            [
+                                                              [
+                                                                [
+                                                                  [
+                                                                    [
+                                                                      [
+                                                                        [
+                                                                          [
+                                                                            [
+                                                                              [
+                                                                                0
+                                                                              ]
+                                                                            ]
+                                                                          ]
+                                                                        ]
+                                                                      ]
+                                                                    ]
+                                                                  ]
+                                                                ]
+                                                              ]
+                                                            ]
+                                                          ]
+                                                        ]
+                                                      ]
+                                                    ]
+                                                  ]
+                                                ]
+                                              ]
+                                            ]
+                                          ]
+                                        ]
+                                      ]
+                                    ]
+                                  ]
+                                ]
+                              ]
+                            ]
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "name": "missing-version",
+    "ok": false,
+    "patches": [
+      {
+        "path": "/0/version",
+        "remove": true
+      }
+    ]
+  },
+  {
+    "name": "unfinished-read-only",
+    "ok": true,
+    "patches": [
+      {
+        "path": "/0/endResult",
+        "value": 0
+      },
+      {
+        "path": "/0/rawRecords/16",
+        "remove": true
+      },
+      {
+        "path": "/0/totalEvents",
+        "value": 16
+      }
+    ]
+  },
+  {
+    "name": "unfinished-marker-read-only",
+    "ok": true,
+    "patches": [
+      {
+        "path": "/0/endResult",
+        "value": 0
+      },
+      {
+        "path": "/0/rawRecords/16",
+        "value": "END|result=UNFINISHED|day=0"
+      }
+    ]
+  }
+]
