@@ -11,7 +11,7 @@ const playing=ref(null), importFile=ref(null), candidates=ref([]), chosen=ref([]
 const store = createReplayStore()
 const opened = ref(false), working = ref(false), entries = ref([]), message = ref(''), problem = ref('')
 const query = ref(''), configuration = ref(''), result = ref(''), removing = ref(''), selected = ref('')
-const resultNames = { 0:'未完（資料のみ）', 1:'村人勝利', 2:'人狼勝利', 3:'妖狐勝利' }
+const resultNames = { 0:'未完（概要のみ・取り込み不可）', 1:'村人勝利', 2:'人狼勝利', 3:'妖狐勝利' }
 const filtered = computed(() => entries.value.filter(e => {
   const r = e.replay
   return (!configuration.value || r.peiyiName === configuration.value)
@@ -124,7 +124,7 @@ function remove(id) {
       <p>終局の全イベント確認後に保存できます。上限9局・合計64MiB。交換ファイルはUTF-8 JSON・最大8MiBです。対局や戦績は再開・加算しません。</p>
       <div class="replay-file-actions">
         <label>録画ファイルを選ぶ<input type="file" accept=".json,application/json" :disabled="working" @change="previewFile"></label>
-        <p>ファイルには役職・技能・seedを含みます。選択後に全体を検証し、終局録画を確認してから保存します。未完録画は資料表示のみです。</p>
+        <p>ファイルには役職・技能・seedを含みます。選択後に全体を検証し、終局録画を確認してから保存します。未完録画は概要のみ表示します。取り込み・再生はできません。</p>
         <button class="quiet-button" :disabled="working || !entries.length" @click="exportEntries(entries)">一覧の全録画をエクスポート</button>
         <button class="quiet-button" :disabled="working" @click="backupLibrary">ローカル庫の修復資料を保存</button>
         <p>修復資料は未検証のローカル保存内容です。交換・再取り込みには使えません。第三者に共有せず保管してください。</p>
