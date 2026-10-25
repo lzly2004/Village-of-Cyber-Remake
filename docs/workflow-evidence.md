@@ -1,6 +1,6 @@
 # WF-005：证据包与独立CR交接
 
-当前：WF-005完成，PR #2经明确授权以merge commit合入main@dbbf884，4个维护提交保留，合并树等于已审8a9f6d6。main真实push run40177191539完整通过，revision4、Git环境记录和新政策指纹9ceeeb03生效，证据/回执复算通过；本轮元数据来自一方UI（REST限流），边界见[合流归档](review-8a9f6d6.md)。required checks未配置，WF-006/007仍PLANNED；下一项WEB-036保持READY且本轮未实施，人工/容量/发布门槛开放。
+当前：WF-001～005完成；PR #3以merge commit合流main@d04b2de，docs层PR/main证据已由独立CR复算通过。保护规则85330239的历史设置页面导出与SHA-256见[保护证据](workflow-protection-evidence.json)，不冒充可公开读取的认证API。日常由Coder整理交接包、用户转交独立CR并回传报告；实施、自查、CI绿灯均不替代CR，详见[角色与交接](workflow-daily-guide.md)。WF-006/007仍可选，人工/容量/发布门槛开放。
 
 ## 产物与身份契约（schema 1）
 

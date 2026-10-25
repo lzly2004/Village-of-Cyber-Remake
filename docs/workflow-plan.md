@@ -105,3 +105,5 @@ WF-005复评补修：三条P3与历史证据兼容见[2fb4edf归档](review-2fb4
 2026-10-25 PR #2合流收尾：用户明确批准Ready→merge commit，main@dbbf884保留4个维护提交且树等于已审8a9f6d6；main run40177191539 full20项通过，revision4/55项契约和policy9ceeeb03生效，证据与回执复算通过。来源边界见[本轮记录](review-8a9f6d6.md)。required checks尚未配置，下一项WEB-036仍READY，本轮不实施；收尾文档随正常批次同步，不循环创建维护PR。
 
 最终收尾按[本轮记录](review-6a7af2d.md)对齐本地main、同步6a7af2d归档、准备main保护并以纯文档增量验证；不增加新工作流子系统。tooling/frontend首次独立真实云端路径随实际后续任务验证，不拿docs或full成功冒充全部层级。WF-006/007仍为可选PLANNED，人工/容量/发布门槛不变。
+
+本轮接续WEB-036前已实际补齐[角色与交接](workflow-daily-guide.md)：Coder实施/验证/交接，独立CR只读审查/复评/主线核验，用户转交和决策；不是Coder自评放行。PR #3通过结论与保护历史导出见[review-d04b2de](review-d04b2de.md)，不以本轮前端任务冒充WF-006/007实施。
