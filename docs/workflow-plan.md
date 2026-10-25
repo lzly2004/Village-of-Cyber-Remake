@@ -97,3 +97,5 @@ WF-005复评补修：三条P3与历史证据兼容见[2fb4edf归档](review-2fb4
 2026-10-25授权后收尾：0b28449真实PR红灯确认新摘要；独立3文件24行空白提交3b8641c经本机完整验收及真实PR完整CI通过，取消push单次补验也成功，最新两个verify全绿、PR clean且仍draft。证据包/回执复算和边界见[本轮归档](review-f089bda.md)。main仍6163620；最终文档归档留本地，不将其冒充已测/已推代码SHA。前文待授权/红灯为对应阶段记录。下一步独立CR与用户主线决策，不自动推进WF-006/007或WEB-036。
 
 2026-10-25主线合流完成：用户明确授权Ready→merge commit，PR #1合入main@8ef3240并保留169提交，首次main push全门与证据/回执复算通过。来源与未覆盖边界见[主线归档](review-394779a.md)。WEB-036恢复原READY顺序，本轮未实施；WF-006/007仍PLANNED、required check未改设置。本地P3补修394779a及归档仍待独立维护PR，不直接推main。
+
+2026-10-25维护接续：从最新main@8ef3240创建maintenance/wf005-tools，同步三个未推源提交ddd86b1/394779a/dea2a94及当前归档，拟走新维护草稿PR。接受现有full分级，不整体降低tools/ci门槛；required checks只保留配置建议，未改设置。实际核验、提交映射与发布边界见[维护记录](review-dea2a94.md)。原WF-001～005完成状态不变，WF-006/007仍PLANNED；维护交接前不混入WEB-036开发。

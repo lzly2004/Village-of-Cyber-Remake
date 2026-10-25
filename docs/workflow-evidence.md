@@ -1,6 +1,6 @@
 # WF-005：证据包与独立CR交接
 
-当前：WF-005完成，用户另行明确授权后，[PR #1](https://github.com/lzly2004/Village-of-Cyber-Remake/pull/1)以merge commit合入main@8ef3240，169个小提交保留。main首次完整CI run40157766560通过，证据/回执复算通过；先核对一方GitHub页面digest，限流解除后又以新鲜REST元数据独立复算，来源边界见[主线归档](review-394779a.md)。本地394779a的P3补修尚未推送或合流。WF-006/007仍PLANNED，WEB-036恢复READY顺序，尚未实施；人工/容量/发布门槛不关闭。
+当前：WF-005已完成，main@8ef3240的首次完整CI和证据/回执复算通过；保留169个小提交的合流记录见[主线归档](review-394779a.md)。本轮正以main为基线准备maintenance/wf005-tools维护PR，完整同步ddd86b1、394779a、dea2a94的归档和工具补修；发布/评审状态与决策见[维护记录](review-dea2a94.md)。分级仍full，不将本机55项称云端已通过。required checks尚未配置，WF-006/007仍PLANNED，WEB-036保持READY且本轮未实施；人工/容量/发布门槛开放。
 
 ## 产物与身份契约（schema 1）
 
