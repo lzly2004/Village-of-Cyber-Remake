@@ -1,6 +1,6 @@
 # WF-005：证据包与独立CR交接
 
-当前：WF-005已完成，main@8ef3240的首次完整CI和证据/回执复算通过；保留169个小提交的合流记录见[主线归档](review-394779a.md)。本轮正以main为基线准备maintenance/wf005-tools维护PR，完整同步ddd86b1、394779a、dea2a94的归档和工具补修；发布/评审状态与决策见[维护记录](review-dea2a94.md)。分级仍full，不将本机55项称云端已通过。required checks尚未配置，WF-006/007仍PLANNED，WEB-036保持READY且本轮未实施；人工/容量/发布门槛开放。
+当前：WF-005完成，PR #2经明确授权以merge commit合入main@dbbf884，4个维护提交保留，合并树等于已审8a9f6d6。main真实push run40177191539完整通过，revision4、Git环境记录和新政策指纹9ceeeb03生效，证据/回执复算通过；本轮元数据来自一方UI（REST限流），边界见[合流归档](review-8a9f6d6.md)。required checks未配置，WF-006/007仍PLANNED；下一项WEB-036保持READY且本轮未实施，人工/容量/发布门槛开放。
 
 ## 产物与身份契约（schema 1）
 

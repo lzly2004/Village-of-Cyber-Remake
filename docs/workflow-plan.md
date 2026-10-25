@@ -99,3 +99,7 @@ WF-005复评补修：三条P3与历史证据兼容见[2fb4edf归档](review-2fb4
 2026-10-25主线合流完成：用户明确授权Ready→merge commit，PR #1合入main@8ef3240并保留169提交，首次main push全门与证据/回执复算通过。来源与未覆盖边界见[主线归档](review-394779a.md)。WEB-036恢复原READY顺序，本轮未实施；WF-006/007仍PLANNED、required check未改设置。本地P3补修394779a及归档仍待独立维护PR，不直接推main。
 
 2026-10-25维护接续：从最新main@8ef3240创建maintenance/wf005-tools，同步三个未推源提交ddd86b1/394779a/dea2a94及当前归档，拟走新维护草稿PR。接受现有full分级，不整体降低tools/ci门槛；required checks只保留配置建议，未改设置。实际核验、提交映射与发布边界见[维护记录](review-dea2a94.md)。原WF-001～005完成状态不变，WF-006/007仍PLANNED；维护交接前不混入WEB-036开发。
+
+维护类CI时长约定：tools/ci/*默认full为有意保守政策，近期观测verify约10–16分钟（604/911/942秒；run 608/914/946秒），受缓存及runner影响，不是固定SLA。不要将此正常成本误判为性能故障，也不为省一次验收整体降级；细分须另评具体文件、覆盖矩阵及策略测试。PR #2合流/新政策基线见[本轮记录](review-8a9f6d6.md)。
+
+2026-10-25 PR #2合流收尾：用户明确批准Ready→merge commit，main@dbbf884保留4个维护提交且树等于已审8a9f6d6；main run40177191539 full20项通过，revision4/55项契约和policy9ceeeb03生效，证据与回执复算通过。来源边界见[本轮记录](review-8a9f6d6.md)。required checks尚未配置，下一项WEB-036仍READY，本轮不实施；收尾文档随正常批次同步，不循环创建维护PR。
