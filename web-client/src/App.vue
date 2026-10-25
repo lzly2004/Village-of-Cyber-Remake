@@ -9,6 +9,7 @@ import BgmControl from './BgmControl.vue'
 import PlayerPortrait from './PlayerPortrait.vue'
 import ReplayEntry from './ReplayEntry.vue'
 import RecordSettlement from './RecordSettlement.vue'
+import RecordPage from './RecordPage.vue'
 import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
@@ -41,6 +42,7 @@ const HelpDialog = defineAsyncComponent({
   ]) },
 })
 const helpPage = ref('')
+const recordPage = ref(false)
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
 const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
@@ -81,7 +83,7 @@ function name(number) {
         <span>確認済みイベント {{ cursor }}</span>
         <button class="quiet-button" :disabled="busy" @click="refresh">再同期</button>
       </div>
-      <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button></nav>
+      <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button><button class="quiet-button" @click="recordPage = true">戦績を見る</button></nav>
       <BgmControl :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
       <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。サービス再起動後は無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
@@ -92,6 +94,7 @@ function name(number) {
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
       <ReplayEntry :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" @playing="replayPlaying=$event" />
+      <RecordPage v-if="recordPage" @close="recordPage=false" />
       <RecordSettlement :session-id="sessionId" :update="update" :eligible="finished && !busy && !uncertain && !replayPlaying" />
 
       <section v-if="!update && !sessionId" class="lobby">
@@ -107,7 +110,7 @@ function name(number) {
             <span class="radio-mark" aria-hidden="true"></span>
           </label>
         </fieldset>
-        <div class="start-row"><button class="primary-button" :disabled="busy" @click="start(configuration)">{{ busy ? '開村中…' : '対局を始める' }} <span aria-hidden="true">↗</span></button><span>ログイン不要・戦績はサービス終了までの一時記録です</span></div>
+        <div class="start-row"><button class="primary-button" :disabled="busy" @click="start(configuration)">{{ busy ? '開村中…' : '対局を始める' }} <span aria-hidden="true">↗</span></button><span>ログイン不要・戦績はこのブラウザーに保存します</span></div>
       </section>
 
       <section v-else-if="!update" class="restoring" aria-live="polite">
