@@ -94,6 +94,7 @@ test('records: only acknowledged completion captures public configuration/result
   assert.throws(()=>completedRecord('invalid',update,true),/INVALID_RESULT/)
   assert.throws(()=>completedRecord(id,{phase:'FINISHED',view:{configuration:'NONE',result:'VILLAGE_WIN'}},true),/INVALID_RESULT/)
 })
+// Intentional cross-end contract tripwires: changes to GameRecord must review/synchronize these anchors, not simply delete them as text-fragile tests.
 test('records: configuration order, village-only victory and five-place HALF_UP follow desktop source',async()=>{
   const source=await readFile(new URL('../../src/main/java/com/vocr/domain/peiyi.java',import.meta.url),'utf8')
   assert.deepEqual([...source.matchAll(/^\s*(jianyi|tongchang|yaoohu|kuangxin|beide|maoyou|daxing)\b/gm)].map(x=>x[1]),recordConfigurations)
