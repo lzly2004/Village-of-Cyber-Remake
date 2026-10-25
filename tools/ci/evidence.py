@@ -90,8 +90,16 @@ def short(value):
     return ''.join(c for c in value if ord(c) >= 32)[:400]
 
 
-def failure_detail(text):
+def failure_detail(text, *, diff_check=False):
     text = ANSI.sub('', text)
+    if diff_check:
+        issues = re.findall(r'^([^\r\n]+?):([1-9][0-9]*): (trailing whitespace(?:, space before tab in indent)?\.|space before tab in indent\.|new blank line at EOF\.)\r?$', text, re.M)
+        if issues:
+            first = issues[0][0] + ':' + issues[0][1]
+            reasons = [reason for item in issues for reason in item[2][:-1].split(', ')]
+            labels = '; '.join(kind + ': ' + str(reasons.count(kind)) for kind in dict.fromkeys(reasons))
+            return {'case': short(first), 'first_error': short('git diff --check: ' + str(len(issues)) +
+                    ' issues / ' + str(len({item[0] for item in issues})) + ' files (' + labels + '); first ' + first)}
     case = re.search(r'^(?:FAIL|ERROR): (.+)$|^not ok \d+ - (.+)$|^\s*\d+\) (.+ › .+)$', text, re.M)
     error = re.search(r'^\s*((?:AssertionError|Error|TypeError|ValueError|FAILED|REFUSED)[^\n]*)', text, re.M)
     error = error or re.search(r'^\s*(error:[^\n]*)', text, re.M)
@@ -130,10 +138,10 @@ def xml_counts(read, names):
             'xml_files': len(names), 'source': 'build/test-results/test/TEST-*.xml'}, failure
 
 
-def assemble(read, names, environment, *, assembly_revision=2):
+def assemble(read, names, environment, *, assembly_revision=3):
     """read(names) can be filesystem or a bounded ZIP reader; no extraction/execution."""
-    # Revision 1 reproduces published WF-005 reports field-for-field, duplicates included.
-    if type(assembly_revision) is not int or assembly_revision not in (1, 2):
+    # Reproduce published reports exactly: revision 1 duplicates; revision 2 null diff diagnostics.
+    if type(assembly_revision) is not int or assembly_revision not in (1, 2, 3):
         raise ValueError("UNSUPPORTED_ASSEMBLY_REVISION")
     names = set(map(safe_path, names))
     files = {}
@@ -161,8 +169,8 @@ def assemble(read, names, environment, *, assembly_revision=2):
               'not_covered': ['real PR/fork event unless separately evidenced', 'release approval',
                               'physical output/listening/DPI', 'capacity/long game'],
               'files': files, 'first_failure': None, 'fat_jar': (outcome or {}).get('fat_jar')}
-    if assembly_revision == 2:
-        report['assembly_revision'] = 2
+    if assembly_revision >= 2:
+        report['assembly_revision'] = assembly_revision
     repo, run = report['ci']['repository'], report['ci']['run_id']
     if repo and re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repo) and run and str(run).isdigit():
         report['ci']['run_url'] = 'https://github.com/' + repo + '/actions/runs/' + str(run)
@@ -201,7 +209,7 @@ def assemble(read, names, environment, *, assembly_revision=2):
     report.update({'tested_sha': result['tested_sha'], 'plan': result['plan'], 'eol_policy': result.get('eol_policy'),
                    'fingerprints': result.get('input_audit', {}).get('fingerprints'),
                    'lfs': result.get('input_audit', {}).get('lfs'), 'not_covered': report['not_covered'] + result.get('not_covered', [])})
-    if assembly_revision == 2:
+    if assembly_revision >= 2:
         report['not_covered'] = list(dict.fromkeys(report['not_covered']))
     planned = [s['id'] for s in result['plan']['suites']]
     actual = [s['id'] for s in result.get('suites', [])]
@@ -219,7 +227,7 @@ def assemble(read, names, environment, *, assembly_revision=2):
             files[name] = {'sha256': digest(b), 'bytes': len(b)}
             text = b.decode('utf-8', errors='replace'); item['counts'] = counts(text)
             if s['status'] == 'failed':
-                report['first_failure'] = {'suite': s['id'], **failure_detail(text)}
+                report['first_failure'] = {'suite': s['id'], **failure_detail(text, diff_check=assembly_revision >= 3 and s['id'] == 'diff-check')}
         if s['id'] == 'java-full' and xml_names:
             item['counts'], failure = xml_counts(read, xml_names)
             for name in xml_names:

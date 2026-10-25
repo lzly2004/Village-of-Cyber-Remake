@@ -92,7 +92,7 @@ def validate(zip_path, run, artifact, expected_head, repository):
         stored = (evidence.load_json(archive.read('build/ci/evidence.json'))
                   if 'build/ci/evidence.json' in names else None)
         # Absent revision identifies the original, published WF-005 assembly rule.
-        revision = stored.get('assembly_revision', 1) if stored is not None else 2
+        revision = stored.get('assembly_revision', 1) if stored is not None else 3
         report = evidence.assemble(archive.read, names, {'CI_EXPECTED_HEAD': expected_head,
                   'GITHUB_REPOSITORY': repository, 'GITHUB_RUN_ID': str(run['id']),
                   'GITHUB_RUN_ATTEMPT': str(run['run_attempt']),

@@ -60,7 +60,7 @@ class EvidenceTest(Fixture, unittest.TestCase):
     def test_not_covered_deduplicates_without_reordering_or_closing_gates(self):
         self.result['not_covered']=['release approval','extra check','release approval','capacity/long game','last check'];self.sync()
         r=self.report()
-        self.assertEqual(2,r['assembly_revision'])
+        self.assertEqual(3,r['assembly_revision'])
         self.assertEqual(['real PR/fork event unless separately evidenced','release approval',
                           'physical output/listening/DPI','capacity/long game','extra check','last check'],r['not_covered'])
         self.assertTrue(all(x=='not_covered' for x in r['manual_gates'].values()))
@@ -71,6 +71,29 @@ class EvidenceTest(Fixture, unittest.TestCase):
         self.assertLess(s.index('[GitHub run]'),s.index('[Evidence artifact]'))
         self.assertLess(s.index('[Evidence artifact]'),s.index('ZIP digest:'))
         self.assertLess(s.index('ZIP digest:'),s.index('| Suite |'))
+
+    def test_diff_check_summary_counts_issues_files_and_preserves_first_location(self):
+        text='\x1b[31msrc/a.java:48: trailing whitespace.\x1b[0m\r\n+    \r\nsrc/a.java:50: space before tab in indent.\r\nsrc/b file.java:9: new blank line at EOF.\r\n'
+        d=E.failure_detail(text,diff_check=True)
+        self.assertEqual('src/a.java:48',d['case'])
+        self.assertIn('3 issues / 2 files',d['first_error'])
+        for reason in ['trailing whitespace: 1','space before tab in indent: 1','new blank line at EOF: 1']:
+            self.assertIn(reason,d['first_error'])
+        self.assertEqual({'case':None,'first_error':None},E.failure_detail(text))
+        self.assertEqual({'case':None,'first_error':None},E.failure_detail('src/a:0: trailing whitespace.\nsrc/a:2: arbitrary message.',diff_check=True))
+        d=E.failure_detail('src/a:1: trailing whitespace, space before tab in indent.\n',diff_check=True)
+        self.assertEqual('src/a:1',d['case']);self.assertIn('1 issues / 1 files',d['first_error'])
+        self.assertIn('trailing whitespace: 1; space before tab in indent: 1',d['first_error'])
+        r=self.report();self.assertIsNone(r['first_failure'])
+
+    def test_diff_check_summary_is_bounded_escaped_and_does_not_take_over_other_suites(self):
+        text='<img>|[x]'+('a'*500)+':7: trailing whitespace.\n'
+        d=E.failure_detail(text,diff_check=True)
+        self.assertLessEqual(len(d['case']),400);self.assertLessEqual(len(d['first_error']),400)
+        r=self.report();r['first_failure']={'suite':'diff-check',**d}
+        self.assertNotIn('<img>',E.markdown(r));self.assertIn('\\|',E.markdown(r))
+        d=E.failure_detail('not ok 1 - existing case\n  error: controlled\n')
+        self.assertEqual('existing case',d['case']);self.assertEqual('error: controlled',d['first_error'])
 
     def test_unittest_playwright_and_tap_failure_counts_and_case_detail(self):
         self.assertEqual({'tests':3,'passed':1,'failures':1,'errors':0,'skipped':1,'source':'python-unittest-log'},E.counts('Ran 3 tests in 0.1s\n\nFAILED (failures=1, skipped=1)\n'))
@@ -193,7 +216,7 @@ class DownloadTest(Fixture, unittest.TestCase):
             self.files['build/ci/evidence.json']=json.dumps(legacy).encode()
             p,r,a=self.proof(t);value=D.validate(p,r,a,HEAD,'owner/repo')
             value.pop('download_proof');self.assertEqual(legacy,value)
-            for revision in [0,3,True,None]:
+            for revision in [0,4,True,None,2.0]:
                 self.files['build/ci/evidence.json']=json.dumps({**legacy,'assembly_revision':revision}).encode()
                 p,r,a=self.proof(t)
                 with self.subTest(revision=revision),self.assertRaisesRegex(ValueError,'UNSUPPORTED_ASSEMBLY_REVISION'):
@@ -202,6 +225,26 @@ class DownloadTest(Fixture, unittest.TestCase):
                             {**legacy,'assembly_revision':2}]:
                 self.files['build/ci/evidence.json']=json.dumps(changed).encode();p,r,a=self.proof(t)
                 with self.assertRaisesRegex(ValueError,'DOES_NOT_RECOMPUTE'):D.validate(p,r,a,HEAD,'owner/repo')
+
+    def test_revision_two_failed_diff_report_remains_exact_but_new_reports_have_detail(self):
+        b=b'src/a.java:48: trailing whitespace.\n+   \nsrc/a.java:50: trailing whitespace.\n+ \nsrc/b.java:7: trailing whitespace.\n'
+        self.files['build/verify/run/diff-check.log']=b
+        self.result['suites']=self.result['suites'][:1]
+        self.result['suites'][0].update(status='failed',exit_code=2,log_sha256=E.digest(b))
+        self.result['status']='failed';self.outcome['status']='failed';self.sync()
+        for revision in (2,3):
+            env={**ENV,'CI_JOB_STATUS':'failure'}
+            report=E.assemble(self.files.__getitem__,self.files,env,assembly_revision=revision)
+            self.files['build/ci/evidence.json']=json.dumps(report).encode()
+            with tempfile.TemporaryDirectory() as t:
+                p,r,a=self.proof(t);r['conclusion']='failure';value=D.validate(p,r,a,HEAD,'owner/repo')
+                value.pop('download_proof');self.assertEqual(report,value)
+            self.assertEqual('failed',value['status']);self.assertEqual(2,value['suites'][0]['exit_code'])
+            self.assertEqual(['frontend-unit'],value['unexecuted_suites'])
+            if revision==2:self.assertIsNone(value['first_failure']['case'])
+            else:
+                self.assertEqual('src/a.java:48',value['first_failure']['case'])
+                self.assertIn('3 issues / 2 files',value['first_failure']['first_error'])
 
     def test_wrong_attempt_run_head_digest_size_expiry_or_stored_report_refused(self):
         with tempfile.TemporaryDirectory() as t:
