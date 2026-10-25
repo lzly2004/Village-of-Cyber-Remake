@@ -138,10 +138,10 @@ def xml_counts(read, names):
             'xml_files': len(names), 'source': 'build/test-results/test/TEST-*.xml'}, failure
 
 
-def assemble(read, names, environment, *, assembly_revision=3):
+def assemble(read, names, environment, *, assembly_revision=4):
     """read(names) can be filesystem or a bounded ZIP reader; no extraction/execution."""
     # Reproduce published reports exactly: revision 1 duplicates; revision 2 null diff diagnostics.
-    if type(assembly_revision) is not int or assembly_revision not in (1, 2, 3):
+    if type(assembly_revision) is not int or assembly_revision not in (1, 2, 3, 4):
         raise ValueError("UNSUPPORTED_ASSEMBLY_REVISION")
     names = set(map(safe_path, names))
     files = {}
@@ -190,6 +190,9 @@ def assemble(read, names, environment, *, assembly_revision=3):
         if load_json(read('build/ci/verify.stdout')) != result:
             raise ValueError('STDOUT_RESULT_MISMATCH')
     if result is None:
+        if assembly_revision >= 4:
+            report['unexecuted_suites'] = []
+            report['policy_skipped_suites'] = []
         report['status'] = 'failed' if environment.get('CI_JOB_STATUS') in ('failure','cancelled') or outcome else 'not_run'
         report['first_failure'] = {'suite': 'preparation-or-entry', 'case': None,
                                    'first_error': short((outcome or {}).get('reason', 'No verification result; inspect job preparation logs.'))}

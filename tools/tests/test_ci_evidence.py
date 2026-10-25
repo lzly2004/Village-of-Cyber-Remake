@@ -60,7 +60,7 @@ class EvidenceTest(Fixture, unittest.TestCase):
     def test_not_covered_deduplicates_without_reordering_or_closing_gates(self):
         self.result['not_covered']=['release approval','extra check','release approval','capacity/long game','last check'];self.sync()
         r=self.report()
-        self.assertEqual(3,r['assembly_revision'])
+        self.assertEqual(4,r['assembly_revision'])
         self.assertEqual(['real PR/fork event unless separately evidenced','release approval',
                           'physical output/listening/DPI','capacity/long game','extra check','last check'],r['not_covered'])
         self.assertTrue(all(x=='not_covered' for x in r['manual_gates'].values()))
@@ -198,6 +198,27 @@ class DownloadTest(Fixture, unittest.TestCase):
         a={'id':7,'name':'verify-123-2','size_in_bytes':p.stat().st_size,'digest':'sha256:'+E.digest(p.read_bytes()),'expired':False,'workflow_run':{'id':123,'head_sha':HEAD}}
         return p,run,a
 
+    def test_preparation_failure_lists_are_stable_without_rewriting_legacy_reports(self):
+        files = {'build/ci/context.json': json.dumps(self.context).encode()}
+        env = {**ENV, 'CI_JOB_STATUS': 'cancelled'}
+        for revision in (1, 2, 3, 4):
+            report = E.assemble(files.__getitem__, files, env, assembly_revision=revision)
+            self.assertEqual('failed', report['status'])
+            self.assertEqual([], report['suites'])
+            self.assertEqual('preparation-or-entry', report['first_failure']['suite'])
+            for key in ('unexecuted_suites', 'policy_skipped_suites'):
+                if revision >= 4:
+                    self.assertEqual([], report[key])
+                else:
+                    self.assertNotIn(key, report)
+            self.files = {**files, 'build/ci/evidence.json': json.dumps(report).encode()}
+            with tempfile.TemporaryDirectory() as t:
+                p, run, artifact = self.proof(t)
+                run['conclusion'] = 'cancelled'
+                value = D.validate(p, run, artifact, HEAD, 'owner/repo')
+                value.pop('download_proof')
+                self.assertEqual(report, value)
+
     def test_zip_is_recomputed_without_extracting_or_executing(self):
         self.files['build/ci/evidence.json']=json.dumps(self.report()).encode()
         with tempfile.TemporaryDirectory() as t:
@@ -216,7 +237,7 @@ class DownloadTest(Fixture, unittest.TestCase):
             self.files['build/ci/evidence.json']=json.dumps(legacy).encode()
             p,r,a=self.proof(t);value=D.validate(p,r,a,HEAD,'owner/repo')
             value.pop('download_proof');self.assertEqual(legacy,value)
-            for revision in [0,4,True,None,2.0]:
+            for revision in [0,5,True,None,2.0]:
                 self.files['build/ci/evidence.json']=json.dumps({**legacy,'assembly_revision':revision}).encode()
                 p,r,a=self.proof(t)
                 with self.subTest(revision=revision),self.assertRaisesRegex(ValueError,'UNSUPPORTED_ASSEMBLY_REVISION'):
