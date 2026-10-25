@@ -1,3 +1,6 @@
+import groovy.json.JsonSlurper
+import java.nio.charset.StandardCharsets
+
 plugins {
     id 'java'
     id 'application'
@@ -15,51 +18,185 @@ repositories {
     mavenCentral()
 }
 
+// HTTP 适配器独立编译、运行；不把 Jetty/Javalin 装进桌面 Fat JAR。
+sourceSets {
+    web {
+        java.srcDir 'src/web/java'
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+    test {
+        compileClasspath += sourceSets.web.output
+        runtimeClasspath += sourceSets.web.output
+    }
+}
+
+configurations {
+    webImplementation.extendsFrom implementation
+    webRuntimeOnly.extendsFrom runtimeOnly
+    testImplementation.extendsFrom webImplementation
+    testRuntimeOnly.extendsFrom webRuntimeOnly
+}
+
 dependencies {
+    webImplementation 'io.javalin:javalin:7.2.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.17.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.1'
-
+    testImplementation 'com.tngtech.archunit:archunit:1.5.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.0'
 }
 
 application {
-    mainClass = 'Game'
+    mainClass = 'com.vocr.app.Game'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['vocr/src']
-        }
-        resources {
-            srcDirs = ['vocr/resources']
-        }
-    }
-    test {
-        java {
-            srcDirs = ['vocr/test']
-        }
-    }
+tasks.register('runWeb', JavaExec) {
+    group = 'application'
+    description = '启动仅绑定 127.0.0.1 的游客 HTTP API。'
+    classpath = sourceSets.web.runtimeClasspath
+    mainClass = 'com.vocr.web.GuestGameServer'
+    workingDir = rootDir
 }
 
-tasks.withType(JavaCompile) {
+tasks.register('runWebTestServer', JavaExec) {
+    group = 'verification'
+    description = '仅供浏览器回归使用的固定种子真实 HTTP 服务，不进入生产产物。'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.vocr.web.SeededGuestGameServer'
+    workingDir = rootDir
+}
+
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }
 
 test {
     useJUnitPlatform()
+    workingDir = rootDir
+    maxParallelForks = 1
+    minHeapSize = '32m'
+    maxHeapSize = '256m'
+    jvmArgs '-XX:MaxMetaspaceSize=192m', '-XX:ActiveProcessorCount=2'
 }
 
+tasks.withType(JavaExec).configureEach {
+    maxHeapSize = '256m'
+    jvmArgs '-XX:MaxMetaspaceSize=192m', '-XX:ActiveProcessorCount=2'
+}
+
+tasks.register('verifyProbabilityConfig') {
+    group = 'verification'
+    description = '校验唯一概率配置包含全部560种合法组合。'
+    inputs.file(layout.projectDirectory.file('config/probability.json'))
+
+    doLast {
+        File configFile = layout.projectDirectory.file('config/probability.json').asFile
+        def root = new JsonSlurper().parse(configFile)
+        if (!(root.probabilities instanceof List)) {
+            throw new GradleException("${configFile} 缺少 probabilities 数组")
+        }
+
+        List probabilities = root.probabilities as List
+        if (probabilities.size() != 560) {
+            throw new GradleException("概率配置应有560条，实际为${probabilities.size()}条")
+        }
+
+        Set<String> keys = new HashSet<>()
+        probabilities.eachWithIndex { entry, index ->
+            List<String> required = ['zhi', 'situation', 'p1', 'p2', 'probability']
+            if (!required.every { entry.containsKey(it) }) {
+                throw new GradleException("概率配置第${index + 1}条缺少必需字段")
+            }
+            int zhi = entry.zhi as int
+            int situation = entry.situation as int
+            int p1 = entry.p1 as int
+            int p2 = entry.p2 as int
+            int probability = entry.probability as int
+            if (!(zhi in 0..4) || !(situation in 0..6) || !(p1 in 0..3) || !(p2 in 0..3)) {
+                throw new GradleException("概率配置第${index + 1}条参数越界")
+            }
+            if (!(probability in 0..100)) {
+                throw new GradleException("概率配置第${index + 1}条概率不在0..100")
+            }
+            String key = "${zhi} ${situation} ${p1} ${p2}"
+            if (!keys.add(key)) {
+                throw new GradleException("概率配置存在重复组合: ${key}")
+            }
+        }
+    }
+}
+
+tasks.register('verifyRuntimeAssets') {
+    group = 'verification'
+    description = '校验全部打包音频已拉取Git LFS且具有合法WAV文件头。'
+    inputs.files(fileTree('src/main/resources') { include '**/*.wav' })
+
+    doLast {
+        List<File> audioFiles = fileTree('src/main/resources') {
+            include 'BGM/*.wav'
+            include 'sounds/*.wav'
+        }.files.sort { it.path }
+        if (audioFiles.isEmpty()) {
+            throw new GradleException('没有找到任何待打包的WAV音频')
+        }
+
+        List<File> pointers = audioFiles.findAll { file ->
+            byte[] prefix = new byte[(int) Math.min(file.length(), 128L)]
+            file.withInputStream { stream -> stream.read(prefix) }
+            new String(prefix, StandardCharsets.US_ASCII)
+                    .startsWith('version https://git-lfs.github.com/spec/v1')
+        }.sort { it.path }
+
+        if (!pointers.isEmpty()) {
+            String relativeFiles = pointers.collect { rootDir.toPath().relativize(it.toPath()) }.join(', ')
+            throw new GradleException("以下音频仍是Git LFS指针，不能打包：${relativeFiles}。请先运行 git lfs pull。")
+        }
+
+        List<File> invalidWav = audioFiles.findAll { file ->
+            byte[] header = new byte[12]
+            int read = file.withInputStream { stream -> stream.read(header) }
+            read != 12 || new String(header, 0, 4, StandardCharsets.US_ASCII) != 'RIFF'
+                    || new String(header, 8, 4, StandardCharsets.US_ASCII) != 'WAVE'
+        }
+        if (!invalidWav.isEmpty()) {
+            String relativeFiles = invalidWav.collect { rootDir.toPath().relativize(it.toPath()) }.join(', ')
+            throw new GradleException("以下必需音频不是有效的RIFF/WAV文件：${relativeFiles}")
+        }
+    }
+}
+
+check.dependsOn tasks.named('verifyProbabilityConfig')
+
 tasks.register('fatJar', Jar) {
+    group = 'build'
+    description = '生成包含运行依赖的可执行JAR。'
     archiveClassifier = 'all'
+    dependsOn check, tasks.named('verifyRuntimeAssets')
     from sourceSets.main.output
-    dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     manifest {
-        attributes 'Main-Class': 'Game'
+        attributes 'Main-Class': application.mainClass.get()
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+distributions {
+    main {
+        contents {
+            from('config/probability.json') {
+                into 'config'
+            }
+        }
+    }
 }

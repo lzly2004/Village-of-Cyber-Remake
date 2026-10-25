@@ -133,10 +133,10 @@ for (int k = 1; k < ui.ctx.getGameDay(); ++k) {
 - 多人死亡：显示"名字1+名字2→"
 
 ### 3.5 技能结果显示规则
-- 占卜师(claimedRole=1): 从第1天开始显示技能结果
-- 灵能者(claimedRole=2): 从第1天开始显示技能结果
-- 猎人(claimedRole=3): 从第2天开始显示技能结果
-- 使用 `GameLogicUtils.appendSkillResultLog()` 方法统一处理
+- 当前局内：占卜师(claimedRole=1)从第1天开始，灵能者(claimedRole=2)与猎人(claimedRole=3)从第2天开始显示技能结果；护卫结果不带黑白球。
+- 实际调用位于 `src/main/java/com/vocr/ui/VoteInfoRenderer.java`，共用 `UIHelpers.appendSkillResultLog()`（`src/main/java/com/vocr/ui/UIHelpers.java`），不是旧的GameLogicUtils方法。
+- 只显示已完成日，死亡者在死亡日截断；公开CO可追溯CO前历史，不把当日预约当作结果。
+- Replay是独立兼容路径：`src/main/java/com/vocr/ui/ReplayTextFormatter.java`当前占卜/灵能从第1天、护卫从第2天开始。WEB-030/034核对兼容；本说明不授权统一两条路径或修改规则、快照偏移与旧录像。
 
 ---
 
@@ -316,18 +316,18 @@ P5-XX: 简要描述重构内容
 ## 十、参考文件
 
 ### 核心参考
-- [VoteInfoRenderer.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/VoteInfoRenderer.java) - 局内处刑显示逻辑
-- [DaySnapshot.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/DaySnapshot.java) - 快照数据结构
-- [Role.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/Role.java) - 角色定义
-- [whyDie.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/whyDie.java) - 死亡原因枚举
+- [VoteInfoRenderer.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/VoteInfoRenderer.java) - 局内处刑显示逻辑
+- [DaySnapshot.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/replay/DaySnapshot.java) - 快照数据结构
+- [Role.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/domain/Role.java) - 角色定义
+- [whyDie.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/domain/whyDie.java) - 死亡原因枚举
 
 ### UI 工具
-- [UIHelpers.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/UIHelpers.java) - UI 工具方法
-- [GameStrings.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/GameStrings.java) - 字符串常量
+- [UIHelpers.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/UIHelpers.java) - UI 工具方法
+- [GameStrings.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/GameStrings.java) - 字符串常量
 
 ### 状态管理
-- [GameContext.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/GameContext.java) - 游戏状态
-- [GameRecorder.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/GameRecorder.java) - 游戏记录
+- [GameContext.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/GameContext.java) - 游戏状态
+- [GameRecorder.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/GameRecorder.java) - 游戏记录
 
 ### 复盘模块
-- [ReplayPlayerHandler.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/vocr/src/ReplayPlayerHandler.java) - 复盘界面处理
+- [ReplayPlayerHandler.java](file:///c:/Users/Lenovo/Desktop/电脑村/电脑村重制相关文件/Village%20of%20Cyber%20Remake/src/main/java/com/vocr/ReplayPlayerHandler.java) - 复盘界面处理

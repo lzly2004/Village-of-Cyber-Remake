@@ -1,0 +1,794 @@
+{
+  "bgm": {
+    "BLOOD": {
+      "analysis": {
+        "decodedSamples": 10685952,
+        "minSdrDb": 16.9478,
+        "peakDb": 2.70872,
+        "rmsDb": -9.43937
+      },
+      "bitrate": 128000,
+      "bytes": 3877824,
+      "channels": 2,
+      "description": null,
+      "duration": 242.311836735,
+      "file": "bgm/0bf753ff8895c9dbb4f2ef3432a5e2f29e5244cacbae95e36aba8a3a883d12c1.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 10685952,
+      "sha256": "0bf753ff8895c9dbb4f2ef3432a5e2f29e5244cacbae95e36aba8a3a883d12c1",
+      "source": "BGM/西江紫堂 - BLOOD.wav",
+      "sourceBytes": 42755122,
+      "sourceSha256": "601cf057045f6bec2824e9ddac37642a01dbca038ca02349deda7c2100c8123b"
+    },
+    "DARK_TOMORROW": {
+      "analysis": {
+        "decodedSamples": 5031936,
+        "minSdrDb": 17.3555,
+        "peakDb": 2.59582,
+        "rmsDb": -10.21892
+      },
+      "bitrate": 128000,
+      "bytes": 1826480,
+      "channels": 2,
+      "description": null,
+      "duration": 114.102857143,
+      "file": "bgm/3ef68d2f720e8775e725caf0968ca91d9a8c2b00e1a0beba26fd02cd2b0b36ae.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 5031936,
+      "sha256": "3ef68d2f720e8775e725caf0968ca91d9a8c2b00e1a0beba26fd02cd2b0b36ae",
+      "source": "BGM/西江紫堂 - 黒き明日、清き闇.wav",
+      "sourceBytes": 20139166,
+      "sourceSha256": "591a5db753593cf8195e9c80dbe72debf35a4d3ccdc208f1bdcb8068d9144311"
+    },
+    "DEATH_IMPACT": {
+      "analysis": {
+        "decodedSamples": 7029504,
+        "minSdrDb": 14.5543,
+        "peakDb": 2.10906,
+        "rmsDb": -14.46476
+      },
+      "bitrate": 128000,
+      "bytes": 2551221,
+      "channels": 2,
+      "description": {
+        "bytes": 12,
+        "file": "descriptions/8c30c79e9ee447de1743e7785f5d6395fadbe8f4fdb19a99955e8030762211ef.txt",
+        "sha256": "8c30c79e9ee447de1743e7785f5d6395fadbe8f4fdb19a99955e8030762211ef",
+        "source": "help/Death Impact.txt"
+      },
+      "duration": 159.399183673,
+      "file": "bgm/bd96ddeb1e735bcd34d3106fdef299a925d99c4e0f095003178770522b3ecd58.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 7029504,
+      "sha256": "bd96ddeb1e735bcd34d3106fdef299a925d99c4e0f095003178770522b3ecd58",
+      "source": "BGM/Death Impact.wav",
+      "sourceBytes": 28129338,
+      "sourceSha256": "0cb0f8eb874d3a1588413c922cf3e9efb8187f38537b71894f3cf223d3ef21fa"
+    },
+    "DEFEAT_SCREEN": {
+      "analysis": {
+        "decodedSamples": 5823360,
+        "minSdrDb": 19.7731,
+        "peakDb": 1.65862,
+        "rmsDb": -12.51498
+      },
+      "bitrate": 128000,
+      "bytes": 2113618,
+      "channels": 2,
+      "description": null,
+      "duration": 132.048979592,
+      "file": "bgm/3416628723f1d5c53d14c82ced9a70afe0aa014a6bcbeccc824dadc7f82639db.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 5823360,
+      "sha256": "3416628723f1d5c53d14c82ced9a70afe0aa014a6bcbeccc824dadc7f82639db",
+      "source": "BGM/失败画面.wav",
+      "sourceBytes": 23305428,
+      "sourceSha256": "5b9a8da83c4b1cef27503a053a9a5d13823412cd4577bba9ed6d437a4da29481"
+    },
+    "DUNGEON_09": {
+      "analysis": {
+        "decodedSamples": 2947968,
+        "minSdrDb": 25.4768,
+        "peakDb": -0.14142,
+        "rmsDb": -19.60585
+      },
+      "bitrate": 128000,
+      "bytes": 1070392,
+      "channels": 2,
+      "description": {
+        "bytes": 17,
+        "file": "descriptions/d659af37ea0c4b76aada665fe1135061c0ca3c7d09d0b96d1257d7bd31b167bf.txt",
+        "sha256": "d659af37ea0c4b76aada665fe1135061c0ca3c7d09d0b96d1257d7bd31b167bf",
+        "source": "help/ダンジョン09.txt"
+      },
+      "duration": 66.847346939,
+      "file": "bgm/3098a5a62806f8d06a2109554da69b400f63564635ed6706db7d35f16e7a6f3f.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 2947968,
+      "sha256": "3098a5a62806f8d06a2109554da69b400f63564635ed6706db7d35f16e7a6f3f",
+      "source": "BGM/ダンジョン09.wav",
+      "sourceBytes": 11804104,
+      "sourceSha256": "b0c5929e6fc8b6c34b5eb7befb35b32593182636a2a2c464fa134b0fb33675c4"
+    },
+    "DUNGEON_14": {
+      "analysis": {
+        "decodedSamples": 4337280,
+        "minSdrDb": 21.8008,
+        "peakDb": -0.04173,
+        "rmsDb": -16.05427
+      },
+      "bitrate": 128000,
+      "bytes": 1574451,
+      "channels": 2,
+      "description": {
+        "bytes": 47,
+        "file": "descriptions/f47d5d512d65016d668117bc0def32ab48e33ea56871f741e4fc7c602a34f0b5.txt",
+        "sha256": "f47d5d512d65016d668117bc0def32ab48e33ea56871f741e4fc7c602a34f0b5",
+        "source": "help/真甜呢丨先来一斤吧 - ダンジョン14.txt"
+      },
+      "duration": 98.351020408,
+      "file": "bgm/134a6704d22a0608325c877391690d2e3b9a2bc584e76bb84ad44d209d4bbe81.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 4337280,
+      "sha256": "134a6704d22a0608325c877391690d2e3b9a2bc584e76bb84ad44d209d4bbe81",
+      "source": "BGM/真甜呢丨先来一斤吧 - ダンジョン14.wav",
+      "sourceBytes": 17361392,
+      "sourceSha256": "cf246abcfea099557d0c08fbed7d87abcb0c93028771c651b93f8307526aa028"
+    },
+    "EMOTIONALLY_UNSTABLE": {
+      "analysis": {
+        "decodedSamples": 5966624,
+        "minSdrDb": 14.5905,
+        "peakDb": 3.85918,
+        "rmsDb": -11.92492
+      },
+      "bitrate": 160000,
+      "bytes": 2487360,
+      "channels": 2,
+      "description": {
+        "bytes": 20,
+        "file": "descriptions/c8cb0c4d36cbcdf0433fba438c259ead9b83d8e79a3ed38c999ce58a46af922b.txt",
+        "sha256": "c8cb0c4d36cbcdf0433fba438c259ead9b83d8e79a3ed38c999ce58a46af922b",
+        "source": "help/Emotionally Unstable.txt"
+      },
+      "duration": 124.304666667,
+      "file": "bgm/4c6444623e6630ed66f592796ee86628715c08bb8703c4e537225dcc069755f5.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 48000,
+      "samples": 5966624,
+      "sha256": "4c6444623e6630ed66f592796ee86628715c08bb8703c4e537225dcc069755f5",
+      "source": "BGM/Emotionally Unstable.wav",
+      "sourceBytes": 23866540,
+      "sourceSha256": "687966127c30411acf496ca1512f02bab5345e55bbc791a9f3a9ddc81351fdf4"
+    },
+    "FELT_LOVE": {
+      "analysis": {
+        "decodedSamples": 11323055,
+        "minSdrDb": 18.0893,
+        "peakDb": 2.10636,
+        "rmsDb": -11.57544
+      },
+      "bitrate": 128000,
+      "bytes": 4109373,
+      "channels": 2,
+      "description": {
+        "bytes": 9,
+        "file": "descriptions/0b2de9cd20ea610090a4fb897d68c7f699f2429ef25da4f5122c94473cfeaaff.txt",
+        "sha256": "0b2de9cd20ea610090a4fb897d68c7f699f2429ef25da4f5122c94473cfeaaff",
+        "source": "help/FELT LOVE.txt"
+      },
+      "duration": 256.75861678,
+      "file": "bgm/91a449a5a0352345c95c6a7cb7bdc0110870b1bc71816dbc5fd69f0d12868ecf.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 11323055,
+      "sha256": "91a449a5a0352345c95c6a7cb7bdc0110870b1bc71816dbc5fd69f0d12868ecf",
+      "source": "BGM/FELT LOVE.wav",
+      "sourceBytes": 45303006,
+      "sourceSha256": "36358f93da1116325a20bed3a20509e288d3363a6d3eea7a45a46796544c1395"
+    },
+    "INFO": {
+      "analysis": {
+        "decodedSamples": 6440879,
+        "minSdrDb": 21.207,
+        "peakDb": 0.44107,
+        "rmsDb": -12.84825
+      },
+      "bitrate": 128000,
+      "bytes": 2338062,
+      "channels": 2,
+      "description": null,
+      "duration": 146.051678005,
+      "file": "bgm/11695c5d0f1b38ab29a8304bf87704436fe05386fe97722609eae9c4f4c4e73e.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 6440879,
+      "sha256": "11695c5d0f1b38ab29a8304bf87704436fe05386fe97722609eae9c4f4c4e73e",
+      "source": "BGM/Info.wav",
+      "sourceBytes": 25774234,
+      "sourceSha256": "1d66e388d72d1cb9b77013b5334bb96c7f7dd0d380c236f5aca5127ef70eb6e9"
+    },
+    "JUST_COMPLEX": {
+      "analysis": {
+        "decodedSamples": 6522671,
+        "minSdrDb": 19.9189,
+        "peakDb": -0.16079,
+        "rmsDb": -17.93825
+      },
+      "bitrate": 128000,
+      "bytes": 2367737,
+      "channels": 2,
+      "description": {
+        "bytes": 12,
+        "file": "descriptions/577773cf9c908e927ca0da3d3bd93ed4bce0a5650c4a8e3af71d1dcb2cdcc537.txt",
+        "sha256": "577773cf9c908e927ca0da3d3bd93ed4bce0a5650c4a8e3af71d1dcb2cdcc537",
+        "source": "help/Just Complex.txt"
+      },
+      "duration": 147.906371882,
+      "file": "bgm/ffd7259756aaa3bb72346dd304d65143f5b918ef6d76c37488e4f3c13d65bc7d.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 6522671,
+      "sha256": "ffd7259756aaa3bb72346dd304d65143f5b918ef6d76c37488e4f3c13d65bc7d",
+      "source": "BGM/Just Complex.wav",
+      "sourceBytes": 26101616,
+      "sourceSha256": "2f6d257225296f5291060dda3d481be8bd72c5aaabb6f855a0f4e9c1000c4f61"
+    },
+    "LAST_BOSS_02": {
+      "analysis": {
+        "decodedSamples": 7271424,
+        "minSdrDb": 21.3316,
+        "peakDb": 0.53611,
+        "rmsDb": -13.60223
+      },
+      "bitrate": 128000,
+      "bytes": 2638993,
+      "channels": 2,
+      "description": null,
+      "duration": 164.884897959,
+      "file": "bgm/632562943e1e1a4fad61937d9a15fc33c765fe74b0b26ef100a329f5b8931b09.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 7271424,
+      "sha256": "632562943e1e1a4fad61937d9a15fc33c765fe74b0b26ef100a329f5b8931b09",
+      "source": "BGM/真甜呢丨先来一斤吧 - ラストボス02.wav",
+      "sourceBytes": 29097968,
+      "sourceSha256": "61fd645e5c26a724e35b91a827c11c4fc6f7c8e1a27fe72ba297e41cd26c9eda"
+    },
+    "LIAR_BUSINESS": {
+      "analysis": {
+        "decodedSamples": 4059648,
+        "minSdrDb": 20.7045,
+        "peakDb": 1.324,
+        "rmsDb": -10.45888
+      },
+      "bitrate": 128000,
+      "bytes": 1473723,
+      "channels": 2,
+      "description": {
+        "bytes": 24,
+        "file": "descriptions/03583967641cdc3095aefaa85f4b147290115e13c83651374d12c06676559b10.txt",
+        "sha256": "03583967641cdc3095aefaa85f4b147290115e13c83651374d12c06676559b10",
+        "source": "help/ライアービジネス.txt"
+      },
+      "duration": 92.055510204,
+      "file": "bgm/2fda849247f6faf036b379ca6830046171441e381bdd825f04ecf7dadaafe930.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 4059648,
+      "sha256": "2fda849247f6faf036b379ca6830046171441e381bdd825f04ecf7dadaafe930",
+      "source": "BGM/ライアービジネス.wav",
+      "sourceBytes": 16250014,
+      "sourceSha256": "98a347506f2c5f23757f2dd0fe06f060932ad3fd6ac931e142f14e896bc5e1b1"
+    },
+    "LIGHTLESS_GAZE": {
+      "analysis": {
+        "decodedSamples": 6964992,
+        "minSdrDb": 15.1915,
+        "peakDb": 2.43764,
+        "rmsDb": -11.98501
+      },
+      "bitrate": 128000,
+      "bytes": 2527816,
+      "channels": 2,
+      "description": null,
+      "duration": 157.936326531,
+      "file": "bgm/c34ebe6ba35141937d4d4fc4dfddd990e730f5e86cac741de48e8e673f76e5ad.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 6964992,
+      "sha256": "c34ebe6ba35141937d4d4fc4dfddd990e730f5e86cac741de48e8e673f76e5ad",
+      "source": "BGM/西江紫堂 - 灯り無き眼光.wav",
+      "sourceBytes": 27871360,
+      "sourceSha256": "a6821456170d1c0ae49bfa72d48503a7a18cbda66e26d22f7be92de82177c34e"
+    },
+    "PEACE_OF_LOST_PUZZLE": {
+      "analysis": {
+        "decodedSamples": 8363520,
+        "minSdrDb": 17.4536,
+        "peakDb": 2.89102,
+        "rmsDb": -10.05586
+      },
+      "bitrate": 128000,
+      "bytes": 3035218,
+      "channels": 2,
+      "description": {
+        "bytes": 20,
+        "file": "descriptions/4d551e2756782eaee5309ec544a67830580831e8a95aae81e405b46532a72410.txt",
+        "sha256": "4d551e2756782eaee5309ec544a67830580831e8a95aae81e405b46532a72410",
+        "source": "help/Peace of lost puzzle.txt"
+      },
+      "duration": 189.648979592,
+      "file": "bgm/06b0cd2090c0347cd055dd60ca4f5fd1178dc4a0b56fe05908c475236d756b7c.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 8363520,
+      "sha256": "06b0cd2090c0347cd055dd60ca4f5fd1178dc4a0b56fe05908c475236d756b7c",
+      "source": "BGM/Peace of lost puzzle.wav",
+      "sourceBytes": 33465474,
+      "sourceSha256": "889912053f6d2cbd12e74be7bddac98f5ba7c78f631bfab9d3ea256c70a22ff7"
+    },
+    "PERMANENT_FIVE_COLORS": {
+      "analysis": {
+        "decodedSamples": 9174575,
+        "minSdrDb": 16.417,
+        "peakDb": 3.22507,
+        "rmsDb": -13.77314
+      },
+      "bitrate": 128000,
+      "bytes": 3329879,
+      "channels": 2,
+      "description": {
+        "bytes": 15,
+        "file": "descriptions/665d6aa50f4196eceb3674bff967866be7721d8a8d6191a860c4845ad7b000e6.txt",
+        "sha256": "665d6aa50f4196eceb3674bff967866be7721d8a8d6191a860c4845ad7b000e6",
+        "source": "help/永久色五色.txt"
+      },
+      "duration": 208.040249433,
+      "file": "bgm/5249c4243ab40e222456f9beb5687bba434f548e1e7cc0ad864b89c937d0d34d.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 9174575,
+      "sha256": "5249c4243ab40e222456f9beb5687bba434f548e1e7cc0ad864b89c937d0d34d",
+      "source": "BGM/永久色五色.wav",
+      "sourceBytes": 36709108,
+      "sourceSha256": "0d6f7209fc6727fbff1496b50ac9cdc6e22816ecb2e3b0113cafe932eb3c604d"
+    },
+    "REPLAY_BROWSER": {
+      "analysis": {
+        "decodedSamples": 6422400,
+        "minSdrDb": 24.3302,
+        "peakDb": -8.11259,
+        "rmsDb": -27.37771
+      },
+      "bitrate": 128000,
+      "bytes": 2330957,
+      "channels": 2,
+      "description": null,
+      "duration": 145.632653061,
+      "file": "bgm/3e4e730989cfd1e70fd604c66f96f6d209028d95b7b99d053dd7f05e7a2e026c.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 6422400,
+      "sha256": "3e4e730989cfd1e70fd604c66f96f6d209028d95b7b99d053dd7f05e7a2e026c",
+      "source": "BGM/纯音乐-优美旋律.wav",
+      "sourceBytes": 25689732,
+      "sourceSha256": "bfe9145ec95536bc85e8b2326aa6c6ab596db8997899b255ece3e3a8174545fe"
+    },
+    "REPLAY_PLAYER": {
+      "analysis": {
+        "decodedSamples": 9995904,
+        "minSdrDb": 20.838,
+        "peakDb": 1.763,
+        "rmsDb": -12.87424
+      },
+      "bitrate": 128000,
+      "bytes": 3627466,
+      "channels": 2,
+      "description": null,
+      "duration": 226.664489796,
+      "file": "bgm/37cd8549ecfdb3c37b52bcfe0634691e8a17a942d32e2ffc6aa2d83033d93d54.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 9995904,
+      "sha256": "37cd8549ecfdb3c37b52bcfe0634691e8a17a942d32e2ffc6aa2d83033d93d54",
+      "source": "BGM/replay_bgm.wav",
+      "sourceBytes": 39993788,
+      "sourceSha256": "016f93981c9007af587110033c938a560d611cf2e999f6393f06b8b1be36d539"
+    },
+    "SAMIDARE_VIVARIDE": {
+      "analysis": {
+        "decodedSamples": 3705984,
+        "minSdrDb": 16.5759,
+        "peakDb": 2.54419,
+        "rmsDb": -10.45953
+      },
+      "bitrate": 128000,
+      "bytes": 1345409,
+      "channels": 2,
+      "description": {
+        "bytes": 17,
+        "file": "descriptions/9593aa0fac00dc2e8c400f8af952317de268079fd4d09944b024d8bd50169342.txt",
+        "sha256": "9593aa0fac00dc2e8c400f8af952317de268079fd4d09944b024d8bd50169342",
+        "source": "help/五月雨Vivaride.txt"
+      },
+      "duration": 84.035918367,
+      "file": "bgm/144b383b3689332093418a478032764efb740a2abbb1191343b517b17b1834ca.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 3705984,
+      "sha256": "144b383b3689332093418a478032764efb740a2abbb1191343b517b17b1834ca",
+      "source": "BGM/五月雨Vivaride.wav",
+      "sourceBytes": 14835410,
+      "sourceSha256": "ed76001264313002082ddebde8ba0a1008c70bbcee990d5850f9491a68c85d0b"
+    },
+    "SAMIDARE_VIVARIDE_REMIX": {
+      "analysis": {
+        "decodedSamples": 3705984,
+        "minSdrDb": 16.5759,
+        "peakDb": 2.54419,
+        "rmsDb": -10.45953
+      },
+      "bitrate": 128000,
+      "bytes": 1345409,
+      "channels": 2,
+      "description": {
+        "bytes": 52,
+        "file": "descriptions/236a08df888aca0a5ba1c0a00d162156d6c67381aea40a9e8df19b6aa7311078.txt",
+        "sha256": "236a08df888aca0a5ba1c0a00d162156d6c67381aea40a9e8df19b6aa7311078",
+        "source": "help/西江紫堂 - 五月雨Vivaride-Samidare bibaraido-.txt"
+      },
+      "duration": 84.035918367,
+      "file": "bgm/144b383b3689332093418a478032764efb740a2abbb1191343b517b17b1834ca.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 3705984,
+      "sha256": "144b383b3689332093418a478032764efb740a2abbb1191343b517b17b1834ca",
+      "source": "BGM/西江紫堂 - 五月雨Vivaride-Samidare bibaraido-.wav",
+      "sourceBytes": 14835410,
+      "sourceSha256": "ed76001264313002082ddebde8ba0a1008c70bbcee990d5850f9491a68c85d0b"
+    },
+    "START_MENU": {
+      "analysis": {
+        "decodedSamples": 2469600,
+        "minSdrDb": 25.7687,
+        "peakDb": -4.16912,
+        "rmsDb": -28.83061
+      },
+      "bitrate": 128000,
+      "bytes": 896939,
+      "channels": 2,
+      "description": null,
+      "duration": 56.0,
+      "file": "bgm/606dfa5514389b891d698f6abdd5481ff9dfa602e74ff34f025ea3c11285ff40.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 2469600,
+      "sha256": "606dfa5514389b891d698f6abdd5481ff9dfa602e74ff34f025ea3c11285ff40",
+      "source": "BGM/start_menu.wav",
+      "sourceBytes": 9890524,
+      "sourceSha256": "ba9e23d0b88d0e9f5b0c23d24b20a2dcced5ca94be4dca6f19fc012ccbdc010f"
+    },
+    "TEEK_TEEK_TEEK": {
+      "analysis": {
+        "decodedSamples": 9938351,
+        "minSdrDb": 18.073,
+        "peakDb": 3.39419,
+        "rmsDb": -11.36693
+      },
+      "bitrate": 128000,
+      "bytes": 3606986,
+      "channels": 2,
+      "description": {
+        "bytes": 14,
+        "file": "descriptions/09860fdbc1abe923c8c333eefd97c01d5c394ca7648285e8ddbab1be9e1bcd56.txt",
+        "sha256": "09860fdbc1abe923c8c333eefd97c01d5c394ca7648285e8ddbab1be9e1bcd56",
+        "source": "help/TEEK TEEK TEEK.txt"
+      },
+      "duration": 225.359433107,
+      "file": "bgm/f18e12df3ada44df00a07a1b1d70b6f1c899453cda0f072748bc7590496ae7a9.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 9938351,
+      "sha256": "f18e12df3ada44df00a07a1b1d70b6f1c899453cda0f072748bc7590496ae7a9",
+      "source": "BGM/TEEK TEEK TEEK.wav",
+      "sourceBytes": 39764092,
+      "sourceSha256": "7dd1dc1a3f4120b880651f47cd8cfa619b9cd9a0b52ac789338c3faae5c88a09"
+    },
+    "VICTORY_SCREEN": {
+      "analysis": {
+        "decodedSamples": 14035968,
+        "minSdrDb": 16.7631,
+        "peakDb": 2.89653,
+        "rmsDb": -12.24722
+      },
+      "bitrate": 128000,
+      "bytes": 5093249,
+      "channels": 2,
+      "description": null,
+      "duration": 318.275918367,
+      "file": "bgm/b64b87d5d8b0a0f85f47a2a79aab8d432e9f9e4c2edce6353f5d05d183d8fbef.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 14035968,
+      "sha256": "b64b87d5d8b0a0f85f47a2a79aab8d432e9f9e4c2edce6353f5d05d183d8fbef",
+      "source": "BGM/胜利画面.wav",
+      "sourceBytes": 56155240,
+      "sourceSha256": "20f5853087c66992abf3517016eaeac1c79db886d0ea7b4af3c94f7ba4300e45"
+    },
+    "VILLAGE_08": {
+      "analysis": {
+        "decodedSamples": 1836288,
+        "minSdrDb": 25.0292,
+        "peakDb": -2.96706,
+        "rmsDb": -18.23065
+      },
+      "bitrate": 128000,
+      "bytes": 667061,
+      "channels": 2,
+      "description": {
+        "bytes": 5,
+        "file": "descriptions/04588298e0a116c5e9863149cccfa2e42cfc361c18a6bd1986dc4e12eaedba9d.txt",
+        "sha256": "04588298e0a116c5e9863149cccfa2e42cfc361c18a6bd1986dc4e12eaedba9d",
+        "source": "help/村08.txt"
+      },
+      "duration": 41.639183673,
+      "file": "bgm/8d1c8c8fe4d6a23346df88e2b2cd10f8315b8e148368e3668bcffb4b097e4b24.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 1836288,
+      "sha256": "8d1c8c8fe4d6a23346df88e2b2cd10f8315b8e148368e3668bcffb4b097e4b24",
+      "source": "BGM/村08.wav",
+      "sourceBytes": 7357348,
+      "sourceSha256": "24c4bea7535209fcdce9da7cd9a11b21fd5bab3ab141414c106a34014a62cbb2"
+    }
+  },
+  "encoder": {
+    "binarySha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99",
+    "version": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+  },
+  "playlists": {
+    "LATE_GAME_PLAYLIST": [
+      "LAST_BOSS_02",
+      "DARK_TOMORROW",
+      "BLOOD",
+      "LIGHTLESS_GAZE"
+    ],
+    "NORMAL_GAME_PLAYLIST": [
+      "DEATH_IMPACT",
+      "PERMANENT_FIVE_COLORS",
+      "EMOTIONALLY_UNSTABLE",
+      "FELT_LOVE",
+      "JUST_COMPLEX",
+      "PEACE_OF_LOST_PUZZLE",
+      "TEEK_TEEK_TEEK",
+      "DUNGEON_09",
+      "LIAR_BUSINESS",
+      "SAMIDARE_VIVARIDE",
+      "VILLAGE_08",
+      "DUNGEON_14",
+      "SAMIDARE_VIVARIDE_REMIX"
+    ]
+  },
+  "policy": {
+    "bgmBitrates": [
+      128000,
+      160000,
+      192000
+    ],
+    "bgmBudget": 67108864,
+    "encoder": "libmp3lame",
+    "format": "mp3",
+    "minSdrDb": 14,
+    "singleBgmBudget": 5242880,
+    "soundBitrate": 192000,
+    "soundBudget": 1048576,
+    "staticBudget": 104857600,
+    "textBudget": 1048576,
+    "threads": 1,
+    "version": 1
+  },
+  "schemaVersion": 1,
+  "selectionInputNormalization": "utf8-lf",
+  "selectionInputs": {
+    "src/main/java/com/vocr/resources/BgmTrack.java": "9419ab844641184d69d372f87fd5cd3fc3ad55a4a09771879e41a46e127a0ca1",
+    "src/main/java/com/vocr/resources/SoundEffect.java": "1c79bd5cbffa72800d210fdf0a5f0887926fc74292e5cfc642e47f4d17990835"
+  },
+  "sounds": {
+    "CLICK": {
+      "analysis": {
+        "decodedSamples": 31744,
+        "minSdrDb": 29.9807,
+        "peakDb": -10.0455,
+        "rmsDb": -27.12669
+      },
+      "bitrate": 192000,
+      "bytes": 17280,
+      "channels": 2,
+      "description": null,
+      "duration": 0.661333333,
+      "file": "sounds/4f3907177996c8b0ac84035d774737081e586a4561e3af64dd87cd9ddbd35850.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 48000,
+      "samples": 31744,
+      "sha256": "4f3907177996c8b0ac84035d774737081e586a4561e3af64dd87cd9ddbd35850",
+      "source": "sounds/click.wav",
+      "sourceBytes": 127054,
+      "sourceSha256": "44f5e9d3681c2247c5055cfdbc637b4d803357d1256ed96efe312b1ef3dbd10e"
+    },
+    "DAY_EXECUTION": {
+      "analysis": {
+        "decodedSamples": 68139,
+        "minSdrDb": 27.7204,
+        "peakDb": -9.33202,
+        "rmsDb": -25.00263
+      },
+      "bitrate": 192000,
+      "bytes": 38869,
+      "channels": 2,
+      "description": null,
+      "duration": 1.545102041,
+      "file": "sounds/45f7169bf6c42d09f706d5091b9b1ce695d48506b8183f739e417fcf09a32021.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 68139,
+      "sha256": "45f7169bf6c42d09f706d5091b9b1ce695d48506b8183f739e417fcf09a32021",
+      "source": "sounds/白天处刑音效.wav",
+      "sourceBytes": 272600,
+      "sourceSha256": "8fd61fc61d5e2110abc28ce24594b38db43f9cbfb432d4da9309e3f959726aa2"
+    },
+    "FOX_VICTORY": {
+      "analysis": {
+        "decodedSamples": 60793,
+        "minSdrDb": 29.5381,
+        "peakDb": -0.09329,
+        "rmsDb": -16.4649
+      },
+      "bitrate": 192000,
+      "bytes": 31680,
+      "channels": 2,
+      "description": null,
+      "duration": 1.266520833,
+      "file": "sounds/60cd2884cf8931381cc0aec5ad1eaaf4706f6371cde75621afb75e30f225243c.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 48000,
+      "samples": 60793,
+      "sha256": "60cd2884cf8931381cc0aec5ad1eaaf4706f6371cde75621afb75e30f225243c",
+      "source": "sounds/妖狐胜利音效.wav",
+      "sourceBytes": 243216,
+      "sourceSha256": "748026c08fc548bae008ecfd6aa7d3c927a40870b25f7351915e17f4ef4fce34"
+    },
+    "NIGHTFALL": {
+      "analysis": {
+        "decodedSamples": 279182,
+        "minSdrDb": 21.3873,
+        "peakDb": -6.5672,
+        "rmsDb": -22.09708
+      },
+      "bitrate": 192000,
+      "bytes": 153599,
+      "channels": 2,
+      "description": null,
+      "duration": 6.330657596,
+      "file": "sounds/42fb614171c6d8f8fa5c7f9df0b33e7756628e02ef82f67d08c6c123dc0d0861.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 279182,
+      "sha256": "42fb614171c6d8f8fa5c7f9df0b33e7756628e02ef82f67d08c6c123dc0d0861",
+      "source": "sounds/入夜音效.wav",
+      "sourceBytes": 1116772,
+      "sourceSha256": "ce09ca674fdba5eb33700b01a3599465e5ecf773c957652916a419a0957d5af1"
+    },
+    "NIGHT_DEATH": {
+      "analysis": {
+        "decodedSamples": 92745,
+        "minSdrDb": 30.3434,
+        "peakDb": -12.50689,
+        "rmsDb": -27.67958
+      },
+      "bitrate": 192000,
+      "bytes": 52035,
+      "channels": 2,
+      "description": null,
+      "duration": 2.103061224,
+      "file": "sounds/85074188bf356c51be73afcf5e83431f34ec93f9194229e18db4e8ca86c0c151.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 92745,
+      "sha256": "85074188bf356c51be73afcf5e83431f34ec93f9194229e18db4e8ca86c0c151",
+      "source": "sounds/夜间死亡音效.wav",
+      "sourceBytes": 371024,
+      "sourceSha256": "67096f601d608bc48cc66d57e272e79c2b55d98b9038dc165982e9f741b0ec11"
+    },
+    "PEACEFUL_NIGHT": {
+      "analysis": {
+        "decodedSamples": 31568,
+        "minSdrDb": 29.7962,
+        "peakDb": -9.68878,
+        "rmsDb": -22.24858
+      },
+      "bitrate": 192000,
+      "bytes": 17280,
+      "channels": 2,
+      "description": null,
+      "duration": 0.657666667,
+      "file": "sounds/fae687c61528e0069c526c98884cb98c67c1147526501193cf8fd87fda9709cc.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 48000,
+      "samples": 31568,
+      "sha256": "fae687c61528e0069c526c98884cb98c67c1147526501193cf8fd87fda9709cc",
+      "source": "sounds/平和音效.wav",
+      "sourceBytes": 126316,
+      "sourceSha256": "9e40a81a0750576a44daf534fefa77d38f2b1743a552c6d052fabacf67b3f032"
+    },
+    "VILLAGE_VICTORY": {
+      "analysis": {
+        "decodedSamples": 138442,
+        "minSdrDb": 27.8533,
+        "peakDb": -3.21546,
+        "rmsDb": -19.29884
+      },
+      "bitrate": 192000,
+      "bytes": 70848,
+      "channels": 2,
+      "description": null,
+      "duration": 2.884208333,
+      "file": "sounds/b3e267859c208d6a27b13d714507c0960a5e339f4f7710f7072894bd95db7baa.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 48000,
+      "samples": 138442,
+      "sha256": "b3e267859c208d6a27b13d714507c0960a5e339f4f7710f7072894bd95db7baa",
+      "source": "sounds/村人胜利音效.wav",
+      "sourceBytes": 553812,
+      "sourceSha256": "29e0dc3aa869fa964a099e32aee564f5d8f8b1425ef74a47499d9de3a1378361"
+    },
+    "WOLF_HOWL": {
+      "analysis": {
+        "decodedSamples": 109007,
+        "minSdrDb": 30.4594,
+        "peakDb": -10.55755,
+        "rmsDb": -21.65088
+      },
+      "bitrate": 192000,
+      "bytes": 60812,
+      "channels": 2,
+      "description": null,
+      "duration": 2.471814059,
+      "file": "sounds/55ad1d87b5dd39f5ebf581f8975fa46ce2141adc1b225dbdabf1fc929a5bf814.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 44100,
+      "samples": 109007,
+      "sha256": "55ad1d87b5dd39f5ebf581f8975fa46ce2141adc1b225dbdabf1fc929a5bf814",
+      "source": "sounds/狼嚎音效.wav",
+      "sourceBytes": 436072,
+      "sourceSha256": "a00887c5e049199e58aeda641136c949d6d0fda33410f961dd66e8dafabd19a6"
+    },
+    "WOLF_VICTORY": {
+      "analysis": {
+        "decodedSamples": 108949,
+        "minSdrDb": 30.3292,
+        "peakDb": -0.18126,
+        "rmsDb": -14.24913
+      },
+      "bitrate": 192000,
+      "bytes": 55872,
+      "channels": 2,
+      "description": null,
+      "duration": 2.269770833,
+      "file": "sounds/c6c226b267b92f64bc8c9911f9a5bb5beb8cca2ed3a6b8d20613e5560f95ec5c.mp3",
+      "mime": "audio/mpeg",
+      "sampleRate": 48000,
+      "samples": 108949,
+      "sha256": "c6c226b267b92f64bc8c9911f9a5bb5beb8cca2ed3a6b8d20613e5560f95ec5c",
+      "source": "sounds/人狼胜利音效.wav",
+      "sourceBytes": 435840,
+      "sourceSha256": "f918d9b09db630aa800212b8df3c2505b0fc41f6f5d2a7efdc259d38a0f56383"
+    }
+  }
+}

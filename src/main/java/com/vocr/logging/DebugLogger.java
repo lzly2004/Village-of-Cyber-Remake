@@ -1,0 +1,205 @@
+package com.vocr.logging;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * 集中管理项目中的普通诊断日志。
+ *
+ * 功能:
+ *   1. 全局开关: enabled 控制所有调试输出
+ *   2. 分级日志: DEBUG(详细) / INFO(关键事件) / WARN(警告) / ERROR(错误)
+ *   3. 双重输出: 控制台 + 文件(可选)
+ *
+ * 对局轨迹和 Replay 由各自的确定性记录组件负责，不进入普通日志。
+ */
+public final class DebugLogger
+{
+    // ==================== 单例 ====================
+    private static final DebugLogger INSTANCE = new DebugLogger();
+
+    private DebugLogger() {}
+
+    public static DebugLogger getInstance()
+    {
+        return INSTANCE;
+    }
+
+    /**
+     * 便捷静态方法 — 替代 logicTools.log() 和 System.out.println()
+     */
+    public static void log(String message) { getInstance().debug(message); }
+    /** 接受任意对象的log重载 — 替代 System.out.println(obj) */
+    public static void log(Object obj) { getInstance().debug(String.valueOf(obj)); }
+    /** 无参数log — 替代 System.out.println() */
+    public static void log() { getInstance().debug(""); }
+
+    public static void info(String message) { getInstance().info0(message); }
+
+    public static void warn(String message) { getInstance().warn0(message); }
+
+    public static void warn(String message, Throwable cause) { getInstance().warn0(message, cause); }
+
+    public static void error(String message) { getInstance().error0(message); }
+
+    public static void error(String message, Throwable cause) { getInstance().error0(message, cause); }
+
+    // ==================== 实例字段 ====================
+    private boolean enabled = true;           // 总开关
+    private LogLevel minConsoleLevel = LogLevel.DEBUG;  // 控制台最低输出级别
+    private LogLevel minFileLevel = LogLevel.INFO;      // 文件最低输出级别
+    private PrintWriter fileWriter = null;    // 文件输出
+
+    // 时间戳格式化
+    private static final DateTimeFormatter TIME_FMT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+
+    // ==================== 日志级别枚举 ====================
+    public enum LogLevel
+    {
+        DEBUG(0, "DEBUG"),
+        INFO(1, "INFO"),
+        WARN(2, "WARN"),
+        ERROR(3, "ERROR");
+
+        public final int level;
+        public final String label;
+
+        LogLevel(int level, String label)
+        {
+            this.level = level;
+            this.label = label;
+        }
+    }
+
+    // ==================== 配置方法 ====================
+
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public boolean isEnabled() { return enabled; }
+
+    public void setMinConsoleLevel(LogLevel level) { this.minConsoleLevel = level; }
+
+    public void setMinFileLevel(LogLevel level) { this.minFileLevel = level; }
+
+    /**
+     * 开始将普通诊断日志写入文件。
+     * @param filePath 日志文件路径(如 "logs/baseline_2026-06-15.log")
+     */
+    public void startFileLogging(String filePath)
+    {
+        try
+        {
+            // 确保目录存在
+            java.io.File dir = new java.io.File(filePath).getParentFile();
+            if (dir != null && !dir.exists())
+                dir.mkdirs();
+
+            fileWriter = new PrintWriter(new FileWriter(filePath, true)); // 追加模式
+            info0("=== 日志文件已开启: " + filePath + " ===");
+        }
+        catch (IOException e)
+        {
+            System.err.println("无法创建日志文件: " + filePath + " - " + e.getMessage());
+        }
+    }
+
+    /**
+     * 停止文件日志并关闭文件
+     */
+    public void stopFileLogging()
+    {
+        if (fileWriter != null)
+        {
+            info0("=== 日志文件已关闭 ===");
+            fileWriter.flush();
+            fileWriter.close();
+            fileWriter = null;
+        }
+    }
+
+    // ==================== 核心日志方法 ====================
+
+    public void debug(String message) { log(LogLevel.DEBUG, message); }
+
+    public void info0(String message) { log(LogLevel.INFO, message); }
+
+    public void warn0(String message) { log(LogLevel.WARN, message); }
+
+    public void warn0(String message, Throwable cause) { log(LogLevel.WARN, message, cause); }
+
+    public void error0(String message) { log(LogLevel.ERROR, message); }
+
+    public void error0(String message, Throwable cause) { log(LogLevel.ERROR, message, cause); }
+
+    // ==================== 格式化输出(用于 MainLogic 调试) ====================
+
+    /**
+     * 格式化输出 — 用于替换 System.out.print/println (静态便捷方法)
+     */
+    public static void print(String message) { getInstance().print0(LogLevel.DEBUG, message); }
+
+    public static void println(String message) { getInstance().print0(LogLevel.DEBUG, message + "\n"); }
+
+    public static void printf(String format, Object... args)
+    {
+        getInstance().print0(LogLevel.DEBUG, String.format(format, args));
+    }
+
+    // 实例版本的print (内部使用)
+    public void print0(LogLevel level, String message)
+    {
+        if (!enabled) return;
+        if (level.level >= minConsoleLevel.level)
+            System.out.print(message);
+        if (fileWriter != null && level.level >= minFileLevel.level)
+        {
+            fileWriter.print(message);
+            fileWriter.flush();
+        }
+    }
+
+    // ==================== 内部实现 ====================
+
+    private void log(LogLevel level, String message)
+    {
+        log(level, message, null);
+    }
+
+    private void log(LogLevel level, String message, Throwable cause)
+    {
+        if (!enabled) return;
+
+        boolean writeToConsole = level.level >= minConsoleLevel.level;
+        boolean writeToFile = fileWriter != null && level.level >= minFileLevel.level;
+        if (!writeToConsole && !writeToFile) return;
+
+        String formatted = formatMessage(level, message);
+
+        // 控制台输出
+        if (writeToConsole)
+        {
+            PrintStream stream = level == LogLevel.ERROR ? System.err : System.out;
+            stream.println(formatted);
+            if (cause != null) cause.printStackTrace(stream);
+        }
+
+        // 文件输出
+        if (writeToFile)
+        {
+            fileWriter.println(formatted);
+            if (cause != null) cause.printStackTrace(fileWriter);
+            fileWriter.flush();
+        }
+    }
+
+    private String formatMessage(LogLevel level, String message)
+    {
+        String timestamp = LocalDateTime.now().format(TIME_FMT);
+        return String.format("[%s] [%s] %s", timestamp, level.label, message);
+    }
+}

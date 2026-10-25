@@ -1,0 +1,180 @@
+package com.vocr.core;
+
+import com.vocr.logging.DebugLogger;
+
+import com.vocr.domain.IntPair;
+import com.vocr.domain.peiyi;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/** 规划首个白天被占卜师判黑玩家的身份声明响应。 */
+final class OpeningBlackResultResponsePlanner
+{
+    private final GameContext ctx;
+
+    OpeningBlackResultResponsePlanner(GameContext ctx)
+    {
+        this.ctx = ctx;
+    }
+
+    void collectResponses(int playerCount, List<IntPair> responses)
+    {
+        boolean wolfSeerOrMediumResponseAdded = false;
+        boolean wolfHunterOrCatResponseAdded = false;
+        List<Integer> blackTargets = collectBlackTargets(playerCount);
+
+        for(int blackTarget : blackTargets)
+        {
+            if(ctx.isDead(blackTarget)) continue;
+
+            int actualRole = ctx.getActualRole(blackTarget);
+            if(actualRole < 7)
+            {
+                responses.add(new IntPair(blackTarget, actualRole));
+            }
+            else if(actualRole == 7)
+            {
+                NonHumanPlan plan = ctx.getNonHumanPlan(blackTarget);
+                if(plan.isClaimPlan())
+                {
+                    responses.add(new IntPair(blackTarget, plan.claimedRole()));
+                }
+                else
+                {
+                    int wolfSeerClaims = 0;
+                    int wolfMediumClaims = 0;
+                    int wolfSeerWeight = 10;
+                    int wolfMediumWeight = 10;
+                    int wolfHunterOrCatWeight = 10;
+                    int stayHiddenWeight = 10;
+                    for(int wolfOrder=1;wolfOrder<=ctx.getInitialWolfCount();wolfOrder++)
+                    {
+                        if(ctx.getClaimedRole(ctx.getRlIndex(wolfOrder)) == 1)
+                            wolfSeerClaims++;
+                        else if(ctx.getClaimedRole(ctx.getRlIndex(wolfOrder)) == 2)
+                            wolfMediumClaims++;
+                    }
+                    if(wolfSeerClaims > 1) wolfSeerWeight = 0;
+                    if(wolfMediumClaims > 0) wolfMediumWeight = 0;
+                    if(wolfSeerOrMediumResponseAdded)
+                    {
+                        wolfSeerWeight = 0;
+                        wolfMediumWeight = 0;
+                    }
+                    if(wolfHunterOrCatResponseAdded)
+                        wolfHunterOrCatWeight = 0;
+                    if(ctx.getPeiyi() == peiyi.jianyi
+                            && (ctx.getZhans().contains(ctx.getRlIndex(1))
+                            || ctx.getZhans().contains(ctx.getRlIndex(2))))
+                    {
+                        wolfSeerWeight = 0;
+                        wolfMediumWeight = 0;
+                        wolfHunterOrCatWeight = 0;
+                    }
+
+                    int option = ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
+                            wolfSeerWeight, wolfMediumWeight, wolfHunterOrCatWeight, stayHiddenWeight)));
+                    switch(option)
+                    {
+                        case 0:
+                            ctx.recordSkillTarget(blackTarget, 1, ctx.getPreliminaryDivinationTarget(blackTarget));
+                            responses.add(new IntPair(blackTarget,1));
+                            wolfSeerOrMediumResponseAdded = true;
+                            break;
+                        case 1:
+                            responses.add(new IntPair(blackTarget,2));
+                            wolfSeerOrMediumResponseAdded = true;
+                            for(int wolfOrder=1;wolfOrder<=ctx.getInitialWolfCount();wolfOrder++)
+                            {
+                                int wolf = ctx.getRlIndex(wolfOrder);
+                                NonHumanPlan wolfPlan = ctx.getNonHumanPlan(wolf);
+                                if(wolfPlan == NonHumanPlan.CLAIM_MEDIUM
+                                        && !blackTargets.contains(wolf))
+                                    ctx.setNonHumanPlan(wolf, NonHumanPlan.STAY_HIDDEN);
+                            }
+                            break;
+                        case 2:
+                            int role = chooseHunterOrCatRole();
+                            NonHumanPlan responsePlan = NonHumanPlan.claimRole(role);
+                            ctx.setNonHumanPlan(blackTarget, responsePlan);
+                            if(responsePlan == NonHumanPlan.CLAIM_CAT)
+                                responses.add(new IntPair(blackTarget,5));
+                            wolfHunterOrCatResponseAdded = true;
+                            break;
+                        case 3:
+                            ctx.clearNonHumanPlan(blackTarget);
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                handleWhiteNonHumanResponse(blackTarget, actualRole, responses);
+            }
+        }
+    }
+
+    private List<Integer> collectBlackTargets(int playerCount)
+    {
+        List<Integer> blackTargets = new ArrayList<>();
+        for(int seer : ctx.getZhans())
+        {
+            if(ctx.getSkillTarget(seer,1) <= playerCount) continue;
+            int blackTarget = ctx.getSkillTarget(seer,1) - playerCount;
+            if(!blackTargets.contains(blackTarget))
+                blackTargets.add(blackTarget);
+        }
+        return blackTargets;
+    }
+
+    private void handleWhiteNonHumanResponse(
+            int blackTarget, int actualRole, List<IntPair> responses)
+    {
+        DebugLogger.log("白非接黒并且没有之前的计划->狂狐背");
+        int option = ctx.getRandom().weightedIndex(new ArrayList<>(
+                whiteResponseWeights(actualRole, ctx.getNonHumanAggression())));
+
+        switch(option)
+        {
+            case 0:
+                ctx.recordSkillTarget(blackTarget, 1, ctx.getPreliminaryDivinationTarget(blackTarget));
+                responses.add(new IntPair(blackTarget,1));
+                break;
+            case 1:
+                responses.add(new IntPair(blackTarget,2));
+                break;
+            case 2:
+                int role = chooseHunterOrCatRole();
+                NonHumanPlan responsePlan = NonHumanPlan.claimRole(role);
+                ctx.setNonHumanPlan(blackTarget, responsePlan);
+                if(responsePlan == NonHumanPlan.CLAIM_CAT)
+                    responses.add(new IntPair(blackTarget,5));
+                break;
+            case 3:
+                ctx.clearNonHumanPlan(blackTarget);
+                break;
+        }
+    }
+
+    /** 白方非人接黑后的四类响应权重：占/灵/猎或猫/潜伏。 */
+    static List<Integer> whiteResponseWeights(int actualRole, int aggression)
+    {
+        return switch(actualRole)
+        {
+            case 8, 9 -> List.of(95, 5, 0, 0);
+            case 10 -> List.of(80, 5, 10, 5);
+            case 11 -> List.of(45 + aggression, 30, 20, 5 - aggression);
+            default -> throw new IllegalArgumentException(
+                    "不是白方非人职业: " + actualRole);
+        };
+    }
+
+    private int chooseHunterOrCatRole()
+    {
+        int role = 5 - ctx.getRandom().weightedIndex(new ArrayList<>(List.of(
+                50 + 50 * ctx.getLies().size(), 50 + 50 * ctx.getMaos().size()))) * 2;
+        if(ctx.getCat() == 0 || ctx.isCatDefinitivelyOut()) role = 3;
+        return role;
+    }
+}

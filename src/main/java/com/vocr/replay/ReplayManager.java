@@ -1,0 +1,150 @@
+package com.vocr.replay;
+
+import com.vocr.config.PathConfig;
+import com.vocr.logging.DebugLogger;
+
+// C:\Users\Lenovo\Desktop\电脑村\电脑村重制相关文件\Village of Cyber Remake\src\main\java\com\vocr\replay\ReplayManager.java
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+
+public class ReplayManager {
+    public static final int MAX_SLOTS = 9;
+    private final String saveFile;
+
+    private ReplaySave[] slots = new ReplaySave[MAX_SLOTS];
+
+    public ReplayManager() { this(PathConfig.REPLAY_SAVES); }
+
+    /** 允许兼容性测试使用隔离的存档文件，不触碰用户的真实 Replay 数据。 */
+    ReplayManager(String saveFile) {
+        if (saveFile == null || saveFile.isBlank()) {
+            throw new IllegalArgumentException("Replay存档路径不能为空");
+        }
+        this.saveFile = saveFile;
+        load();
+    }
+
+    public void load() {
+        File file = new File(saveFile);
+        if (file.exists() && file.length() > 50) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                slots = mapper.readValue(file, ReplaySave[].class);
+                
+                int validCount = 0;
+                for (int i = 0; i < slots.length; i++) {
+                    if (slots[i] != null && slots[i].rawRecords != null && !slots[i].rawRecords.isEmpty()) {
+                        migrateVersion(slots[i]);
+                        validCount++;
+                    } else {
+                        slots[i] = null;
+                    }
+                }
+                
+                DebugLogger.info("[ReplayManager] 已加载存档数据: " + saveFile + ", 有效存档=" + validCount + "/" + MAX_SLOTS);
+            } catch (Exception e) {
+                DebugLogger.error("[ReplayManager] 加载失败（可能格式不兼容，将重建）", e);
+                
+                // 备份损坏的文件
+                if (file.exists()) {
+                    File backup = new File(saveFile + ".corrupted." + System.currentTimeMillis());
+                    file.renameTo(backup);
+                    DebugLogger.warn("[ReplayManager] 已备份损坏文件到: " + backup.getName());
+                }
+                
+                slots = new ReplaySave[MAX_SLOTS];
+                save(); // 创建新的空存档文件
+            }
+        } else {
+            if (file.exists() && file.length() <= 50) {
+                file.delete();
+                DebugLogger.warn("[ReplayManager] 检测到空/过小存档，已删除");
+            }
+            save();
+        }
+    }
+
+    public void save() {
+        try {
+            File file = new File(saveFile);
+            File dir = file.getParentFile();
+            if (dir != null && !dir.exists()) dir.mkdirs();
+
+            // 验证数据有效性
+            for (int i = 0; i < slots.length; i++) {
+                if (slots[i] != null) {
+                    if (slots[i].rawRecords == null) slots[i].rawRecords = new java.util.ArrayList<>();
+                    if (slots[i].daySnapshots == null) slots[i].daySnapshots = new java.util.ArrayList<>();
+                    if (slots[i].saveTime == null) slots[i].saveTime = "unknown";
+                    if (slots[i].peiyiName == null) slots[i].peiyiName = "unknown";
+                }
+            }
+            
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT, true);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, slots);
+            DebugLogger.info("[ReplayManager] 已保存存档数据: " + saveFile);
+        } catch (Exception e) {
+            DebugLogger.error("[ReplayManager] 保存失败", e);
+        }
+    }
+
+    /** Checked port path: publish the new slot only after an atomic file replacement succeeds. */
+    public synchronized void saveToSlotChecked(int slotIndex, ReplaySave replay) throws java.io.IOException {
+        if (slotIndex < 0 || slotIndex >= MAX_SLOTS)
+            throw new IllegalArgumentException("Replay槽位越界");
+        if (slots == null || slots.length != MAX_SLOTS)
+            throw new IllegalStateException("Replay槽位结构不完整，未覆盖原文件");
+        java.util.Objects.requireNonNull(replay, "Replay数据不能为空");
+        ReplaySave[] candidate = slots.clone();
+        replay.slotIndex = slotIndex;
+        candidate[slotIndex] = replay;
+        java.nio.file.Path target = java.nio.file.Path.of(saveFile).toAbsolutePath();
+        java.nio.file.Files.createDirectories(target.getParent());
+        java.nio.file.Path temporary = java.nio.file.Files.createTempFile(target.getParent(), ".vocr-replay-", ".tmp");
+        try {
+            new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(temporary.toFile(), candidate);
+            java.nio.file.Files.move(temporary, target,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            slots = candidate;
+        } finally {
+            java.nio.file.Files.deleteIfExists(temporary);
+        }
+    }
+
+    public ReplaySave getSlot(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= MAX_SLOTS) return null;
+        return slots[slotIndex];
+    }
+
+    public int getUsedSlotCount() {
+        int count = 0;
+        for (int i = 0; i < MAX_SLOTS; i++) {
+            if (slots[i] != null) count++;
+        }
+        return count;
+    }
+
+    private void migrateVersion(ReplaySave save) {
+        if (save.version == 0) {
+            save.version = 1;
+            DebugLogger.info("[ReplayManager] 迁移存档版本: v0 -> v1");
+        }
+        if (save.version == 1) {
+            save.version = 2;
+            if (save.peiyiVillageCount <= 0) save.peiyiVillageCount = -1;
+            if (save.totalVillageCount <= 0) save.totalVillageCount = -1;
+            DebugLogger.info("[ReplayManager] 迁移存档版本: v1 -> v2");
+        }
+        if (save.version == 2) {
+            save.version = 3;
+            DebugLogger.info("[ReplayManager] 迁移存档版本: v2 -> v3");
+        }
+        if (save.version < ReplaySave.CURRENT_VERSION) {
+            DebugLogger.warn("[ReplayManager] 存档版本 v" + save.version + " 无法自动迁移到 v" + ReplaySave.CURRENT_VERSION);
+        }
+    }
+}

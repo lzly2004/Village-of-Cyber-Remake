@@ -1,0 +1,191 @@
+name: Deterministic verification
+
+on:
+  push:
+    branches: [main, 'workflow/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      base_sha:
+        description: Exact committed base SHA (40 lowercase hex)
+        required: true
+        type: string
+      full:
+        description: Explicit full verification (also permits same-SHA revalidation)
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    if: ${{ github.event_name != 'push' || !github.event.deleted }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      GIT_LFS_SKIP_SMUDGE: '1'
+      GRADLE_USER_HOME: ${{ github.workspace }}/build/ci/gradle-home
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/build/ci/browsers
+    steps:
+      - name: Checkout the exact event head, never a synthetic PR merge
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          lfs: false # Restore objects first, then hydrate and verify; no smudge download before cache.
+          persist-credentials: false
+
+      - name: Fixed Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12.12'
+          check-latest: false
+
+      - name: Resolve immutable base and preview scope
+        run: |
+          git config --local core.autocrlf false
+          git config --local core.eol lf
+          python3 -B tools/ci/context.py
+
+      - name: Restore exact raw LFS object cache
+        if: env.CI_NEEDS_LFS == 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .git/lfs/objects
+          key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes', 'src/main/resources/BGM/*.wav', 'src/main/resources/sounds/*.wav') }}
+          restore-keys: lfs-${{ runner.os }}-
+
+      - name: Fixed Node and npm download cache
+        if: env.CI_NEEDS_NODE == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.23.0'
+          check-latest: false
+          cache: npm
+          cache-dependency-path: web-client/package-lock.json
+          package-manager-cache: false
+
+      - name: Fixed JDK (official Microsoft catalog)
+        if: env.CI_NEEDS_JAVA == 'true'
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: microsoft
+          java-version: '21.0.11'
+          check-latest: false
+
+      - name: Restore checked tool archives and dependency cache
+        if: env.CI_NEEDS_LFS == 'true' || env.CI_NEEDS_JAVA == 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            build/ci/downloads
+            build/ci/gradle-home/caches/modules-2
+          key: tools-${{ runner.os }}-${{ hashFiles('tools/ci/toolchain.json', 'build.gradle', 'settings.gradle', 'gradle.properties') }}
+
+      - name: Install hashed CI-only Python tools
+        if: env.CI_NEEDS_PIP == 'true'
+        run: |
+          python3 -m pip install --require-hashes --only-binary=:all: -r tools/ci/requirements-linux-x64.txt
+
+      - name: Validate and prepare user-directory tools
+        run: python3 -B tools/ci/bootstrap.py
+
+      - name: Hydrate actual LFS payloads (cache hits do not bypass checks)
+        if: env.CI_NEEDS_LFS == 'true'
+        run: |
+          git lfs install --local --skip-smudge
+          git lfs fetch origin HEAD
+          git lfs checkout
+          git lfs fsck
+
+      - name: Install locked frontend dependencies
+        if: env.CI_NEEDS_NODE == 'true'
+        run: npm --prefix web-client ci
+
+      - name: Verified dry-run before executing any suite
+        run: |
+          args=(--base "$CI_BASE_SHA" --dry-run --json)
+          if [[ "$CI_FORCE_FULL" == true ]]; then args+=(--full); fi
+          bash tools/verify.sh "${args[@]}" > build/ci/plan.json 2> build/ci/plan.stderr
+
+      - name: Prepare ephemeral runner display and CJK fonts
+        if: env.CI_NEEDS_JAVA == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb xauth fonts-noto-cjk
+
+      - name: Install matching Chromium and runner libraries
+        if: env.CI_NEEDS_BROWSER == 'true'
+        working-directory: web-client
+        run: npx --no-install playwright install --with-deps chromium
+
+      - name: Warm Java dependencies through the existing safety entry (no tests)
+        if: env.CI_NEEDS_JAVA == 'true'
+        run: bash tools/run-gradle-safe.sh testClasses
+
+      - name: Execute once, same job for both exchange files and all suites
+        # Owner-approved cloud execution only; preparation and upload do not inherit it.
+        env:
+          VOCR_APPROVED_FULL_CHECK: '1'
+        run: |
+          if [[ "$CI_NEEDS_JAVA" == true ]]; then
+            xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' python3 -B tools/ci/run.py
+          else
+            python3 -B tools/ci/run.py
+          fi
+
+      - name: Assemble evidence and failure summary without running tests
+        if: always()
+        env:
+          CI_JOB_STATUS: ${{ job.status }}
+          CI_EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python3 -B tools/ci/evidence.py
+
+      - name: Upload existing verification evidence even on failure
+        id: evidence_upload
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verify-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            build/ci/context.json
+            build/ci/plan.json
+            build/ci/plan.stderr
+            build/ci/tools.json
+            build/ci/verify.stdout
+            build/ci/verify.stderr
+            build/ci/outcome.json
+            build/ci/evidence.json
+            build/ci/summary.md
+            build/verify/**
+            build/test-results/test/**
+            build/web035/*.json
+            web-client/test-results/**
+            tools/test-results/**
+
+      - name: Record the uploaded artifact identity and digest
+        id: receipt
+        if: ${{ always() && steps.evidence_upload.outputs.artifact-id != '' }}
+        env:
+          CI_EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          CI_ARTIFACT_ID: ${{ steps.evidence_upload.outputs.artifact-id }}
+          CI_ARTIFACT_URL: ${{ steps.evidence_upload.outputs.artifact-url }}
+          CI_ARTIFACT_DIGEST: ${{ steps.evidence_upload.outputs.artifact-digest }}
+        run: python3 -B tools/ci/evidence.py --receipt
+
+      - name: Preserve the separate post-upload receipt
+        if: ${{ always() && steps.receipt.outcome == 'success' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: error
+          path: build/ci/receipt.json

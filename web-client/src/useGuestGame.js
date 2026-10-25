@@ -1,0 +1,299 @@
+import { computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { ApiError, request } from './api'
+import { mergePresentationHistory } from './eventArtwork.js'
+
+export const STORAGE_KEY = 'vocr.guest.v1'
+
+export function useGuestGame() {
+  const sessionId = ref('')
+  const cursor = ref(0)
+  const update = shallowRef(null)
+  const presentationHistory = shallowRef([])
+  let presentationVersion = 0
+  function rememberPresentation(snapshot) {
+    const version = ++presentationVersion
+    const merged = mergePresentationHistory(presentationHistory.value, snapshot)
+    if (merged) { presentationHistory.value = merged; return }
+    presentationHistory.value = []
+    const id = sessionId.value
+    // Presentation recovery is read-only and cannot delay/replace an authoritative game update.
+    request('/' + id + '?eventCursor=0').then(full => {
+      if (version !== presentationVersion || sessionId.value !== id) return
+      if (full.revision !== snapshot.revision || full.eventCursor !== 0) return
+      const recovered = mergePresentationHistory([], full)
+      if (recovered) presentationHistory.value = recovered
+    }).catch(() => { /* GameStage visibly diagnoses unavailable context; no command is retried. */ })
+  }
+  const busy = ref(false)
+  const uncertain = ref(false)
+  const notice = ref('')
+  const storageWarning = ref('')
+  const pending = computed(() => update.value
+    ? update.value.presentedEvents.slice(Math.max(0, cursor.value - update.value.eventCursor))
+    : [])
+  const currentEvent = computed(() => pending.value[0] || null)
+  const canDecide = computed(() => update.value?.phase === 'DAY_DECISION'
+    && !currentEvent.value && !busy.value && !uncertain.value)
+  const designatedVote = computed(() =>
+    update.value?.legalVoteActions.find(action => action.method === 'DESIGNATED'))
+  const canVote = computed(() => canDecide.value && Boolean(designatedVote.value))
+  const alternativeVotes = computed(() => update.value?.legalVoteActions.filter(
+    action => action.method === 'FREE' || action.method === 'GREY') || [])
+  const claimRoles = computed(() => update.value?.claimInquiry.roles || [])
+  const divinationTargets = computed(() => update.value?.legalTargetSelections.find(
+    action => action.type === 'DIVINATION')?.targets || [])
+  const selectedDivinationTargets = computed(() => {
+    const selections = update.value?.selections.divination
+    return new Set(selections ? [...selections.hiddenTargets,
+      ...selections.claimedActors.flatMap(actor => actor.targets)] : [])
+  })
+  const claimPlayers = computed(() => update.value?.claimInquiry.players || [])
+  const guardTargets = computed(() => update.value?.legalTargetSelections.find(
+    action => action.type === 'GUARD')?.targets || [])
+  const selectedGuardTargets = computed(() => {
+    const selections = update.value?.selections.guard
+    return new Set(selections ? [...selections.hiddenTargets,
+      ...selections.claimedActors.flatMap(actor => actor.targets)] : [])
+  })
+  const claimPlayerDraft = ref([])
+  const canAskClaimPlayers = computed(() => canDecide.value && claimPlayerDraft.value.length > 0
+    && claimPlayerDraft.value.every(player => claimPlayers.value.includes(player)))
+  // Unsubmitted choices are UI drafts, never authoritative or replayed after synchronization.
+  watch(update, () => { claimPlayerDraft.value = [] })
+
+  function persist() {
+    try {
+      if (sessionId.value) sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+        sessionId: sessionId.value, eventCursor: cursor.value,
+      }))
+      else sessionStorage.removeItem(STORAGE_KEY)
+    } catch {
+      storageWarning.value = '浏览器未允许保存会话，刷新后将无法自动恢复。'
+    }
+  }
+
+  function forget() {
+    sessionId.value = ''
+    cursor.value = 0
+    update.value = null
+    presentationVersion++
+    presentationHistory.value = []
+    uncertain.value = false
+    persist()
+  }
+
+  async function sync() {
+    if (!sessionId.value) return
+    let snapshot
+    try {
+      snapshot = await request('/' + sessionId.value + '?eventCursor=' + cursor.value)
+    } catch (error) {
+      if (!(error instanceof ApiError) || error.status !== 400) throw error
+      // 损坏或超出范围的本地游标从头恢复，确保不丢事件。
+      snapshot = await request('/' + sessionId.value + '?eventCursor=0')
+      cursor.value = 0
+    }
+    update.value = snapshot
+    rememberPresentation(snapshot)
+    uncertain.value = false
+    persist()
+  }
+
+  async function accept(snapshot) {
+    // 命令窗口若晚于已确认游标，先补读其间事件，不能跳过未展示内容。
+    if (snapshot.eventCursor > cursor.value || snapshot.nextEventCursor < cursor.value) {
+      await sync()
+    } else {
+      update.value = snapshot
+      rememberPresentation(snapshot)
+      persist()
+    }
+  }
+
+  async function handleError(error) {
+    if (error instanceof ApiError && error.status === 404) {
+      forget()
+      notice.value = '这局游戏已失效，可能是服务重启或会话已被释放。请选择配役重新开局。'
+    } else if (error instanceof ApiError && error.status === 409) {
+      await sync()
+      notice.value = '对局状态已更新，已重新同步。请查看最新事件与选择后再操作。'
+    } else if (error instanceof ApiError && error.status < 500) {
+      notice.value = error.message
+    } else if (!sessionId.value) {
+      notice.value = error instanceof ApiError
+        ? error.message : '无法连接本机游戏服务，请确认服务已启动后重试。'
+    } else {
+      uncertain.value = Boolean(sessionId.value)
+      notice.value = '连接未能确认，操作可能已在服务器完成。请重新同步后继续。'
+    }
+  }
+
+  async function run(action) {
+    if (busy.value) return
+    busy.value = true
+    notice.value = ''
+    try {
+      await action()
+    } catch (error) {
+      try {
+        await handleError(error)
+      } catch (syncError) {
+        if (syncError instanceof ApiError && syncError.status === 404) {
+          forget()
+          notice.value = '对局已失效，请重新开局。'
+        } else {
+          uncertain.value = true
+          notice.value = '暂时无法同步对局，请检查本机服务后重试。'
+        }
+      }
+    } finally {
+      busy.value = false
+    }
+  }
+
+  function start(configuration) {
+    return run(async () => {
+      const created = await request('', { method: 'POST', body: { configuration } })
+      sessionId.value = created.sessionId
+      cursor.value = 0
+      update.value = created.update
+      rememberPresentation(created.update)
+      uncertain.value = false
+      persist()
+    })
+  }
+
+  function nextEvent() {
+    if (!currentEvent.value || busy.value) return
+    cursor.value++
+    persist()
+  }
+
+  function toggleTarget(target, selected) {
+    if (!canDecide.value) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/vote-target', {
+        method: 'PUT', body: { expectedRevision: update.value.revision, target, selected },
+      }))
+    })
+  }
+
+  function vote(method) {
+    const action = update.value?.legalVoteActions.find(action => action.method === method)
+    if (!canDecide.value || !action) return
+    return run(async () => {
+      const result = await request('/' + sessionId.value + '/votes', {
+        method: 'POST', body: {
+          expectedRevision: update.value.revision,
+          method: action.method,
+          candidates: action.candidates,
+        },
+      })
+      await accept(result.update)
+      if (!result.voteCompleted) notice.value = '投票被回避 CO 中断。读完新发言后，请重新确认投票目标。'
+    })
+  }
+
+  function askClaimRole(role) {
+    if (!canDecide.value || !claimRoles.value.includes(role)) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/claims/by-role', {
+        method: 'POST', body: { expectedRevision: update.value.revision, role },
+      }))
+    })
+  }
+
+  function setDivinationTarget(target, selected) {
+    if (!canDecide.value || !divinationTargets.value.includes(target)) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/target-selections', {
+        method: 'PUT', body: {
+          expectedRevision: update.value.revision, type: 'DIVINATION', target, selected,
+        },
+      }))
+    })
+  }
+
+  function setGuardTarget(target, selected) {
+    if (!canDecide.value || !guardTargets.value.includes(target)) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/target-selections', {
+        method: 'PUT', body: {
+          expectedRevision: update.value.revision, type: 'GUARD', target, selected,
+        },
+      }))
+    })
+  }
+
+  function setClaimedTarget(type, claimedPlayer, target, selected) {
+    const action = update.value?.legalTargetSelections.find(action => action.type === type)
+    if (!canDecide.value || !['DIVINATION', 'GUARD'].includes(type)
+      || !action?.targets.includes(target)
+      || !action.claimedActors.some(actor => actor.playerNumber === claimedPlayer)) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/claimed-target-selections', {
+        method: 'PUT', body: { expectedRevision: update.value.revision, type, claimedPlayer, target, selected },
+      }))
+    })
+  }
+
+  function refresh() { return run(sync) }
+
+  function setAvoidance(enabled) {
+    if (!canDecide.value) return
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/avoidance', {
+        method: 'PUT', body: { expectedRevision: update.value.revision, enabled },
+      }))
+    })
+  }
+
+  function toggleClaimPlayer(player, selected) {
+    if (!canDecide.value || !claimPlayers.value.includes(player)) return
+    if (selected && !claimPlayerDraft.value.includes(player)) claimPlayerDraft.value.push(player)
+    else if (!selected) claimPlayerDraft.value = claimPlayerDraft.value.filter(value => value !== player)
+  }
+
+  function askClaimPlayers() {
+    if (!canAskClaimPlayers.value) return
+    const players = [...claimPlayerDraft.value]
+    return run(async () => {
+      await accept(await request('/' + sessionId.value + '/claims/by-players', {
+        method: 'POST', body: { expectedRevision: update.value.revision, players },
+      }))
+    })
+  }
+
+  function release() {
+    return run(async () => {
+      await request('/' + sessionId.value, { method: 'DELETE' })
+      forget()
+      notice.value = '已结束这次试玩，可以开始新的一局。'
+    })
+  }
+
+  onMounted(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null')
+      if (saved && /^[0-9a-f-]{36}$/i.test(saved.sessionId)
+          && Number.isSafeInteger(saved.eventCursor) && saved.eventCursor >= 0) {
+        sessionId.value = saved.sessionId
+        cursor.value = saved.eventCursor
+        refresh()
+      } else {
+        persist()
+      }
+    } catch {
+      persist()
+    }
+  })
+
+  return {
+    sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory,
+    pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
+    divinationTargets, selectedDivinationTargets, setDivinationTarget,
+    guardTargets, selectedGuardTargets, setGuardTarget,
+    setClaimedTarget,
+    start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
+  }
+}

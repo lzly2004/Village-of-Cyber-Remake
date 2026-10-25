@@ -1,0 +1,28 @@
+{
+  "name": "village-of-cyber-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "^20.19.0 || >=22.12.0" },
+  "scripts": {
+    "dev": "vite",
+    "assets:check": "python3 -B ../tools/build-web-images.py check",
+    "audio:check": "python3 -B ../tools/build-web-audio.py check",
+    "prebuild": "npm run assets:check && npm run audio:check",
+    "build": "vite build",
+    "postbuild": "python3 -B ../tools/build-web-images.py distribution && python3 -B ../tools/build-web-audio.py distribution",
+    "test:assets": "playwright test --config playwright.assets.config.js",
+    "test:audio": "playwright test --config playwright.audio.config.js",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:e2e": "playwright test",
+    "test:diagnostic-probe": "playwright test --config playwright.probe.config.js",
+    "test:gate": "playwright test --config playwright.gate.config.js",
+    "test:unit": "node --test --test-concurrency=1 unit/public-information-text.test.js unit/vote-history.test.js unit/gate-config.test.js unit/event-dialogue.test.js unit/player-visual.test.js unit/event-artwork.test.js unit/scene-artwork.test.js unit/audio-assets.test.js unit/bgm.test.js unit/sound.test.js unit/help.test.js unit/public-information-diagnostics.test.js unit/replay.test.js unit/replay-playback.test.js unit/replay-information.test.js unit/replay-files.test.js"
+  },
+  "dependencies": { "vue": "3.5.44" },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@vitejs/plugin-vue": "6.0.10",
+    "vite": "8.3.5"
+  }
+}

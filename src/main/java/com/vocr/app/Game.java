@@ -1,0 +1,78 @@
+package com.vocr.app;
+
+import com.vocr.application.GameEventBuffer;
+import com.vocr.application.GameSession;
+import com.vocr.logging.DebugLogger;
+import com.vocr.core.MainLogic;
+import com.vocr.history.GameRecordManager;
+import com.vocr.replay.ReplayManager;
+import com.vocr.resources.Resources;
+import com.vocr.ui.UI;
+
+public class Game
+{   //单例模式
+    //公共成员，三个类共同维护的外部类的数据成员
+    //...
+    private static Game instance = null;
+    UI ui;
+    Resources resources;
+    MainLogic mainlogic;
+    ReplayManager replayManager;
+    GameRecordManager gameRecordManager;
+    private Game()
+    {
+        this.resources = new Resources();
+        this.replayManager = new ReplayManager();
+        this.gameRecordManager = new GameRecordManager();
+        this.ui = new UI(resources, replayManager, gameRecordManager);
+        this.ui.attachSessionFactory(this::createSession);
+    }
+
+    /** 每局创建独立会话；桌面端共用同一战绩文件以保持战绩页累计行为。 */
+    private GameSession createSession()
+    {
+        GameEventBuffer eventBuffer = new GameEventBuffer();
+        MainLogic logic = new MainLogic(eventBuffer::publish, gameRecordManager);
+        this.mainlogic = logic;
+        return new GameSession(logic, eventBuffer, gameRecordManager);
+    }
+    public static Game getInstance()
+    {
+        if (instance == null) instance = new Game();
+        return instance;
+    }
+    public void init()
+    {
+        resources.init();
+        ui.init();
+    }
+    public void run()
+    {
+        try {
+            init();
+            DebugLogger.info("Village of Cyber Remake - 游戏启动");
+            resources.run();
+            ui.run();
+        } catch (Exception e) {
+            DebugLogger.error("未捕获异常，游戏崩溃", e);
+            if (mainlogic != null && mainlogic.getRecorder() != null) {
+                try {
+                    mainlogic.getRecorder().endGame(0, 0);
+                    DebugLogger.info("崩溃时已尝试保存Replay数据（endResult=0, gameDay=0）");
+                } catch (Exception ex) {
+                    DebugLogger.error("保存Replay数据失败", ex);
+                }
+            }
+            javax.swing.JOptionPane.showMessageDialog(null,
+                "游戏发生错误，请查看日志。\n错误信息: " + e.getMessage(),
+                "错误", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    public static void main(String[] args)
+   {
+       Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+           DebugLogger.error("线程[" + t.getName() + "]未捕获异常", e);
+       });
+       getInstance().run();
+   }
+}
