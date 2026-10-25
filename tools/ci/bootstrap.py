@@ -97,6 +97,18 @@ def append_environment(file, values):
             stream.write(key + '=' + value + '\n')
 
 
+def git_environment():
+    version = subprocess.check_output(['git', '--version'], cwd=ROOT, text=True).strip()
+    config = subprocess.run(['git', 'config', '--get', 'diff.renameLimit'],
+                            cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if config.returncode not in (0, 1):
+        raise ValueError('GIT_RENAME_LIMIT_QUERY_FAILED')
+    limit = int(config.stdout.strip()) if config.returncode == 0 else None
+    if limit is not None and limit < 0:
+        raise ValueError('INVALID_GIT_RENAME_LIMIT')
+    return {'git_version': version, 'git_diff_rename_limit': limit}
+
+
 def main():
     try:
         if os.environ.get('GITHUB_ACTIONS') != 'true':
@@ -107,6 +119,7 @@ def main():
         tools.mkdir(parents=True, exist_ok=True)
         env, report = {}, {'python': sys.version, 'runner_image_version': os.environ.get('ImageVersion'),
                            'toolchain_lock_sha256': digest(ROOT / 'tools/ci/toolchain.json')}
+        report.update(git_environment())
         if '.'.join(map(str, sys.version_info[:3])) != lock['python']:
             raise ValueError('PYTHON_VERSION_MISMATCH')
         if os.environ.get('CI_NEEDS_LFS') == 'true':

@@ -1,6 +1,6 @@
 # WF-005：证据包与独立CR交接
 
-当前：WF-005完成。2063274真实push run40086327059完整成功、revision 2证据重算通过；已按用户明确授权创建[草稿PR #1](https://github.com/lzly2004/Village-of-Cyber-Remake/pull/1)，真实PR run40149558683采用正确base/head并因历史24处尾随空白严格拒绝，后续19项未执行。流程验证完成不等于PR绿灯或合并放行；main未改。结果及逐项处置见[本轮归档](review-2fb4edf.md)，原交付见[前轮归档](review-9e5d17a.md)。本次摘要补修见[后续评审归档](review-f089bda.md)。WF-006/007仍PLANNED，WEB-036仍暂停。
+当前：WF-005已完成，main@8ef3240的首次完整CI和证据/回执复算通过；保留169个小提交的合流记录见[主线归档](review-394779a.md)。本轮正以main为基线准备maintenance/wf005-tools维护PR，完整同步ddd86b1、394779a、dea2a94的归档和工具补修；发布/评审状态与决策见[维护记录](review-dea2a94.md)。分级仍full，不将本机55项称云端已通过。required checks尚未配置，WF-006/007仍PLANNED，WEB-036保持READY且本轮未实施；人工/容量/发布门槛开放。
 
 ## 产物与身份契约（schema 1）
 
@@ -12,7 +12,7 @@
 - fingerprints与eol_policy照录输入审计；LFS保留声明OID/大小和ASCII排序的`oid TAB bytes LF`聚合、指针/唯一payload口径。HTTP请求计数、账户计费未知为null，不能用对象数替代；工作目录有效payload也不冒充独立远端证明。存储路径为CI使用的.git/lfs/objects。
 - manual_gates固定为A06/A07/A08、046正式浏览器/DPI/辅助技术/人工音频、049发布前人工复检、047容量/长局的not_covered。即使原输入报告声称通过，本工具也不自动关闭这些门槛。
 
-新生成的schema 1证据使用`assembly_revision: 3`：not_covered按首次出现顺序去重、Markdown链接为run→artifact→ZIP digest，另对diff-check套件聚合Git的尾随空白、Tab前空格及EOF空行诊断，记录首个文件:行号、问题数及文件数。同一行合并原因也可识别；输出有界且经摘要转义。revision 2保留原失败摘要（包括diff-check的null），缺修订字段的revision 1保留原重复项及无新增字段。下载器按明确修订规则重组，与包内报告全部字段完全比对；不先归一化或忽略旧字段，未知修订拒绝。没有包内报告的WF-004包使用当前规则重算。
+新生成的schema 1证据使用`assembly_revision: 4`：无result的准备失败/取消分支也输出空的unexecuted_suites与policy_skipped_suites（空数组表示该分支无可核验result清单，不表示所有计划已执行）。revision 1/2/3各按原规则精确复算，revision 3的旧准备失败包继续保留原缺键。revision 3引入：not_covered按首次出现顺序去重、Markdown链接为run→artifact→ZIP digest，另对diff-check套件聚合Git的尾随空白、Tab前空格及EOF空行诊断，记录首个文件:行号、问题数及文件数。同一行合并原因也可识别；输出有界且经摘要转义。revision 2保留原失败摘要（包括diff-check的null），缺修订字段的revision 1保留原重复项及无新增字段。下载器按明确修订规则重组，与包内报告全部字段完全比对；不先归一化或忽略旧字段，未知修订拒绝。没有包内报告的WF-004包使用当前规则重算。
 
 上传后才获得artifact ID/URL/digest。因此使用单独receipt-<run_id>-<attempt>保存receipt.json，并写入job summary；不把ZIP自身hash嵌回该ZIP造成自引用。回执明确关联run、attempt、tested head与verify artifact，消费者仍须从GitHub API读取digest并核对实际ZIP。receipt文件不是游戏/Replay格式。
 
@@ -57,6 +57,8 @@ ZIP有压缩/解压总量、单项、条目数上限，拒绝越界、重复/大
 4. 用户批准具体PR创建后，才创建草稿PR并提交已审的正文；仅附摘要和证据入口，不复制全日志。当前工具不发评论、不调用AI、不生成/提交补丁、不合并。
 5. 补修后CI再验，检查当前HEAD；最后由用户决定合并。真实PR/fork事件的base_source应为pull_request.base.sha，不能换成HEAD^或伪造main基线。
 
-main仍是旧基线，准备分支包含已审长历史。用户已单独授权并完成草稿PR #1创建；首次真实PR因3文件24处历史尾随空白被严格diff-check拒绝，失败证据已保留。不得为绿灯顺手改生产Java空白、放宽门槛或更新main；主线整合与任何修复另由用户决定。当前只创建PR正文，不自动发额外评论、邀请reviewer或合并。
+main仍是旧基线，准备分支包含已审长历史。首次真实PR的3文件24处空白红灯证据保留；用户已另行授权本轮独立空白修复、本机完整验收及准备分支推送，最新3b8641c真实PR完整通过，未放宽diff-check。PR原正文已更新，不额外发评论、邀请reviewer或合并；主线整合仍由用户决定。
 
 同SHA三次full是WF-007 Auto-Fix前置，不把一次成功当无flake证明；尚未执行。首次真实frontend层CI时记录实际成本，不靠人工触碰生产路径凑样本。以上未完成项不得勾选为实测通过。
+
+工具环境记录git --version和有效的diff.renameLimit（未显式配置为null，不猜测内置默认值；0保留其真实语义）。只读查询，不修改配置。跨历史区间diff-check以当前CI的Git环境为验收依据；本地不一致时先比版本与重命名配置，保留差异证据，不改门禁或用旧绿灯替代新head。

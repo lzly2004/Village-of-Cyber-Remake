@@ -38,6 +38,18 @@ FLOW = yaml.load((ROOT / '.github/workflows/verify.yml').read_text(), Loader=yam
 HEAD, BASE, MERGE = '1' * 40, '2' * 40, '3' * 40
 
 
+class GitEnvironmentTest(unittest.TestCase):
+    def test_git_version_effective_limit_and_unset_are_recorded_without_mutation(self):
+        for code, raw, expected in [(1, '', None), (0, '10000\n', 10000), (0, '0\n', 0)]:
+            with patch.object(BOOT.subprocess, 'check_output', return_value='git version fixture\n') as version, patch.object(BOOT.subprocess, 'run', return_value=subprocess.CompletedProcess([], code, raw, '')) as config:
+                self.assertEqual({'git_version': 'git version fixture', 'git_diff_rename_limit': expected}, BOOT.git_environment())
+                self.assertEqual(['git', '--version'], version.call_args.args[0])
+                self.assertEqual(['git', 'config', '--get', 'diff.renameLimit'], config.call_args.args[0])
+        for code, raw in [(2, ''), (0, 'not-a-number'), (0, '-1')]:
+            with patch.object(BOOT.subprocess, 'check_output', return_value='git version fixture'), patch.object(BOOT.subprocess, 'run', return_value=subprocess.CompletedProcess([], code, raw, '')):
+                with self.assertRaises(ValueError): BOOT.git_environment()
+
+
 class ContextTest(unittest.TestCase):
     def read(self, *args):
         if args == ('rev-parse', 'HEAD'):
