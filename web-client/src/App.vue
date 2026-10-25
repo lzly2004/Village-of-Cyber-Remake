@@ -8,6 +8,7 @@ import GameStage from './GameStage.vue'
 import BgmControl from './BgmControl.vue'
 import PlayerPortrait from './PlayerPortrait.vue'
 import ReplayEntry from './ReplayEntry.vue'
+import RecordSettlement from './RecordSettlement.vue'
 import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
@@ -91,6 +92,7 @@ function name(number) {
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
       <ReplayEntry :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" @playing="replayPlaying=$event" />
+      <RecordSettlement :session-id="sessionId" :update="update" :eligible="finished && !busy && !uncertain && !replayPlaying" />
 
       <section v-if="!update && !sessionId" class="lobby">
         <span class="eyebrow">WELCOME TO THE VILLAGE</span>

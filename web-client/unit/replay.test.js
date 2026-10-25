@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises'
 import { validateReplay, replayFromFile, REPLAY_LIMITS } from '../src/replayValidation.js'
 import { replayId, createReplayStore } from '../src/replayStore.js'
 import { readCompletedReplay } from '../src/replayApi.js'
+import { completedRecord, emptyRecord, accumulate, createRecordStore, recordConfigurations } from '../src/recordStore.js'
 const fixture=JSON.parse(await readFile(new URL('../../src/test/resources/replay/exchange-v3.json',import.meta.url),'utf8'))
 const copy=()=>structuredClone(fixture[0])
 test('v3 preserves raw Unicode, multiline JSON, opaque large seed, order and both index kinds',async()=>{
@@ -80,4 +81,37 @@ test('denied IndexedDB capability getter is handled lazily, never throws during 
     const store=createReplayStore()
     await assert.rejects(store.list(),/STORAGE_UNAVAILABLE/)
   }finally{if(original)Object.defineProperty(globalThis,'indexedDB',original);else delete globalThis.indexedDB}
+})
+
+test('records: only acknowledged completion captures public configuration/result, never private or replay data',()=>{
+  const id='12345678-1234-1234-1234-123456789012'
+  const update={phase:'FINISHED',view:{configuration:'jianyi',result:'VILLAGE_WIN'}}
+  for(const name of ['players','actualRole','revealedRoles','replay'])Object.defineProperty(update,name,{get(){throw Error('private read')}})
+  assert.equal(completedRecord(id,update,false),null)
+  assert.deepEqual(completedRecord(id,update,true),{sessionId:id,configuration:'jianyi',result:'VILLAGE_WIN'})
+  for(const value of ['NONE','toString',null,1])assert.throws(()=>completedRecord(id,{phase:'FINISHED',view:{configuration:'jianyi',result:value}},true),/INVALID_RESULT/)
+  assert.throws(()=>completedRecord(id,{...update,phase:'DAY_DECISION'},true),/INVALID_RESULT/)
+  assert.throws(()=>completedRecord('invalid',update,true),/INVALID_RESULT/)
+  assert.throws(()=>completedRecord(id,{phase:'FINISHED',view:{configuration:'NONE',result:'VILLAGE_WIN'}},true),/INVALID_RESULT/)
+})
+test('records: configuration order, village-only victory and five-place HALF_UP follow desktop source',async()=>{
+  const source=await readFile(new URL('../../src/main/java/com/vocr/domain/peiyi.java',import.meta.url),'utf8')
+  assert.deepEqual([...source.matchAll(/^\s*(jianyi|tongchang|yaoohu|kuangxin|beide|maoyou|daxing)\b/gm)].map(x=>x[1]),recordConfigurations)
+  const java=await readFile(new URL('../../src/main/java/com/vocr/history/GameRecord.java',import.meta.url),'utf8')
+  assert.match(java,/boolean isWin = \(result == 1\)/)
+  assert.match(java,/divide\(BigDecimal.valueOf\(total\), 5, RoundingMode.HALF_UP\)/)
+  assert.match(java,/maxStreak\[i\] > totalMaxStreak/)
+  const r=emptyRecord()
+  for(const [configuration,result] of [['jianyi','VILLAGE_WIN'],['tongchang','VILLAGE_WIN'],['jianyi','VILLAGE_WIN'],['jianyi','WOLF_WIN'],['jianyi','FOX_WIN']])accumulate(r,{configuration,result})
+  assert.equal(r.totalPlayCnt,5);assert.equal(r.totalVillageWin,3);assert.equal(r.totalWolfWin,1);assert.equal(r.totalFoxWin,1)
+  assert.equal(r.totalWinRate,60);assert.equal(r.winrate[1],50);assert.equal(r.totalMaxStreak,2)
+  assert.deepEqual(r.currentStreak,[0,0,1,0,0,0,0,0]);assert.deepEqual(r.wincnt,Array(8).fill(0))
+  const third=emptyRecord();for(const result of ['VILLAGE_WIN','WOLF_WIN','FOX_WIN'])accumulate(third,{configuration:'daxing',result})
+  assert.equal(third.totalWinRate,33.33333);assert.equal(third.winrate[7],33.33333)
+  const round=emptyRecord();for(let i=0;i<128;i++)accumulate(round,{configuration:'jianyi',result:i?'WOLF_WIN':'VILLAGE_WIN'})
+  assert.equal(round.totalWinRate,0.78125)
+})
+test('records: storage denial is explicit and never falls back to another history database',async()=>{
+  await assert.rejects(createRecordStore(null).read(),/STORAGE_UNAVAILABLE/)
+  await assert.rejects(createRecordStore({open(){throw new DOMException('denied','SecurityError')}}).read(),/STORAGE_UNAVAILABLE/)
 })
