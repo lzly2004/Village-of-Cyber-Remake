@@ -1,6 +1,6 @@
 # WF-005：证据包与独立CR交接
 
-当前：WF-005已完成，main@8ef3240的首次完整CI和证据/回执复算通过；保留169个小提交的合流记录见[主线归档](review-394779a.md)。本轮正以main为基线准备maintenance/wf005-tools维护PR，完整同步ddd86b1、394779a、dea2a94的归档和工具补修；发布/评审状态与决策见[维护记录](review-dea2a94.md)。分级仍full，不将本机55项称云端已通过。required checks尚未配置，WF-006/007仍PLANNED，WEB-036保持READY且本轮未实施；人工/容量/发布门槛开放。
+当前：WF-005完成，PR #2经明确授权以merge commit合入main@dbbf884，4个维护提交保留，合并树等于已审8a9f6d6。main真实push run40177191539完整通过，revision4、Git环境记录和新政策指纹9ceeeb03生效，证据/回执复算通过；本轮元数据来自一方UI（REST限流），边界见[合流归档](review-8a9f6d6.md)。required checks未配置，WF-006/007仍PLANNED；下一项WEB-036保持READY且本轮未实施，人工/容量/发布门槛开放。
 
 ## 产物与身份契约（schema 1）
 
@@ -62,3 +62,5 @@ main仍是旧基线，准备分支包含已审长历史。首次真实PR的3文�
 同SHA三次full是WF-007 Auto-Fix前置，不把一次成功当无flake证明；尚未执行。首次真实frontend层CI时记录实际成本，不靠人工触碰生产路径凑样本。以上未完成项不得勾选为实测通过。
 
 工具环境记录git --version和有效的diff.renameLimit（未显式配置为null，不猜测内置默认值；0保留其真实语义）。只读查询，不修改配置。跨历史区间diff-check以当前CI的Git环境为验收依据；本地不一致时先比版本与重命名配置，保留差异证据，不改门禁或用旧绿灯替代新head。
+
+日常判断与所有异常分叉集中见[工作流指南](workflow-daily-guide.md)；本轮引用对齐、归档同步、保护规则和docs增量实测见[收尾记录](review-6a7af2d.md)。文档只有规则与证据边界，远端保护生效以保存后的实读为准。
