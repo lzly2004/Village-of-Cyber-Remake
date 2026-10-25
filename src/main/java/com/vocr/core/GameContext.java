@@ -455,13 +455,13 @@ class GameContext implements GameContextView
     {
         int cat = getCat();
         if (cat == 0) return true;
-        
+
         whyDie deathReason = getDeathReason(cat);
-        
+
         // 条件1: 猫又白天被处刑并发动猫咒（chuxing或daymaozhou）
         if (deathReason == whyDie.chuxing || deathReason == whyDie.daymaozhou)
             return true;
-        
+
         // 条件2/3: 至少两晚双死，或某个夜间死亡4人
         return nightDeathState.hasDefinitiveCatEvidenceThrough(getGameDay());
     }

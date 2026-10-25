@@ -109,7 +109,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         return null;
     }
 
-    
+
 
     private DaySnapshot getSnapshot(UI ui, int day) {
         if (ui.currentReplaySave == null || ui.currentReplaySave.daySnapshots.isEmpty())
@@ -155,21 +155,21 @@ public class ReplayPlayerHandler implements SceneHandler {
         }
 
         int playerSum = snapshot.players.length;
-        
+
         for (int i = 0; i < playerSum; i++) {
             try {
                 DaySnapshot.PlayerStatus ps = snapshot.players[i];
                 if (ps == null || ps.characterNumber == 0) continue;
-                
+
                 int playerIndex = i + 1;
                 boolean isFirstRow = (playerIndex <= (playerSum + 1) / 2);
-                
+
                 boolean isDead = ps.deathDay > 0 && ps.deathDay < day;
 
                 // 复盘模式：根据实际身份显示不同颜色头像（对齐结算界面规则）
                 String imageName = ImageNames.characterRolePortrait(
                         ps.characterNumber, ps.actualRole);
-                
+
                 // === 1. 添加CO职业图标 ===
                 if (ps.claimedRole > 0 && ps.claimedRole < 6) {
                     if (ps.comingOutDay > 0) {
@@ -184,7 +184,7 @@ public class ReplayPlayerHandler implements SceneHandler {
                         if (claimedRoleLabel != null) ui.jPanel.add(claimedRoleLabel);
                     }
                 }
-                
+
                 // === 2.添加死亡标记 ===
                 if (isDead) {
                     int charIndex = UIHelpers.calculateRowIndex(playerIndex, playerSum);
@@ -193,31 +193,31 @@ public class ReplayPlayerHandler implements SceneHandler {
                     JLabel deathLabel = UIHelpers.createDeathMarker(ui, ps.deathReason, deathX, deathY);
                     if (deathLabel != null) ui.jPanel.add(deathLabel);
                 }
-                
+
                 // === 3. 添加头像和角色名 ===
                 ImageIcon characterImage = ui.resources.getImage(imageName);
                 if (characterImage == null) {
                     DebugLogger.warn("[ReplayPlayerHandler] 头像图片未找到: " + imageName);
                     continue;
                 }
-                
+
                 JLabel label = new JLabel(characterImage);
                 int charWidth = characterImage.getIconWidth();
                 int charHeight = characterImage.getIconHeight();
                 int charIndex = UIHelpers.calculateRowIndex(playerIndex, playerSum);
-                
+
                 JLabel textLabel = UIHelpers.createCharacterText(ui, ps.characterNumber,
                         175 + charWidth * charIndex,
                         isFirstRow ? charHeight : 2 * charHeight, false);
                 if (textLabel != null) ui.jPanel.add(textLabel);
-                
+
                 if (isFirstRow) {
                     label.setBounds(160 + charWidth * charIndex, 0, charWidth, charHeight);
                 } else {
                     label.setBounds(160 + charWidth * charIndex, charHeight, charWidth, charHeight);
                 }
                 ui.jPanel.add(label);
-                
+
             } catch (Exception e) {
                 DebugLogger.warn("[ReplayPlayerHandler] 渲染玩家" + (i+1) + "时出错: " + e.getMessage());
             }
@@ -320,7 +320,7 @@ public class ReplayPlayerHandler implements SceneHandler {
             DebugLogger.info("[ReplayPlayerHandler] 已添加日历背景图 (880, 10)");
         }
     }
-    
+
     private void renderInfoArea(UI ui, int day) {
         try {
             int playerSum = getPlayerSumFromSave(ui);

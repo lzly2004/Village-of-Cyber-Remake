@@ -45,9 +45,9 @@ class ExecutionManager
     {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
-        
+
         dayVoteCoordinator.logSkillSchedule(n, gd);
-        
+
         ctx.clearPendingEvents();
         if(dailyVotingRule == 2) handleAvoidanceCO(chuxingList, huibi);
         if(ctx.hasPendingEvents())
@@ -55,16 +55,16 @@ class ExecutionManager
             deliverEvents.run();
             return false;
         }
-        
+
         int topnum = dayVoteCoordinator.conductVoting(n, gd, dailyVotingRule, chuxingList);
-        
+
         deliverEvents.run();
         processExecution(n, gd, topnum);
-        
+
         deliverEvents.run();
         return checkAndHandleGameEnd(gd);
     }
-    
+
     private void processExecution(int n, int gd, int topnum)
     {
         dieaux.accept(topnum,whyDie.chuxing);
@@ -96,7 +96,7 @@ class ExecutionManager
             ctx.markNonHuman(ctx.getDeviant());
         }
     }
-    
+
     private boolean checkAndHandleGameEnd(int gd)
     {
         ctx.setEndResult(gameEndChecker.check());
@@ -178,7 +178,7 @@ class ExecutionManager
         }
         deliverEvents.run();
     }
-    
+
     private void recordReplayEnd(int endResult, int gameDay) {
         try {
             if (recorder != null) {
@@ -193,7 +193,7 @@ class ExecutionManager
     public void recordReplayGameEnd(int endResult, int gameDay) {
         recordReplayEnd(endResult, gameDay);
     }
-    
+
     public void recordReplayDailySnapshot(int day) {
         try {
             if (recorder != null) {
