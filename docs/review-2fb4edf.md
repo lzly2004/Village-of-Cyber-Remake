@@ -31,4 +31,31 @@
 - Python AST、文档链接与定向diff-check通过；生产成功启动命令未变，无本机JVM/浏览器/全量构建。
 - 原137项porcelain差异及136个原文件hash保留，不整体暂存，不修改用户数据或系统配置。
 
-本轮本地补修完成后尚未推送；没有新云端结果。真实PR创建、预期历史空白拒绝取证及main合流仍待明确授权，WF-005不标DONE。
+本地补修提交前状态：尚未推送，没有新云端结果。真实PR创建、预期历史空白拒绝取证及main合流仍待明确授权，WF-005不标DONE。
+
+
+## 授权发布与真实PR闭环（2063274）
+
+用户随后明确授权“推送并创建草稿PR”，范围为准备分支快进至2063274及面向main创建草稿，不含main更新/设置/secret/强推/合并。本次只推送2063274（2fb4edf→2063274）；创建前实时核对main仍616362073999cb280ef8891a8f69272541904357、head为206327447b76317a0d2cc58492cf0f2fc5297757，共166提交。没有因浏览器连续超时重复提交；用户完成登录并重新打开页面后，改用辅助功能交互创建成功。
+
+[草稿PR #1](https://github.com/lzly2004/Village-of-Cyber-Remake/pull/1)已创建并附于当前对话，保持draft/open，未邀请reviewer、发额外评论或合并。正文明确包含已有长历史与预期空白拒绝，不将其描述为仅8文件补修。API核对真实base/head与draft=true；UI截图另存/tmp/wf005-pr-1.png。
+
+### 真实push完整CI
+
+[run40086327059](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40086327059)，attempt1，2026-10-24北京时间18:32:33—18:48:02，head/tested=2063274，status=success。20项suite/internal校验通过：guarded15、audit14、verify32、ci-tests50、图片工具17、音频工具18、交换契约3、前端单测189、assets4、audio27、文件重复30、默认浏览器136、Java617、gate15、desktop-exchange1；其余为非测试步骤，只记录退出状态。这些来自本次云端日志/XML，不是本机重跑。
+
+主artifact verify-40086327059-1，ID12557776640，ZIP1825643字节，SHA256 d92a983b62078476c4fba6a5f70a62e08b477c629cdc155091764784c55022c3；receipt artifact ID12558160040，ZIP464字节，SHA256 e2c753b945c58bc528a0d183c5623dfbd140037ca71839f4582ab0a19311b78b。均与GitHub API digest逐位核对；包内assembly_revision=2，逐字段复算通过、not_covered无重复，人工六门仍not_covered；回执ID/digest/tested_head/run/attempt/URL一致。首次本地回执探针误读不存在的嵌套artifact键而KeyError，按文档实际扁平字段修正后核对通过；这是探针错误，不是CI失败。
+
+### 真实pull_request拒绝证据
+
+[run40149558683](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40149558683)，attempt1，2026-10-25北京时间09:10:05—09:12:24，event=pull_request，status=failure。证据context明确base_source=pull_request.base.sha，base=6163620完整SHA、head/tested=2063274完整SHA，与PR API及执行命令相同；不是HEAD^或合成merge。执行命令git diff --check BASE HEAD --，exit2，0.788s。
+
+原始diff-check.log核对为3个Java文件共24处trailing whitespace（ExecutionManager.java、GameContext.java、ReplayPlayerHandler.java），log SHA256 6c99390645dcbb5e754f4c291c4a0f3ff29e5dfa013fb78bfd0a6ad894a59831。这与此前历史空白预期一致；没有修改源文件或降低检查。仅diff-check执行且失败，后续19项全部unexecuted，不能把push完整成功写成PR通过。first_failure.case/first_error无法按现有解析器识别，保持null，具体原因来自原日志。
+
+主artifact verify-40149558683-1，ID12581546968，ZIP466320字节，SHA256 ae0717d55a99ee2ae514aefed93708f2079eda7bbce5fedbace33a654ea32faf；receipt artifact ID12582436498，ZIP464字节，SHA256 d1d072bdc0721b0cd9a171a63b3b436f164cabc51ecc6325b5d7777057a54cf5。API digest、包内逐字段重算、独立回执关联均通过；合法失败仍返回failed，不吞错、不制造绿灯。
+
+两次ZIP均为公开nightly.link入站数据，随后按一方GitHub API metadata/digest严格验证，不自动提取或执行归档；不得称一方认证ZIP下载成功。原包、元数据、重算JSON与失败日志保存在忽略目录build/wf005-review。本机没有新JVM/浏览器游戏套件/全量Java，未复用历史本机全量授权。
+
+WF-005交付完成：真实push成功及真实PR拒绝的身份/失败传播/证据归档路径均经验证；**这不是PR已绿或main可合并**。下一步是用户决定主线整合路径：建议在隔离分支仅处理这24处历史尾随空白，经独立CR与云端完整门后再决定合流；本轮未执行此修复或合流。真实fork、一方认证ZIP下载、同SHA三次full、人工/容量/发布仍开放；WF-006/007仍PLANNED，WEB-036仍暂停。
+
+本次仅文档归档：核对事实/链接/相关差异和原137项porcelain、136文件hash保留。归档提交未获额外推送授权，保留本地，不把文档HEAD称为已重跑2063274的完整门。
