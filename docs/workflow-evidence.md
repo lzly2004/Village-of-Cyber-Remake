@@ -1,6 +1,6 @@
 # WF-005：证据包与独立CR交接
 
-当前：WF-005完成。2063274真实push run40086327059完整成功、revision 2证据重算通过；已按用户明确授权创建[草稿PR #1](https://github.com/lzly2004/Village-of-Cyber-Remake/pull/1)，真实PR run40149558683采用正确base/head并因历史24处尾随空白严格拒绝，后续19项未执行。流程验证完成不等于PR绿灯或合并放行；main未改。结果及逐项处置见[本轮归档](review-2fb4edf.md)，原交付见[前轮归档](review-9e5d17a.md)。本次摘要补修见[后续评审归档](review-f089bda.md)。WF-006/007仍PLANNED，WEB-036仍暂停。
+当前：WF-005完成。本轮0b28449真实PR红灯已给出24处/3文件摘要；独立空白提交3b8641c在真实PR run40153989566完整通过，原取消push补验run40153986129 attempt 2也完整通过，两个最新verify均success、PR状态clean。[草稿PR #1](https://github.com/lzly2004/Village-of-Cyber-Remake/pull/1)仍未合并，main仍6163620。证据包/回执与逐项处置见[本轮归档](review-f089bda.md)；历史红灯/交付见[前轮归档](review-2fb4edf.md)。流程与绿灯不等于主线合流或发布放行；WF-006/007仍PLANNED，WEB-036仍暂停。
 
 ## 产物与身份契约（schema 1）
 
@@ -57,6 +57,6 @@ ZIP有压缩/解压总量、单项、条目数上限，拒绝越界、重复/大
 4. 用户批准具体PR创建后，才创建草稿PR并提交已审的正文；仅附摘要和证据入口，不复制全日志。当前工具不发评论、不调用AI、不生成/提交补丁、不合并。
 5. 补修后CI再验，检查当前HEAD；最后由用户决定合并。真实PR/fork事件的base_source应为pull_request.base.sha，不能换成HEAD^或伪造main基线。
 
-main仍是旧基线，准备分支包含已审长历史。用户已单独授权并完成草稿PR #1创建；首次真实PR因3文件24处历史尾随空白被严格diff-check拒绝，失败证据已保留。不得为绿灯顺手改生产Java空白、放宽门槛或更新main；主线整合与任何修复另由用户决定。当前只创建PR正文，不自动发额外评论、邀请reviewer或合并。
+main仍是旧基线，准备分支包含已审长历史。首次真实PR的3文件24处空白红灯证据保留；用户已另行授权本轮独立空白修复、本机完整验收及准备分支推送，最新3b8641c真实PR完整通过，未放宽diff-check。PR原正文已更新，不额外发评论、邀请reviewer或合并；主线整合仍由用户决定。
 
 同SHA三次full是WF-007 Auto-Fix前置，不把一次成功当无flake证明；尚未执行。首次真实frontend层CI时记录实际成本，不靠人工触碰生产路径凑样本。以上未完成项不得勾选为实测通过。
