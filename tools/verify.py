@@ -33,6 +33,7 @@ COMMANDS = {
     'assets': ['npm', '--prefix', 'web-client', 'run', 'test:assets'],
     'audio': ['npm', '--prefix', 'web-client', 'run', 'test:audio'],
     'files-repeat': ['npm', '--prefix', 'web-client', 'run', 'test:e2e', '--', 'tests/replay-files.spec.js', '--repeat-each=3'],
+    'production-smoke': ['npm', '--prefix', 'web-client', 'run', 'test:e2e', '--', '--config=playwright.production.config.js'],
     'default-e2e': ['npm', '--prefix', 'web-client', 'run', 'test:e2e'],
     'oracle-generate': ['bash', 'tools/run-gradle-safe.sh', 'test', '--tests', 'com.vocr.web.Web017JourneyTest', '--offline', '--rerun-tasks'],
     'java-full': ['bash', 'tools/run-gradle-safe.sh', 'fatJar', '--offline', '--rerun-tasks'],
@@ -41,7 +42,7 @@ COMMANDS = {
 }
 SEQUENCE = ['diff-check', 'guarded-tests', 'audit-tests', 'verify-tests', 'ci-tests', 'image-tool-tests',
             'audio-tool-tests', 'exchange-contract', 'frontend-unit', 'web-build', 'assets',
-            'audio', 'files-repeat', 'default-e2e', 'browser-file', 'java-full', 'java-results',
+            'audio', 'files-repeat', 'default-e2e', 'production-smoke', 'browser-file', 'java-full', 'java-results',
             'oracle-generate', 'oracle-audit', 'gate', 'desktop-exchange']
 INTERNAL = {'browser-file', 'java-results', 'oracle-audit'}
 MANUAL = ['A06', 'A07', 'A08', '046 browser/DPI/accessibility/listening/devices/loop seams',
@@ -65,7 +66,7 @@ def policy():
             raise Refused('UNKNOWN_SUITE_IN_POLICY')
     required = {'docs': {'diff-check'}, 'tooling': {'diff-check', 'audit-tests', 'verify-tests'},
                 'frontend': {'frontend-unit', 'web-build', 'default-e2e'},
-                'full': {'ci-tests', 'browser-file', 'java-full', 'java-results', 'oracle-audit', 'gate', 'desktop-exchange'}}
+                'full': {'production-smoke', 'ci-tests', 'browser-file', 'java-full', 'java-results', 'oracle-audit', 'gate', 'desktop-exchange'}}
     if any(not suites <= set(value['tiers'][tier]) for tier, suites in required.items()):
         raise Refused('REQUIRED_SUITE_REMOVED_FROM_POLICY')
     for rule in value['rules']:
@@ -295,7 +296,7 @@ def main(argv=None):
         else:
             if selected['requires_full_java_approval'] and os.environ.get('VOCR_APPROVED_FULL_CHECK') != '1':
                 raise Refused('FULL_JAVA_PACKAGE_APPROVAL_REQUIRED')
-            if any(s['id'] in ('gate', 'default-e2e', 'files-repeat') for s in selected['suites']) and 'VOCR_WEB_SERVER_COMMAND' in os.environ:
+            if any(s['id'] in ('gate', 'default-e2e', 'files-repeat', 'production-smoke') for s in selected['suites']) and 'VOCR_WEB_SERVER_COMMAND' in os.environ:
                 raise Refused('SERVER_OVERRIDE_NOT_ACCEPTED')
             if selected['requires_full_java_approval'] and not os.environ.get('DISPLAY'):
                 raise Refused('DISPLAY_REQUIRED_FOR_FULL_JAVA')

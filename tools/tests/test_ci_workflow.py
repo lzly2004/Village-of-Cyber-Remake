@@ -111,6 +111,17 @@ class ContextTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'INVALID_DEFAULT_BRANCH'):
                 CONTEXT.resolve({'before': CONTEXT.ZERO, 'after': HEAD, 'repository': {'default_branch': branch}}, 'push', {}, self.read)
 
+    def test_production_smoke_requires_browser_node_and_java_without_seed_override(self):
+        flags = CONTEXT.flags({'suites': [{'id': 'production-smoke'}], 'requires_lfs': True})
+        for key in ('CI_NEEDS_JAVA', 'CI_NEEDS_NODE', 'CI_NEEDS_BROWSER'):
+            self.assertTrue(flags[key])
+        config = (ROOT / 'web-client/playwright.production.config.js').read_text()
+        self.assertIn('run-gradle-safe.sh runWeb --args=17072 --offline', config)
+        self.assertNotIn('runWebTestServer', config)
+        self.assertIn('PRODUCTION_SMOKE_SERVER_OVERRIDE_FORBIDDEN', config)
+        self.assertIn('reuseExistingServer: false', config)
+        self.assertIn('../build/verify/production-browser', config)
+
     def test_scope_flags_skip_heavy_tools_for_docs_and_require_full_chain_for_ci(self):
         docs = CONTEXT.flags(CONTEXT.VERIFY.plan(['docs/guide.md']))
         self.assertFalse(any(docs.values()))

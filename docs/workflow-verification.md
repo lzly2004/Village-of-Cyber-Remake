@@ -31,7 +31,7 @@ bash tools/verify.sh --base <上次评审SHA> --full --dry-run --json
 | docs | 文档/任务索引 | 提交差异空白检查及输入前后审计；内容事实与链接仍须人工核对 |
 | tooling | 已明确列出的验证工具/测试配置 | 审计工具与入口测试；资源工具/监护/Node测试按相关路径追加 |
 | frontend | 前端功能/浏览器测试 | 单测、build资源门、assets/audio、文件重复3次、默认回归；明确列出的共享会话/人物/舞台路径另加定向oracle生成与gate |
-| full | Java/资源/概率/共享构建或未知路径 | 工具/资源/前端/兼容/完整Java与FatJAR/oracle/gate及桌面文件反向网页交换 |
+| full | Java/资源/概率/共享构建或未知路径 | 工具/资源/前端/兼容/生产runWeb无种子冒烟/完整Java与FatJAR/oracle/gate及桌面文件反向网页交换 |
 
 只认最保守的匹配分级，附加套件取并集。所选/未选套件和`not_triggered_by_changed_paths`理由均进JSON；冻结与输入变动另外列为`sensitive_paths_requiring_review`，只报告，不自动授权更改。`AGENTS.md`/未知工具默认full；帮助/音频/Replay/独立样式由默认回归覆盖，不固定跑gate；App.vue等关键文件内即便只改一行文案，路径级判定仍保守追加gate。交换spec/config自身改动分级full，确保执行它并生成当次前置产物。未来细化规则须有正负例，不靠排除未知文件降级。
 
@@ -62,3 +62,5 @@ manual_gates保持not_covered：A06/A07/A08、046正式浏览器/DPI/辅助技�
 WF-004前置补修：无效base统一报INVALID_BASE_REF；真实Git差异为空时即使附加--paths也报NO_CHANGES_TO_VERIFY。仅显式--full允许同SHA重新验收（仍需完整授权），用于以后稳定性观察。新增跳过测试须同时修改并评审XML零skip契约，不能静默接受。远端账本聚合算法的TAB/LF定义已写入JSON，不能按空格或JSON序列化猜测。
 
 CI配置及CI辅助工具变动默认为full，包含ci-tests（事件SHA/缓存/权限/命令/失败等纯工具契约）。只有ci-tests用例本身的独立改动可在tooling层追加该套件，所需PyYAML为开发依赖，不启动JVM。
+
+WEB-038增加独立production-smoke到full计划（21项，含内部检查），在默认浏览器退出后、Java全量开始前串行运行；配置拒绝种子服务器override，使用本轮生产构建。截图位于build/verify/production-browser，被现有CI证据收集覆盖。该套件不自动加入docs/tooling/frontend：控制每次前端改动的验收成本，代价是仅生产preview入口出现的回归可能到下一次full才暴露；这是有意的覆盖取舍，不表示frontend已经覆盖生产入口。该套件不替代七配役确定性门或人工门槛，详见[038记录](web-038-verification.md)。
