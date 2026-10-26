@@ -35,3 +35,7 @@
 定向入口：`cd web-client && npm run test:e2e -- stage-layout.spec.js`；使用README本机工具链及默认安全后端入口、1 worker。共享结构变更按AGENTS追加默认浏览器回归，实际命令/结果及020评审核验见[review-9056eef.md](review-9056eef.md)。
 
 D1补充验证与修复依据见[review-de80851.md](review-de80851.md)。`overflow-anchor: none`的排除语义参见[W3C Scroll Anchoring §3](https://www.w3.org/TR/css-scroll-anchoring-1/#exclusion-api)；本轮通过可控内容插入验证本机实际行为，不把规范说明当作所有浏览器的实测结果。
+
+## 最终视觉目标修订（2026-10-26）
+
+本文件“不宣称复刻Swing动态布局”及外围文档流描述是021阶段的实现边界，不能解释为首发无需对齐桌面外观。用户已明确选择整体外观对齐，新增[WEB-050](web-desktop-visual-alignment.md)于045之后、046之前实施；按桌面关键画面的结构、信息/按钮位置与字体效果建立最终基线。既有信息门槛、纯文本与完整可达要求保留。

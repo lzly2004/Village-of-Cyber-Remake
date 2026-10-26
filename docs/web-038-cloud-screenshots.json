@@ -1,0 +1,25 @@
+{
+  "run_id": 40270748778,
+  "attempt": 1,
+  "tested_head": "551159799b9ea546979063f75d7dfe453f27901c",
+  "artifact_id": 12628308067,
+  "artifact_zip_sha256": "80fbc9a98b0334dbfc7ad0428341356dc3412127de02c15d1f8cbab18eb1291c",
+  "source": "ZIP members independently hashed; supplemental index, not original evidence.json fields",
+  "screenshots": [
+    {
+      "path": "build/verify/production-browser/experience-unseeded-produc-ebd24--opens-local-records-replay/production-records.png",
+      "sha256": "fae1e97dca9e8e098d98834bb49e8b71c3268787a064732b381fd9cb4f456daa",
+      "bytes": 358755
+    },
+    {
+      "path": "build/verify/production-browser/experience-unseeded-produc-ebd24--opens-local-records-replay/production-replay.png",
+      "sha256": "ab2297c369db29306b31907f2f6d7b854784afa831c83dad8889f5dd5b80cf06",
+      "bytes": 516869
+    },
+    {
+      "path": "build/verify/production-browser/experience-unseeded-produc-ebd24--opens-local-records-replay/production-settlement.png",
+      "sha256": "1a09e9b573f9e40ed3473c5862495761cb32f35d80ebeb0d35dd23db77d9a12a",
+      "bytes": 1187570
+    }
+  ]
+}
