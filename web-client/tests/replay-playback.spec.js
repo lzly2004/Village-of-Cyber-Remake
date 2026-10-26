@@ -147,7 +147,7 @@ test('lazy Replay module failure is bounded and leaves the current game usable',
 })
 
 test('lazy save intent cannot attach to a different session when the module arrives late',async({page,request})=>{
-  const id='12345678-1234-1234-1234-123456789033'
+  const id='12345678-1234-4234-8234-123456789033'
   const {publicSnapshot}=await import('../test-fixtures/public-players.js')
   const snapshot=publicSnapshot();snapshot.phase='FINISHED';snapshot.view.result='VILLAGE_WIN'
   snapshot.events=[];snapshot.presentedEvents=[];snapshot.eventCursor=0;snapshot.nextEventCursor=0
@@ -172,7 +172,7 @@ test('lazy save intent cannot attach to a different session when the module arri
 })
 
 test('timed-out lazy save does not auto-save when the chunk eventually arrives',async({page})=>{
-  const id='12345678-1234-1234-1234-123456789034'
+  const id='12345678-1234-4234-8234-123456789034'
   const {publicSnapshot}=await import('../test-fixtures/public-players.js')
   const snapshot=publicSnapshot();snapshot.phase='FINISHED';snapshot.view.result='VILLAGE_WIN'
   snapshot.events=[];snapshot.presentedEvents=[];snapshot.eventCursor=0;snapshot.nextEventCursor=0

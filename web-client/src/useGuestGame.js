@@ -111,9 +111,11 @@ export function useGuestGame() {
   }
 
   async function handleError(error) {
-    if (error instanceof ApiError && error.status === 404) {
+    if (error instanceof ApiError && error.status === 404 && error.code === 'GAME_NOT_FOUND') {
       forget()
-      notice.value = '这局游戏已失效，可能是服务重启或会话已被释放。请选择配役重新开局。'
+      notice.value = '这局游戏已失效，可能是闲置过期、达到最长时限、服务重启或会话已被释放。请选择配役重新开局。'
+    } else if (error instanceof ApiError && error.status === 503 && error.code === 'SESSION_LIMIT') {
+      notice.value = '游客会话已达上限，请稍后重试或释放你持有的旧对局。未创建新局。'
     } else if (error instanceof ApiError && error.status === 409) {
       await sync()
       notice.value = '对局状态已更新，已重新同步。请查看最新事件与选择后再操作。'
@@ -138,7 +140,7 @@ export function useGuestGame() {
       try {
         await handleError(error)
       } catch (syncError) {
-        if (syncError instanceof ApiError && syncError.status === 404) {
+        if (syncError instanceof ApiError && syncError.status === 404 && syncError.code === 'GAME_NOT_FOUND') {
           forget()
           notice.value = '对局已失效，请重新开局。'
         } else {
@@ -275,15 +277,17 @@ export function useGuestGame() {
   onMounted(() => {
     try {
       const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null')
-      if (saved && /^[0-9a-f-]{36}$/i.test(saved.sessionId)
+      if (saved && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(saved.sessionId)
           && Number.isSafeInteger(saved.eventCursor) && saved.eventCursor >= 0) {
         sessionId.value = saved.sessionId
         cursor.value = saved.eventCursor
         refresh()
       } else {
+        if (saved !== null) notice.value = '本地会话凭据无效，已清除。请选择配役重新开局。'
         persist()
       }
     } catch {
+      notice.value = '无法读取本地会话记录，不能自动恢复。请选择配役重新开局。'
       persist()
     }
   })

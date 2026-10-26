@@ -15,12 +15,18 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.LongSupplier;
+import java.time.Duration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 本机游客 API 原型。每个会话独占规则、事件与内存战绩，只有应用快照可以被序列化。
@@ -33,7 +39,26 @@ public final class GuestGameServer implements AutoCloseable
             .enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
             .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
             .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT);
-    private final Map<String, GameSession> sessions = new HashMap<>();
+    private final Map<String, Entry> sessions = new HashMap<>();
+    private final LongSupplier clock;
+    private final long idleNanos;
+    private final long lifetimeNanos;
+    private final ScheduledExecutorService reaper = Executors.newSingleThreadScheduledExecutor(task -> {
+        Thread thread = new Thread(task, "vocr-guest-reaper");
+        thread.setDaemon(true);
+        return thread;
+    });
+    private boolean started;
+
+    private static final class Entry
+    {
+        final GameSession session;
+        final long created;
+        long lastAccess;
+        int users;
+        boolean retired;
+        Entry(GameSession session, long now) { this.session = session; created = lastAccess = now; }
+    }
     private final Function<String, GameSession> sessionFactory;
     private final int maxSessions;
     private final Javalin app;
@@ -48,13 +73,26 @@ public final class GuestGameServer implements AutoCloseable
     // 测试可注入确定性对局；HTTP 请求不开放种子或核心状态。
     GuestGameServer(Function<String, GameSession> sessionFactory, int maxSessions)
     {
+        this(sessionFactory, maxSessions, System::nanoTime, Duration.ofMinutes(30), Duration.ofHours(24));
+    }
+
+    GuestGameServer(Function<String, GameSession> sessionFactory, int maxSessions,
+                    LongSupplier clock, Duration idle, Duration lifetime)
+    {
+        this.clock = Objects.requireNonNull(clock);
+        idleNanos = Objects.requireNonNull(idle).toNanos();
+        lifetimeNanos = Objects.requireNonNull(lifetime).toNanos();
+        if (idleNanos <= 0 || lifetimeNanos <= 0) throw new IllegalArgumentException("会话时限必须为正数");
         this.sessionFactory = Objects.requireNonNull(sessionFactory);
         if (maxSessions <= 0) throw new IllegalArgumentException("会话上限必须为正数");
         this.maxSessions = maxSessions;
         app = Javalin.create(config -> {
             config.jetty.host = "127.0.0.1";
             config.http.maxRequestSize = 16_384L;
-            config.routes.before(ctx -> ctx.header("Cache-Control", "no-store"));
+            config.routes.before(ctx -> {
+                ctx.header("Cache-Control", "no-store");
+                ctx.header("Referrer-Policy", "no-referrer");
+            });
             config.routes.post("/api/v1/games", ctx -> {
                 CreateGame request = read(ctx, CreateGame.class);
                 if (request.configuration() == null || request.configuration() == peiyi.NONE)
@@ -66,14 +104,14 @@ public final class GuestGameServer implements AutoCloseable
             config.routes.get("/api/v1/games/{id}", ctx -> {
                 String cursor = ctx.queryParam("eventCursor");
                 long value = cursor == null ? 0 : Long.parseLong(cursor);
-                send(ctx, session(ctx.pathParam("id")).currentUpdate(value));
+                send(ctx, withSession(ctx.pathParam("id"), session -> session.currentUpdate(value)));
             });
             config.routes.get("/api/v1/games/{id}/replay", ctx -> {
                 String cursor = ctx.queryParam("eventCursor");
                 if (cursor == null || !cursor.matches("0|[1-9][0-9]{0,15}")
                         || ctx.queryParams("eventCursor").size() != 1)
                     throw new IllegalArgumentException("录像读取必须提供有效确认游标");
-                ReplayRecording recording = session(ctx.pathParam("id")).completedReplay(Long.parseLong(cursor));
+                ReplayRecording recording = withSession(ctx.pathParam("id"), session -> session.completedReplay(Long.parseLong(cursor)));
                 // Immutable application snapshot: parsing/serialization is outside the session monitor.
                 if (recording.records().size() > 20_000
                         || recording.records().stream().anyMatch(line -> line.getBytes(StandardCharsets.UTF_8).length > 65_536)
@@ -91,37 +129,37 @@ public final class GuestGameServer implements AutoCloseable
             });
             config.routes.put("/api/v1/games/{id}/vote-target", ctx -> {
                 VoteTarget request = read(ctx, VoteTarget.class);
-                send(ctx, session(ctx.pathParam("id")).setTargetSelection(
+                send(ctx, withSession(ctx.pathParam("id"), session -> session.setTargetSelection(
                         new SetAllTargetSelectionCommand(request.expectedRevision(),
-                                SelectionType.VOTE, request.target(), request.selected())));
+                                SelectionType.VOTE, request.target(), request.selected()))));
             });
             config.routes.post("/api/v1/games/{id}/votes", ctx -> {
                 ExecuteVoteCommand request = read(ctx, ExecuteVoteCommand.class);
-                send(ctx, session(ctx.pathParam("id")).executeVote(request));
+                send(ctx, withSession(ctx.pathParam("id"), session -> session.executeVote(request)));
             });
             config.routes.post("/api/v1/games/{id}/claims/by-role", ctx -> {
                 AskClaimByRoleCommand request = read(ctx, AskClaimByRoleCommand.class);
-                send(ctx, session(ctx.pathParam("id")).requestClaims(request));
+                send(ctx, withSession(ctx.pathParam("id"), session -> session.requestClaims(request)));
             });
             config.routes.post("/api/v1/games/{id}/claims/by-players", ctx -> {
                 AskClaimByPlayersCommand request = read(ctx, AskClaimByPlayersCommand.class);
-                send(ctx, session(ctx.pathParam("id")).requestClaims(request));
+                send(ctx, withSession(ctx.pathParam("id"), session -> session.requestClaims(request)));
             });
             config.routes.put("/api/v1/games/{id}/avoidance", ctx -> {
                 SetAvoidanceCommand request = read(ctx, SetAvoidanceCommand.class);
-                send(ctx, session(ctx.pathParam("id")).setAvoidance(request));
+                send(ctx, withSession(ctx.pathParam("id"), session -> session.setAvoidance(request)));
             });
             config.routes.put("/api/v1/games/{id}/target-selections", ctx -> {
                 SetAllTargetSelectionCommand request = read(ctx, SetAllTargetSelectionCommand.class);
                 if (request.type() != SelectionType.DIVINATION && request.type() != SelectionType.GUARD)
                     throw new IllegalArgumentException("此路径仅支持全体占卜或护卫目标预约");
-                send(ctx, session(ctx.pathParam("id")).setTargetSelection(request));
+                send(ctx, withSession(ctx.pathParam("id"), session -> session.setTargetSelection(request)));
             });
             config.routes.put("/api/v1/games/{id}/claimed-target-selections", ctx -> {
                 SetClaimedRoleTargetSelectionCommand request = read(ctx, SetClaimedRoleTargetSelectionCommand.class);
                 if (request.type() != SelectionType.DIVINATION && request.type() != SelectionType.GUARD)
                     throw new IllegalArgumentException("此路径仅支持公开占卜或护卫行动者预约");
-                send(ctx, session(ctx.pathParam("id")).setTargetSelection(request));
+                send(ctx, withSession(ctx.pathParam("id"), session -> session.setTargetSelection(request)));
             });
             config.routes.delete("/api/v1/games/{id}", ctx -> {
                 remove(ctx.pathParam("id"));
@@ -158,8 +196,14 @@ public final class GuestGameServer implements AutoCloseable
     {
         synchronized (this) {
             if (closed) throw new IllegalStateException("游客服务已经关闭");
+            if (started) throw new IllegalStateException("游客服务已经启动");
+            app.start(port);
+            started = true;
+            reaper.scheduleWithFixedDelay(() -> {
+                try { reapExpired(); }
+                catch (RuntimeException error) { DebugLogger.error("[HTTP] 会话回收失败", error); }
+            }, 1, 1, TimeUnit.MINUTES);
         }
-        app.start(port);
         return this;
     }
 
@@ -167,6 +211,7 @@ public final class GuestGameServer implements AutoCloseable
 
     private GameSession create(peiyi configuration)
     {
+        reapExpired();
         synchronized (this) {
             if (closed) throw new IllegalStateException("游客服务已经关闭");
             if (sessions.size() + pendingCreations >= maxSessions)
@@ -187,7 +232,7 @@ public final class GuestGameServer implements AutoCloseable
         synchronized (this) {
             pendingCreations--;
             if (!closed) {
-                sessions.put(id, session);
+                sessions.put(id, new Entry(session, clock.getAsLong()));
                 return session;
             }
         }
@@ -195,21 +240,83 @@ public final class GuestGameServer implements AutoCloseable
         throw new IllegalStateException("游客服务已经关闭");
     }
 
-    private synchronized GameSession session(String id)
+    private boolean expired(Entry entry, long now)
     {
-        GameSession session = sessions.get(id);
-        if (session == null) throw new ApiException(404, "GAME_NOT_FOUND", "游客对局不存在");
-        return session;
+        // Monotonic differences tolerate nanoTime wraparound; never use wall-clock timestamps.
+        return now - entry.lastAccess >= idleNanos || now - entry.created >= lifetimeNanos;
+    }
+
+    private static ApiException unavailable()
+    {
+        // Same bounded response for unknown, malformed, expired, released or restarted credentials.
+        return new ApiException(404, "GAME_NOT_FOUND", "游客对局已失效或不存在，请重新开局");
+    }
+
+    private static boolean credential(String id)
+    {
+        return id != null && id.matches("[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
+    }
+
+    <T> T withSession(String id, Function<GameSession, T> action)
+    {
+        reapExpired();
+        Entry entry;
+        synchronized (this) {
+            entry = credential(id) ? sessions.get(id) : null;
+            if (closed || entry == null || entry.retired || expired(entry, clock.getAsLong()))
+                throw unavailable();
+            entry.users++;
+        }
+        try {
+            return action.apply(entry.session);
+        } finally {
+            boolean release;
+            synchronized (this) {
+                entry.users--;
+                long now = clock.getAsLong();
+                // Idle is measured since the last request completion; absolute life never extends.
+                entry.lastAccess = now;
+                release = entry.users == 0 && (entry.retired || now - entry.created >= lifetimeNanos);
+                if (release) sessions.remove(id, entry);
+            }
+            if (release) entry.session.close();
+        }
+    }
+
+    void reapExpired()
+    {
+        List<GameSession> toClose = new ArrayList<>();
+        synchronized (this) {
+            long now = clock.getAsLong();
+            var iterator = sessions.values().iterator();
+            while (iterator.hasNext()) {
+                Entry entry = iterator.next();
+                if (entry.retired || expired(entry, now)) {
+                    if (entry.users != 0) continue; // Never close a command in flight.
+                    iterator.remove();
+                    toClose.add(entry.session);
+                }
+            }
+        }
+        // No core/session monitor is acquired while holding the registry monitor.
+        toClose.forEach(GameSession::close);
     }
 
     private void remove(String id)
     {
-        GameSession session;
+        reapExpired();
+        GameSession toClose = null;
         synchronized (this) {
-            session = session(id);
-            sessions.remove(id);
+            Entry entry = credential(id) ? sessions.get(id) : null;
+            if (closed || entry == null || entry.retired || expired(entry, clock.getAsLong()))
+                throw unavailable();
+            entry.retired = true; // Stop new leases; accepted requests may finish, never replayed.
+            if (entry.users == 0) {
+                sessions.remove(id);
+                toClose = entry.session;
+            }
         }
-        session.close();
+        if (toClose != null) toClose.close();
     }
 
     private <T> T read(Context ctx, Class<T> type)
@@ -250,9 +357,10 @@ public final class GuestGameServer implements AutoCloseable
         synchronized (this) {
             if (closed) return;
             closed = true;
-            toClose = List.copyOf(sessions.values());
+            toClose = sessions.values().stream().map(entry -> entry.session).toList();
             sessions.clear();
         }
+        reaper.shutdownNow();
         try {
             toClose.forEach(GameSession::close);
         } finally {

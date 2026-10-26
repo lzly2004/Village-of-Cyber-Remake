@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 test.setTimeout(30000)
 const catalog=JSON.parse(readFileSync(new URL('../public/assets/audio/manifest.json',import.meta.url),'utf8'))
-const id='00000000-0000-0000-0000-000000000028',key='vocr.audio.v1'
+const id='00000000-0000-4000-8000-000000000028',key='vocr.audio.v1'
 const ui=page=>page.locator('.bgm-control')
 const soundPath=id=>'/assets/audio/'+catalog.sounds[id].file
 async function setup(page,{snapshot=publicSnapshot(),settings,denied=false}={}) {

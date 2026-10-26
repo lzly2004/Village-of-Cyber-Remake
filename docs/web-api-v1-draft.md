@@ -16,7 +16,7 @@ WEB-014例外：用户明确批准AUDIT-SEC-001，在v1正式上线前直接修�
 
 ## 2. 核心操作目录
 
-路径中的 `{id}` 为本局凭据。`R` 表示 `expectedRevision`（非负整数）；所有写命令都从最近权威 update 取 R，不使用本地自增猜测。以下 JSON 形状是字段说明，不是可复制的带占位符 JSON。
+路径中的 `{id}` 为规范小写随机UUID v4本局凭据；未知/畸形/过期/释放统一404 GAME_NOT_FOUND，详见[生命周期](web-guest-lifecycle.md)。`R` 表示 `expectedRevision`（非负整数）；所有写命令都从最近权威 update 取 R，不使用本地自增猜测。以下 JSON 形状是字段说明，不是可复制的带占位符 JSON。
 
 | 方法 / 相对路径 | 请求字段 | 成功体与状态 | 状态/对应应用命令 | 任务 |
 |---|---|---|---|---|
@@ -112,7 +112,7 @@ stage 为 `NIGHT_RESULT/DAY_DIALOGUE/AFTERNOON_DIALOGUE/EXECUTION/SETTLEMENT`。
 | 状态 / code | 服务语义 | 客户端动作 |
 |---|---|---|
 | 400 INVALID_REQUEST | JSON/字段、配役、目标或候补前置校验拒绝；见下方 GET 窄语义 | 显示错误，不重放；必要时用户触发同步 |
-| 404 GAME_NOT_FOUND | 未找到会话（包括释放、未来过期、重启丢失） | 清当前会话凭据/游标并回开局；不清浏览器 Replay/累计战绩 |
+| 404 GAME_NOT_FOUND | 未找到会话（包括释放、过期、重启丢失） | 清当前会话凭据/游标并回开局；不清浏览器 Replay/累计战绩 |
 | 409 STALE_REVISION | 本命令未通过 revision 检查 | GET 同步并展示最新事件；不自动重放。不得仅更新本地 revision 后静默再试 |
 | 409 INVALID_STATE | 已结束/已关闭等会话前置状态拒绝 | 同步确认终局/失效，停止旧操作；未经过版本检查时 currentRevision 不保证存在 |
 | 413 HTTP_ERROR | 当前框架请求体上限拒绝 | 缩减/纠正请求；同样的大请求不自动重试 |
@@ -133,7 +133,7 @@ stage 为 `NIGHT_RESULT/DAY_DIALOGUE/AFTERNOON_DIALOGUE/EXECUTION/SETTLEMENT`。
 
 - 已有 id 的写操作：锁住后续决策，GET 当前游标同步。同步成功才解除不确定标记；读取到新 revision 仅表明状态变化，不证明一定是自己的请求，不能据此自动补发。同步失败继续阻止写入，404 按失效处理。
 - 纯 GET 失败不会自行修改服务器；保留原游标与未确认写的状态，不把“读失败”描述成“本次读取可能执行了投票”。
-- 创建响应丢失：客户端可能没有 id，无法发现/恢复刚创建的局；不自动重试，不承诺 exactly-once 创建。提示不确定并允许用户主动重开；孤儿局由 WEB-039 超时/容量回收解决，当前尚无 TTL。
+- 创建响应丢失：客户端可能没有 id，无法发现/恢复刚创建的局；不自动重试，不承诺 exactly-once 创建。提示不确定并允许用户主动重开；孤儿局由WEB-039回收：空闲30分钟/最长24小时，创建前补扫与每60秒定时扫描；不驱逐有效局，见[生命周期](web-guest-lifecycle.md)。
 - DELETE 成功为 204；DELETE 响应丢失后 GET 若返回 GAME_NOT_FOUND 即确认失效；仍存在则由用户决定是否再次释放。当前 DELETE 无版本保护，是明确结束本局的操作，不按普通游戏命令规则伪造 R。
 - 当前不提供请求幂等键、后台重试或事件消费 ACK 接口；若后续需要，须独立设计，不谎称 revision 能保证跨断网 exactly-once。
 

@@ -3,7 +3,7 @@ import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { drainEvents } from './drain-events.js'
 import { readFileSync } from 'node:fs'
 const replayFile=JSON.parse(readFileSync(new URL('../../src/test/resources/replay/exchange-v3.json',import.meta.url),'utf8'))
-const id='12345678-1234-1234-1234-123456789012'
+const id='12345678-1234-4234-8234-123456789012'
 const status=page=>page.getByRole('region',{name:'ローカル戦績保存'})
 const read=page=>page.evaluate(async()=>{const{createRecordStore}=await import('/src/recordStore.js');return createRecordStore().read()})
 async function synthetic(page,{denied=false}={}) {

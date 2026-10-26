@@ -52,7 +52,7 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
   const imageMapping = JSON.parse(readFileSync(new URL('../../src/main/resources/config/event_image_mapping.json', import.meta.url), 'utf8'))
   const stageFiles = ['images/haikei3.png', 'images/' + imageMapping.Abel.zco7.default]
   await page.route('**/api/v1/games', route => route.fulfill({json:{
-    sessionId: '00000000-0000-0000-0000-000000000023', update: snapshot,
+    sessionId: '00000000-0000-4000-8000-000000000023', update: snapshot,
   }}))
   await page.goto('/')
   await expect(page.getByRole('heading', { name: /一つひとつの発言/ })).toBeVisible()
