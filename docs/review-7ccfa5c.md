@@ -14,3 +14,9 @@
 引用旧证据：run40195513737@7ccfa5c，frontend12项通过、job696秒/run700秒；192/141/15、assets4/audio27/files30/audit14/verify32，oracle定向XML8，无java-full与FatJAR。ZIP 21,191,089字节/b683be2e…、receipt0c77dbf4…均已复算，主要体积为gate截图；不记为本次补修重跑。
 
 本次仅文档和测试注释，链接/事实/差异及“仅新增注释、生产源码不变”检查通过；受影响单测30/30（112ms）本轮实际运行，未重跑本机192/141/15或构建；无生产JS/Java/规则/接口/依赖/格式变化。新head仍需PR CI核验，不能用旧head绿灯替代；新增结果由原PR正文及build/web036-review交接，不循环新增归档PR。独立CR已明确无阻断且不要求为这些可选项重开完整首审；若补修出现新行为/失败，仍须复评。合流授权后才可Ready/merge，完成后用户将主线证据交回CR核验。
+
+## 主线合流核验补记（用户转交，2026-10-26）
+
+PR #4实际head为dc19746，比首审7ccfa5c多一个文档/注释提交。Coder未在合流前交增量包，把“不必重开完整首审”误当免于增量审查，这是流程遗漏；独立CR在主线核验时已补审dc19746，确认一行注释/文档无行为变化、无阻断，并接受P3-1保留显式失败的依据。以后任何追加提交均先提供增量包，不以生产树相同替代CR。
+
+CR核验main 5d30cd9为merge commit，父d04b2de+dc19746、保留3提交、树等于head；main run40207361918 / attempt1真实push frontend12项通过（job626秒），前端192/默认141/gate15/assets4/audio27/files30/audit14/verify32，oracle XML8/8，java-full未跑。artifact21,191,207 B / 4eba9591…，receipt47e6298b…，输入/Java/政策指纹不变；原137 porcelain未受影响。上述为CR及已保存主线证据的引用，本次文档修订未重跑这些测试。CR未逐条核136文件哈希、未读取/home截图；不把其抽样核验写成全量哈希验证。人工/容量/发布门槛仍开放。
