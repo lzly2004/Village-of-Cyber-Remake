@@ -85,7 +85,7 @@ function name(number) {
       </div>
       <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button><button class="quiet-button" @click="recordPage = true">戦績を見る</button></nav>
       <BgmControl :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
-      <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。サービス再起動後は無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
+      <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。通信のない状態が30分続くか、開村から24時間経過すると無効になります。サービス再起動・解放でも無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
 
     <main>

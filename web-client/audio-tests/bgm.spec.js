@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 const manifest=JSON.parse(readFileSync(new URL('../public/assets/audio/manifest.json',import.meta.url),'utf8'))
-const id='00000000-0000-0000-0000-000000000027'
+const id='00000000-0000-4000-8000-000000000027'
 const ui=page=>page.locator('.bgm-control')
 const path=id=>'/assets/audio/'+manifest.bgm[id].file
 async function setup(page,snapshot=publicSnapshot()) {

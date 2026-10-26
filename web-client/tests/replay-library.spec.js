@@ -9,7 +9,7 @@ const library=page=>page.getByRole('region',{name:'ローカルReplay',exact:tru
 const rows=page=>library(page).locator('.replay-entries > li')
 const stored=page=>page.evaluate(async()=>{const{createReplayStore}=await import('/src/replayStore.js');return createReplayStore().list()})
 async function synthetic(page, response=file) {
-  const id='12345678-1234-1234-1234-123456789012'
+  const id='12345678-1234-4234-8234-123456789012'
   const snapshot=publicSnapshot();snapshot.phase='FINISHED';snapshot.view.result='VILLAGE_WIN'
   snapshot.view.players=snapshot.view.players.slice(0,3)
   snapshot.revealedRoles=snapshot.view.players.map(p=>({playerNumber:p.playerNumber,actualRole:'wu'}))

@@ -14,7 +14,7 @@ async function inject(page) {
 
 test('WEB-026 actual lobby/first stage request zero audio; explicit resource access fetches only named effect/description',async({page})=>{
   const paths=[];page.on('request',r=>{if(r.url().includes('/assets/audio/'))paths.push(new URL(r.url()).pathname)})
-  await page.route('**/api/v1/games',route=>route.fulfill({json:{sessionId:'00000000-0000-0000-0000-000000000026',update:publicSnapshot()}}))
+  await page.route('**/api/v1/games',route=>route.fulfill({json:{sessionId:'00000000-0000-4000-8000-000000000026',update:publicSnapshot()}}))
   await page.goto('/');await expect(page.getByRole('heading',{name:/一つひとつの発言/})).toBeVisible()
   expect(paths).toEqual([])
   await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.locator('.player-row')).toHaveCount(44)
