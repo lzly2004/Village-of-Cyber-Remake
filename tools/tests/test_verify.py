@@ -218,6 +218,16 @@ class VerifyTest(unittest.TestCase):
         self.assertIn('SERVER_OVERRIDE_NOT_ACCEPTED', p.stderr)
         self.assertFalse((self.root / 'build').exists())
 
+    def test_production_smoke_is_required_only_in_full_and_runs_serially(self):
+        full = VERIFY.plan(['web-client/production-tests/experience.spec.js'])
+        ids = [s['id'] for s in full['suites']]
+        self.assertEqual('full', full['tier'])
+        self.assertLess(ids.index('web-build'), ids.index('production-smoke'))
+        self.assertLess(ids.index('default-e2e'), ids.index('production-smoke'))
+        self.assertLess(ids.index('production-smoke'), ids.index('java-full'))
+        self.assertNotIn('production-smoke', [s['id'] for s in VERIFY.plan(['docs/a.md'])['suites']])
+        self.assertIn('--config=playwright.production.config.js', VERIFY.COMMANDS['production-smoke'])
+
     def test_full_order_has_real_file_before_java_and_oracle_before_gate(self):
         r = VERIFY.plan(['src/web/java/Protocol.java'])
         ids = [s['id'] for s in r['suites']]
@@ -352,10 +362,12 @@ class VerifyTest(unittest.TestCase):
 
     def test_invalid_policy_shapes_and_removed_full_gate_fail_closed(self):
         original = VERIFY.policy()
-        for change in ('pattern-string', 'remove-gate', 'unknown-not-full'):
+        for change in ('pattern-string', 'remove-gate', 'remove-production', 'unknown-not-full'):
             value = copy.deepcopy(original)
             if change == 'pattern-string':
                 value['rules'][0]['patterns'] = '*'
+            elif change == 'remove-production':
+                value['tiers']['full'].remove('production-smoke')
             elif change == 'remove-gate':
                 value['tiers']['full'].remove('gate')
             else:
