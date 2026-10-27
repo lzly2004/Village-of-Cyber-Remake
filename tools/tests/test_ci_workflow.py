@@ -228,6 +228,15 @@ class WorkflowTest(unittest.TestCase):
         self.assertEqual('build/ci/receipt.json',preserve['with']['path'])
         self.assertEqual('14',preserve['with']['retention-days'])
 
+    def test_release_upload_is_success_only_separate_and_precedes_evidence(self):
+        names=[s['name'] for s in self.steps];upload=self.step('Upload verified Web release');identity=self.step('Record verified release')
+        self.assertIn('success()',upload['if']);self.assertIn('steps.execute.outputs.release_ready',upload['if'])
+        self.assertEqual('error',upload['with']['if-no-files-found']);self.assertIn('build/releases/ci/vocr-web.zip',upload['with']['path'])
+        self.assertNotIn('build/releases',self.step('Upload existing')['with']['path'])
+        self.assertLess(names.index(upload['name']),names.index(identity['name']));self.assertLess(names.index(identity['name']),names.index(self.step('Assemble evidence')['name']))
+        self.assertIn('--release-upload',identity['run']);self.assertIn('steps.release_upload.outputs.artifact-digest',identity['env']['CI_ARTIFACT_DIGEST'])
+        self.assertNotIn('VOCR_APPROVED_FULL_CHECK',identity.get('env',{}))
+
     def test_requirements_are_exact_hash_locked_ci_only_wheels(self):
         lines = (ROOT / 'tools/ci/requirements-linux-x64.txt').read_text().splitlines()
         requirements = [x for x in lines if x and not x.startswith('#')]
@@ -352,6 +361,34 @@ class RunTest(unittest.TestCase):
                 self.assertEqual('passed' if mode == 'success' else 'failed', outcome['status'])
                 if mode == 'suite-failure':
                     self.assertEqual(9, outcome['verification_exit_code'])
+
+    def test_packaging_failure_prevents_success_and_is_not_a_second_verification(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);d=root/'build/ci';d.mkdir(parents=True)
+            plan={'status':'planned','tested_sha':HEAD,'base_sha':BASE,'plan':{'tier':'full','suites':[]},'tier_policy_sha256':'hash'}
+            (d/'plan.json').write_text(json.dumps(plan));(d/'context.json').write_text(json.dumps({'head_sha':HEAD,'base_sha':BASE,'force_full':False}))
+            def execute(argv,**kw):
+                result={**plan,'status':'passed','run_dir':'build/verify/run'};p=root/'build/verify/run/result.json';p.parent.mkdir(parents=True);p.write_text(json.dumps(result));kw['stdout'].write(json.dumps(result).encode());return subprocess.CompletedProcess(argv,0)
+            env={'GITHUB_ACTIONS':'true','GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2'}
+            with patch.object(RUN,'ROOT',root),patch.object(RUN,'execute',side_effect=execute) as verify,patch.object(RUN,'package_release',side_effect=ValueError('WEB_RELEASE_BUILD_OR_SMOKE_FAILED')) as package,patch.dict(RUN.os.environ,env,clear=True):
+                self.assertEqual(1,RUN.main());self.assertEqual(1,verify.call_count);self.assertEqual(1,package.call_count)
+            outcome=json.loads((d/'outcome.json').read_text());self.assertEqual('failed',outcome['status']);self.assertTrue(outcome['release_required']);self.assertNotIn('web_release',outcome)
+
+    def test_package_report_must_match_same_result_head_and_actual_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);d=root/'build/ci';d.mkdir(parents=True)
+            result=root/'build/verify/run/result.json';result.parent.mkdir(parents=True);result.write_bytes(b'{}')
+            output=root/'build/releases/ci';output.mkdir(parents=True);archive=output/'vocr-web.zip';archive.write_bytes(b'fixture')
+            report={'status':'passed','source_sha':HEAD,'verification':{'resultSha256':RUN.digest(result)},
+                    'archive':{'sha256':RUN.digest(archive),'bytes':7},'packaged_smoke':{'status':'passed','tests':1}}
+            (output/'release-report.json').write_text(json.dumps(report))
+            with patch.object(RUN,'ROOT',root),patch.object(RUN.subprocess,'run',return_value=subprocess.CompletedProcess([],0)) as run:
+                value=RUN.package_release(result,HEAD,d)
+                self.assertEqual('build/ci/web-release.json',value['report'])
+                self.assertEqual(1,run.call_count);self.assertIn('--verified-result',run.call_args[0][0]);self.assertIn(str(result),run.call_args[0][0])
+                self.assertNotIn('tools/verify.sh',run.call_args[0][0])
+                archive.write_bytes(b'changed')
+                with self.assertRaisesRegex(ValueError,'MISMATCH'):RUN.package_release(result,HEAD,d)
 
     def test_jar_boundary_and_hash_without_publishing_binary(self):
         with tempfile.TemporaryDirectory() as temporary:

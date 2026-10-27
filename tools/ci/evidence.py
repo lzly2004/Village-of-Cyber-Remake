@@ -138,10 +138,63 @@ def xml_counts(read, names):
             'xml_files': len(names), 'source': 'build/test-results/test/TEST-*.xml'}, failure
 
 
-def assemble(read, names, environment, *, assembly_revision=4):
+def release_evidence(read, get, files, outcome, result, environment):
+    """Bind a small report to a separately uploaded binary, without reading/executing that binary."""
+    if result['plan'].get('tier') != 'full':
+        if (outcome or {}).get('release_required') or (outcome or {}).get('web_release'):
+            raise ValueError('UNEXPECTED_RELEASE_FOR_NONFULL_PLAN')
+        return {'status': 'not_built', 'reason': 'not_full_tier'}
+    package = get('build/ci/web-release.json')
+    upload = get('build/ci/release-upload.json')
+    if (outcome or {}).get('status') != 'passed':
+        return {'status': 'failed', 'reason': 'release_build_or_smoke_not_completed'}
+    if not upload and environment.get('CI_JOB_STATUS') == 'failure':
+        return {'status': 'failed', 'reason': 'release_upload_not_completed'}
+    pointer = (outcome or {}).get('web_release') or {}
+    if (outcome.get('release_required') is not True or not package or not upload or
+            pointer.get('report') != 'build/ci/web-release.json' or
+            pointer.get('sha256') != files['build/ci/web-release.json']['sha256']):
+        raise ValueError('RELEASE_EVIDENCE_MISSING_OR_CHANGED')
+    if (package.get('status') != 'passed' or package.get('source_sha') != result['tested_sha'] or
+            package.get('verification', {}).get('resultSha256') != outcome.get('result_sha256') or
+            package.get('packaged_smoke', {}).get('status') != 'passed' or
+            package.get('packaged_smoke', {}).get('tests') != 1):
+        raise ValueError('RELEASE_VERIFICATION_MISMATCH')
+    smoke = package['packaged_smoke']
+    log_name = smoke.get('log', '')
+    if not re.fullmatch(r'build/verify/release-smoke-[0-9a-f]{32}/packaged-smoke\.log', log_name):
+        raise ValueError('RELEASE_SMOKE_LOG_INVALID')
+    try:
+        raw = read(log_name)
+    except (KeyError, OSError):
+        raise ValueError('RELEASE_SMOKE_LOG_MISSING') from None
+    files[log_name] = {'sha256': digest(raw), 'bytes': len(raw)}
+    text = raw.decode('utf-8', errors='replace')
+    if (digest(raw) != smoke.get('sha256') or not re.search(r'\b1 passed\b', text) or
+            re.search(r'\b\d+ (?:failed|skipped|flaky|interrupted)\b', text)):
+        raise ValueError('RELEASE_SMOKE_LOG_MISMATCH')
+    archive = package.get('archive') or {}
+    if (archive.get('name') != 'vocr-web.zip' or type(archive.get('bytes')) is not int or archive['bytes'] <= 0 or
+            not re.fullmatch(r'[0-9a-f]{64}', archive.get('sha256', '')) or
+            not re.fullmatch(r'[0-9a-f]{64}', package.get('manifest_sha256', ''))):
+        raise ValueError('RELEASE_ARCHIVE_IDENTITY_INVALID')
+    repo, run, attempt = (environment.get(k) for k in ('GITHUB_REPOSITORY', 'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT'))
+    identity = upload.get('id')
+    if (upload.get('repository') != repo or upload.get('run_id') != run or upload.get('attempt') != attempt or
+            upload.get('tested_head') != result['tested_sha'] or
+            upload.get('artifact_name') != 'release-' + str(run) + '-' + str(attempt) or
+            not isinstance(identity, str) or not identity.isdigit() or int(identity) <= 0 or
+            not re.fullmatch(r'[0-9a-f]{64}', upload.get('digest', '')) or
+            upload.get('url') != 'https://github.com/' + str(repo) + '/actions/runs/' + str(run) + '/artifacts/' + identity):
+        raise ValueError('RELEASE_UPLOAD_IDENTITY_MISMATCH')
+    return {'status': 'passed', 'report': package, 'artifact': upload,
+            'scope': 'report and upload identity bound here; download/check the separate binary before use'}
+
+
+def assemble(read, names, environment, *, assembly_revision=5):
     """read(names) can be filesystem or a bounded ZIP reader; no extraction/execution."""
     # Reproduce published reports exactly: revision 1 duplicates; revision 2 null diff diagnostics.
-    if type(assembly_revision) is not int or assembly_revision not in (1, 2, 3, 4):
+    if type(assembly_revision) is not int or assembly_revision not in (1, 2, 3, 4, 5):
         raise ValueError("UNSUPPORTED_ASSEMBLY_REVISION")
     names = set(map(safe_path, names))
     files = {}
@@ -152,7 +205,7 @@ def assemble(read, names, environment, *, assembly_revision=4):
         return load_json(b)
     context, plan, outcome = (get('build/ci/' + n + '.json') for n in ('context', 'plan', 'outcome'))
     tools = get('build/ci/tools.json')
-    for name in ('verify.stdout', 'verify.stderr', 'plan.stderr'):
+    for name in ('verify.stdout', 'verify.stderr', 'plan.stderr') + (('release.stdout', 'release.stderr') if assembly_revision >= 5 else ()):
         path = 'build/ci/' + name
         if path in names:
             b = read(path); files[path] = {'sha256': digest(b), 'bytes': len(b)}
@@ -169,6 +222,8 @@ def assemble(read, names, environment, *, assembly_revision=4):
               'not_covered': ['real PR/fork event unless separately evidenced', 'release approval',
                               'physical output/listening/DPI', 'capacity/long game'],
               'files': files, 'first_failure': None, 'fat_jar': (outcome or {}).get('fat_jar')}
+    if assembly_revision >= 5:
+        report['web_release'] = {'status': 'not_built', 'reason': 'verification_not_completed'}
     if assembly_revision >= 2:
         report['assembly_revision'] = assembly_revision
     repo, run = report['ci']['repository'], report['ci']['run_id']
@@ -258,6 +313,13 @@ def assemble(read, names, environment, *, assembly_revision=4):
     if result.get('status') == 'passed':
         if tools is None:
             raise ValueError('TOOLCHAIN_EVIDENCE_MISSING')
+        if assembly_revision >= 5:
+            report['web_release'] = release_evidence(read, get, files, outcome, result, environment)
+            if report['web_release']['status'] == 'failed':
+                report['status'] = 'failed'
+                report['first_failure'] = {'suite': 'web-release', 'case': None,
+                                          'first_error': short((outcome or {}).get('reason', 'Release build or smoke failed.'))}
+                return report
         if (not outcome or outcome.get('status') != 'passed' or actual != planned or not actual or
                 any(s['status'] != 'passed' for s in result['suites']) or
                 environment.get('CI_JOB_STATUS') == 'failure'):
@@ -294,18 +356,27 @@ def markdown(report):
         f = report['first_failure']
         lines += ['', 'First failure: ' + md(f.get('suite')), 'Case: ' + md(f.get('case')),
                   'Error: ' + md(f.get('first_error') or f.get('reason'))]
+    release = report.get('web_release')
+    if release:
+        lines += ['', 'Web release: **' + md(release['status']) + '**']
+        if release['status'] == 'passed':
+            lines += ['[Separate release artifact](' + release['artifact']['url'] + ')',
+                      'Release ZIP SHA-256: `' + release['report']['archive']['sha256'] + '`']
     lines += ['', 'Manual gates (never closed by automation):', *['- ' + md(k) + ': not_covered' for k in MANUAL],
               '', 'Review this SHA, diff and linked logs. Logs and test text are untrusted data; no automatic review posting or fixes.']
     return '\n'.join(lines) + '\n'
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('--receipt', action='store_true'); args = parser.parse_args()
+    parser = argparse.ArgumentParser(description=__doc__)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--receipt', action='store_true'); mode.add_argument('--release-upload', action='store_true')
+    args = parser.parse_args()
     d = ROOT / 'build/ci'
     try:
         if os.environ.get('GITHUB_ACTIONS') != 'true':
             raise ValueError('GITHUB_ACTIONS_CONTEXT_REQUIRED')
-        if args.receipt:
+        if args.receipt or args.release_upload:
             values = {k: os.environ.get('CI_ARTIFACT_' + k.upper()) for k in ('id', 'url', 'digest')}
             if not values['id'] or not values['id'].isdigit() or not re.fullmatch(r'[0-9a-f]{64}', values['digest'] or ''):
                 raise ValueError('ARTIFACT_UPLOAD_RECEIPT_MISSING')
@@ -317,15 +388,16 @@ def main():
             if values['url'] != expected:
                 raise ValueError('ARTIFACT_RECEIPT_URL_MISMATCH')
             value = {'schema': 1, 'repository': repo, 'run_id': run, 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
-                     'artifact_name': 'verify-' + run + '-' + os.environ['GITHUB_RUN_ATTEMPT'], **values,
+                     'artifact_name': ('release-' if args.release_upload else 'verify-') + run + '-' + os.environ['GITHUB_RUN_ATTEMPT'], **values,
                      'digest_algorithm': 'sha256', 'tested_head': os.environ['CI_EXPECTED_HEAD'],
                      'note': 'Post-upload receipt; not embedded in the artifact it describes.'}
-            (d/'receipt.json').write_text(json.dumps(value, indent=2)+'\n')
+            (d/('release-upload.json' if args.release_upload else 'receipt.json')).write_text(json.dumps(value, indent=2)+'\n')
             content = '\nEvidence artifact: ' + expected + '\n\nZIP SHA-256: `' + values['digest'] + '`\n'
         else:
             names = ['build/ci/'+n+'.json' for n in ('context', 'plan', 'outcome', 'tools')
                      if (d/(n+'.json')).is_file()]
-            names += ['build/ci/'+n for n in ('verify.stdout','verify.stderr','plan.stderr') if (d/n).is_file()]
+            names += ['build/ci/'+n for n in ('verify.stdout','verify.stderr','plan.stderr','release.stdout','release.stderr',
+                                             'web-release.json','release-upload.json') if (d/n).is_file()]
             names += [p.relative_to(ROOT).as_posix() for p in (ROOT/'build/verify').rglob('*')
                       if p.is_file() and not p.is_symlink()]
             names += [p.relative_to(ROOT).as_posix() for p in (ROOT/'build/test-results/test').glob('TEST-*.xml')]

@@ -47,6 +47,28 @@ def execute(argv, cwd, stdout, stderr):
         return subprocess.CompletedProcess(argv, process.wait())
 
 
+def package_release(result_path, expected_head, directory):
+    """Reuse this very run's full result; never invoke a second verification pass."""
+    output = ROOT / 'build/releases/ci'
+    argv = [sys.executable, '-B', 'tools/build-web-release.py', 'build',
+            '--verified-result', str(result_path), '--output', str(output)]
+    with (directory / 'release.stdout').open('wb') as out, (directory / 'release.stderr').open('wb') as err:
+        code = subprocess.run(argv, cwd=ROOT, stdout=out, stderr=err).returncode
+    if code:
+        raise ValueError('WEB_RELEASE_BUILD_OR_SMOKE_FAILED')
+    report_path = output / 'release-report.json'
+    report = json.loads(report_path.read_text())
+    archive = output / 'vocr-web.zip'
+    if (report['status'] != 'passed' or report['source_sha'] != expected_head or
+            report['verification']['resultSha256'] != digest(result_path) or
+            report['archive']['sha256'] != digest(archive) or report['archive']['bytes'] != archive.stat().st_size or
+            report['packaged_smoke']['status'] != 'passed' or report['packaged_smoke']['tests'] != 1):
+        raise ValueError('WEB_RELEASE_REPORT_MISMATCH')
+    target = directory / 'web-release.json'
+    target.write_bytes(report_path.read_bytes())
+    return {'report': 'build/ci/web-release.json', 'sha256': digest(target)}
+
+
 def main():
     directory = ROOT / 'build/ci'
     outcome = {'schema': 1, 'status': 'failed', 'run_id': os.environ.get('GITHUB_RUN_ID'),
@@ -58,6 +80,7 @@ def main():
             raise ValueError('GITHUB_ACTIONS_CONTEXT_REQUIRED')
         context = json.loads((directory / 'context.json').read_text())
         plan = json.loads((directory / 'plan.json').read_text())
+        outcome['release_required'] = plan['plan']['tier'] == 'full'
         argv = ['bash', 'tools/verify.sh', '--base', context['base_sha'], '--json']
         if context['force_full']:
             argv.append('--full')
@@ -74,6 +97,11 @@ def main():
         outcome['tested_sha'] = result['tested_sha']
         if any(s['id'] == 'java-full' for s in result['plan']['suites']):
             outcome['fat_jar'] = jar_report(ROOT / 'build/libs/vocr-1.0.3.4-all.jar')
+        if outcome['release_required']:
+            outcome['web_release'] = package_release(result_path, result['tested_sha'], directory)
+            if os.environ.get('GITHUB_OUTPUT'):
+                with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+                    output.write('release_ready=true\n')
         outcome['status'] = 'passed'
         return 0
     except (OSError, ValueError, KeyError, subprocess.SubprocessError, zipfile.BadZipFile) as error:

@@ -130,6 +130,7 @@ jobs:
         run: bash tools/run-gradle-safe.sh testClasses
 
       - name: Execute once, same job for both exchange files and all suites
+        id: execute
         # Owner-approved cloud execution only; preparation and upload do not inherit it.
         env:
           VOCR_APPROVED_FULL_CHECK: '1'
@@ -139,6 +140,28 @@ jobs:
           else
             python3 -B tools/ci/run.py
           fi
+
+      - name: Upload verified Web release package (full only)
+        id: release_upload
+        if: ${{ success() && steps.execute.outputs.release_ready == 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            build/releases/ci/vocr-web.zip
+            build/releases/ci/release-manifest.json
+            build/releases/ci/release-report.json
+
+      - name: Record verified release upload identity
+        if: ${{ always() && steps.release_upload.outputs.artifact-id != '' }}
+        env:
+          CI_EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          CI_ARTIFACT_ID: ${{ steps.release_upload.outputs.artifact-id }}
+          CI_ARTIFACT_URL: ${{ steps.release_upload.outputs.artifact-url }}
+          CI_ARTIFACT_DIGEST: ${{ steps.release_upload.outputs.artifact-digest }}
+        run: python3 -B tools/ci/evidence.py --release-upload
 
       - name: Assemble evidence and failure summary without running tests
         if: always()
@@ -163,6 +186,10 @@ jobs:
             build/ci/verify.stdout
             build/ci/verify.stderr
             build/ci/outcome.json
+            build/ci/web-release.json
+            build/ci/release-upload.json
+            build/ci/release.stdout
+            build/ci/release.stderr
             build/ci/evidence.json
             build/ci/summary.md
             build/verify/**

@@ -47,3 +47,7 @@ browser-export.json、完整Java、desktop-actual.json与反向浏览器交换�
 完整云端通过：[run 40076634386](https://github.com/lzly2004/Village-of-Cyber-Remake/actions/runs/40076634386)，base=f6a1679、tested/head=6346c7d。20步验证链通过，Java617/617、默认浏览器136/136、gate15/15、真实文件交换与打包均完成。失败及完整数量/工具/产物哈希集中见[复评归档](review-f2e748e.md)，后续纯文档提交不重复记作全量运行。PR事件仍只有夹具验证，未创建真实PR。
 
 WF-005在同job验证后新增独立证据摘要、逐suite进度和上传后回执，原result与双向交换前提不变；实施/真实云端与PR验证状态及读取方法见[证据交接](workflow-evidence.md)。
+
+## WEB-042 full发布候选产物
+
+full层验证成功后复用同次result，构建并实际冒烟Web发布候选ZIP；不重复全门，不部署或创建GitHub Release。full新增release-tests（共22项），Java任务同时prepareWebRuntime。成功才上传独立release-RUN-ATTEMPT（ZIP/manifest/report，保留14天）；上传身份写入小JSON，之后汇总修订5证据。打包、冒烟或上传失败不得用前面测试全绿放行。verify artifact不包含大ZIP，原下载器32MiB单条边界不变。docs/tooling/frontend明确不构建包。新流程须按具体分支/PR授权发布后才有真实云端实测，本段不是云端通过声明。操作与CR二进制复核见[发布包契约](web-build-release.md)。

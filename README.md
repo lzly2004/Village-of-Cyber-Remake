@@ -36,13 +36,13 @@ gradlew.bat fatJar
 
 ## 游客 HTTP 原型
 
-在项目根目录执行 `gradlew.bat runWeb`（Linux：`./gradlew runWeb`），默认监听
+在项目根目录执行 `gradlew.bat runWeb`（Linux：`bash tools/run-gradle-safe.sh runWeb --offline`），默认监听
 `127.0.0.1:7070`。指定端口可用 `runWeb --args="7071"`。
-此原型支持创建游客局、读取安全更新、指定投票与释放会话，尚无浏览器页面。
-会话和战绩只保存在当前进程内；重启后清空。接口与示例见
+此服务支持创建游客局、读取安全更新、指定投票与释放会话，配套页面见下文。
+进行中会话在服务重启后失效；网页录像与战绩另存浏览器本地。接口与示例见
 [游客 HTTP API](docs/guest-http-api.md)。
 
-## 浏览器文本试玩
+## 浏览器试玩
 
 除 Java 21 外，前端需要 Node.js 22.12+。先在项目根目录启动 `gradlew.bat runWeb`，
 再在另一个终端执行：
@@ -56,6 +56,13 @@ npm run dev
 打开 `http://127.0.0.1:5173` 可选择配役、逐条阅读公开事件、指定投票并查看终局。
 刷新同一标签页可恢复当前会话与未确认事件。构建与浏览器测试见
 [客户端说明](web-client/README.md)。
+
+## Web 统一构建与发布候选包
+
+WEB-042 提供独立服务端 JAR/classpath、前端静态文件、概率配置及逐文件 SHA 清单。
+统一入口先完整验证，再组包、校验并对解包内容运行真实整局冒烟；不会部署或创建 GitHub Release。
+本机执行须先取得该轮全量/打包授权，并满足 Linux 安全入口与内存条件，见
+[构建与发布包契约](docs/web-build-release.md)。CI 的发布二进制与轻量验证证据分开上传；不能只凭测试绿灯运行未核对的 ZIP。
 
 ## 目录说明
 
@@ -72,7 +79,7 @@ npm run dev
 - `src/main/java/com/vocr/ui/`：Swing 场景、渲染器和组件工厂
 - `src/test/java/com/vocr/`：JUnit 5 测试，按生产包镜像组织
 - `src/web/java/com/vocr/web/`：独立 HTTP 源集与游客会话组合根，不进入桌面 Fat JAR
-- `web-client/`：独立 Vue/Vite 文本试玩客户端与 Playwright 端到端测试
+- `web-client/`：独立 Vue/Vite 试玩客户端与 Playwright 端到端测试
 - `src/main/resources/`：图片、台词、事件映射、音效和 BGM
 - `docs/legacy/`：从旧源码目录移出的历史设计文档和进度记录
 - `config/probability.json`：唯一的外部概率配置

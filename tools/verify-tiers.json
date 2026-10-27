@@ -26,6 +26,7 @@
       "audit-tests",
       "verify-tests",
       "ci-tests",
+      "release-tests",
       "image-tool-tests",
       "audio-tool-tests",
       "exchange-contract",
@@ -64,6 +65,15 @@
         "tools/tests/test_verify.py"
       ],
       "tier": "tooling"
+    },
+    {
+      "patterns": [
+        "tools/tests/test_web_release.py"
+      ],
+      "tier": "tooling",
+      "extra": [
+        "release-tests"
+      ]
     },
     {
       "patterns": [

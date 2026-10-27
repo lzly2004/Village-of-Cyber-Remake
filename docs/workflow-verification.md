@@ -64,3 +64,5 @@ WF-004前置补修：无效base统一报INVALID_BASE_REF；真实Git差异为空
 CI配置及CI辅助工具变动默认为full，包含ci-tests（事件SHA/缓存/权限/命令/失败等纯工具契约）。只有ci-tests用例本身的独立改动可在tooling层追加该套件，所需PyYAML为开发依赖，不启动JVM。
 
 WEB-038增加独立production-smoke到full计划（21项，含内部检查），在默认浏览器退出后、Java全量开始前串行运行；配置拒绝种子服务器override，使用本轮生产构建。截图位于build/verify/production-browser，被现有CI证据收集覆盖。该套件不自动加入docs/tooling/frontend：控制每次前端改动的验收成本，代价是仅生产preview入口出现的回归可能到下一次full才暴露；这是有意的覆盖取舍，不表示frontend已经覆盖生产入口。该套件不替代七配役确定性门或人工门槛，详见[038记录](web-038-verification.md)。
+
+WEB-042将full从21项增为22项，追加release-tests；java-full在同一安全入口执行`fatJar prepareWebRuntime --offline --rerun-tasks`。成功web-build绑定全部dist文件大小/SHA，成功java-full绑定运行时stamp。统一发布编排只消费同次full结果，随后校验/解包并实际运行发布包；CI full自动追加，其他层明确not_built。包内冒烟不是22项中重复的一项，失败仍使CI失败，详见[发布包契约](web-build-release.md)。
