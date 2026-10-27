@@ -101,7 +101,11 @@ async function fixture(page, request, unknown) {
     rounds: [structuredClone(tie), structuredClone(final)], ignoredPrivateField: 'DO_NOT_RENDER_PRIVATE_SENTINEL',
   }))
   if (unknown) snapshot.legalVoteActions.push({ method: 'FUTURE_METHOD', candidates: [2, 1] })
-  await page.route('**/api/v1/games/' + created.sessionId + '?**', route => route.fulfill({ json: snapshot }))
+  await page.route('**/api/v1/games/' + created.sessionId + '?**', route => {
+    const cursor = Number(new URL(route.request().url()).searchParams.get('eventCursor') || 0)
+    return route.fulfill({ json: { ...snapshot, eventCursor: cursor,
+      events: snapshot.events.slice(cursor), presentedEvents: snapshot.presentedEvents.slice(cursor) } })
+  })
   await page.addInitScript(({ key, id, cursor }) => sessionStorage.setItem(key, JSON.stringify({ sessionId: id, eventCursor: cursor })),
     { key, id: created.sessionId, cursor: snapshot.nextEventCursor })
   await page.goto('/')
