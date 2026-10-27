@@ -9,6 +9,8 @@ import com.vocr.domain.SelectionType;
 import com.vocr.domain.peiyi;
 import com.vocr.history.GameRecordManager;
 import com.vocr.logging.DebugLogger;
+import com.vocr.logging.WebDiagnostics;
+import static com.vocr.logging.WebDiagnostics.Event.*;
 import com.vocr.replay.ReplaySave;
 import java.nio.charset.StandardCharsets;
 import io.javalin.Javalin;
@@ -43,6 +45,7 @@ public final class GuestGameServer implements AutoCloseable
     private final LongSupplier clock;
     private final long idleNanos;
     private final long lifetimeNanos;
+    private final GuestRequestLimits requestLimits;
     private final ScheduledExecutorService reaper = Executors.newSingleThreadScheduledExecutor(task -> {
         Thread thread = new Thread(task, "vocr-guest-reaper");
         thread.setDaemon(true);
@@ -50,13 +53,17 @@ public final class GuestGameServer implements AutoCloseable
     });
     private boolean started;
 
-    private static final class Entry
+    private final class Entry
     {
         final GameSession session;
         final long created;
         long lastAccess;
         int users;
         boolean retired;
+        final GuestRequestLimits.Bucket requests = new GuestRequestLimits.Bucket(clock,
+                requestLimits.policy.sessionPerSecond(), requestLimits.policy.sessionBurst(), Duration.ofSeconds(1));
+        final GuestRequestLimits.Bucket replays = new GuestRequestLimits.Bucket(clock,
+                requestLimits.policy.replaysPerMinute(), requestLimits.policy.replayBurst(), Duration.ofMinutes(1));
         Entry(GameSession session, long now) { this.session = session; created = lastAccess = now; }
     }
     private final Function<String, GameSession> sessionFactory;
@@ -79,6 +86,12 @@ public final class GuestGameServer implements AutoCloseable
     GuestGameServer(Function<String, GameSession> sessionFactory, int maxSessions,
                     LongSupplier clock, Duration idle, Duration lifetime)
     {
+        this(sessionFactory, maxSessions, clock, idle, lifetime, GuestRequestLimits.Policy.production());
+    }
+
+    GuestGameServer(Function<String, GameSession> sessionFactory, int maxSessions,
+                    LongSupplier clock, Duration idle, Duration lifetime, GuestRequestLimits.Policy limits)
+    {
         this.clock = Objects.requireNonNull(clock);
         idleNanos = Objects.requireNonNull(idle).toNanos();
         lifetimeNanos = Objects.requireNonNull(lifetime).toNanos();
@@ -86,12 +99,31 @@ public final class GuestGameServer implements AutoCloseable
         this.sessionFactory = Objects.requireNonNull(sessionFactory);
         if (maxSessions <= 0) throw new IllegalArgumentException("会话上限必须为正数");
         this.maxSessions = maxSessions;
+        requestLimits = new GuestRequestLimits(Objects.requireNonNull(limits), clock);
         app = Javalin.create(config -> {
             config.jetty.host = "127.0.0.1";
             config.http.maxRequestSize = 16_384L;
+            // Bind costly admission to registered endpoints, not the untrusted raw URI.
+            // Router aliases (trailing slashes/decoding) cannot bypass creation or Replay limits.
+            config.router.handlerWrapper(endpoint -> {
+                boolean create = endpoint.method.name().equals("POST") && endpoint.path.equals("/api/v1/games");
+                boolean replay = endpoint.method.name().equals("GET") && endpoint.path.equals("/api/v1/games/{id}/replay");
+                if (!create && !replay) return endpoint.handler;
+                return ctx -> {
+                    GuestRequestLimits.Lease lease = Objects.requireNonNull(ctx.attribute("vocr.requestLease"));
+                    lease.restrictRoute(create, replay);
+                    endpoint.handler.handle(ctx);
+                };
+            });
             config.routes.before(ctx -> {
                 ctx.header("Cache-Control", "no-store");
                 ctx.header("Referrer-Policy", "no-referrer");
+                // Before body parsing, session acquisition or game commands. after also runs on exceptions.
+                ctx.attribute("vocr.requestLease", requestLimits.enter(false, false));
+            });
+            config.routes.after(ctx -> {
+                GuestRequestLimits.Lease lease = ctx.attribute("vocr.requestLease");
+                if (lease != null) lease.close();
             });
             config.routes.post("/api/v1/games", ctx -> {
                 CreateGame request = read(ctx, CreateGame.class);
@@ -111,7 +143,8 @@ public final class GuestGameServer implements AutoCloseable
                 if (cursor == null || !cursor.matches("0|[1-9][0-9]{0,15}")
                         || ctx.queryParams("eventCursor").size() != 1)
                     throw new IllegalArgumentException("录像读取必须提供有效确认游标");
-                ReplayRecording recording = withSession(ctx.pathParam("id"), session -> session.completedReplay(Long.parseLong(cursor)));
+                ReplayRecording recording = withSession(ctx.pathParam("id"), true,
+                        session -> session.completedReplay(Long.parseLong(cursor)));
                 // Immutable application snapshot: parsing/serialization is outside the session monitor.
                 if (recording.records().size() > 20_000
                         || recording.records().stream().anyMatch(line -> line.getBytes(StandardCharsets.UTF_8).length > 65_536)
@@ -167,19 +200,27 @@ public final class GuestGameServer implements AutoCloseable
             });
             config.routes.exception(StaleGameRevisionException.class, (error, ctx) -> {
                 ctx.status(409);
-                send(ctx, new ApiError("STALE_REVISION", error.getMessage(),
+                send(ctx, new ApiError("STALE_REVISION", "对局版本已更新，请重新同步",
                         error.currentRevision()));
             });
             config.routes.exception(IllegalArgumentException.class,
-                    (error, ctx) -> error(ctx, 400, "INVALID_REQUEST", error.getMessage()));
+                    (error, ctx) -> error(ctx, 400, "INVALID_REQUEST", "请求参数无效，请核对后重试"));
             config.routes.exception(IllegalStateException.class,
-                    (error, ctx) -> error(ctx, 409, "INVALID_STATE", error.getMessage()));
+                    (error, ctx) -> error(ctx, 409, "INVALID_STATE", "当前对局状态不允许该操作，请重新同步"));
+            config.routes.exception(GuestRequestLimits.Rejected.class, (error, ctx) -> {
+                ctx.header("Retry-After", Integer.toString(error.retrySeconds));
+                error(ctx, 429, "REQUEST_LIMIT", "请求过于频繁或正在处理其他请求，本次操作未执行");
+            });
             config.routes.exception(ApiException.class,
                     (error, ctx) -> error(ctx, error.status, error.code, error.getMessage()));
             config.routes.exception(HttpResponseException.class,
-                    (error, ctx) -> error(ctx, error.getStatus(), "HTTP_ERROR", error.getMessage()));
+                    (error, ctx) -> error(ctx, error.getStatus(), "HTTP_ERROR", "HTTP 请求被拒绝"));
+            config.routes.error(404, ctx -> {
+                if (!Boolean.TRUE.equals(ctx.attribute("vocr.apiError")))
+                    error(ctx, 404, "HTTP_ERROR", "请求路径不存在");
+            });
             config.routes.exception(Exception.class, (error, ctx) -> {
-                DebugLogger.error("[HTTP] 请求处理失败", error);
+                WebDiagnostics.write(REQUEST_FAILED);
                 error(ctx, 500, "INTERNAL_ERROR", "请求处理失败");
             });
         });
@@ -194,6 +235,9 @@ public final class GuestGameServer implements AutoCloseable
 
     public GuestGameServer start(int port)
     {
+        // A standalone Web process must not emit the desktop core's private game diagnostics.
+        // The desktop default and Replay recorder are unchanged. Web operational logging is separate.
+        DebugLogger.getInstance().setEnabled(false);
         synchronized (this) {
             if (closed) throw new IllegalStateException("游客服务已经关闭");
             if (started) throw new IllegalStateException("游客服务已经启动");
@@ -201,7 +245,7 @@ public final class GuestGameServer implements AutoCloseable
             started = true;
             reaper.scheduleWithFixedDelay(() -> {
                 try { reapExpired(); }
-                catch (RuntimeException error) { DebugLogger.error("[HTTP] 会话回收失败", error); }
+                catch (RuntimeException error) { WebDiagnostics.write(REAP_FAILED); }
             }, 1, 1, TimeUnit.MINUTES);
         }
         return this;
@@ -259,12 +303,20 @@ public final class GuestGameServer implements AutoCloseable
 
     <T> T withSession(String id, Function<GameSession, T> action)
     {
+        return withSession(id, false, action);
+    }
+
+    private <T> T withSession(String id, boolean replay, Function<GameSession, T> action)
+    {
         reapExpired();
         Entry entry;
         synchronized (this) {
             entry = credential(id) ? sessions.get(id) : null;
             if (closed || entry == null || entry.retired || expired(entry, clock.getAsLong()))
                 throw unavailable();
+            if (entry.users >= requestLimits.policy.sessionUsers()) throw new GuestRequestLimits.Rejected(1);
+            entry.requests.take();
+            if (replay) entry.replays.take();
             entry.users++;
         }
         try {
@@ -338,7 +390,7 @@ public final class GuestGameServer implements AutoCloseable
         try {
             ctx.contentType("application/json; charset=utf-8").result(json.writeValueAsString(value));
         } catch (JsonProcessingException error) {
-            DebugLogger.error("[HTTP] 响应序列化失败", error);
+            WebDiagnostics.write(SERIALIZATION_FAILED);
             ctx.status(500).contentType("application/json")
                     .result("{\"code\":\"INTERNAL_ERROR\",\"message\":\"响应序列化失败\"}");
         }
@@ -346,6 +398,7 @@ public final class GuestGameServer implements AutoCloseable
 
     private void error(Context ctx, int status, String code, String message)
     {
+        ctx.attribute("vocr.apiError", true);
         ctx.status(status);
         send(ctx, new ApiError(code, message, null));
     }
@@ -394,7 +447,7 @@ public final class GuestGameServer implements AutoCloseable
         try {
             port = parsePort(args);
         } catch (IllegalArgumentException error) {
-            DebugLogger.error(error.getMessage() + "；用法：runWeb --args=\"7070\"（可省略端口）");
+            WebDiagnostics.write(INVALID_PORT);
             return 2;
         }
         GuestGameServer server = new GuestGameServer();
@@ -402,11 +455,11 @@ public final class GuestGameServer implements AutoCloseable
             server.start(port);
         } catch (RuntimeException error) {
             try { server.close(); }
-            catch (RuntimeException ignored) { DebugLogger.warn("启动失败后的服务清理未完成"); }
-            DebugLogger.error("无法启动游客服务，请检查端口 " + port + " 是否被占用及监听权限");
+            catch (RuntimeException ignored) { WebDiagnostics.write(START_CLEANUP_FAILED); }
+            WebDiagnostics.write(START_FAILED);
             return 1;
         }
-        DebugLogger.info("[HTTP] 游客 API: http://127.0.0.1:" + server.port() + "/api/v1/games");
+        WebDiagnostics.listening(server.port());
         Runtime.getRuntime().addShutdownHook(new Thread(server::close));
         return 0;
     }

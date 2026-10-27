@@ -13,6 +13,79 @@ async function start(page){
 }
 const read= (request,id)=>request.get('/api/v1/games/'+id).then(r=>r.json())
 
+test('known 429 write rejection does not execute or retry and keeps authoritative choices available',async({page,request})=>{
+  const id=await start(page)
+  try{
+    await drainEvents(page)
+    const before=await read(request,id),local=await saved(page)
+    let writes=0
+    await page.route('**/vote-target',route=>{
+      writes++;return route.fulfill({status:429,contentType:'application/json',headers:{'Retry-After':'1'},body:errorBody('REQUEST_LIMIT')})
+    })
+    const choice=page.locator('.player-row:not(.departed)').getByRole('checkbox').first()
+    await choice.click()
+    await expect(page.getByRole('alert')).toContainText('本次操作未执行')
+    await expect(choice).toBeEnabled()
+    expect(writes).toBe(1);expect(await saved(page)).toEqual(local)
+    expect(await read(request,id)).toEqual(before)
+    await page.unroute('**/vote-target')
+    await choice.click();await expect(choice).toBeChecked()
+    expect((await read(request,id)).revision).toBe(before.revision+1)
+  }finally{await request.delete('/api/v1/games/'+id)}
+})
+
+test('known 429 read preserves cursor, locks decisions, and never performs the cursor fallback',async({page,request})=>{
+  const id=await start(page)
+  try{
+    await drainEvents(page)
+    const before=await saved(page),reads=[]
+    await page.route('**/api/v1/games/'+id+'?*',route=>{
+      reads.push(new URL(route.request().url()).searchParams.get('eventCursor'))
+      return route.fulfill({status:429,contentType:'application/json',body:errorBody('REQUEST_LIMIT')})
+    })
+    await sync(page).click()
+    await expect(page.getByRole('alert')).toContainText('读取暂被限流')
+    expect(reads).toEqual([String(before.eventCursor)]);expect(await saved(page)).toEqual(before)
+    await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeDisabled()
+    await page.unroute('**/api/v1/games/'+id+'?*')
+    await sync(page).click()
+    await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeEnabled()
+  }finally{await request.delete('/api/v1/games/'+id)}
+})
+
+test('known 429 creation is rejected without capability and only an explicit new click retries',async({page,request})=>{
+  let creates=0,id
+  await page.goto('/')
+  await page.route('**/api/v1/games',route=>{
+    creates++;return route.fulfill({status:429,contentType:'application/json',body:errorBody('REQUEST_LIMIT')})
+  })
+  await page.getByRole('button',{name:'対局を始める',exact:true}).click()
+  await expect(page.getByRole('alert')).toContainText('本次操作未执行')
+  expect(creates).toBe(1);expect(await saved(page)).toBeNull()
+  await page.unroute('**/api/v1/games')
+  try{
+    await page.getByRole('button',{name:'対局を始める',exact:true}).click()
+    await expect(page.getByTestId('next-event')).toBeVisible();id=(await saved(page)).sessionId
+  }finally{if(id)await request.delete('/api/v1/games/'+id)}
+})
+
+test('known 409 INVALID_STATE synchronizes exactly once without replaying the rejected vote',async({page,request})=>{
+  const id=await start(page)
+  try{
+    await drainEvents(page)
+    const choice=page.locator('.player-row:not(.departed)').getByRole('checkbox').first()
+    await choice.click();await expect(choice).toBeChecked()
+    await expect(page.getByTestId('vote')).toBeEnabled()
+    const before=await read(request,id),local=await saved(page),reads=[];let writes=0
+    page.on('request',req=>{if(req.method()==='GET'&&new URL(req.url()).pathname==='/api/v1/games/'+id)reads.push(req.url())})
+    await page.route('**/votes',route=>{writes++;return route.fulfill({status:409,contentType:'application/json',body:errorBody('INVALID_STATE')})})
+    await page.getByTestId('vote').click()
+    await expect(page.getByRole('alert')).toContainText('已重新同步')
+    expect(writes).toBe(1);expect(reads).toHaveLength(1)
+    expect(await saved(page)).toEqual(local);expect(await read(request,id)).toEqual(before)
+  }finally{await request.delete('/api/v1/games/'+id)}
+})
+
 for(const [status,code] of [[400,'HTTP_ERROR'],[400,'OTHER'],[409,'STALE_REVISION'],[404,'HTTP_ERROR']]){
   test(`GET ${status}/${code} never rewinds or retries and locks stale decisions`,async({page,request})=>{
     const id=await start(page)
