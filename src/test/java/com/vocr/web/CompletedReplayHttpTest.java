@@ -32,6 +32,74 @@ class CompletedReplayHttpTest {
     }
     private JsonNode get(GuestGameServer server,String path) throws Exception { return json.readTree(request(server,"GET",path,null).body()); }
 
+    // Independent sessions start/export at different wall-clock instants. Validate
+    // both clocks, then normalize exactly those two non-game fields. Keep every
+    // other record byte and metadata value in the strict whole-tree comparison.
+    private JsonNode withoutWallClock(JsonNode source) {
+        assertTrue(source.isObject());
+        var copy=(com.fasterxml.jackson.databind.node.ObjectNode)source.deepCopy();
+        assertTrue(copy.path("saveTime").isTextual());
+        assertDoesNotThrow(() -> java.time.LocalDateTime.parse(copy.path("saveTime").asText(),
+                java.time.format.DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss")
+                        .withResolverStyle(java.time.format.ResolverStyle.STRICT)));
+        assertTrue(copy.path("rawRecords").isArray());
+        var raw=(com.fasterxml.jackson.databind.node.ArrayNode)copy.get("rawRecords");
+        assertTrue(raw.size()>2);
+        String prefix="# Time: ";
+        long headers=0;
+        for (var row:raw) {
+            assertTrue(row.isTextual());
+            if (row.asText().startsWith(prefix)) headers++;
+        }
+        assertEquals(1L,headers);
+        assertTrue(raw.get(2).asText().startsWith(prefix));
+        assertDoesNotThrow(() -> java.time.LocalDateTime.parse(raw.get(2).asText().substring(prefix.length()),
+                java.time.format.DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+                        .withResolverStyle(java.time.format.ResolverStyle.STRICT)));
+        copy.remove("saveTime");
+        raw.set(2,json.getNodeFactory().textNode("# Time: <wall-clock>"));
+        return copy;
+    }
+    private com.fasterxml.jackson.databind.node.ObjectNode clockFixture() {
+        var replay=json.createObjectNode().put("version",3).put("totalEvents",4)
+                .put("saveTime","2026/10/27 12:50:41");
+        replay.putArray("rawRecords").add("# header").add("# title")
+                .add("# Time: 2026-10-27 12:50:39").add("JSON|{\"seed\":1}");
+        return replay;
+    }
+    @Test void replayComparisonAcceptsControlledClockBoundaryButDetectsEveryGameDifference() {
+        var before=clockFixture();var after=before.deepCopy();
+        after.put("saveTime","2026/10/27 12:50:42");
+        ((com.fasterxml.jackson.databind.node.ArrayNode)after.get("rawRecords"))
+                .set(2,json.getNodeFactory().textNode("# Time: 2026-10-27 12:50:40"));
+        var legacyBefore=before.deepCopy();legacyBefore.remove("saveTime");
+        var legacyAfter=after.deepCopy();legacyAfter.remove("saveTime");
+        assertNotEquals(legacyBefore,legacyAfter,"Controlled clock boundary must expose the original comparison defect");
+        assertEquals(withoutWallClock(before),withoutWallClock(after));
+        assertEquals("2026/10/27 12:50:41",before.path("saveTime").asText());
+        assertEquals("# Time: 2026-10-27 12:50:39",before.path("rawRecords").get(2).asText());
+        ((com.fasterxml.jackson.databind.node.ArrayNode)after.get("rawRecords"))
+                .set(3,json.getNodeFactory().textNode("JSON|{\"seed\":2}"));
+        assertNotEquals(withoutWallClock(before),withoutWallClock(after));
+        after=before.deepCopy();after.put("version",2);
+        assertNotEquals(withoutWallClock(before),withoutWallClock(after));
+    }
+    @Test void replayComparisonRejectsMissingDuplicateMovedOrMalformedClockFields() {
+        var missing=clockFixture();missing.remove("saveTime");
+        assertThrows(AssertionError.class,() -> withoutWallClock(missing));
+        var malformed=clockFixture();malformed.put("saveTime","2026/02/30 12:50:41");
+        assertThrows(AssertionError.class,() -> withoutWallClock(malformed));
+        var duplicate=clockFixture();((com.fasterxml.jackson.databind.node.ArrayNode)duplicate.get("rawRecords"))
+                .add("# Time: 2026-10-27 12:50:40");
+        assertThrows(AssertionError.class,() -> withoutWallClock(duplicate));
+        var moved=clockFixture();var raw=(com.fasterxml.jackson.databind.node.ArrayNode)moved.get("rawRecords");
+        raw.set(1,raw.get(2));raw.set(2,json.getNodeFactory().textNode("# title"));
+        assertThrows(AssertionError.class,() -> withoutWallClock(moved));
+        var badHeader=clockFixture();((com.fasterxml.jackson.databind.node.ArrayNode)badHeader.get("rawRecords"))
+                .set(2,json.getNodeFactory().textNode("# Time: 2026-02-30 12:50:39"));
+        assertThrows(AssertionError.class,() -> withoutWallClock(badHeader));
+    }
+
     @ParameterizedTest @EnumSource(value=peiyi.class,names="NONE",mode=EnumSource.Mode.EXCLUDE)
     void finishedReplayMatchesExistingV3WithoutWritingOrChangingAuthority(peiyi config) throws Exception {
         long seed=4200+config.ordinal();
@@ -63,10 +131,8 @@ class CompletedReplayHttpTest {
             assertTrue(file.isArray()); assertEquals(9,file.size());
             for (int i=1;i<9;i++) assertTrue(file.get(i).isNull());
             var expected=json.valueToTree(ReplaySave.fromRecords(0,direct.completedReplay(cursor).records()));
-            ((com.fasterxml.jackson.databind.node.ObjectNode)expected).remove("saveTime");
             var actual=file.get(0).deepCopy();
-            ((com.fasterxml.jackson.databind.node.ObjectNode)actual).remove("saveTime");
-            assertEquals(expected,actual);
+            assertEquals(withoutWallClock(expected),withoutWallClock(actual));
             assertEquals(3,actual.path("version").asInt());
             assertFalse(response.body().contains(path.substring(path.lastIndexOf('/')+1)));
             assertFalse(response.body().contains("sessionId"));

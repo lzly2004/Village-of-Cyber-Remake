@@ -102,3 +102,14 @@ Coder负责实现、验证、CI读取及交接包；用户负责转交独立CR�
 包内三张截图（战绩、Replay、终局）已由Coder目视并登记SHA：可见内容未发现本轮新增异常；Replay横向/弹窗纵向、终局名单内部滚动仍是既有交互，不能把单张截图没展示全部内容当作已验证末项可达。正式布局/字体/日文化对照仍归050/046，CR图像能力限制单列，A06/A07/A08不放行。
 
 原始日志、full-result/summary、runtime-boundary、包检查、截图哈希和保护证明集中于忽略目录`build/web042`；快照完整结果位于`build/verify/20261027T121751Z-ffe79c98/`，包位于快照`build/releases/web042/`。尚未推送/云端CI、Windows原生执行、HTTPS代理、容量100或人工正式验收；不得以本机结果替代云端首审包。
+
+
+### 首次云端失败及必要测试补修
+
+PR #10首次run `40505760373`（head7d787eb、attempt1）失败：Java648项中1项失败，后续java-results/oracle-audit/gate/desktop-exchange四项未执行，发布包未构建或上传。verify artifact为22,727,514字节/SHA `950351aa571e6e135644d212bf837b77d8a3e5d41d8ee4ed563e9ecd1af90a6e`，回执465字节/SHA `7bee5c3f83fb1be65d4795ff7c3473b704b6c9de2563b18ae4b959f10c47db2a`；公开REST元数据与公开ZIP字节一致，仓库下载器复算为failed/exit1，回执绑定正确。未当环境失败直接重试。
+
+逐字段比较失败XML的expected/actual：**唯一差异是`$.rawRecords[2]`**，分别`# Time: 2026-10-27 12:50:39`和`12:50:40`；其余JSON值完全相同。`GameRecorder`在两个独立会话开始时写真实秒时钟，而旧`CompletedReplayHttpTest`只排除了导出`saveTime`，误把录制时间头当确定性内容；这是既有测试前提缺口，不是042构建改变游戏结果。
+
+按用户本轮“必要CI补修复验”授权，仅修改该测试：先严格校验saveTime及唯一、固定第2索引的Time头格式，再归一化这两个时钟字段，其他全部记录字节/结构仍做整树相等。新增两个受控用例证明不同秒时旧比较必不等、新比较可通过，seed/版本变化仍不等；缺失、非法日期、重复/移位时间头均拒绝。不修改生产时钟、录像格式、超时、黄金或随机源，不加sleep。
+
+最终本机定向`test --tests com.vocr.web.CompletedReplayHttpTest --offline --rerun-tasks`为10/10（0失败/错误/跳过），经原安全入口运行。此次没有额外重跑本机全量；上文648/200/180/15及本机ZIP仍对应原快照，不冒充补修后全量。Java指纹因测试源变化须更新，下一次云端full会重生成并核对最终oracle；其真实结果与新增head见PR首审包，不预报通过。
