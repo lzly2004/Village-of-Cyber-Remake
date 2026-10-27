@@ -14,12 +14,20 @@ test('recovery requires exact status/code AND operation; unknown replies never p
     [503,'HTTP_ERROR','create','unknown'], [500,'INTERNAL_ERROR','write','unknown'],
     [413,'HTTP_ERROR','write','rejected'], [415,'JSON_REQUIRED','create','rejected'],
     [429,'HTTP_ERROR','write','unknown'], [200,'INVALID_REQUEST','write','unknown'],
+    [429,'REQUEST_LIMIT','read','limited'], [429,'REQUEST_LIMIT','write','limited'],
+    [429,'REQUEST_LIMIT','create','limited'], [503,'REQUEST_LIMIT','write','unknown'],
     [401,'INVALID_REQUEST','write','unknown'], [400,'toString','write','unknown'],
   ]
   for (const [status,code,operation,want] of cases)
     assert.equal(recoveryKind(new ApiError(status,{code}),operation),want,`${status}/${code}/${operation}`)
   for(const value of [new Error('offline'),null,{status:400,code:'INVALID_REQUEST'}])
     assert.equal(recoveryKind(value,'write'),'unknown')
+})
+
+test('rate-limit classification never trusts a non-ApiError or a lookalike code', () => {
+  assert.equal(recoveryKind({status:429,code:'REQUEST_LIMIT'},'write'),'unknown')
+  for(const code of ['REQUEST_LIMIT ', 'REQUEST_LIMITED', 'toString', 'HTTP_ERROR'])
+    assert.equal(recoveryKind(new ApiError(429,{code}),'write'),'unknown')
 })
 
 test('malformed business envelopes cannot masquerade as a known code', () => {

@@ -122,7 +122,12 @@ export function useGuestGame() {
   async function handleError(error, operation) {
     if (error instanceof ReadFailure) { error = error.cause; operation = 'read' }
     const kind = recoveryKind(error, operation)
-    if (kind === 'expired') {
+    if (kind === 'limited') {
+      if (operation === 'read') uncertain.value = Boolean(sessionId.value)
+      notice.value = operation === 'read'
+        ? '读取暂被限流，已保留本局与确认游标；请稍后主动重新同步。'
+        : '请求暂被限流，本次操作未执行。请稍后主动重试，不会自动重发。'
+    } else if (kind === 'expired') {
       forget()
       notice.value = '这局游戏已失效，可能是闲置过期、达到最长时限、服务重启或会话已被释放。请选择配役重新开局。'
     } else if (kind === 'capacity') {

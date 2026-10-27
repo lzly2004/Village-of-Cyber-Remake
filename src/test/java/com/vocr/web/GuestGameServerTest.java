@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,6 +32,7 @@ class GuestGameServerTest
     private final ObjectMapper json = new ObjectMapper();
     private final HttpClient client = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(5)).build();
+    private AtomicLong pacedRequestClock;
 
     @ParameterizedTest
     @EnumSource(value = peiyi.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
@@ -815,7 +817,11 @@ class GuestGameServerTest
     @org.junit.jupiter.params.provider.MethodSource("claimedSkillConfigurations")
     void claimedSkillSelections_shouldMatchDirectAndComposeWithAllSelections(peiyi configuration, SelectionType type, long seed) throws Exception
     {
-        try (GuestGameServer server = new GuestGameServer(id -> SeededGuestSession.create(id, seed), 2).start(0))
+        // This deterministic contract journey sends hundreds of sequential requests as fast as the CPU permits.
+        // Advance admission time by 10ms per request; retain production limits and all response assertions.
+        pacedRequestClock = new AtomicLong();
+        try (GuestGameServer server = new GuestGameServer(id -> SeededGuestSession.create(id, seed), 2,
+                pacedRequestClock::get, Duration.ofMinutes(30), Duration.ofHours(24)).start(0))
         {
             GameSession direct = SeededGuestSession.create("claimed-direct", seed);
             direct.startGame(new StartGameCommand(0, configuration));
@@ -928,8 +934,11 @@ class GuestGameServerTest
         GuestWireContract.assertUpdate(actual);
         assertEquals(command.expectedRevision() + 1, expected.revision());
         assertTrue(expected.events().isEmpty());
-        for (int repeat = 0; repeat < 2; repeat++)
-            assertEquals(actual, json.readTree(request(server, "GET", path + "?eventCursor=" + cursor, null).body()));
+        for (int repeat = 0; repeat < 2; repeat++) {
+            var repeated = request(server, "GET", path + "?eventCursor=" + cursor, null);
+            assertEquals(200, repeated.statusCode(), repeated.body());
+            assertEquals(actual, json.readTree(repeated.body()));
+        }
         return expected;
     }
 
@@ -1105,6 +1114,7 @@ class GuestGameServerTest
     private HttpResponse<String> request(GuestGameServer server, String method,
                                          String path, Object body) throws Exception
     {
+        if (pacedRequestClock != null) pacedRequestClock.addAndGet(Duration.ofMillis(10).toNanos());
         return raw(server, method, path, body == null ? null : json.writeValueAsString(body));
     }
 

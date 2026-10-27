@@ -31,6 +31,8 @@ WEB-014例外：用户明确批准AUDIT-SEC-001，在v1正式上线前直接修�
 | PUT `/{id}/target-selections` | expectedRevision, type, target, selected | 200 GameUpdate | DIVINATION/GUARD 已实现；SetAllTargetSelectionCommand；VOTE 保持原路径 | 010、011 |
 | PUT `/{id}/claimed-target-selections` | expectedRevision, type, claimedPlayer, target, selected | 200 GameUpdate | 已实现；SetClaimedRoleTargetSelectionCommand，type 只开放 DIVINATION/GUARD | 012 |
 
+成功状态总规则：仅POST空路径创建返回201，DELETE返回204且无响应体，其余已列成功路由返回200 JSON。代理不得把这些状态改写为统一200或HTML成功页。
+
 ### 参数与动作约束
 
 - configuration：`jianyi/tongchang/yaoohu/kuangxin/beide/maoyou/daxing`；NONE、缺失、null 或未知值无效。玩家编号为局内从 1 开始的正整数，不是角色枚举序号。
@@ -119,7 +121,7 @@ stage 为 `NIGHT_RESULT/DAY_DIALOGUE/AFTERNOON_DIALOGUE/EXECUTION/SETTLEMENT`。
 | 415 JSON_REQUIRED | 请求体媒体类型拒绝 | 纠正请求 Content-Type |
 | 503 SESSION_LIMIT | **本服务**创建前容量拒绝，未新建对局 | 确定性拒绝，不置“操作可能完成”的 uncertain；提示稍后手动再试/释放可控旧会话 |
 | 500 INTERNAL_ERROR | 核心、结果写入、响应序列化等未知阶段失败 | 写请求可能已有副作用；禁止自动重放，已有 sessionId 时先同步确认 |
-| 429（待 WEB-041 定稿 code） | 将来限流的扩展点，当前未实现 | 仅在明确为执行前限流且有稳定错误码/测试时按确定拒绝；不凭任意 429 页面推断 |
+| 429 REQUEST_LIMIT | 041执行前频率/在途名额拒绝，Retry-After为整数秒，无自动重试 | 写/创建明确未执行；读保留凭据/游标、锁旧决策，稍后显式同步；其他429或HTML仍为未知，不凭状态推断 |
 | 无法解析/未知 code、网络中断、超时或代理 5xx | 无可信业务拒绝证据 | 写入结果不确定；与 503 SESSION_LIMIT 区分，不按所有 5xx 一刀切 |
 
 确定性拒绝仅指本请求未执行核心命令，不表示没有其他页面的并发写。框架状态与业务 code 需组合判断；不把任意 404 HTML 当作失效会话，也不把任意 503 当 SESSION_LIMIT。

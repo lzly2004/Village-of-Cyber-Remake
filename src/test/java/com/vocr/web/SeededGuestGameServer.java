@@ -11,7 +11,8 @@ public final class SeededGuestGameServer
     {
         boolean baseline = args.length == 2 && args[1].equals("--release-baseline");
         int port = GuestGameServer.parsePort(baseline ? new String[] { args[0] } : args);
-        // Test-process scope only. Production logging defaults and desktop buttons are NOT changed.
+        // Baseline quiet mode is test-only; GuestGameServer.start also disables private diagnostics in Web.
+        // Desktop defaults and buttons remain unchanged.
         if (baseline) com.vocr.logging.DebugLogger.getInstance().setEnabled(false);
         GuestGameServer server = new GuestGameServer(
                 baseline ? SeededGuestSession::createReleaseBaseline
