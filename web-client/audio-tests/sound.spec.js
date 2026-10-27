@@ -23,7 +23,7 @@ async function setup(page,{snapshot=publicSnapshot(),settings,denied=false}={}) 
     URL.createObjectURL=blob=>{const url=create(blob);p.urls.push(url);return url}
     URL.revokeObjectURL=url=>{p.revoked.push(url);revoke(url)}
   },{key,settings,denied})
-  await page.route('**/api/v1/games',r=>r.fulfill({json:{sessionId:id,update:snapshot}}))
+  await page.route('**/api/v1/games',r=>r.fulfill({status:201,json:{sessionId:id,update:snapshot}}))
   await page.route('**/api/v1/games/'+id+'?**',r=>{
     const cursor=Number(new URL(r.request().url()).searchParams.get('eventCursor')||0)
     return r.fulfill({json:{...snapshot,eventCursor:cursor,events:snapshot.events.slice(cursor),presentedEvents:snapshot.presentedEvents.slice(cursor)}})

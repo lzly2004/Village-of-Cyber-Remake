@@ -51,7 +51,7 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
   snapshot.events = [event]; snapshot.presentedEvents = [{ stage: 'DAY_DIALOGUE', event }]; snapshot.nextEventCursor = 1
   const imageMapping = JSON.parse(readFileSync(new URL('../../src/main/resources/config/event_image_mapping.json', import.meta.url), 'utf8'))
   const stageFiles = ['images/haikei3.png', 'images/' + imageMapping.Abel.zco7.default]
-  await page.route('**/api/v1/games', route => route.fulfill({json:{
+  await page.route('**/api/v1/games', route => route.fulfill({status:201,json:{
     sessionId: '00000000-0000-4000-8000-000000000023', update: snapshot,
   }}))
   await page.goto('/')

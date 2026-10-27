@@ -1,5 +1,6 @@
 import { computed, onMounted, ref, shallowRef, watch } from 'vue'
 import { ApiError, request } from './api'
+import { ReadFailure, recoveryKind, requireUpdate, validCredential } from './requestRecovery.js'
 import { mergePresentationHistory } from './eventArtwork.js'
 
 export const STORAGE_KEY = 'vocr.guest.v1'
@@ -84,15 +85,22 @@ export function useGuestGame() {
 
   async function sync() {
     if (!sessionId.value) return
-    let snapshot
+    let snapshot, nextCursor = cursor.value
     try {
-      snapshot = await request('/' + sessionId.value + '?eventCursor=' + cursor.value)
+      try {
+        snapshot = await request('/' + sessionId.value + '?eventCursor=' + nextCursor)
+      } catch (error) {
+        if (recoveryKind(error, 'read') !== 'cursor' || nextCursor === 0) throw error
+        // Only this route's documented business cursor rejection permits one C=0 read.
+        snapshot = await request('/' + sessionId.value + '?eventCursor=0')
+        nextCursor = 0
+      }
+      requireUpdate(snapshot)
+      if (snapshot.eventCursor !== nextCursor) throw new Error('续读窗口与请求不一致')
     } catch (error) {
-      if (!(error instanceof ApiError) || error.status !== 400) throw error
-      // 损坏或超出范围的本地游标从头恢复，确保不丢事件。
-      snapshot = await request('/' + sessionId.value + '?eventCursor=0')
-      cursor.value = 0
+      throw new ReadFailure(error)
     }
+    cursor.value = nextCursor
     update.value = snapshot
     rememberPresentation(snapshot)
     uncertain.value = false
@@ -100,6 +108,7 @@ export function useGuestGame() {
   }
 
   async function accept(snapshot) {
+    requireUpdate(snapshot)
     // 命令窗口若晚于已确认游标，先补读其间事件，不能跳过未展示内容。
     if (snapshot.eventCursor > cursor.value || snapshot.nextEventCursor < cursor.value) {
       await sync()
@@ -110,27 +119,35 @@ export function useGuestGame() {
     }
   }
 
-  async function handleError(error) {
-    if (error instanceof ApiError && error.status === 404 && error.code === 'GAME_NOT_FOUND') {
+  async function handleError(error, operation) {
+    if (error instanceof ReadFailure) { error = error.cause; operation = 'read' }
+    const kind = recoveryKind(error, operation)
+    if (kind === 'expired') {
       forget()
       notice.value = '这局游戏已失效，可能是闲置过期、达到最长时限、服务重启或会话已被释放。请选择配役重新开局。'
-    } else if (error instanceof ApiError && error.status === 503 && error.code === 'SESSION_LIMIT') {
+    } else if (kind === 'capacity') {
       notice.value = '游客会话已达上限，请稍后重试或释放你持有的旧对局。未创建新局。'
-    } else if (error instanceof ApiError && error.status === 409) {
+    } else if (kind === 'sync') {
       await sync()
       notice.value = '对局状态已更新，已重新同步。请查看最新事件与选择后再操作。'
-    } else if (error instanceof ApiError && error.status < 500) {
+    } else if (kind === 'rejected') {
       notice.value = error.message
-    } else if (!sessionId.value) {
-      notice.value = error instanceof ApiError
-        ? error.message : '无法连接本机游戏服务，请确认服务已启动后重试。'
+    } else if (operation === 'read') {
+      uncertain.value = Boolean(sessionId.value)
+      notice.value = '暂时无法读取权威状态；已保留本局与确认游标，请重新同步后继续。'
+        + (error instanceof ApiError ? ' ' + error.message : '')
+    } else if (operation === 'create') {
+      uncertain.value = true
+      notice.value = sessionId.value
+        ? '开局状态未能确认，已保留本局凭据。请重新同步后继续，不会自动重试开局。'
+        : '开局响应未能确认，服务器可能已创建对局，但未取得可恢复的凭据。不会自动重试；你可以主动重新开局，孤儿局将按时限回收。'
     } else {
       uncertain.value = Boolean(sessionId.value)
       notice.value = '连接未能确认，操作可能已在服务器完成。请重新同步后继续。'
     }
   }
 
-  async function run(action) {
+  async function run(action, operation = 'write') {
     if (busy.value) return
     busy.value = true
     notice.value = ''
@@ -138,8 +155,9 @@ export function useGuestGame() {
       await action()
     } catch (error) {
       try {
-        await handleError(error)
+        await handleError(error, operation)
       } catch (syncError) {
+        if (syncError instanceof ReadFailure) syncError = syncError.cause
         if (syncError instanceof ApiError && syncError.status === 404 && syncError.code === 'GAME_NOT_FOUND') {
           forget()
           notice.value = '对局已失效，请重新开局。'
@@ -154,15 +172,20 @@ export function useGuestGame() {
   }
 
   function start(configuration) {
+    if (sessionId.value) return
     return run(async () => {
       const created = await request('', { method: 'POST', body: { configuration } })
+      if (!validCredential(created?.sessionId)) throw new Error('开局凭据无法确认')
       sessionId.value = created.sessionId
       cursor.value = 0
+      persist()
+      requireUpdate(created.update)
+      if (created.update.eventCursor !== 0) throw new Error('开局事件窗口无法确认')
       update.value = created.update
       rememberPresentation(created.update)
       uncertain.value = false
       persist()
-    })
+    }, 'create')
   }
 
   function nextEvent() {
@@ -191,6 +214,7 @@ export function useGuestGame() {
           candidates: action.candidates,
         },
       })
+      if (typeof result?.voteCompleted !== 'boolean') throw new Error('投票响应无法确认')
       await accept(result.update)
       if (!result.voteCompleted) notice.value = '投票被回避 CO 中断。读完新发言后，请重新确认投票目标。'
     })
@@ -239,7 +263,7 @@ export function useGuestGame() {
     })
   }
 
-  function refresh() { return run(sync) }
+  function refresh() { return run(sync, 'read') }
 
   function setAvoidance(enabled) {
     if (!canDecide.value) return
@@ -277,7 +301,7 @@ export function useGuestGame() {
   onMounted(() => {
     try {
       const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null')
-      if (saved && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(saved.sessionId)
+      if (saved && validCredential(saved.sessionId)
           && Number.isSafeInteger(saved.eventCursor) && saved.eventCursor >= 0) {
         sessionId.value = saved.sessionId
         cursor.value = saved.eventCursor
