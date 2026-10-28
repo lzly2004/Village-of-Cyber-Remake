@@ -66,3 +66,5 @@ CI配置及CI辅助工具变动默认为full，包含ci-tests（事件SHA/缓存
 WEB-038增加独立production-smoke到full计划（21项，含内部检查），在默认浏览器退出后、Java全量开始前串行运行；配置拒绝种子服务器override，使用本轮生产构建。截图位于build/verify/production-browser，被现有CI证据收集覆盖。该套件不自动加入docs/tooling/frontend：控制每次前端改动的验收成本，代价是仅生产preview入口出现的回归可能到下一次full才暴露；这是有意的覆盖取舍，不表示frontend已经覆盖生产入口。该套件不替代七配役确定性门或人工门槛，详见[038记录](web-038-verification.md)。
 
 WEB-042将full从21项增为22项，追加release-tests；java-full在同一安全入口执行`fatJar prepareWebRuntime --offline --rerun-tasks`。成功web-build绑定全部dist文件大小/SHA，成功java-full绑定运行时stamp。统一发布编排只消费同次full结果，随后校验/解包并实际运行发布包；CI full自动追加，其他层明确not_built。包内冒烟不是22项中重复的一项，失败仍使CI失败，详见[发布包契约](web-build-release.md)。
+
+WEB-043 将 full 从 22 增至 24 项，新增 hosting-tests 与 hosting-smoke，后者在原生产/兼容/桌面交换退出后串行启动实际 Caddy + runWeb。CI 按 tools/hosting-toolchain.json 固定归档及二进制 SHA，记录工具版本；证书仅在 build/hosting-private，artifact 仍只采集 build/verify 等既有公开证据目录。旧 042 的22项发布声明保持只读兼容，新组包必须包含同次24项结果；docs/tooling/frontend不自动增加实际托管测试。见 [043操作与限制](web-localhost-hosting.md)。

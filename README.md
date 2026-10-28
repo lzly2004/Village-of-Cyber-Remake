@@ -64,6 +64,11 @@ WEB-042 提供独立服务端 JAR/classpath、前端静态文件、概率配置�
 本机执行须先取得该轮全量/打包授权，并满足 Linux 安全入口与内存条件，见
 [构建与发布包契约](docs/web-build-release.md)。CI 的发布二进制与轻量验证证据分开上传；不能只凭测试绿灯运行未核对的 ZIP。
 
+## Localhost HTTPS 托管
+
+WEB-043 使用固定 Caddy 在 IPv4 回环提供 HTTPS、静态文件及同源 API；不改系统信任、不监听公网。
+从核验过的 ZIP 准备、证书限制及后续域名切换见 [本地托管说明](docs/web-localhost-hosting.md)。
+
 ## 目录说明
 
 - `src/main/java/com/vocr/app/`：程序入口与应用装配

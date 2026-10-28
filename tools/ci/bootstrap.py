@@ -162,6 +162,15 @@ def main():
             env['FFMPEG'] = str(ffmpeg)
             report['ffmpeg_sha256'] = digest(ffmpeg)
             report['pillow'] = PIL.__version__
+        if os.environ.get('CI_NEEDS_HOSTING') == 'true':
+            import importlib.util
+            spec = importlib.util.spec_from_file_location('ci_hosting', ROOT / 'tools/web_hosting.py')
+            hosting = importlib.util.module_from_spec(spec); spec.loader.exec_module(hosting)
+            binary = hosting.install(downloads / ('caddy-' + json.loads(hosting.LOCK.read_text())['version']))
+            env['VOCR_CADDY'] = str(binary)
+            report['caddy_version'] = json.loads(hosting.LOCK.read_text())['version']
+            report['caddy_sha256'] = digest(binary)
+            report['hosting_toolchain_sha256'] = digest(hosting.LOCK)
         append_environment(Path(os.environ['GITHUB_ENV']), env)
         (directory / 'tools.json').write_text(json.dumps(report, indent=2) + '\n')
         return 0

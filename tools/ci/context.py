@@ -71,9 +71,10 @@ def resolve(event, name, environment, git_read):
 def flags(plan):
     ids = {s['id'] for s in plan['suites']}
     return {'CI_NEEDS_LFS': plan['requires_lfs'],
-            'CI_NEEDS_JAVA': bool(ids & {'java-full', 'oracle-generate', 'gate', 'files-repeat', 'default-e2e', 'production-smoke', 'desktop-exchange'}),
-            'CI_NEEDS_NODE': bool(ids & {'frontend-unit', 'exchange-contract', 'web-build', 'assets', 'audio', 'files-repeat', 'default-e2e', 'production-smoke', 'gate', 'desktop-exchange'}),
-            'CI_NEEDS_BROWSER': bool(ids & {'assets', 'audio', 'files-repeat', 'default-e2e', 'production-smoke', 'gate', 'desktop-exchange'}),
+            'CI_NEEDS_HOSTING': 'hosting-smoke' in ids,
+            'CI_NEEDS_JAVA': bool(ids & {'java-full', 'oracle-generate', 'gate', 'files-repeat', 'default-e2e', 'production-smoke', 'desktop-exchange', 'hosting-smoke'}),
+            'CI_NEEDS_NODE': bool(ids & {'frontend-unit', 'exchange-contract', 'web-build', 'assets', 'audio', 'files-repeat', 'default-e2e', 'production-smoke', 'gate', 'desktop-exchange', 'hosting-smoke'}),
+            'CI_NEEDS_BROWSER': bool(ids & {'assets', 'audio', 'files-repeat', 'default-e2e', 'production-smoke', 'gate', 'desktop-exchange', 'hosting-smoke'}),
             'CI_NEEDS_PIP': bool(ids & {'ci-tests', 'image-tool-tests', 'audio-tool-tests', 'web-build'})}
 
 

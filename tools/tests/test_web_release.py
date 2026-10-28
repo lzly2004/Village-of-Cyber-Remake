@@ -90,6 +90,20 @@ class ReleaseTest(unittest.TestCase):
                 cli.build(self.result_file,output)
             self.assertFalse(output.exists())
 
+    def test_reader_accepts_old_042_declaration_but_new_builder_requires_hosting_suites(self):
+        archive=self.build();files=R.read_archive(archive)
+        manifest=R.load_json(files['release-manifest.json'])
+        manifest['verification']['suites']=[{'id':n,'status':'passed'} for n in R.LEGACY_REQUIRED_SUITES]
+        files['release-manifest.json']=(json.dumps(manifest,ensure_ascii=False,sort_keys=True,indent=2)+'\n').encode()
+        files['SHA256SUMS']=''.join(R.sha(b)+'  '+n+'\n' for n,b in sorted(files.items()) if n!='SHA256SUMS').encode()
+        old=self.root/'old.zip'
+        with zipfile.ZipFile(old,'w') as z:
+            for n,b in files.items():z.writestr(n,b)
+        self.assertEqual(manifest,R.check_release(old))
+        self.result['plan']['suites']=[{'id':n} for n in R.LEGACY_REQUIRED_SUITES]
+        self.result['suites']=[x for x in self.result['suites'] if x['id'] in R.LEGACY_REQUIRED_SUITES];self.save_result()
+        with self.assertRaisesRegex(ValueError,'INCOMPLETE_VERIFICATION'):self.build('missing-hosting')
+
     def test_valid_archive_is_deterministic_and_binds_source_config_and_verified_result(self):
         a=self.build();b=self.build('other');self.assertEqual(R.hash_file(a),R.hash_file(b))
         v=R.check_release(a);self.assertEqual(self.head,v['source']['sha']);self.assertEqual(R.hash_file(self.result_file),v['verification']['resultSha256'])

@@ -86,7 +86,7 @@ jobs:
           path: |
             build/ci/downloads
             build/ci/gradle-home/caches/modules-2
-          key: tools-${{ runner.os }}-${{ hashFiles('tools/ci/toolchain.json', 'build.gradle', 'settings.gradle', 'gradle.properties') }}
+          key: tools-${{ runner.os }}-${{ hashFiles('tools/ci/toolchain.json', 'tools/hosting-toolchain.json', 'build.gradle', 'settings.gradle', 'gradle.properties') }}
 
       - name: Install hashed CI-only Python tools
         if: env.CI_NEEDS_PIP == 'true'
