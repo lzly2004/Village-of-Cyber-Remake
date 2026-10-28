@@ -19,10 +19,11 @@ MAX_ARCHIVE=192*MIB
 MAX_FILES=20000
 BUDGET={'static':100*MIB,'code':MIB,'gzip':512*1024,'images':32*MIB,'singleImage':512*1024,
         'bgm':64*MIB,'singleBgm':5*MIB,'sounds':MIB,'text':MIB}
-REQUIRED_SUITES=('diff-check','guarded-tests','audit-tests','verify-tests','ci-tests','release-tests',
+LEGACY_REQUIRED_SUITES=('diff-check','guarded-tests','audit-tests','verify-tests','ci-tests','release-tests',
                  'image-tool-tests','audio-tool-tests','exchange-contract','frontend-unit','web-build',
                  'assets','audio','files-repeat','default-e2e','production-smoke','browser-file',
                  'java-full','java-results','oracle-audit','gate','desktop-exchange')
+REQUIRED_SUITES=LEGACY_REQUIRED_SUITES[:6]+('hosting-tests',)+LEGACY_REQUIRED_SUITES[6:]+('hosting-smoke',)
 INTERNAL={'browser-file','java-results','oracle-audit'}
 HEX=re.compile(r'[0-9a-f]{64}\Z')
 
@@ -288,7 +289,7 @@ def check_release(archive):
     stamp=load_json(files['metadata/runtime-build.json']);require(stamp['sourceSha']==manifest['source']['sha'],'RUNTIME_MANIFEST_SOURCE_MISMATCH')
     actual={n[len('backend/'):]:sha(b) for n,b in files.items() if n=='backend/server.jar' or n.startswith('backend/lib/')}
     require(stamp['files']==actual and stamp['sourceFiles']['config/probability.json']==sha(files['config/probability.json']),'RUNTIME_MANIFEST_FILES_MISMATCH')
-    require(manifest['verification']['status']=='passed' and manifest['verification']['suites']==[{'id':n,'status':'passed'} for n in REQUIRED_SUITES],'VERIFICATION_DECLARATION_MISMATCH')
+    require(manifest['verification']['status']=='passed' and manifest['verification']['suites'] in [[{'id':n,'status':'passed'} for n in sequence] for sequence in (LEGACY_REQUIRED_SUITES,REQUIRED_SUITES)],'VERIFICATION_DECLARATION_MISMATCH')
     return manifest
 
 

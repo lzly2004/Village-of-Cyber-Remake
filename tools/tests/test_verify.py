@@ -96,7 +96,9 @@ class VerifyTest(unittest.TestCase):
 
     def test_full_plan_requires_release_tests_and_fresh_runtime_stamp_from_same_java_command(self):
         planned=VERIFY.plan([],True)
-        self.assertEqual(22,len(planned['suites']))
+        self.assertEqual(24,len(planned['suites']))
+        self.assertIn('hosting-smoke',[x['id'] for x in planned['suites']])
+        self.assertIn('hosting-tests',[x['id'] for x in planned['suites']])
         self.assertIn('release-tests',[x['id'] for x in planned['suites']])
         self.assertIn('prepareWebRuntime',VERIFY.COMMANDS['java-full'])
         code,result,saved=self.run_result(['java-full'])

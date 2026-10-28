@@ -113,3 +113,9 @@ PR #10首次run `40505760373`（head7d787eb、attempt1）失败：Java648项中1
 按用户本轮“必要CI补修复验”授权，仅修改该测试：先严格校验saveTime及唯一、固定第2索引的Time头格式，再归一化这两个时钟字段，其他全部记录字节/结构仍做整树相等。新增两个受控用例证明不同秒时旧比较必不等、新比较可通过，seed/版本变化仍不等；缺失、非法日期、重复/移位时间头均拒绝。不修改生产时钟、录像格式、超时、黄金或随机源，不加sleep。
 
 最终本机定向`test --tests com.vocr.web.CompletedReplayHttpTest --offline --rerun-tasks`为10/10（0失败/错误/跳过），经原安全入口运行。此次没有额外重跑本机全量；上文648/200/180/15及本机ZIP仍对应原快照，不冒充补修后全量。Java指纹因测试源变化须更新，下一次云端full会重生成并核对最终oracle；其真实结果与新增head见PR首审包，不预报通过。
+
+## WEB-043 托管与后续验证基线
+
+042 的历史22项与已发包仍可只读校验；043起新组包须消费同次 full24项（原22项加 hosting-tests/hosting-smoke），包内实际冒烟继续独立执行，不替换任何原检查。运行包格式与启动器不变，Caddy为固定的外部用户目录工具，不混入桌面JAR或重复素材。解包托管操作见 [043](web-localhost-hosting.md)。
+
+manifest 中 Java 版本/依赖字段是声明性元数据；逐文件 SHA 只证明当前包内字节一致。源码关联由 runtime stamp、统一 result 与最终输入审计、外部 artifact/回执绑定共同提供，不能把可编辑 JSON 字段当作独立可信来源证明。Windows run.cmd 端口校验与 run.sh 对齐仍为045候选，原生 Windows 尚未验收。

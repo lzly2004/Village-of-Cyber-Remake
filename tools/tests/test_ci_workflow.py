@@ -122,6 +122,22 @@ class ContextTest(unittest.TestCase):
         self.assertIn('reuseExistingServer: false', config)
         self.assertIn('../build/verify/production-browser', config)
 
+    def test_hosting_requires_actual_browser_java_pinned_tool_and_keeps_keys_outside_artifacts(self):
+        flags=CONTEXT.flags({'suites':[{'id':'hosting-smoke'}],'requires_lfs':True})
+        for key in ('CI_NEEDS_HOSTING','CI_NEEDS_JAVA','CI_NEEDS_NODE','CI_NEEDS_BROWSER'):self.assertTrue(flags[key])
+        self.assertFalse(CONTEXT.flags({'suites':[{'id':'hosting-tests'}],'requires_lfs':False})['CI_NEEDS_HOSTING'])
+        config=(ROOT/'tools/playwright.hosting.config.mjs').read_text()
+        self.assertIn('ignoreHTTPSErrors:false',config);self.assertIn('--ignore-certificate-errors-spki-list=',config)
+        self.assertNotIn("'--ignore-certificate-errors'",config)
+        self.assertIn('run-gradle-safe.sh runWeb --args=17075 --offline',config)
+        self.assertIn('HOSTING_SERVER_OVERRIDE_FORBIDDEN',config)
+        self.assertIn('build/hosting-private/',config)
+        workflow=(ROOT/'.github/workflows/verify.yml').read_text()
+        self.assertIn('tools/hosting-toolchain.json',workflow)
+        uploads=[x for x in FLOW['jobs']['verify']['steps'] if 'upload-artifact' in x.get('uses','')]
+        self.assertTrue(uploads)
+        for upload in uploads:self.assertNotIn('hosting-private',upload['with']['path'])
+
     def test_scope_flags_skip_heavy_tools_for_docs_and_require_full_chain_for_ci(self):
         docs = CONTEXT.flags(CONTEXT.VERIFY.plan(['docs/guide.md']))
         self.assertFalse(any(docs.values()))

@@ -27,6 +27,7 @@
       "verify-tests",
       "ci-tests",
       "release-tests",
+      "hosting-tests",
       "image-tool-tests",
       "audio-tool-tests",
       "exchange-contract",
@@ -42,7 +43,8 @@
       "java-results",
       "oracle-audit",
       "gate",
-      "desktop-exchange"
+      "desktop-exchange",
+      "hosting-smoke"
     ]
   },
   "rules": [
@@ -73,6 +75,15 @@
       "tier": "tooling",
       "extra": [
         "release-tests"
+      ]
+    },
+    {
+      "patterns": [
+        "tools/tests/test_web_hosting.py"
+      ],
+      "tier": "tooling",
+      "extra": [
+        "hosting-tests"
       ]
     },
     {
