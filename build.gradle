@@ -1,5 +1,7 @@
 import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
 import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 
 plugins {
     id 'java'
@@ -189,6 +191,73 @@ tasks.register('fatJar', Jar) {
         attributes 'Main-Class': application.mainClass.get()
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// A distinct server classpath: retain shared code, never desktop media or test classes.
+// Dependencies stay in separate JARs so Jetty/service-provider metadata is not flattened.
+tasks.register('webServerJar', Jar) {
+    group = 'build'
+    archiveClassifier = 'web'
+    dependsOn tasks.named('classes'), tasks.named('webClasses')
+    from sourceSets.main.output.classesDirs
+    from sourceSets.web.output.classesDirs
+    manifest { attributes 'Main-Class': 'com.vocr.web.GuestGameServer' }
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
+
+tasks.register('prepareWebRuntime', Sync) {
+    group = 'build'
+    description = '准备独立Web运行classpath；发布入口在完整验证后核对并组包。'
+    dependsOn tasks.named('webServerJar')
+    into layout.buildDirectory.dir('web-runtime')
+    from(tasks.named('webServerJar')) { rename { 'server.jar' } }
+    from(configurations.webRuntimeClasspath) { into 'lib' }
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    doLast {
+        def sha256 = { File f ->
+            def digest = MessageDigest.getInstance('SHA-256')
+            f.withInputStream { stream ->
+                byte[] buffer = new byte[1024 * 1024]
+                int count
+                while ((count = stream.read(buffer)) != -1) digest.update(buffer, 0, count)
+            }
+            digest.digest().encodeHex().toString()
+        }
+        def capture = new ByteArrayOutputStream()
+        exec { commandLine 'git', 'rev-parse', 'HEAD'; standardOutput = capture }
+        String head = capture.toString('UTF-8').trim()
+        if (!(head ==~ /[0-9a-f]{40}/)) throw new GradleException('Invalid source SHA')
+        def sources = fileTree('src/main/java') { include '**/*.java' }.files +
+                fileTree('src/web/java') { include '**/*.java' }.files +
+                [file('build.gradle'), file('settings.gradle'), file('gradle.properties'), file('config/probability.json')]
+        def sourceHashes = sources.sort { it.path }.collectEntries {
+            [(rootDir.toPath().relativize(it.toPath()).toString().replace('\\', '/')): sha256(it)]
+        }
+        File output = layout.buildDirectory.dir('web-runtime').get().asFile
+        def jars = fileTree(output) { include '**/*.jar' }.files.sort { it.path }.collectEntries {
+            [(output.toPath().relativize(it.toPath()).toString().replace('\\', '/')): sha256(it)]
+        }
+        new File(output, 'runtime-build.json').setText(JsonOutput.prettyPrint(JsonOutput.toJson([
+                schema: 1, sourceSha: head, javaVersion: System.getProperty('java.version'),
+                gradleVersion: gradle.gradleVersion, sourceFiles: sourceHashes, files: jars
+        ])) + '\n', 'UTF-8')
+    }
+}
+
+tasks.register('runPackagedWeb', Exec) {
+    group = 'verification'
+    description = '只在build内运行已校验解包的Web启动脚本，沿现有Linux安全入口调用。'
+    doFirst {
+        String value = providers.gradleProperty('vocrReleaseDir').orNull
+        if (!value) throw new GradleException('vocrReleaseDir is required')
+        File release = file(value).canonicalFile
+        if (!release.toPath().startsWith(layout.buildDirectory.get().asFile.canonicalFile.toPath()) ||
+                !new File(release, 'backend/run.sh').isFile()) {
+            throw new GradleException('Packaged verification must use a checked directory inside build')
+        }
+        workingDir release
+        commandLine 'bash', new File(release, 'backend/run.sh').path, '17074'
+    }
 }
 
 distributions {

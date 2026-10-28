@@ -82,6 +82,29 @@ class VerifyTest(unittest.TestCase):
             (directory / name).write_text(json.dumps({'sourceFingerprint': value}))
         return directory
 
+    def test_successful_build_binds_exact_frontend_outputs_and_rejects_links_and_case_collisions(self):
+        self.write('web-client/dist/index.html',b'fixture')
+        self.commit()  # Fixture has no production dist ignore; keep source audit clean.
+        code,result,saved=self.run_result(['web-build'])
+        self.assertEqual(0,code)
+        self.assertEqual({'index.html':{'bytes':7,'sha256':hashlib.sha256(b'fixture').hexdigest()}},saved['suites'][0]['frontend_files'])
+        self.write('web-client/dist/INDEX.html',b'collision')
+        with self.assertRaisesRegex(VERIFY.Refused,'DUPLICATE'):VERIFY.output_inventory(self.root/'web-client/dist')
+        (self.root/'web-client/dist/INDEX.html').unlink()
+        (self.root/'web-client/dist/link').symlink_to(self.root/'docs/guide.md')
+        with self.assertRaisesRegex(VERIFY.Refused,'SYMLINK'):VERIFY.output_inventory(self.root/'web-client/dist')
+
+    def test_full_plan_requires_release_tests_and_fresh_runtime_stamp_from_same_java_command(self):
+        planned=VERIFY.plan([],True)
+        self.assertEqual(22,len(planned['suites']))
+        self.assertIn('release-tests',[x['id'] for x in planned['suites']])
+        self.assertIn('prepareWebRuntime',VERIFY.COMMANDS['java-full'])
+        code,result,saved=self.run_result(['java-full'])
+        self.assertEqual(1,code);self.assertEqual('WEB_RUNTIME_STAMP_MISSING',saved['suites'][0]['error'])
+        stamp=self.write('build/web-runtime/runtime-build.json',b'fixture')
+        code,result,saved=self.run_result(['java-full'])
+        self.assertEqual(0,code);self.assertEqual(hashlib.sha256(stamp.read_bytes()).hexdigest(),saved['suites'][0]['runtime_build_sha256'])
+
     def test_opt_in_progress_is_stderr_json_and_running_entry_is_saved_before_child(self):
         directory = self.root / 'build/progress'
         directory.mkdir(parents=True)

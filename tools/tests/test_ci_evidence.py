@@ -48,8 +48,86 @@ class Fixture:
 
     def report(self,env=None):return E.assemble(self.files.__getitem__,self.files,env or ENV)
 
+    def proof(self,directory,extra=None):
+        p=Path(directory)/'proof.zip'
+        with zipfile.ZipFile(p,'w') as z:
+            for n,b in self.files.items():z.writestr(n,b)
+            if extra:z.writestr(*extra)
+        run={'id':123,'run_attempt':2,'status':'completed','conclusion':'success','head_sha':HEAD,'repository':{'full_name':'owner/repo'}}
+        a={'id':7,'name':'verify-123-2','size_in_bytes':p.stat().st_size,'digest':'sha256:'+E.digest(p.read_bytes()),'expired':False,'workflow_run':{'id':123,'head_sha':HEAD}}
+        return p,run,a
+
+
 
 class EvidenceTest(Fixture, unittest.TestCase):
+    def release_fixture(self):
+        self.result['plan']['tier']='full';self.plan['plan']['tier']='full';self.outcome['release_required']=True;self.sync()
+        log='build/verify/release-smoke-'+('d'*32)+'/packaged-smoke.log';self.files[log]=b'  1 passed (1s)\n'
+        report={'status':'passed','source_sha':HEAD,'archive':{'name':'vocr-web.zip','bytes':123,'sha256':'a'*64},
+                'manifest_sha256':'b'*64,'verification':{'resultSha256':self.outcome['result_sha256']},
+                'packaged_smoke':{'status':'passed','tests':1,'log':log,'sha256':E.digest(self.files[log])}}
+        data=json.dumps(report).encode();self.files['build/ci/web-release.json']=data
+        self.outcome['web_release']={'report':'build/ci/web-release.json','sha256':E.digest(data)}
+        self.files['build/ci/release-upload.json']=json.dumps({'repository':'owner/repo','run_id':'123','attempt':'2',
+            'tested_head':HEAD,'artifact_name':'release-123-2','id':'8','digest':'c'*64,
+            'url':'https://github.com/owner/repo/actions/runs/123/artifacts/8'}).encode();self.sync()
+
+    def test_release_report_and_separate_upload_identity_are_bound_without_binary_in_evidence(self):
+        self.release_fixture();report=self.report();self.assertEqual('passed',report['web_release']['status'])
+        self.assertEqual('8',report['web_release']['artifact']['id']);self.assertNotIn('vocr-web.zip',self.files)
+        self.assertIn('[Separate release artifact]',E.markdown(report))
+        self.files['build/ci/evidence.json']=json.dumps(report).encode()
+        with tempfile.TemporaryDirectory() as t:
+            p,r,a=self.proof(t);value=D.validate(p,r,a,HEAD,'owner/repo');value.pop('download_proof');self.assertEqual(report,value)
+
+    def test_release_upload_failure_after_green_packaging_cannot_pass(self):
+        self.release_fixture();del self.files['build/ci/release-upload.json']
+        report=self.report({**ENV,'CI_JOB_STATUS':'failure'})
+        self.assertEqual('failed',report['status']);self.assertEqual('web-release',report['first_failure']['suite'])
+        self.assertEqual('failed',report['web_release']['status'])
+
+    def test_release_upload_cli_writes_only_separate_identity_and_checks_url(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);(root/'build/ci').mkdir(parents=True)
+            env={**ENV,'GITHUB_ACTIONS':'true','CI_ARTIFACT_ID':'8','CI_ARTIFACT_URL':'https://github.com/owner/repo/actions/runs/123/artifacts/8','CI_ARTIFACT_DIGEST':'c'*64}
+            with patch.object(E,'ROOT',root),patch.dict(os.environ,env,clear=True),patch.object(sys,'argv',['evidence.py','--release-upload']):self.assertEqual(0,E.main())
+            value=json.loads((root/'build/ci/release-upload.json').read_text())
+            self.assertEqual('release-123-2',value['artifact_name']);self.assertEqual(HEAD,value['tested_head'])
+            self.assertFalse((root/'build/ci/receipt.json').exists())
+            with patch.object(E,'ROOT',root),patch.dict(os.environ,{**env,'CI_ARTIFACT_URL':'https://evil/'},clear=True),patch.object(sys,'argv',['evidence.py','--release-upload']):self.assertEqual(1,E.main())
+
+    def test_release_failure_after_green_tests_is_still_failed_and_no_release_can_be_claimed(self):
+        self.release_fixture();self.outcome.update(status='failed',reason='WEB_RELEASE_BUILD_OR_SMOKE_FAILED');self.sync()
+        report=self.report();self.assertEqual('failed',report['status']);self.assertEqual('web-release',report['first_failure']['suite'])
+        self.assertTrue(all(s['status']=='passed' for s in report['suites']))
+
+    def test_release_missing_changed_report_wrong_head_digest_upload_or_incomplete_smoke_is_refused(self):
+        for change in ('missing','hash','head','upload-run','upload-head','upload-url','smoke','smoke-log','smoke-missing'):
+            self.setUp();self.release_fixture()
+            if change=='missing':del self.files['build/ci/release-upload.json']
+            elif change=='hash':self.files['build/ci/web-release.json']+=b' '
+            elif change in ('smoke-log','smoke-missing'):
+                log=json.loads(self.files['build/ci/web-release.json'])['packaged_smoke']['log']
+                if change=='smoke-log':self.files[log]=b'0 passed\n'
+                else:del self.files[log]
+            elif change in ('head','smoke'):
+                value=json.loads(self.files['build/ci/web-release.json'])
+                if change=='head':value['source_sha']=BASE
+                else:value['packaged_smoke']['tests']=0
+                data=json.dumps(value).encode();self.files['build/ci/web-release.json']=data
+                self.outcome['web_release']['sha256']=E.digest(data);self.sync()
+            else:
+                value=json.loads(self.files['build/ci/release-upload.json']);value[{'upload-run':'run_id','upload-head':'tested_head','upload-url':'url'}[change]]='wrong'
+                self.files['build/ci/release-upload.json']=json.dumps(value).encode()
+            with self.subTest(change=change),self.assertRaises(ValueError):self.report()
+
+    def test_nonfull_does_not_publish_and_legacy_four_has_no_release_schema_change(self):
+        self.assertEqual({'status':'not_built','reason':'not_full_tier'},self.report()['web_release'])
+        legacy=E.assemble(self.files.__getitem__,self.files,ENV,assembly_revision=4);self.assertNotIn('web_release',legacy)
+        self.files['build/ci/evidence.json']=json.dumps(legacy).encode()
+        with tempfile.TemporaryDirectory() as t:
+            p,r,a=self.proof(t);value=D.validate(p,r,a,HEAD,'owner/repo');value.pop('download_proof');self.assertEqual(legacy,value)
+
     def test_counts_have_sources_unknown_is_not_zero_and_manual_gates_never_close(self):
         self.result['manual_gates']={'A08':'passed'};self.sync();r=self.report()
         self.assertEqual('passed',r['status']);self.assertIsNone(r['suites'][0]['counts'])
@@ -60,7 +138,7 @@ class EvidenceTest(Fixture, unittest.TestCase):
     def test_not_covered_deduplicates_without_reordering_or_closing_gates(self):
         self.result['not_covered']=['release approval','extra check','release approval','capacity/long game','last check'];self.sync()
         r=self.report()
-        self.assertEqual(4,r['assembly_revision'])
+        self.assertEqual(5,r['assembly_revision'])
         self.assertEqual(['real PR/fork event unless separately evidenced','release approval',
                           'physical output/listening/DPI','capacity/long game','extra check','last check'],r['not_covered'])
         self.assertTrue(all(x=='not_covered' for x in r['manual_gates'].values()))
@@ -189,15 +267,6 @@ class EvidenceTest(Fixture, unittest.TestCase):
 
 
 class DownloadTest(Fixture, unittest.TestCase):
-    def proof(self,directory,extra=None):
-        p=Path(directory)/'proof.zip'
-        with zipfile.ZipFile(p,'w') as z:
-            for n,b in self.files.items():z.writestr(n,b)
-            if extra:z.writestr(*extra)
-        run={'id':123,'run_attempt':2,'status':'completed','conclusion':'success','head_sha':HEAD,'repository':{'full_name':'owner/repo'}}
-        a={'id':7,'name':'verify-123-2','size_in_bytes':p.stat().st_size,'digest':'sha256:'+E.digest(p.read_bytes()),'expired':False,'workflow_run':{'id':123,'head_sha':HEAD}}
-        return p,run,a
-
     def test_preparation_failure_lists_are_stable_without_rewriting_legacy_reports(self):
         files = {'build/ci/context.json': json.dumps(self.context).encode()}
         env = {**ENV, 'CI_JOB_STATUS': 'cancelled'}
@@ -237,7 +306,7 @@ class DownloadTest(Fixture, unittest.TestCase):
             self.files['build/ci/evidence.json']=json.dumps(legacy).encode()
             p,r,a=self.proof(t);value=D.validate(p,r,a,HEAD,'owner/repo')
             value.pop('download_proof');self.assertEqual(legacy,value)
-            for revision in [0,5,True,None,2.0]:
+            for revision in [0,6,True,None,2.0]:
                 self.files['build/ci/evidence.json']=json.dumps({**legacy,'assembly_revision':revision}).encode()
                 p,r,a=self.proof(t)
                 with self.subTest(revision=revision),self.assertRaisesRegex(ValueError,'UNSUPPORTED_ASSEMBLY_REVISION'):

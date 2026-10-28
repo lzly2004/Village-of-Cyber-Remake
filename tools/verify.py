@@ -25,6 +25,7 @@ COMMANDS = {
     'audit-tests': ['python3', '-B', 'tools/tests/test_ci_inputs.py', '-v'],
     'verify-tests': ['python3', '-B', 'tools/tests/test_verify.py', '-v'],
     'ci-tests': ['python3', '-B', 'tools/tests/test_ci_workflow.py', '-v'],
+    'release-tests': ['python3', '-B', 'tools/tests/test_web_release.py', '-v'],
     'image-tool-tests': ['python3', '-B', 'tools/tests/test_web_images.py', '-v'],
     'audio-tool-tests': ['python3', '-B', 'tools/tests/test_web_audio.py', '-v'],
     'exchange-contract': ['node', '--test', 'tools/tests/replay-exchange.test.mjs'],
@@ -36,11 +37,11 @@ COMMANDS = {
     'production-smoke': ['npm', '--prefix', 'web-client', 'run', 'test:e2e', '--', '--config=playwright.production.config.js'],
     'default-e2e': ['npm', '--prefix', 'web-client', 'run', 'test:e2e'],
     'oracle-generate': ['bash', 'tools/run-gradle-safe.sh', 'test', '--tests', 'com.vocr.web.Web017JourneyTest', '--offline', '--rerun-tasks'],
-    'java-full': ['bash', 'tools/run-gradle-safe.sh', 'fatJar', '--offline', '--rerun-tasks'],
+    'java-full': ['bash', 'tools/run-gradle-safe.sh', 'fatJar', 'prepareWebRuntime', '--offline', '--rerun-tasks'],
     'gate': ['npm', '--prefix', 'web-client', 'run', 'test:gate'],
     'desktop-exchange': ['npm', '--prefix', 'web-client', 'run', 'test:e2e', '--', '--config=../tools/playwright.exchange.config.mjs'],
 }
-SEQUENCE = ['diff-check', 'guarded-tests', 'audit-tests', 'verify-tests', 'ci-tests', 'image-tool-tests',
+SEQUENCE = ['diff-check', 'guarded-tests', 'audit-tests', 'verify-tests', 'ci-tests', 'release-tests', 'image-tool-tests',
             'audio-tool-tests', 'exchange-contract', 'frontend-unit', 'web-build', 'assets',
             'audio', 'files-repeat', 'default-e2e', 'production-smoke', 'browser-file', 'java-full', 'java-results',
             'oracle-generate', 'oracle-audit', 'gate', 'desktop-exchange']
@@ -105,7 +106,7 @@ def plan(paths, full=False):
         selected.discard('oracle-generate')  # Full test already regenerates these artifacts.
     return {'tier': tier, 'paths': matches, 'unknown_paths': unknown,
             'requires_full_java_approval': 'java-full' in selected,
-            'requires_lfs': bool(selected - {'diff-check', 'audit-tests', 'verify-tests', 'ci-tests', 'guarded-tests', 'exchange-contract', 'frontend-unit'}),
+            'requires_lfs': bool(selected - {'diff-check', 'audit-tests', 'verify-tests', 'ci-tests', 'release-tests', 'guarded-tests', 'exchange-contract', 'frontend-unit'}),
             'sensitive_paths_requiring_review': [p for p in sorted(set(paths)) if any(g in ('frozen', 'inputs') for g in AUDIT.groups(p))],
             'suites': [{'id': name, 'argv': COMMANDS.get(name), 'internal': name in INTERNAL} for name in SEQUENCE if name in selected],
             'skipped': [{'id': name, 'reason': 'not_triggered_by_changed_paths'} for name in SEQUENCE if name not in selected]}
@@ -192,6 +193,27 @@ def execute(argv, root, env, log):
     return subprocess.run(argv, cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT).returncode
 
 
+def output_inventory(directory):
+    """Bind ignored frontend outputs to this successful build, not merely the current source tree."""
+    if not directory.is_dir() or directory.is_symlink():
+        raise Refused('BUILD_OUTPUT_MISSING')
+    rows = {}
+    seen = set()
+    for file in sorted(directory.rglob('*')):
+        if file.is_symlink():
+            raise Refused('BUILD_OUTPUT_SYMLINK')
+        if file.is_dir():
+            continue
+        path = valid_path(file.relative_to(directory).as_posix())
+        if not file.is_file() or path.casefold() in seen:
+            raise Refused('BUILD_OUTPUT_INVALID_OR_DUPLICATE')
+        seen.add(path.casefold())
+        rows[path] = {'bytes': file.stat().st_size, 'sha256': AUDIT.file_hash(file)}
+    if not rows:
+        raise Refused('BUILD_OUTPUT_EMPTY')
+    return rows
+
+
 def run_suites(root, result, directory, runner=execute, env=None):
     env = dict(os.environ if env is None else env)
     def progress(event, **values):
@@ -237,6 +259,13 @@ def run_suites(root, result, directory, runner=execute, env=None):
                 entry['tail'] = log.read_bytes()[-3000:].decode('utf-8', errors='replace')
                 if code:
                     raise Refused('SUITE_FAILED:' + name)
+                if name == 'web-build':
+                    entry['frontend_files'] = output_inventory(root / 'web-client/dist')
+                if name == 'java-full':
+                    stamp = root / 'build/web-runtime/runtime-build.json'
+                    if not stamp.is_file() or stamp.is_symlink():
+                        raise Refused('WEB_RUNTIME_STAMP_MISSING')
+                    entry['runtime_build_sha256'] = AUDIT.file_hash(stamp)
             entry['status'] = 'passed'
         except (Refused, OSError, ValueError, ET.ParseError) as error:
             entry['status'], entry['error'] = 'failed', str(error)

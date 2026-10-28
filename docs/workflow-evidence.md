@@ -64,3 +64,9 @@ main仍是旧基线，准备分支包含已审长历史。首次真实PR的3文�
 工具环境记录git --version和有效的diff.renameLimit（未显式配置为null，不猜测内置默认值；0保留其真实语义）。只读查询，不修改配置。跨历史区间diff-check以当前CI的Git环境为验收依据；本地不一致时先比版本与重命名配置，保留差异证据，不改门禁或用旧绿灯替代新head。
 
 日常判断与所有异常分叉集中见[工作流指南](workflow-daily-guide.md)；本轮引用对齐、归档同步、保护规则和docs增量实测见[收尾记录](review-6a7af2d.md)。文档只有规则与证据边界，远端保护生效以保存后的实读为准。
+
+## WEB-042：修订5与独立发布二进制
+
+修订5新增web_release状态；full成功必须绑定同次result SHA、报告SHA、包内冒烟成功和独立release artifact id/digest/URL/run/attempt/head；构建/冒烟或上传失败令证据失败。非full为not_built，准备/取消仍不伪造通过。原修订1—4保留精确重算，保存的真实041修订4包已用新代码验证兼容，不表示重跑041。
+
+轻量verify与receipt机制不变；download.py只复算小报告与上传身份，**不会替用户下载或执行独立发布ZIP**，也不放宽原32MiB限制。使用二进制前必须核对外层GitHub artifact digest、内层ZIP SHA/大小和manifest，再运行只读check；交接分别注明元数据/二进制实际核验范围。完整契约见[WEB-042](web-build-release.md)。
