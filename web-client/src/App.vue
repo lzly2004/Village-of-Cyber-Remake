@@ -15,6 +15,7 @@ import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
 import { sceneArtwork, outcomes } from './sceneArtwork.js'
 import { settlementReveal } from './settlementVisual.js'
+import { useNightDayPresentation } from './useNightDayPresentation.js'
 import { configurations, configurationName, roles, claimRoleNames, stages } from './labels'
 
 const {
@@ -25,8 +26,17 @@ const {
   setClaimedTarget,
   start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
-const artwork = computed(() => sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
+const {phase:presentationPhase,artwork:preludeArtwork,text:dayStartText,completeText:dayStartReady,
+  diagnostic:presentationDiagnostic,sceneReady,continueLocal,fail:failPrelude} = useNightDayPresentation(()=>({
+  sessionId:sessionId.value,cursor:cursor.value,current:currentEvent.value,history:presentationHistory.value,
+  day:update.value?.view.gameDay,uncertain:uncertain.value,
+}))
+const artwork = computed(() => preludeArtwork.value || sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
 const audioControl = ref(null)
+function artReady() {
+  if(presentationPhase.value==='event')audioControl.value?.presented(sessionId.value+':'+cursor.value)
+  else if(sceneReady())audioControl.value?.presentation(presentationPhase.value,sessionId.value+':'+cursor.value)
+}
 const replayPlaying = ref(false)
 const replayAudio = { state:()=>audioControl.value?.status, enable:()=>audioControl.value?.enable(), stop:()=>audioControl.value?.stop() }
 function clickSound(event) {
@@ -84,7 +94,7 @@ function name(number) {
         <button class="quiet-button" :disabled="busy" @click="refresh">再同期</button>
       </div>
       <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button><button class="quiet-button" @click="recordPage = true">戦績を見る</button></nav>
-      <BgmControl :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
+      <BgmControl :presentation-phase="presentationPhase" :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
       <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。通信のない状態が30分続くか、開村から24時間経過すると無効になります。サービス再起動・解放でも無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
 
@@ -131,7 +141,7 @@ function name(number) {
             <span id="journal-label" class="visually-hidden" lang="zh-CN">事件展示</span>
             <header class="panel-heading"><span class="eyebrow" lang="zh-CN">01 / 村落纪事</span><span class="pill" :lang="currentEvent ? 'zh-CN' : 'ja'">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
-            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor" :event-key="sessionId + ':' + cursor" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
+            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!['night','dawn'].includes(presentationPhase)" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="failPrelude" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
               <template #scene-overlay>
                 <div v-if="finished" class="settlement-board" role="region" aria-label="結算役職一覧" tabindex="0" data-testid="settlement-board" lang="ja">
                   <p>配役一覧 · {{ players.length }}人 · 一覧内をスクロールして確認できます。</p>
@@ -144,7 +154,9 @@ function name(number) {
                   </div>
                 </div>
               </template>
-              <div v-if="currentEvent" class="event-content" role="region" aria-labelledby="current-event-label" lang="ja" aria-live="polite">
+              <div v-if="presentationPhase==='day-text'" class="event-content" lang="ja" role="status" data-testid="day-start-text">{{ dayStartText }}</div>
+              <div v-else-if="presentationPhase==='error'" class="event-content" lang="ja" role="status">夜明けの画像を表示できません。現在の出来事へ進めます。</div>
+              <div v-else-if="presentationPhase==='event' && currentEvent" class="event-content" role="region" aria-labelledby="current-event-label" lang="ja" aria-live="polite">
                 <span id="current-event-label" class="visually-hidden" lang="zh-CN">当前事件</span>
                 <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
                 <EventDialogue :event="currentEvent.event" />
@@ -156,15 +168,17 @@ function name(number) {
                 </div>
                 <p class="event-hint">台詞・叙述は既存リソースを使用しています。COと報告は公開発言であり、真偽を保証しません。</p>
               </div>
-              <div v-else-if="finished" class="event-content settlement" role="status" lang="ja">
+              <div v-else-if="presentationPhase==='event' && finished" class="event-content settlement" role="status" lang="ja">
                 <span class="event-number">THE FINAL VERDICT</span><AssetImage v-if="outcome" class="settlement-win-icon" :name="outcome.icon" /><h2 lang="ja">{{ outcome?.text || '勝敗不明（表示診断）' }}</h2><p>全イベントを確認しました。役職はサーバーの公開結果に従います。</p>
                 <p v-if="reveal.diagnostic" class="visual-diagnostic" role="status" data-testid="reveal-diagnostic">表示診断：身分情報が不完全です。人物の役職画像を表示できません。</p>
               </div>
-              <div v-else class="event-content decision" lang="ja">
+              <div v-else-if="presentationPhase==='event'" class="event-content decision" lang="ja">
                 <span class="event-number">YOUR DECISION</span><h2>今日は、誰に投票しますか？</h2><p>プレイヤー一覧で指定候補にチェックして、投票を確定してください。</p><p>回避COがあれば発言を読んで再検討してください。共有者の回避後は候補を選び直せます。</p>
               </div>
             </GameStage>
-            <div v-if="currentEvent" class="event-controls"><span>未確認 {{ pending.length }} 件</span><button data-testid="next-event" class="primary-button" :disabled="busy" @click="nextEvent">{{ pending.length === 1 ? '読み終えて対局を続ける' : '続きを読む' }} <span aria-hidden="true">→</span></button></div>
+            <div v-if="['day-text','error'].includes(presentationPhase)" class="event-controls"><span lang="ja">場面表示（出来事は未確認）</span><button data-testid="day-start-continue" class="primary-button" :disabled="!dayStartReady" @click="continueLocal">続きを読む <span aria-hidden="true">→</span></button></div>
+            <div v-else-if="currentEvent && presentationPhase==='event'" class="event-controls"><span>未確認 {{ pending.length }} 件</span><button data-testid="next-event" class="primary-button" :disabled="busy" @click="nextEvent">{{ pending.length === 1 ? '読み終えて対局を続ける' : '続きを読む' }} <span aria-hidden="true">→</span></button></div>
+            <small v-if="presentationDiagnostic" class="visual-diagnostic" role="status" lang="ja">場面表示診断：{{ presentationDiagnostic }}</small>
             <footer class="decision-footer" v-if="!finished">
               <div><span class="eyebrow">指定候補</span><p>{{ voteTargets.length ? voteTargets.map(name).join('、') : '未選択' }}</p></div>
               <button class="primary-button" data-testid="vote" :disabled="!canVote" @click="vote('DESIGNATED')">{{ busy ? '処理中…' : '投票を確定' }}</button>

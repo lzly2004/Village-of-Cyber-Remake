@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { characterNames } from '../src/characterNames.js'
 
 const storageKey = 'vocr.guest.v1'

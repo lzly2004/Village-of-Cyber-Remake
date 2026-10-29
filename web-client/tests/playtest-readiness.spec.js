@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 
 // The launcher uses this already-existing 404 contract; never create a "probe game".
 test('read-only playtest readiness probes preserve a live game and browser history', async ({ page, request }) => {

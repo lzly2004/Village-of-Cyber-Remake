@@ -1,7 +1,8 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { drainEvents } from '../tests/drain-events.js'
 
-// Real production runWeb, built UI, no routes/fixtures/seed selection or outcome hunting.
+// Real production runWeb and built UI; no API mocks, seed selection or outcome hunting.
+// Only local presentation time/continue is handled by the journey fixture; rules stay real.
 test('unseeded production game restores, reaches settlement and opens local records/replay', async ({ page, request }, info) => {
   const errors = []
   page.on('pageerror', error => errors.push(error.name))

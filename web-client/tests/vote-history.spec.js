@@ -1,6 +1,6 @@
 import { drainEvents as drain } from './drain-events.js'
 import { characterDisplayName } from '../src/characterDisplay.js'
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 
 const key = 'vocr.guest.v1'
 const saved = page => page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), key)

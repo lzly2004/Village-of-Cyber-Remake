@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { drainEvents } from './drain-events.js'
 
 const key='vocr.guest.v1'
@@ -282,7 +282,7 @@ test('GET timeout aborts after the real client deadline, keeps the cursor, and h
   try{
     await drainEvents(page)
     const before=await saved(page)
-    await page.clock.install()
+    // Clock is already installed by the local-presentation fixture.
     let reads=0
     await page.route('**/api/v1/games/'+id+'?*',async route=>{reads++;await hold;try{await route.continue()}catch{/* timed-out browser request */}})
     const sent=page.waitForRequest(req=>req.method()==='GET'&&new URL(req.url()).pathname==='/api/v1/games/'+id)

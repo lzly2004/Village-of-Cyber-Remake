@@ -1,4 +1,4 @@
-import { test,expect } from '@playwright/test'
+import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync,mkdirSync,writeFileSync } from 'node:fs'
 const read=p=>readFileSync(new URL(p,import.meta.url))
 const fixture=JSON.parse(read('../../src/test/resources/replay/exchange-v3.json'))
@@ -109,7 +109,7 @@ test('storage quota aborts the whole selected batch and a corrupt library can be
 
 test('timed-out file read never publishes late preview or saves automatically; a new explicit selection works',async({page})=>{
   await open(page)
-  await page.clock.install()
+  // Clock is already installed by the local-presentation fixture.
   await page.evaluate(()=>{const original=File.prototype.arrayBuffer;globalThis.restoreFileRead=()=>{File.prototype.arrayBuffer=original};File.prototype.arrayBuffer=function(){return new Promise(resolve=>{globalThis.finishOldFile=()=>resolve(new ArrayBuffer(0))})}})
   await upload(page,desktop);await page.clock.fastForward(15001)
   await expect(library(page).getByRole('alert')).toContainText('FILE_TIMEOUT');await expect(preview(page)).toHaveCount(0);expect(await raw(page)).toEqual([])

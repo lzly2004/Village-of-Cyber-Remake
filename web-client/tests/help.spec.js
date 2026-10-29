@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { helpGroups } from '../src/helpContent.js'
 import { configurations, roles } from '../src/labels.js'

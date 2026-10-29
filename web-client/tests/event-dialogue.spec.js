@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 
 const catalog = JSON.parse(readFileSync(new URL('../../src/main/resources/lines/event_lines.json', import.meta.url), 'utf8'))

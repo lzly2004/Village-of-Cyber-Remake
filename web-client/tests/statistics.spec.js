@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 const dialog=page=>page.getByRole('dialog',{name:'ブラウザーの戦績'})
 const opener=page=>page.getByRole('button',{name:'戦績を見る',exact:true})
 async function put(page,configuration,result,index) {

@@ -3,12 +3,13 @@ import { computed } from 'vue'
 import { characterKana } from './characterDisplay.js'
 import StageArtwork from './StageArtwork.vue'
 
-const emit = defineEmits(['consequence'])
+const emit = defineEmits(['consequence','art-ready','art-failed'])
 const props = defineProps({
   event: { type: Object, default: null },
   artwork: { type: Object, default: () => ({ mode: 'deferred' }) },
   eventKey: { type: String, default: '' },
   stage: { type: String, default: '' },
+  reading: { type: Boolean, default: true },
 })
 // Only the already-public event's character keys. This is NOT the final image mapping.
 const participants = computed(() => props.event?.eventname === 'wsw' ? []
@@ -22,7 +23,7 @@ const positions = computed(() => participants.value.map((character, index, all) 
 <template>
   <div class="game-stage" :data-stage="stage" data-testid="game-stage">
     <div class="stage-surface" data-testid="stage-surface">
-      <StageArtwork v-if="artwork.mode === 'dialogue' || artwork.mode === 'scene'" :plan="artwork" @consequence="emit('consequence', eventKey)" />
+      <StageArtwork v-if="artwork.mode === 'dialogue' || artwork.mode === 'scene'" :plan="artwork" @consequence="emit('consequence', eventKey)" @ready="emit('art-ready')" @failed="emit('art-failed')" />
       <svg v-else lang="zh-CN" class="stage-artwork" data-testid="stage-artwork" viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <rect class="stage-sky" width="1280" height="720" />
@@ -40,11 +41,11 @@ const positions = computed(() => participants.value.map((character, index, all) 
         <text v-if="!positions.length" x="640" y="270" text-anchor="middle" class="stage-empty">场景占位</text>
       </svg>
       <slot name="scene-overlay" />
-      <div class="stage-text" role="region" lang="zh-CN" aria-label="舞台文字阅读区" tabindex="0"
+      <div v-if="reading" class="stage-text" role="region" lang="zh-CN" aria-label="舞台文字阅读区" tabindex="0"
         aria-describedby="stage-reading-help" data-testid="stage-text">
         <slot />
       </div>
     </div>
-    <p id="stage-reading-help" lang="zh-CN" class="stage-reading-help">文字较长时可在阅读区滚动；按 Tab 聚焦后，可用方向键阅读。确认按钮位于舞台下方。</p>
+    <p v-if="reading" id="stage-reading-help" lang="zh-CN" class="stage-reading-help">文字较长时可在阅读区滚动；按 Tab 聚焦后，可用方向键阅读。确认按钮位于舞台下方。</p>
   </div>
 </template>

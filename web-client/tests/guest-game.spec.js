@@ -1,6 +1,6 @@
 import { drainEvents as readEvents } from './drain-events.js'
 import { characterDisplayName } from '../src/characterDisplay.js'
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 
 const storageKey = 'vocr.guest.v1'
 

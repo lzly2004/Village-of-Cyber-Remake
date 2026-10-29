@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { characterDisplayName } from '../src/characterDisplay.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
@@ -35,6 +35,7 @@ test('WEB-023 real public players use ordinal Japanese names and status images, 
   const created = await (await createdResponse).json()
   try {
     const state = await saved(page)
+    await expect(page.getByTestId('event-dialogue')).toBeVisible()
     const text = await page.getByTestId('event-dialogue').textContent()
     for (const player of created.update.view.players) {
       const row = page.locator(`[data-player-number="${player.playerNumber}"]`)

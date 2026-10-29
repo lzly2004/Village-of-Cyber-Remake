@@ -1,5 +1,5 @@
 import { drainEvents } from './drain-events.js'
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 const saved=page=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')))
 
 test('WEB-027/028 real session audio controls and settings never write game state or confirm an event',async({page,request})=>{
