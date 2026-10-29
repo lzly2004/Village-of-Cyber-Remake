@@ -10,7 +10,8 @@ export async function preparePresentation(page) {
     await page.clock.install()
     const prelude = page.locator('[data-testid="game-stage"][data-presentation-phase]:not([data-presentation-phase="event"])')
     await page.addLocatorHandler(prelude, async () => {
-      await page.clock.pauseAt(new Date(await page.evaluate(() => Date.now()) + 10))
+      // Relative runFor disables real-time sync while advancing internally.
+      // Never sample Date.now then pauseAt: transport delay can make that time past.
       const stage = page.getByTestId('game-stage')
       let phase = await stage.getAttribute('data-presentation-phase')
       if (phase === 'night') {
@@ -32,7 +33,6 @@ export async function preparePresentation(page) {
         throw new Error('Unexpected local presentation phase: ' + phase)
       }
       await expect(stage).toHaveAttribute('data-presentation-phase', 'event')
-      await page.clock.resume()
     })
 }
 export const test = base.extend({
