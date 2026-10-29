@@ -1,5 +1,5 @@
 import { characterDisplayName } from '../src/characterDisplay.js'
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync, readdirSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'

@@ -102,3 +102,29 @@ test('WEB-033 Replay code and database stay cold until explicit library entry',a
   await expect(page.getByRole('heading',{name:'Replay一覧',exact:true})).toBeVisible()
   expect(chunks).toHaveLength(1);expect(await page.evaluate(()=>window.replayDbOpens)).toBeGreaterThan(0)
 })
+
+test('night/dawn and current result together obey the unchanged first-game transfer budget',async({page,request},info)=>{
+ const manifest=await(await request.get('/assets/images/manifest.json')).json()
+ const mapping=JSON.parse(readFileSync(new URL('../../src/main/resources/config/event_image_mapping.json',import.meta.url),'utf8'))
+ const snapshot=publicSnapshot(),event={eventname:'yjsw',ch1:'Abel',ch2:'NONE',ch3:'NONE'}
+ snapshot.events=[event];snapshot.presentedEvents=[{stage:'NIGHT_RESULT',event}];snapshot.nextEventCursor=1
+ await page.route('**/api/v1/games',r=>r.fulfill({status:201,json:{sessionId:'00000000-0000-4000-8000-000000000052',update:snapshot}}))
+ const paths=[];page.on('request',r=>{if(r.url().endsWith('.webp'))paths.push(new URL(r.url()).pathname)})
+ await page.goto('/');await expect(page.getByRole('button',{name:'対局を始める'})).toBeEnabled()
+ await page.waitForLoadState('networkidle')
+ const since=await page.evaluate(()=>performance.now())
+ await page.getByRole('button',{name:'対局を始める'}).click()
+ await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:12000})
+ await page.getByTestId('day-start-continue').click()
+ await expect(page.getByTestId('stage-character')).toHaveCount(1)
+ await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
+ await page.waitForLoadState('networkidle')
+ const stage=['images/komorebi000night01.png','images/komorebi002.png','images/haikei3.png',...mapping.Abel.yjsw.default.map(n=>'images/'+n)]
+ const allowed=new Set([...stage,...Array.from({length:44},(_,i)=>'images/'+String(i+1).padStart(2,'0')+'s.png'),...Array.from({length:44},(_,i)=>'images/'+(i+1)+'job.png')].map(n=>'/assets/images/'+manifest.images[n].file))
+ expect(paths.every(p=>allowed.has(p))).toBe(true)
+ for(const name of stage)expect(paths).toContain('/assets/images/'+manifest.images[name].file)
+ const firstGameBytes=await page.evaluate(since=>performance.getEntriesByType('resource').filter(r=>r.startTime>=since).reduce((sum,r)=>sum+r.transferSize,0),since)
+ expect(firstGameBytes).toBeGreaterThan(0);expect(firstGameBytes).toBeLessThanOrEqual(3*1024**2)
+ console.info('Night/dawn first-game transfer: '+JSON.stringify({firstGameBytes,stageImages:stage.length}))
+ await info.attach('night-first-game-transfer.json',{body:JSON.stringify({firstGameBytes,stageImages:stage.length}),contentType:'application/json'})
+})

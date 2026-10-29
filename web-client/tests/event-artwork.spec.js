@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/presentation-test.js'
 import {readFileSync} from 'node:fs'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 const mapping=JSON.parse(readFileSync(new URL('../../src/main/resources/config/event_image_mapping.json',import.meta.url),'utf8'))

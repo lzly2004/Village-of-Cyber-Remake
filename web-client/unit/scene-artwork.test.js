@@ -1,3 +1,4 @@
+import { nightDayPlan, nightDayImages, nightDayTimes, dayStartFormat } from '../src/nightDayPresentation.js'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
@@ -97,3 +98,49 @@ test('44x11 alive/dead result portraits match ImageNames role switch and hit exi
   assert.equal(settlementPortrait({character:'NONE',alive:true},'wu'),null)
   assert.equal(settlementPortrait({character:'Abel',alive:true},'toString'),null)
 })
+
+
+// Public local-night presentation contracts share the existing scene test entry.
+{
+const nightEvent = (stage,eventname) => ({stage,event:{eventname}})
+test('night/day desktop images, timing and day text are source locked',()=>{
+ const image=readFileSync(new URL('../../src/main/java/com/vocr/resources/UiImage.java',import.meta.url),'utf8')
+ const constants=readFileSync(new URL('../../src/main/java/com/vocr/ui/UIConstants.java',import.meta.url),'utf8')
+ const strings=readFileSync(new URL('../../src/main/java/com/vocr/ui/GameStrings.java',import.meta.url),'utf8')
+ for(const [key,name] of [['night','NIGHT_BACKGROUND'],['dawn','GAME_SETUP_DIALOGUE_BACKGROUND']])assert.equal(nightDayImages[key],'images/'+image.match(new RegExp(name+'\\("([^"]+)"\\)'))[1])
+ for(const [key,name] of [['night','NIGHT_SCREEN_DURATION_MS'],['dawn','HOWL_TRANSITION_MS'],['character','TYPEWRITER_DELAY_MS']])assert.equal(nightDayTimes[key],Number(constants.match(new RegExp(name+'\\s*=\\s*(\\d+)'))[1]))
+ assert.equal(dayStartFormat,strings.match(/DAY_START_FORMAT\s*=\s*"([^"]+)"/)[1])
+})
+test('one introduction per public contiguous night group, including initial night',()=>{
+ const history=[nightEvent('NIGHT_RESULT','wsw'),nightEvent('DAY_DIALOGUE','gyfo1'),nightEvent('EXECUTION','cxs'),nightEvent('NIGHT_RESULT','yjsw'),nightEvent('NIGHT_RESULT','yjsw')]
+ assert.deepEqual(nightDayPlan(history,0,history[0],1),{key:0,nightOnly:false,dayText:'1日目になりました。'})
+ assert.equal(nightDayPlan(history,1,history[1],1),null)
+ assert.deepEqual(nightDayPlan(history,3,history[3],2),{key:3,nightOnly:false,dayText:'2日目になりました。'})
+ assert.equal(nightDayPlan(history,4,history[4],2),null)
+})
+test('public settlement after execution has night only; no future outcome or private getter read',()=>{
+ const history=[nightEvent('EXECUTION','cxs'),nightEvent('SETTLEMENT','crsl')]
+ Object.defineProperty(history[1],'result',{get(){throw Error('result read')}})
+ Object.defineProperty(history[1],'actualRole',{get(){throw Error('private read')}})
+ assert.deepEqual(nightDayPlan(history,1,history[1],2),{key:1,nightOnly:true,dayText:''})
+ assert.equal(nightDayPlan([history[1]],0,history[1],2),null)
+ const followed=[nightEvent('NIGHT_RESULT','yjsw'),history[1]]
+ assert.equal(nightDayPlan(followed,1,followed[1],2),null)
+})
+test('missing or mismatched history is diagnosed, never guessed as another night',()=>{
+ const current=nightEvent('NIGHT_RESULT','yjsw')
+ assert.equal(nightDayPlan([],4,current,2).diagnostic,'NIGHT_CONTEXT_UNAVAILABLE')
+ const gap=[];gap[4]=current;assert.equal(nightDayPlan(gap,4,current,2).diagnostic,'NIGHT_CONTEXT_UNAVAILABLE')
+ assert.equal(nightDayPlan([nightEvent('DAY_DIALOGUE','gyfo1')],0,current,1).diagnostic,'NIGHT_CONTEXT_UNAVAILABLE')
+ assert.equal(nightDayPlan([current],0,current,0).diagnostic,'DAY_NUMBER_UNAVAILABLE')
+ assert.equal(nightDayPlan([nightEvent('NIGHT_RESULT','invalid')],0,nightEvent('NIGHT_RESULT','invalid'),1),null)
+})
+
+test('local presentation mutes BGM without consulting an already-public future outcome',async()=>{
+ const {bgmScene}=await import('../src/bgmScene.js')
+ const view={};Object.defineProperty(view,'result',{get(){throw Error('early outcome read')}})
+ for(const presentationPhase of ['night','dawn','day-text','error']){
+  assert.equal(bgmScene({sessionId:'test',update:{view},currentEvent:nightEvent('SETTLEMENT','crsl'),presentationPhase}).id,null)
+ }
+})
+}

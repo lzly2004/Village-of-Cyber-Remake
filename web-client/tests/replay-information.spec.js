@@ -1,4 +1,4 @@
-import { test,expect } from '@playwright/test'
+import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { replayId } from '../src/replayStore.js'
 const displayCases=JSON.parse(readFileSync(new URL('../../src/test/resources/replay/web034-display-cases.json',import.meta.url),'utf8'))

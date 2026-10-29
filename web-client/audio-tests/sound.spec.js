@@ -74,14 +74,19 @@ test('WEB-028 mute cancels a held effect and suppresses future/retroactive playb
   expect((await probe(page)).contexts).toEqual(['running']);expect((await probe(page)).active).toBe(1)
 })
 
-for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])test('WEB-028 current night serial intro/result '+eventname+'; native ended releases and manual frame never replays death',async({page})=>{
+for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])test('night/day backgrounds gate intro/result '+eventname+'; native ended releases and manual frame never replays death',async({page})=>{
   const snapshot=presented(publicSnapshot(),'NIGHT_RESULT',eventname)
   const paths=await setup(page,{snapshot});await enable(page)
   await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(ui(page)).toHaveAttribute('data-sound','NIGHTFALL');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   expect(paths).not.toContain(soundPath('WOLF_HOWL'));await finishSound(page)
-  await expect(ui(page)).toHaveAttribute('data-sound','WOLF_HOWL');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
-  await finishSound(page);await expect(ui(page)).toHaveAttribute('data-sound',last);await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
+  await expect(page.getByTestId('game-stage')).toHaveAttribute('data-presentation-phase','night')
+  await expect(ui(page)).toHaveAttribute('data-sound','WOLF_HOWL',{timeout:8000});await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
+  await finishSound(page)
+  await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:4000})
+  expect(paths).not.toContain(soundPath(last))
+  await page.getByTestId('day-start-continue').click()
+  await expect(ui(page)).toHaveAttribute('data-sound',last);await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   expect((await probe(page)).active).toBe(1);expect((await probe(page)).effects).toBe(1)
   await finishSound(page);await expect(ui(page)).toHaveAttribute('data-sound-status','idle');expect((await probe(page)).active).toBe(0)
   if(eventname==='yjsw'){
@@ -216,4 +221,38 @@ test('WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK w
     console.info('review CLICK evidence: '+JSON.stringify(evidence))
     await info.attach('review-click.json',{body:JSON.stringify(evidence),contentType:'application/json'})
   }
+})
+
+test('night enable does not replay past NIGHTFALL; future dawn sounds once and stop suppresses result',async({page})=>{
+ const paths=await setup(page,{snapshot:presented(publicSnapshot(),'NIGHT_RESULT','wsw')})
+ await page.getByRole('button',{name:'対局を始める'}).click()
+ await expect(page.getByTestId('game-stage')).toHaveAttribute('data-presentation-phase','night')
+ expect(paths).toEqual([])
+ await page.getByRole('button',{name:'音楽を有効にする'}).click()
+ await expect(ui(page)).toHaveAttribute('data-status','silent')
+ expect(paths).not.toContain(soundPath('NIGHTFALL'))
+ await expect(ui(page)).toHaveAttribute('data-sound','WOLF_HOWL',{timeout:8000})
+ expect(paths.filter(p=>p===soundPath('WOLF_HOWL'))).toHaveLength(1)
+ await page.getByRole('button',{name:'音楽を停止',exact:true}).click()
+ await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:4000})
+ await page.getByTestId('day-start-continue').click()
+ await expect(page.getByTestId('next-event')).toBeEnabled()
+ expect(paths).not.toContain(soundPath('PEACEFUL_NIGHT'))
+})
+
+test('NIGHTFALL waits for the held background publication instead of merely receiving the event',async({page})=>{
+ const images=JSON.parse(readFileSync(new URL('../public/assets/images/manifest.json',import.meta.url),'utf8'))
+ let release,seen=false
+ const gate=new Promise(resolve=>{release=resolve})
+ await page.route('**/assets/images/'+images.images['images/komorebi000night01.png'].file,async route=>{seen=true;await gate;await route.continue()})
+ const paths=await setup(page,{snapshot:presented(publicSnapshot(),'NIGHT_RESULT','wsw')})
+ try{
+  await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
+  await expect.poll(()=>seen).toBe(true)
+  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','false')
+  expect(paths).not.toContain(soundPath('NIGHTFALL'));expect(paths).not.toContain(soundPath('WOLF_HOWL'))
+  release();await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
+  await expect(ui(page)).toHaveAttribute('data-sound','NIGHTFALL')
+  expect(paths.filter(p=>p===soundPath('NIGHTFALL'))).toHaveLength(1)
+ }finally{release()}
 })

@@ -1,4 +1,4 @@
-import { test,expect } from '@playwright/test'
+import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { spawn } from 'node:child_process'
 import http from 'node:http'

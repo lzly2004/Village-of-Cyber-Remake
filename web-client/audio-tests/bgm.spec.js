@@ -99,6 +99,8 @@ test('WEB-027 execution/night are silent; settlement music waits for displayed s
   await page.getByRole('button',{name:'音楽を有効にする'}).click();await expect(ui(page)).toHaveAttribute('data-status','silent')
   expect(paths).toEqual([])
   await page.getByTestId('next-event').click();expect(paths.filter(p=>p.includes('/bgm/'))).toEqual([])
+  await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:12000})
+  await page.getByTestId('day-start-continue').click()
   await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   expect(paths).not.toContain(path('VICTORY_SCREEN'))

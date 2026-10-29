@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { drainEvents } from './drain-events.js'

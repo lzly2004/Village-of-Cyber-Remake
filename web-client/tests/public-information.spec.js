@@ -1,6 +1,6 @@
 import { drainEvents as drain } from './drain-events.js'
 import { characterDisplayName } from '../src/characterDisplay.js'
-import { test as base, expect } from '@playwright/test'
+import { test as base, expect } from '../test-fixtures/presentation-test.js'
 import { publicInformationDiagnostics } from './public-information-diagnostics.js'
 const test = base.extend({
   diagnostics: async ({ page }, use, testInfo) => {
