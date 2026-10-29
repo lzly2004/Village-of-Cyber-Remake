@@ -32,7 +32,7 @@ bash tools/playtest.sh stop
 bash tools/playtest.sh feedback 'full-<40位SHA>-<64位内层ZIP哈希>' --attach /absolute/chosen.png
 ```
 
-独立工具解压目录的playtest.sh用法相同。默认数据根`~/.local/share/vocr-playtest`，可在子命令前传`--home /absolute/private-directory`用于开发隔离实验。source-metadata.json由Coder交付：schema1、repository、confirmation=user-confirmed-page、kind=full/preview，run和verify/receipt/package三份官方来源元数据，含head/status/conclusion/attempt与id/name/size/digest/expired/workflow_run。`--confirm-page`仅记录用户已核对来源，不冒充工具在线认证、签名或实时head新鲜度。
+独立工具解压目录的playtest.sh用法相同。默认数据根`~/.local/share/vocr-playtest`，可在子命令前传`--home /absolute/private-directory`用于开发隔离实验。source-metadata.json由Coder交付：schema1、repository、confirmation=user-confirmed-page、kind=full/preview，run和verify/receipt/package三份官方来源元数据，含head/status/conclusion/attempt与id/name/size/digest/expired/workflow_run。`--confirm-page`仅记录用户已核对来源，不冒充工具在线认证、签名或实时head新鲜度。 非交互CLI不会再弹确认；调用者必须事先自行核对官方页面，不能把这个参数本身当作来源证明。工具包内容由整个候选artifact的官方digest传递绑定；单独复制出的工具ZIP或其同目录SHA不能自证来源，每轮交接另列其bytes/SHA以便核对。
 
 ## 完整功能与桌面对应
 
