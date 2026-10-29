@@ -241,5 +241,52 @@ class RuntimeTest(unittest.TestCase):
             self.assertIn(b'feedback', result.stdout)
 
 
+class PreviewBuildTest(unittest.TestCase):
+    def setUp(self):
+        spec = importlib.util.spec_from_file_location('play_release_fixture', ROOT / 'tools/tests/test_web_release.py')
+        mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+        self.fixture = mod.ReleaseTest('runTest'); self.fixture.setUp(); self.addCleanup(self.fixture.doCleanups)
+        f = self.fixture
+        f.fingerprints = {**{n: {'sha256': 'b' * 64, 'files': 1} for n in ('frozen', 'inputs', 'build_policy')},
+                          'java_ref': 'b' * 64, 'java_worktree': 'b' * 64, 'java_files': 1}
+        f.audit['fingerprints'] = f.fingerprints
+        f.result['input_audit'] = copy.deepcopy(f.audit); f.result['final_audit'] = copy.deepcopy(f.audit)
+        f.result['suites'] = [s for s in f.result['suites'] if s['id'] in P.REQUIRED_FRONTEND]
+        f.result['plan'] = {'tier': 'frontend', 'suites': [{'id': s['id']} for s in f.result['suites']]}
+        f.save_result()
+
+    def test_same_head_preview_payload_has_real_runtime_stamp_and_no_full_claim(self):
+        f = self.fixture
+        with patch.object(P.R, 'current_audit', return_value=f.audit), patch.object(P.R, 'resource_gates'):
+            files = P.preview_payload(f.root, f.result_file)
+        value = P.check_preview_files(files)
+        self.assertFalse(value['verification']['javaFull']); self.assertEqual(f.head, value['source']['sha'])
+        self.assertEqual(R.hash_file(f.result_file), value['verification']['resultSha256'])
+
+    def test_runtime_source_frontend_inventory_and_result_drift_each_refuse_preview(self):
+        f = self.fixture
+        with patch.object(P.R, 'current_audit', return_value=f.audit), patch.object(P.R, 'resource_gates'):
+            path = f.root / 'web-client/dist/assets/app.js'; original = path.read_bytes(); path.write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError, 'FRONTEND_OUTPUT_DRIFT'): P.preview_payload(f.root, f.result_file)
+            path.write_bytes(original)
+            path = f.root / 'config/probability.json'; path.write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError, 'RUNTIME_INPUT_DRIFT'): P.preview_payload(f.root, f.result_file)
+
+    def test_failed_packaged_smoke_does_not_publish_preview(self):
+        f = self.fixture
+        spec = importlib.util.spec_from_file_location('play_preview_cli', ROOT / 'tools/build-playtest-preview.py')
+        cli = importlib.util.module_from_spec(spec); spec.loader.exec_module(cli); cli.ROOT = f.root
+        calls = []
+        def execute(argv, **kw):
+            calls.append(argv); kw['stdout'].write(b'1 failed\n' if len(calls) == 2 else b'compile only\n')
+            return subprocess.CompletedProcess(argv, 1 if len(calls) == 2 else 0)
+        with patch.object(P.R, 'current_audit', return_value=f.audit), patch.object(P.R, 'resource_gates'), \
+             patch.object(cli.subprocess, 'run', side_effect=execute), patch.dict(os.environ, {'VOCR_APPROVED_FULL_CHECK': '1'}):
+            with self.assertRaisesRegex(ValueError, 'PREVIEW_SMOKE_FAILED'):
+                cli.build(f.result_file, f.root / 'build/never-preview')
+        self.assertFalse((f.root / 'build/never-preview').exists())
+        self.assertEqual('prepareWebRuntime', calls[0][2]); self.assertNotIn('test', calls[0])
+        self.assertEqual(2, len(calls))
+
 
 if __name__ == '__main__': unittest.main()

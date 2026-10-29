@@ -153,6 +153,30 @@ jobs:
             build/releases/ci/vocr-web.zip
             build/releases/ci/release-manifest.json
             build/releases/ci/release-report.json
+            build/releases/ci/playtest-tools.zip
+
+      - name: Upload complete internal playtest preview (frontend only)
+        id: preview_upload
+        if: ${{ success() && steps.execute.outputs.preview_ready == 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: preview-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            build/playtest/ci/vocr-preview.zip
+            build/playtest/ci/preview-manifest.json
+            build/playtest/ci/preview-report.json
+            build/playtest/ci/playtest-tools.zip
+
+      - name: Record internal preview upload identity
+        if: ${{ always() && steps.preview_upload.outputs.artifact-id != '' }}
+        env:
+          CI_EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          CI_ARTIFACT_ID: ${{ steps.preview_upload.outputs.artifact-id }}
+          CI_ARTIFACT_URL: ${{ steps.preview_upload.outputs.artifact-url }}
+          CI_ARTIFACT_DIGEST: ${{ steps.preview_upload.outputs.artifact-digest }}
+        run: python3 -B tools/ci/evidence.py --preview-upload
 
       - name: Record verified release upload identity
         if: ${{ always() && steps.release_upload.outputs.artifact-id != '' }}
@@ -190,6 +214,10 @@ jobs:
             build/ci/release-upload.json
             build/ci/release.stdout
             build/ci/release.stderr
+            build/ci/web-preview.json
+            build/ci/preview-upload.json
+            build/ci/preview.stdout
+            build/ci/preview.stderr
             build/ci/evidence.json
             build/ci/summary.md
             build/verify/**
