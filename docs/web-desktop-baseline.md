@@ -51,3 +51,7 @@
 失败保留：首次init脚本目录解析错误导致未发现测试；修正为projectDir绝对源目录。之后真实对话需要getEventText/getEventImage，补采集代理转调真实Resources；新增Event与java.awt.Event名称歧义改为明确限定类名。都属于采集器前提/编译问题，未改产品逻辑、删断言或放宽超时。日志见build/web050/baseline-first-no-tests.log、baseline-second-resource-interface.log、baseline-second-failed.xml、baseline-third-ambiguous-import.log。最终增加明确队列断言后再采集通过。
 
 当前050只进行基线准备，WF-008仍等待CR增量及用户最终完整试玩结论、明确合流授权和main核验。已交付117eda9、专用候选资料及原NTFS脏树不变。050产品B/C不混入PR #12，基于其合流后的main开干净产品分支；本批准备可随后移植。A06/A07/A08/046/047/048/049、公网和最终发布均未放行。
+
+## 后续050-B1
+
+用户查看本批参考后确认方向，并明确要求消息框再下移以遮住半身立绘底部，授权在独立本地分支继续产品实施。B1采用left260/top490/width760/height230，向下40为批准差异；实际实现与验证记录见[对话窗口](web-desktop-dialogue.md)。这不把B1加入PR #12，不替代前序合流/独立CR/用户完整试玩或050最终验收。上节“本批仅基线准备”指A批采集时的范围。

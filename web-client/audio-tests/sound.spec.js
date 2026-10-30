@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test'
+import {completeNativeReading} from '../test-fixtures/native-reading.js'
 import {readFileSync} from 'node:fs'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 test.setTimeout(30000)
@@ -100,9 +101,11 @@ test('WEB-028 execution sound follows second displayed frame once and is cancele
   const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
   expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
+  await page.getByTestId('stage-text').click();await expect(page.getByTestId('execution-continue')).toBeVisible()
+  await page.getByTestId('execution-continue').click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','2')
   await expect(ui(page)).toHaveAttribute('data-sound','DAY_EXECUTION');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
-  await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound-status','idle')
+  await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound-status','idle')
   expect(paths.filter(p=>p===soundPath('DAY_EXECUTION'))).toHaveLength(1)
 })
 
@@ -111,7 +114,7 @@ for(const [result,effect] of [['VILLAGE_WIN','VILLAGE_VICTORY'],['WOLF_WIN','WOL
   snapshot.phase='FINISHED';snapshot.view.result=result
   const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('next-event')).toBeVisible();expect(paths).not.toContain(soundPath(effect))
-  await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound',effect)
+  await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound',effect)
   await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   await page.getByRole('button',{name:'再同期'}).click();expect(paths.filter(p=>p===soundPath(effect))).toHaveLength(1)
   expect((await probe(page)).active).toBeLessThanOrEqual(2)
@@ -149,16 +152,19 @@ for(const denied of [false,true])test('WEB-028 invalid/blocked settings remain e
   expect((await probe(page)).contexts).toEqual([])
 })
 
-test('WEB-028 early confirmation cancels delayed execution sound; reduced motion emits second-frame sound immediately',async({page})=>{
+test('execution sound requires explicit local result; refresh cancels old scene and reduced motion retains that gate',async({page})=>{
   const snapshot=presented(publicSnapshot(),'EXECUTION','cxs')
   const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
-  await page.getByTestId('next-event').click()
-  // Deliberately outlive the 2000ms transition; no stale audio may arrive after confirmation.
+  await page.reload()
+  // Outlive the former automatic transition: an unconfirmed old scene cannot sound.
   await page.waitForTimeout(2200);expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
   await page.emulateMedia({reducedMotion:'reduce'})
   await page.evaluate(()=>sessionStorage.clear());await page.reload();await enable(page)
   await page.getByRole('button',{name:'対局を始める'}).click()
+  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
+  expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
+  await page.getByTestId('execution-continue').click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','2')
   await expect(ui(page)).toHaveAttribute('data-sound','DAY_EXECUTION')
 })
@@ -201,6 +207,7 @@ test('WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK w
   const samples=[]
   try {
     for(const mode of ['mouse','keyboard']){
+      await completeNativeReading(page)
       if(mode==='mouse')await page.getByTestId('next-event').click()
       else {await page.getByTestId('next-event').focus();await page.keyboard.press('Enter')}
       await expect(ui(page)).toHaveAttribute('data-sound','CLICK')

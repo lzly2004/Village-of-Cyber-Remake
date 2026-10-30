@@ -1,3 +1,4 @@
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { characterNames } from '../src/characterNames.js'
 
@@ -67,6 +68,7 @@ test('WEB-021 real session stage scales uniformly at desktop widths without chan
   const id = await start(page)
   try {
     const state = await saved(page)
+    await completeLocalReading(page)
     const text = await page.getByTestId('event-dialogue').textContent()
     for (const viewport of [{ width: 1920, height: 1080 }, { width: 1440, height: 900 },
       { width: 1280, height: 720 }, { width: 1024, height: 768 }]) {

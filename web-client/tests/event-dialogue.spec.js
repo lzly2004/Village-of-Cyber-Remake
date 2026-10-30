@@ -100,6 +100,7 @@ test('WEB-019 synthetic display edges: default, special, Unicode, narrative, sys
     for (const diagnostic of ['SENTINEL_EVENT', 'MISSING_EVENT', 'UNKNOWN_CHARACTER']) {
       const warning = page.locator('[data-diagnostic="' + diagnostic + '"]')
       await expect(warning).toContainText('此为界面诊断，非日文原文')
+      await expect(page.getByTestId('accessible-dialogue')).toHaveAttribute('lang','zh-CN')
       await expect(page.getByTestId('event-dialogue')).toHaveCount(0)
       await expect(page.getByTestId('vote')).toBeDisabled()
       await page.getByTestId('next-event').click()

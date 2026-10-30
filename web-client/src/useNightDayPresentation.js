@@ -1,4 +1,5 @@
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { createTypewriter } from './typewriter.js'
 import { nightDayPlan, nightDayImages, nightDayTimes, nightDayImageWaitMs } from './nightDayPresentation.js'
 
 // No game commands, storage writes or acknowledgement callbacks in this controller.
@@ -8,7 +9,8 @@ export function useNightDayPresentation(input) {
   const background=ref(nightDayImages.night)
   const done=new Set()
   let session='',timer,version=0,armed=false
-  const cancel=()=>{++version;clearTimeout(timer);armed=false}
+  const writer=createTypewriter({publish:s=>{text.value=s.text;completeText.value=s.complete}})
+  const cancel=()=>{++version;clearTimeout(timer);writer.dispose();armed=false}
   function finish() {
     if(active.value)done.add(active.value.key)
     cancel();active.value=null;phase.value='event';text.value='';completeText.value=false
@@ -20,10 +22,7 @@ export function useNightDayPresentation(input) {
   function typeDay() {
     phase.value='day-text';text.value='';completeText.value=false
     const all=active.value.dayText
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches){text.value=all;completeText.value=true;return}
-    let index=0
-    const tick=()=>{text.value=all.slice(0,++index);if(index===all.length)completeText.value=true;else later(nightDayTimes.character,tick)}
-    later(nightDayTimes.character,tick)
+    writer.reset(all,{instant:matchMedia('(prefers-reduced-motion: reduce)').matches})
   }
   function sceneReady() {
     if(!active.value || armed || !['night','dawn'].includes(phase.value))return false

@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test'
+import {completeLocalReading} from '../test-fixtures/presentation-test.js'
 import {readFileSync,mkdirSync,writeFileSync} from 'node:fs'
 import {createHash} from 'node:crypto'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
@@ -23,7 +24,7 @@ const frozen=new WeakSet()
 async function clock(page){frozen.add(page)}
 async function dawn(page){await ready(page,'night');await page.clock.runFor(7000);await ready(page,'dawn');await page.clock.runFor(2500);await expect(phase(page)).toHaveAttribute('data-presentation-phase','day-text');await page.clock.runFor(1000)}
 // Vue timestamps newly mounted event handlers; advance one tick before a new synthetic click.
-async function click(page,id){await expect(page.getByTestId(id)).toBeEnabled();if(frozen.has(page))await page.clock.runFor(1);await page.getByTestId(id).click()}
+async function click(page,id){if(id==='next-event')await completeLocalReading(page);await expect(page.getByTestId(id)).toBeEnabled();if(frozen.has(page))await page.clock.runFor(1);await page.getByTestId(id).click()}
 const captures=[]
 async function captureScene(page,info,name){
  const bytes=await page.getByTestId('stage-surface').screenshot({path:info.outputPath(name)})
@@ -48,7 +49,11 @@ test('night7000, dawn2500, local day text continue and death are distinct; local
  await page.clock.runFor(1);await expect(page.getByTestId('day-start-continue')).toBeDisabled();await page.clock.runFor(1000)
  await expect(page.getByTestId('day-start-text')).toHaveText('1日目になりました。')
  await page.getByTestId('day-start-continue').focus();await page.keyboard.press('Enter');await ready(page,'event')
- await expect(page.getByTestId('stage-character')).toHaveCount(1);await expect(page.getByTestId('event-dialogue')).toBeVisible()
+ await expect(page.getByTestId('stage-character')).toHaveCount(1)
+ await page.clock.runFor(1999);await expect(page.getByTestId('desktop-message')).toHaveCount(0)
+ await page.clock.runFor(1);await expect(phase(page)).toHaveAttribute('data-reading-step','primary')
+ await expect(page.getByTestId('event-dialogue')).toHaveText('')
+ await page.clock.runFor(50);await expect(page.getByTestId('event-dialogue')).toBeVisible()
  expect(await saved(page)).toBe(before);expect(writes).toEqual([])
  await captureScene(page,info,'night-result.png')
  await click(page,'next-event');expect(JSON.parse(await saved(page)).eventCursor).toBe(1)

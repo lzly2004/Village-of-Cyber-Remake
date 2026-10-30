@@ -42,7 +42,9 @@ async function drain(page, snapshot) {
   for (const event of snapshot.presentedEvents) {
     await expect(page.getByTestId('next-event')).toBeVisible()
     if (event.event.ch1 && event.event.ch1 !== 'NONE')
-      await expect(page.getByRole('region', { name: '当前事件', exact: true })).toContainText(characterDisplayName(event.event.ch1))
+      // Speaker identity now lives in the desktop message-frame header rather
+      // than auxiliary metadata inside the body. Keep checking the same name.
+      await expect(page.getByTestId('desktop-message').locator('.message-speaker')).toHaveText(characterDisplayName(event.event.ch1))
     if (['DAY_DIALOGUE', 'AFTERNOON_DIALOGUE', 'NIGHT_RESULT', 'EXECUTION', 'SETTLEMENT'].includes(event.stage)) {
       await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready', 'true')
       await expect(page.getByTestId('stage-art-status')).toHaveCount(0)

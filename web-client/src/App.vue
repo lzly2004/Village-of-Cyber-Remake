@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, defineAsyncComponent, h } from 'vue'
+import { computed, ref, watch, defineAsyncComponent, h } from 'vue'
 import { useGuestGame } from './useGuestGame'
 import PublicInformationPanel from './PublicInformationPanel.vue'
 import VoteHistoryPanel from './VoteHistoryPanel.vue'
@@ -15,6 +15,7 @@ import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
 import { sceneArtwork, outcomes } from './sceneArtwork.js'
 import { settlementReveal } from './settlementVisual.js'
+import { useEventReading } from './useEventReading.js'
 import { useNightDayPresentation } from './useNightDayPresentation.js'
 import { configurations, configurationName, roles, claimRoleNames, stages } from './labels'
 
@@ -31,10 +32,38 @@ const {phase:presentationPhase,artwork:preludeArtwork,text:dayStartText,complete
   sessionId:sessionId.value,cursor:cursor.value,current:currentEvent.value,history:presentationHistory.value,
   day:update.value?.view.gameDay,uncertain:uncertain.value,
 }))
+const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
 const artwork = computed(() => preludeArtwork.value || sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
 const audioControl = ref(null)
+const reading = useEventReading(()=>({key:sessionId.value+':'+cursor.value,
+  enabled:presentationPhase.value==='event',current:currentEvent.value,artwork:artwork.value,
+  blocked:busy.value||uncertain.value}))
+const {text:readingText,fullText:readingFullText,complete:readingComplete,visible:readingVisible,
+  step:readingStep,controlledFrame,diagnostic:readingDiagnostic,language:readingLanguage}=reading
+const pendingContinueFocus=ref(false)
+function rememberContinueFocus() {
+  if(document.activeElement?.closest('.message-actions'))pendingContinueFocus.value=true
+}
+watch([pendingContinueFocus,cursor,presentationPhase,readingVisible,readingComplete,readingStep,dayStartReady,busy,uncertain],()=>{
+  if(!pendingContinueFocus.value||busy.value||uncertain.value)return
+  // Restore only focus lost with the old frame; do not steal it from a menu,
+  // modal, resync control or any other place the user deliberately selected.
+  if(document.activeElement!==document.body&&!document.activeElement?.closest('.message-actions')){
+    pendingContinueFocus.value=false;return
+  }
+  const button=document.querySelector('[data-testid="game-stage"] .message-actions button:not(:disabled)')
+  if(button){button.focus();pendingContinueFocus.value=false}
+},{flush:'post'})
+function advanceReading() {
+  if(busy.value||uncertain.value)return
+  rememberContinueFocus()
+  if(reading.canConfirm.value)nextEvent()
+  else reading.advanceLocal()
+}
+function advanceDayReading(){rememberContinueFocus();continueLocal()}
+function stageFailed() { failPrelude();if(presentationPhase.value==='event')reading.imageFailed() }
 function artReady() {
-  if(presentationPhase.value==='event')audioControl.value?.presented(sessionId.value+':'+cursor.value)
+  if(presentationPhase.value==='event'){reading.ready();audioControl.value?.presented(sessionId.value+':'+cursor.value)}
   else if(sceneReady())audioControl.value?.presentation(presentationPhase.value,sessionId.value+':'+cursor.value)
 }
 const replayPlaying = ref(false)
@@ -55,7 +84,6 @@ const helpPage = ref('')
 const recordPage = ref(false)
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
-const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
 const players = computed(() => update.value?.view.players || [])
 const claimCandidates = computed(() => players.value.filter(player => claimPlayers.value.includes(player.playerNumber)))
 const voteTargets = computed(() => update.value?.selections.voteTargets || [])
@@ -141,7 +169,7 @@ function name(number) {
             <span id="journal-label" class="visually-hidden" lang="zh-CN">事件展示</span>
             <header class="panel-heading"><span class="eyebrow" lang="zh-CN">01 / 村落纪事</span><span class="pill" :lang="currentEvent ? 'zh-CN' : 'ja'">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
-            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!['night','dawn'].includes(presentationPhase)" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="failPrelude" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
+            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
               <template #scene-overlay>
                 <div v-if="finished" class="settlement-board" role="region" aria-label="結算役職一覧" tabindex="0" data-testid="settlement-board" lang="ja">
                   <p>配役一覧 · {{ players.length }}人 · 一覧内をスクロールして確認できます。</p>
@@ -156,17 +184,11 @@ function name(number) {
               </template>
               <div v-if="presentationPhase==='day-text'" class="event-content" lang="ja" role="status" data-testid="day-start-text">{{ dayStartText }}</div>
               <div v-else-if="presentationPhase==='error'" class="event-content" lang="ja" role="status">夜明けの画像を表示できません。現在の出来事へ進めます。</div>
-              <div v-else-if="presentationPhase==='event' && currentEvent" class="event-content" role="region" aria-labelledby="current-event-label" lang="ja" aria-live="polite">
+              <div v-else-if="presentationPhase==='event' && currentEvent" class="event-content" role="region" aria-labelledby="current-event-label" lang="ja">
                 <span id="current-event-label" class="visually-hidden" lang="zh-CN">当前事件</span>
-                <span class="event-number">EVENT {{ String(cursor + 1).padStart(3, '0') }}</span>
-                <EventDialogue :event="currentEvent.event" />
-                <p v-if="artwork.consequence" class="event-consequence" lang="ja" data-testid="event-consequence">{{ artwork.consequence }}</p>
-                <div v-if="currentEvent.event" class="event-participants">
-                  <span v-if="currentEvent.event.ch1 && currentEvent.event.ch1 !== 'NONE'">{{ characterDisplayName(currentEvent.event.ch1) }}</span>
-                  <span v-if="currentEvent.event.ch2 && currentEvent.event.ch2 !== 'NONE'"><small>関連人物</small>{{ characterDisplayName(currentEvent.event.ch2) }}</span>
-                  <span v-if="currentEvent.event.ch3 && currentEvent.event.ch3 !== 'NONE'"><small>関連人物</small>{{ characterDisplayName(currentEvent.event.ch3) }}</span>
-                </div>
-                <p class="event-hint">台詞・叙述は既存リソースを使用しています。COと報告は公開発言であり、真偽を保証しません。</p>
+                <EventDialogue v-if="readingStep!=='consequence'" :event="currentEvent.event" :visible-text="readingText" aria-hidden="true" />
+                <p v-else class="event-consequence event-dialogue" lang="ja" aria-hidden="true" data-testid="event-consequence">{{ readingText }}</p>
+                <span class="visually-hidden" :lang="readingLanguage" data-testid="accessible-dialogue">{{ readingFullText }}</span>
               </div>
               <div v-else-if="presentationPhase==='event' && finished" class="event-content settlement" role="status" lang="ja">
                 <span class="event-number">THE FINAL VERDICT</span><AssetImage v-if="outcome" class="settlement-win-icon" :name="outcome.icon" /><h2 lang="ja">{{ outcome?.text || '勝敗不明（表示診断）' }}</h2><p>全イベントを確認しました。役職はサーバーの公開結果に従います。</p>
@@ -175,9 +197,19 @@ function name(number) {
               <div v-else-if="presentationPhase==='event'" class="event-content decision" lang="ja">
                 <span class="event-number">YOUR DECISION</span><h2>今日は、誰に投票しますか？</h2><p>プレイヤー一覧で指定候補にチェックして、投票を確定してください。</p><p>回避COがあれば発言を読んで再検討してください。共有者の回避後は候補を選び直せます。</p>
               </div>
+              <template #controls>
+                <button v-if="['day-text','error'].includes(presentationPhase)" data-testid="day-start-continue" class="message-continue" :disabled="!dayStartReady" @click.stop="advanceDayReading">続きを読む</button>
+                <button v-else-if="currentEvent && presentationPhase==='event'" :data-testid="readingStep==='primary' && controlledFrame===0 && readingComplete ? 'execution-continue' : 'next-event'" class="message-continue" :disabled="busy || uncertain || !readingVisible" @click.stop="advanceReading">{{ readingVisible ? '続きを読む' : '場面表示中…' }}</button>
+              </template>
             </GameStage>
-            <div v-if="['day-text','error'].includes(presentationPhase)" class="event-controls"><span lang="ja">場面表示（出来事は未確認）</span><button data-testid="day-start-continue" class="primary-button" :disabled="!dayStartReady" @click="continueLocal">続きを読む <span aria-hidden="true">→</span></button></div>
-            <div v-else-if="currentEvent && presentationPhase==='event'" class="event-controls"><span>未確認 {{ pending.length }} 件</span><button data-testid="next-event" class="primary-button" :disabled="busy" @click="nextEvent">{{ pending.length === 1 ? '読み終えて対局を続ける' : '続きを読む' }} <span aria-hidden="true">→</span></button></div>
+            <button v-if="currentEvent && readingStep==='waiting-image'" class="quiet-button image-reading-fallback" data-testid="read-without-image" :disabled="busy || uncertain" @click="reading.imageFailed()">画像なしで文章を読む</button>
+            <details v-if="currentEvent" class="display-details" lang="ja">
+              <summary>表示情報・読み方</summary>
+              <p>未確認 {{ pending.length }} 件 · {{ currentEvent.stage }} · イベント {{ cursor + 1 }}</p>
+              <p>台詞・叙述は既存リソースを使用しています。COと報告は公開発言であり、真偽を保証しません。</p>
+              <p>文章の表示中に続きを読むを押すと全文を表示します。読み終わってからもう一度押すと進みます。</p>
+              <p v-if="readingDiagnostic" role="status">表示診断：{{ readingDiagnostic }}。画像なしでも文章を読めます。</p>
+            </details>
             <small v-if="presentationDiagnostic" class="visual-diagnostic" role="status" lang="ja">場面表示診断：{{ presentationDiagnostic }}</small>
             <footer class="decision-footer" v-if="!finished">
               <div><span class="eyebrow">指定候補</span><p>{{ voteTargets.length ? voteTargets.map(name).join('、') : '未選択' }}</p></div>

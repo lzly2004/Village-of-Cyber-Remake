@@ -1,3 +1,4 @@
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { drainEvents as readEvents } from './drain-events.js'
 import { characterDisplayName } from '../src/characterDisplay.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
@@ -29,6 +30,7 @@ test('选择配役、逐条阅读与刷新恢复已确认游标', async ({ page,
     await expect(page.getByTestId('vote')).toBeDisabled()
     await page.getByTestId('next-event').click()
     await expect.poll(async () => (await saved(page)).eventCursor).toBe(1)
+    await completeLocalReading(page)
     const event = await page.getByRole('region', { name: '当前事件' }).textContent()
     await page.reload()
     await expect(page.getByRole('region', { name: '当前事件' })).toHaveText(event)
@@ -128,6 +130,7 @@ test('固定种子 CO 中断显示提示、先读下午发言且刷新保留事�
       await expect(page.getByRole('alert')).toContainText('投票被回避 CO 中断')
       await expect(page.getByTestId('vote')).toBeDisabled()
       await expect(page.getByTestId('next-event')).toBeVisible()
+      await completeLocalReading(page)
       const event = await page.getByRole('region', { name: '当前事件' }).textContent()
       const state = await saved(page)
       const reread = await (await request.get('/api/v1/games/' + id
@@ -206,6 +209,7 @@ test('按职业询问 CO 使用权威候补，未读时禁用且刷新恢复发�
     expect(result.view.players.some(player => player.claimedRole === 'lie')).toBeTruthy()
     await expect(page.getByTestId('next-event')).toBeVisible()
     await expect(ask).toBeDisabled()
+    await completeLocalReading(page)
     const event = await page.getByRole('region', { name: '当前事件' }).textContent()
     const state = await saved(page)
     await page.reload()
@@ -301,6 +305,7 @@ test('按玩家批量询问 CO 保留选择顺序，恢复公开状态与未读�
     expect(result.view.players.find(player => player.playerNumber === 9).claimedRole).toBe('lie')
     await expect(ask).toBeDisabled()
     await expect(panel.getByRole('checkbox', { checked: true })).toHaveCount(0)
+    await completeLocalReading(page)
     const event = await page.getByRole('region', { name: '当前事件' }).textContent()
     const state = await saved(page)
     await page.reload()
@@ -517,6 +522,7 @@ for (const method of ['FREE', 'GREY']) {
         expect(result.update.voteHistory.at(-1).method).toBe(action.method)
         await expect(page.getByTestId('next-event')).toBeVisible()
         if (turns === 1) {
+          await completeLocalReading(page)
           const event = await page.getByRole('region', { name: '当前事件' }).textContent()
           await page.reload()
           await expect(page.getByRole('region', { name: '当前事件' })).toHaveText(event)

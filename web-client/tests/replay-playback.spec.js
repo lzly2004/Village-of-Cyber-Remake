@@ -1,3 +1,4 @@
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { replayId } from '../src/replayStore.js'
@@ -42,6 +43,7 @@ test('frozen desktop dates/portraits play read-only beside a real running game, 
   const credentials=await saved(page),path='/api/v1/games/'+credentials.sessionId+'?eventCursor='+credentials.eventCursor
   try{
     const before=await(await request.get(path)).json()
+    await completeLocalReading(page)
     const current=await page.getByTestId('event-dialogue').textContent()
     await seed(page)
     let writes=0,reads=0,audio=0

@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, shallowRef, watch } from 'vue'
 import { stageImageCache } from './stageImageCache.js'
 const emit = defineEmits(['consequence','ready','failed'])
-const props = defineProps({ plan: { type: Object, required: true } })
+const props = defineProps({ plan: { type: Object, required: true }, frameIndex: { type: Number, default: null }, reviewAllowed: { type: Boolean, default: true } })
 const frames = computed(() => props.plan.frames || [props.plan.actors])
 const names = computed(() => [...new Set([props.plan.background, ...frames.value.flat().map(actor => actor.name)])])
 const assets = shallowRef(stageImageCache.ready(names.value))
@@ -13,20 +13,21 @@ let version = 0
 let notified = false
 function showFrame(value) {
   frame.value = value
-  if (value === frames.value.length - 1 && !notified && !failed.value && !props.plan.diagnostic) { notified = true; emit('consequence') }
+  if (value === frames.value.length - 1 && !notified && !failed.value && !props.plan.diagnostic) { notified = true; const token=version; nextTick(()=>{if(token===version&&!failed.value)emit('consequence')}) }
 }
 function startTransition(current) {
-  if (frames.value.length < 2) return
+  if (frames.value.length < 2 || props.frameIndex !== null) return
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { showFrame(frames.value.length - 1); return }
   timer = setTimeout(() => { if (current === version) showFrame(1) }, props.plan.transitionMs)
 }
+watch(()=>props.frameIndex,value=>{if(value!==null&&assets.value)showFrame(value)})
 function toggleFrame() {
   clearTimeout(timer)
   showFrame((frame.value + 1) % frames.value.length)
 }
 function markFailed() { clearTimeout(timer);if(!failed.value){failed.value=true;emit('failed')} }
 function publishReady(current) {
-  nextTick(()=>{if(current===version && assets.value && !failed.value){emit('ready');startTransition(current)}})
+  nextTick(()=>{if(current===version && assets.value && !failed.value){emit('ready');if(props.frameIndex!==null)showFrame(props.frameIndex);startTransition(current)}})
 }
 watch(names, list => {
   const current = ++version
@@ -56,7 +57,7 @@ const actors = computed(() => assets.value ? frames.value[frame.value].map(actor
         :data-source="actor.name" :data-layer="actor.layer" data-testid="stage-character" @error="markFailed" />
     </g>
   </svg>
-  <button v-if="assets && !failed && frames.length > 1" class="stage-frame-toggle quiet-button" data-testid="stage-frame-toggle" @click="toggleFrame">画像を切替（{{ frame + 1 }}/{{ frames.length }}）</button>
+  <button v-if="assets && !failed && frames.length > 1 && (frameIndex===null || (frameIndex===1 && reviewAllowed))" class="stage-frame-toggle quiet-button" data-testid="stage-frame-toggle" @click="toggleFrame">画像を切替（{{ frame + 1 }}/{{ frames.length }}）</button>
   <span v-if="failed || plan.diagnostic || !assets" class="stage-art-status" role="status" data-testid="stage-art-status">
     {{ failed ? '画像表示診断：立ち絵を読み込めません。台詞は引き続き読めます。'
       : plan.diagnostic ? '画像表示診断：表示情報が不足しているため代替表示です。'

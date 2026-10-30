@@ -50,7 +50,7 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
   const event = { eventname: 'zco7', ch1: 'Abel', ch2: 'NONE', ch3: 'NONE' }
   snapshot.events = [event]; snapshot.presentedEvents = [{ stage: 'DAY_DIALOGUE', event }]; snapshot.nextEventCursor = 1
   const imageMapping = JSON.parse(readFileSync(new URL('../../src/main/resources/config/event_image_mapping.json', import.meta.url), 'utf8'))
-  const stageFiles = ['images/haikei3.png', 'images/' + imageMapping.Abel.zco7.default]
+  const stageFiles = ['images/haikei3.png', 'images/messageframe.png', 'images/' + imageMapping.Abel.zco7.default]
   await page.route('**/api/v1/games', route => route.fulfill({status:201,json:{
     sessionId: '00000000-0000-4000-8000-000000000023', update: snapshot,
   }}))
@@ -119,7 +119,7 @@ test('night/dawn and current result together obey the unchanged first-game trans
  await expect(page.getByTestId('stage-character')).toHaveCount(1)
  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
  await page.waitForLoadState('networkidle')
- const stage=['images/komorebi000night01.png','images/komorebi002.png','images/haikei3.png',...mapping.Abel.yjsw.default.map(n=>'images/'+n)]
+ const stage=['images/komorebi000night01.png','images/komorebi002.png','images/haikei3.png','images/messageframe.png',...mapping.Abel.yjsw.default.map(n=>'images/'+n)]
  const allowed=new Set([...stage,...Array.from({length:44},(_,i)=>'images/'+String(i+1).padStart(2,'0')+'s.png'),...Array.from({length:44},(_,i)=>'images/'+(i+1)+'job.png')].map(n=>'/assets/images/'+manifest.images[n].file))
  expect(paths.every(p=>allowed.has(p))).toBe(true)
  for(const name of stage)expect(paths).toContain('/assets/images/'+manifest.images[name].file)

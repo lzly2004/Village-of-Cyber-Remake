@@ -1,0 +1,27 @@
+/* WEB-050-B1: desktop dialogue frame, with the user-approved 40px downward move.
+   Coordinates use the 1280x720 stage, not browser/device pixels. Font distribution
+   remains a separate confirmed baseline; only existing system fallbacks are used. */
+.stage-surface { container-type: inline-size; }
+.game-stage { font-family: "Takao Mincho", "Noto Sans CJK JP", "Yu Gothic", sans-serif; }
+.desktop-message { position: absolute; left: 20.3125%; bottom: 0; width: 59.375%; height: 31.944444%; background: #344a52; color: white; }
+.desktop-message .message-frame { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+.desktop-message .message-frame img { width: 100%; height: 100%; object-fit: fill; max-width: none; max-height: none; }
+.message-speaker { position: absolute; left: 5.263158%; top: 2.173913%; right: 3%; height: 18%; overflow: hidden; font-size: 2.03125cqw; line-height: 1.25; white-space: nowrap; }
+.desktop-message .stage-text { left: 2.631579%; right: 2.631579%; top: 21.73913%; bottom: 13%; width: auto; min-height: 0; max-height: none; padding: 0; border: 0; background: transparent; scrollbar-gutter: stable; }
+.game-stage .desktop-message .event-dialogue { font: inherit; font-size: 2.03125cqw; line-height: 1.25; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.game-stage .desktop-message .event-content { padding: 0; margin: 0; }
+.message-actions { position: absolute; left: 2.631579%; right: 2%; bottom: 1%; height: 12%; display: flex; justify-content: flex-end; align-items: center; }
+.message-continue { color: #fff; background: #233a45; border: 1px solid #b3c6cc; padding: 0 .5em; font-size: max(11px, 1.171875cqw); line-height: 1.2; }
+.message-continue:focus-visible { outline: 2px solid #ffd589; outline-offset: 0; }
+.message-continue:disabled { opacity: .7; }
+.desktop-message .dialogue-diagnostic { font-size: max(12px,1.3cqw); padding: .3em; margin: 0; }
+.display-details { padding: .6rem 1rem; border-top: 1px solid #d9dfd2; font-size: 12px; }
+.display-details summary { cursor: pointer; }
+.display-details p { margin: .4rem 0; }
+.game-stage[data-message="true"] .stage-reading-help { font-size: 12px; }
+@media (max-width: 1100px) {
+  /* Keep text legible at smaller desktop widths, while preserving frame placement.
+     Long lines scroll in the text region; the separate continue control stays fixed. */
+  .game-stage .desktop-message .event-dialogue { font-size: max(14px,2.03125cqw); }
+  .message-speaker { font-size: max(13px,2.03125cqw); }
+}
