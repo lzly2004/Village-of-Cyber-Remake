@@ -206,7 +206,7 @@ function name(number) {
                 <SettlementBoard v-if="finished" :players="players" :reveal="reveal" :result="update.view.result" />
               </template>
               <div v-if="presentationPhase==='day-text'" class="event-content" lang="ja" role="status" data-testid="day-start-text">{{ dayStartText }}</div>
-              <div v-else-if="presentationPhase==='error'" class="event-content" lang="ja" role="status">夜明けの画像を表示できません。現在の出来事へ進めます。</div>
+              <div v-else-if="presentationPhase==='error'" class="event-content" lang="ja" role="status">場面の画像を表示できません。現在の出来事へ進めます。</div>
               <div v-else-if="presentationPhase==='event' && currentEvent" class="event-content" role="region" aria-labelledby="current-event-label" lang="ja">
                 <span id="current-event-label" class="visually-hidden" lang="zh-CN">当前事件</span>
                 <EventDialogue v-if="readingStep!=='consequence'" :event="currentEvent.event" :visible-text="readingText" aria-hidden="true" />

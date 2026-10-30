@@ -82,9 +82,30 @@ test('refresh replays local first-night presentation without moving saved cursor
 test('broken transition image diagnoses and local exit does not consume current event',async({page})=>{
  await page.route('**'+url('komorebi000night01.png'),r=>r.abort('failed'))
  await setup(page,[p('NIGHT_RESULT','yjsw')]);await expect(phase(page)).toHaveAttribute('data-presentation-phase','error')
+ await expect(page.getByText('場面の画像を表示できません。現在の出来事へ進めます。',{exact:true})).toBeVisible()
  const before=await saved(page);await expect(page.getByTestId('day-start-continue')).toBeEnabled()
  await click(page,'day-start-continue');await ready(page,'event');expect(await saved(page)).toBe(before)
  await expect(page.getByTestId('next-event')).toBeEnabled()
+})
+test('broken dawn uses scene-neutral error text and local exit keeps the authoritative cursor',async({page})=>{
+ await clock(page)
+ await page.route('**'+url('komorebi002.png'),r=>r.abort('failed'))
+ await setup(page,[p('NIGHT_RESULT','yjsw')]);await ready(page,'night')
+ const before=await saved(page),writes=[]
+ page.on('request',r=>{if(['POST','PUT','DELETE'].includes(r.method()))writes.push(r.url())})
+ await page.clock.runFor(7000)
+ await expect(phase(page)).toHaveAttribute('data-presentation-phase','error')
+ await expect(page.getByText('場面の画像を表示できません。現在の出来事へ進めます。',{exact:true})).toBeVisible()
+ await expect(page.getByText('場面表示診断：NIGHT_IMAGE_UNAVAILABLE')).toBeVisible()
+ await click(page,'day-start-continue')
+ await expect(phase(page)).toHaveAttribute('data-presentation-phase','event')
+ // Dawn and the event background share a content-addressed asset. Keeping the
+ // failure active must still allow text, not falsely report successful art.
+ await expect(page.getByTestId('stage-art-status')).toContainText('読み込めません')
+ await expect(page.getByTestId('next-event')).toBeEnabled()
+ await completeLocalReading(page)
+ await expect(page.getByTestId('event-dialogue')).not.toBeEmpty()
+ expect(await saved(page)).toBe(before);expect(writes).toEqual([])
 })
 test('reduced motion keeps both static backgrounds and their order, but no day text animation',async({page})=>{
  await clock(page);await page.emulateMedia({reducedMotion:'reduce'});await setup(page,[p('NIGHT_RESULT','yjsw')]);await ready(page,'night')
