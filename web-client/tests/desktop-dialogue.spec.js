@@ -18,7 +18,13 @@ async function setup(page,{kind='DAY_DIALOGUE',name='gyfo1',long=false}={}){
 const saved=page=>page.evaluate(k=>sessionStorage.getItem(k),key)
 async function click(page,testid){await page.clock.runFor(1);await page.getByTestId(testid).click()}
 async function full(page){await page.clock.runFor(50*Number(await stage(page).getAttribute('data-reading-length'))+1)}
-async function capture(page,info,name){const data=await page.getByTestId('stage-surface').screenshot({path:info.outputPath(name)});mkdirSync('../build/web050/dialogue/screenshots',{recursive:true});writeFileSync('../build/web050/dialogue/screenshots/'+name,data);writeFileSync('../build/web050/dialogue/screenshots/'+name+'.json',JSON.stringify({name,bytes:data.length,sha256:createHash('sha256').update(data).digest('hex')},null,2))}
+async function capture(page,info,name){
+ const data=await page.getByTestId('stage-surface').screenshot({path:info.outputPath(name)})
+ const meta={name,source:'Synthetic public snapshot, real browser rendering; not user playtest',bytes:data.length,sha256:createHash('sha256').update(data).digest('hex')}
+ for(const folder of [new URL('../../build/web050/dialogue/screenshots/',import.meta.url),new URL('../../build/verify/desktop-core/',import.meta.url)]){
+  mkdirSync(folder,{recursive:true});writeFileSync(new URL(name,folder),data);writeFileSync(new URL(name+'.json',folder),JSON.stringify(meta,null,2))
+ }
+}
 
 test('desktop dialogue types at50ms; reveal is local, next confirm persists exactly once',async({page},info)=>{
  const {event}=await setup(page);const before=await saved(page),writes=[];page.on('request',r=>{if(['POST','PUT','DELETE'].includes(r.method()))writes.push(r.url())})

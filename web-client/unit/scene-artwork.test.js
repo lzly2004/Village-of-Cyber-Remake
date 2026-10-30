@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { sceneArtwork, sceneImages, outcomes, consequenceFormats, transitionTimes } from '../src/sceneArtwork.js'
 import { dialogueArtwork, eventImageNames } from '../src/eventArtwork.js'
-import { settlementReveal, settlementPortrait } from '../src/settlementVisual.js'
+import { settlementReveal, settlementPortrait, settlementDetails } from '../src/settlementVisual.js'
 import { characters } from '../src/characterDisplay.js'
 import { roles } from '../src/labels.js'
 const read = path => readFileSync(new URL('../../' + path, import.meta.url),'utf8')
@@ -144,3 +144,32 @@ test('local presentation mutes BGM without consulting an already-public future o
  }
 })
 }
+
+test('desktop settlement details preserve claims, exact death days and all seven core reasons', () => {
+  const suffixes={beiyao:'狼噛',chuxing:'処刑',zhousha:'呪殺',dayhouzhui:'後追',nighthouzhui:'後追',daymaozhou:'猫呪',nightmaozhou:'猫呪'}
+  for(const [deathReason,suffix] of Object.entries(suffixes)) {
+    const value=settlementDetails(true,{alive:false,deathReason,deathDay:4,claimedRole:'zhan'},'renlang','WOLF_WIN')
+    assert.equal(value.claim,'占い師');assert.equal(value.actual,'人狼');assert.equal(value.fate,'4日目'+suffix);assert.equal(value.diagnostic,null)
+  }
+})
+test('desktop alive outcome matches EndAnimeHandler factions rather than fabricating death dates',()=>{
+  for(const role of Object.keys(roles).filter(r=>r!=='NONE'))for(const result of ['VILLAGE_WIN','WOLF_WIN','FOX_WIN']) {
+    const value=settlementDetails(true,{alive:true,deathReason:'NONE',deathDay:0,claimedRole:'NONE'},role,result)
+    const winner=result==='WOLF_WIN'?['renlang','kuangren','kuangxinzhe'].includes(role):['yaohu','beidezhe'].includes(role)
+    assert.equal(value.fate,result==='VILLAGE_WIN'?'最終存活':winner?'最終胜利':'最終死亡')
+    assert.equal(value.claim,'無し');assert.equal(value.actual,roles[role]);assert.equal(value.diagnostic,null)
+  }
+})
+test('settlement details do not read fields before reveal and diagnose missing or sanitized terminal facts',()=>{
+  const poison=new Proxy({},{get(){throw Error('premature read')}})
+  assert.equal(settlementDetails(false,poison,poison,poison),null)
+  for(const deathReason of ['NIGHT_DEATH','EXECUTION','toString',null]){
+    const v=settlementDetails(true,{alive:false,deathDay:2,deathReason,claimedRole:'NONE'},'wu','VILLAGE_WIN')
+    assert.equal(v.fate,'死因不明（表示診断）');assert.equal(v.diagnostic,'INVALID_DEATH_REASON')
+  }
+  for(const day of [null,0,-1,2.5,'3']){
+    const v=settlementDetails(true,{alive:false,deathDay:day,deathReason:'beiyao',claimedRole:'NONE'},'wu','VILLAGE_WIN')
+    assert.equal(v.fate,'死亡日不明（表示診断）');assert.equal(v.diagnostic,'INVALID_DEATH_DAY')
+  }
+  assert.match(settlementDetails(true,{alive:true,claimedRole:'toString'},'bad','bad').actual,/不明/)
+})

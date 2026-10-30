@@ -1,6 +1,6 @@
 import { characterDisplayName } from '../src/characterDisplay.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
-import { readFileSync, readdirSync } from 'node:fs'
+import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
@@ -198,6 +198,14 @@ async function journey(page, request, testInfo, configuration, strategy) {
       await page.getByRole('region', { name: '公开玩家列表', exact: true })
         .screenshot({ path: testInfo.outputPath('settlement-players.png') })
       await page.screenshot({ path: testInfo.outputPath('settlement.png'), fullPage: true })
+      // One real seeded API journey documents the implemented core window;
+      // synthetic layout cases have a separate provenance index.
+      if(configuration==='jianyi' && strategy==='designated') {
+        const folder=resolve(root,'build/verify/desktop-core')
+        mkdirSync(folder,{recursive:true})
+        const image=await page.getByTestId('stage-surface').screenshot({path:resolve(folder,'settlement-real-jianyi.png')})
+        writeFileSync(resolve(folder,'settlement-real-jianyi.json'),JSON.stringify({source:'Real seeded API/HTTP/browser gate journey; not user random playtest',configuration,strategy,seed:data.seed,bytes:image.length,sha256:createHash('sha256').update(image).digest('hex')},null,2)+'\n')
+      }
     }
     for (const endpoint of ['/debug', '/context', '/recorder', '/suspicion'])
       expect((await request.get(path + endpoint)).status()).toBe(404)

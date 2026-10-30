@@ -52,7 +52,8 @@ function manyPlayers(snapshot, withActors = false) {
 }
 async function expectContainedStage(page) {
   const rect = await page.getByTestId('stage-surface').boundingBox()
-  expect(Math.abs(rect.width / rect.height - 16 / 9)).toBeLessThan(0.005)
+  if(await page.getByTestId('desktop-vote-window').count())expect(rect.height).toBeGreaterThanOrEqual(720)
+  else expect(Math.abs(rect.width / rect.height - 16 / 9)).toBeLessThan(0.005)
   const drawing = await page.getByTestId('stage-artwork').boundingBox()
   expect(Math.abs(drawing.width - rect.width)).toBeLessThan(1)
   expect(Math.abs(drawing.height - rect.height)).toBeLessThan(1)
@@ -164,30 +165,17 @@ test('WEB-021 synthetic long player list exposes scroll instructions and support
   page.on('request', req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ })
   try {
     const list = page.getByRole('region', { name: '公开玩家列表滚动区域', exact: true })
-    await expect(page.locator('#player-list-help')).toContainText('按 Tab')
+    await expect(page.locator('#player-list-help')).toContainText('Tab')
     await expect(list.getByRole('checkbox')).toHaveCount(44)
-    expect(await list.evaluate(node => node.scrollHeight > node.clientHeight)).toBe(true)
+    const viewport=page.locator('.desktop-vote-players')
+    expect(await viewport.evaluate(node=>node.scrollWidth>node.clientWidth)).toBe(true)
     await list.focus()
-    await page.keyboard.press('End')
-    await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeGreaterThan(0)
-    await list.getByRole('checkbox').last().focus()
+    for(let i=0;i<44;i++)await page.keyboard.press('Tab')
     await expect(list.getByRole('checkbox').last()).toBeFocused()
-    // Wheel scrolling is independent; finish native End animation first.
-    const before = await list.evaluate(async node => {
-      let previous = node.scrollTop
-      let stable = 0
-      for (let frame = 0; frame < 60; frame++) {
-        await new Promise(resolve => requestAnimationFrame(resolve))
-        const current = node.scrollTop
-        stable = current === previous ? stable + 1 : 0
-        previous = current
-        if (stable === 4) return current
-      }
-      throw new Error('End key scrolling did not settle before wheel input')
-    })
-    await list.hover()
-    await page.mouse.wheel(0, -1000)
-    await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeLessThan(before)
+    await expect.poll(()=>viewport.evaluate(node=>node.scrollLeft)).toBeGreaterThan(0)
+    const before=await viewport.evaluate(node=>node.scrollLeft)
+    await viewport.hover();await page.mouse.wheel(-1000,0)
+    await expect.poll(()=>viewport.evaluate(node=>node.scrollLeft)).toBeLessThan(before)
     expect(writes).toBe(0)
     expect((await saved(page)).eventCursor).toBe(0)
     await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
@@ -237,7 +225,7 @@ test('WEB-021 CSS zoom stress keeps stage ratio, readable text and controls with
     for (const zoom of [1.25, 2]) {
       await page.evaluate(zoom => { document.body.style.zoom = String(zoom) }, zoom)
       await expectContainedStage(page)
-      expect(await page.getByTestId('stage-text').evaluate(node => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(14)
+      expect(await page.locator('.vote-information-content').evaluate(node => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(14)
       await page.getByTestId('vote').focus()
       await expect(page.getByTestId('vote')).toBeFocused()
     }

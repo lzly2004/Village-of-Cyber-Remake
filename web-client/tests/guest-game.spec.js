@@ -37,7 +37,7 @@ test('选择配役、逐条阅读与刷新恢复已确认游标', async ({ page,
     expect((await saved(page)).sessionId).toBe(id)
     expect(Object.keys(await saved(page)).sort()).toEqual(['eventCursor', 'sessionId'])
     await readEvents(page)
-    await expect(page.getByRole('heading', { name: '今日は、誰に投票しますか？' })).toBeVisible()
+    await expect(page.getByTestId('desktop-vote-window')).toBeVisible()
   } finally { await release(request, id) }
 })
 

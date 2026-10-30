@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, defineAsyncComponent, h } from 'vue'
+import { computed, ref, watch, defineAsyncComponent, h, nextTick } from 'vue'
 import { useGuestGame } from './useGuestGame'
 import PublicInformationPanel from './PublicInformationPanel.vue'
 import VoteHistoryPanel from './VoteHistoryPanel.vue'
@@ -9,11 +9,14 @@ import BgmControl from './BgmControl.vue'
 import PlayerPortrait from './PlayerPortrait.vue'
 import ReplayEntry from './ReplayEntry.vue'
 import RecordSettlement from './RecordSettlement.vue'
+import SettlementBoard from './SettlementBoard.vue'
+import DesktopVoteWindow from './DesktopVoteWindow.vue'
+import GameOrders from './GameOrders.vue'
 import RecordPage from './RecordPage.vue'
 import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
 import { playerVisual } from './playerVisual.js'
-import { sceneArtwork, outcomes } from './sceneArtwork.js'
+import { sceneArtwork } from './sceneArtwork.js'
 import { settlementReveal } from './settlementVisual.js'
 import { useEventReading } from './useEventReading.js'
 import { useNightDayPresentation } from './useNightDayPresentation.js'
@@ -32,6 +35,7 @@ const {phase:presentationPhase,artwork:preludeArtwork,text:dayStartText,complete
   sessionId:sessionId.value,cursor:cursor.value,current:currentEvent.value,history:presentationHistory.value,
   day:update.value?.view.gameDay,uncertain:uncertain.value,
 }))
+const decisionWindow = computed(()=>update.value?.phase==='DAY_DECISION' && !currentEvent.value && presentationPhase.value==='event')
 const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
 const artwork = computed(() => preludeArtwork.value || sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
 const audioControl = ref(null)
@@ -84,13 +88,18 @@ const helpPage = ref('')
 const recordPage = ref(false)
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
+async function openGameMenu(){
+  confirmingExit.value=true
+  await nextTick()
+  const menu=document.querySelector('.exit-confirm')
+  menu?.scrollIntoView({block:'nearest'});menu?.querySelector('button')?.focus({preventScroll:true})
+}
 const players = computed(() => update.value?.view.players || [])
 const claimCandidates = computed(() => players.value.filter(player => claimPlayers.value.includes(player.playerNumber)))
 const voteTargets = computed(() => update.value?.selections.voteTargets || [])
 const legalTargets = computed(() =>
   update.value?.legalTargetSelections.find(action => action.type === 'VOTE')?.targets || [])
 const reveal = computed(() => settlementReveal(finished.value, players.value, finished.value ? update.value.revealedRoles : null))
-const outcome = computed(() => finished.value && typeof update.value.view.result === 'string' && Object.hasOwn(outcomes, update.value.view.result) ? outcomes[update.value.view.result] : null)
 const claimedSkills = computed(() => (update.value?.legalTargetSelections || [])
   .filter(action => ['DIVINATION', 'GUARD'].includes(action.type))
   .map(action => {
@@ -102,6 +111,7 @@ const claimedSkills = computed(() => (update.value?.legalTargetSelections || [])
       })),
     }
   }))
+const orderBindings=computed(()=>({update:update.value,alternativeVotes:alternativeVotes.value,canDecide:canDecide.value,vote,divinationTargets:divinationTargets.value,selectedDivinationTargets:selectedDivinationTargets.value,setDivinationTarget,guardTargets:guardTargets.value,selectedGuardTargets:selectedGuardTargets.value,setGuardTarget,claimedSkills:claimedSkills.value,setClaimedTarget,claimRoles:claimRoles.value,askClaimRole,claimRoleNames,claimPlayers:claimPlayers.value,claimCandidates:claimCandidates.value,claimPlayerDraft:claimPlayerDraft.value,toggleClaimPlayer,characterDisplayName,canAskClaimPlayers:canAskClaimPlayers.value,askClaimPlayers,name,setAvoidance}))
 function name(number) {
   const player = players.value.find(item => item.playerNumber === number)
   return player ? number + ' · ' + characterDisplayName(player.character) : String(number)
@@ -127,7 +137,7 @@ function name(number) {
     </aside>
 
     <main>
-      <header class="topbar"><span>電脳村リメイク / Web試遊版</span><span class="build-tag">TEXT EDITION · 01</span></header>
+      <header class="topbar"><span>電脳村リメイク / Web試遊版</span><span class="build-tag">デスクトップ表示 · 050（調整中）</span></header>
       <div v-if="notice" class="notice" role="alert" lang="zh-CN">{{ notice }}</div>
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
@@ -169,18 +179,31 @@ function name(number) {
             <span id="journal-label" class="visually-hidden" lang="zh-CN">事件展示</span>
             <header class="panel-heading"><span class="eyebrow" lang="zh-CN">01 / 村落纪事</span><span class="pill" :lang="currentEvent ? 'zh-CN' : 'ja'">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
-            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
+            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!finished && !decisionWindow && !['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
               <template #scene-overlay>
-                <div v-if="finished" class="settlement-board" role="region" aria-label="結算役職一覧" tabindex="0" data-testid="settlement-board" lang="ja">
-                  <p>配役一覧 · {{ players.length }}人 · 一覧内をスクロールして確認できます。</p>
-                  <div class="settlement-grid">
-                    <div v-for="player in players" :key="player.playerNumber" class="settlement-card">
-                      <PlayerPortrait :player="player" revealed :actual-role="reveal.roles.get(player.playerNumber)" />
-                      <strong>{{ player.playerNumber }} · {{ characterDisplayName(player.character) }}</strong>
-                      <small>{{ roles[reveal.roles.get(player.playerNumber)] || '身分不明（表示診断）' }}</small>
-                    </div>
-                  </div>
-                </div>
+                <DesktopVoteWindow v-if="decisionWindow" :day="update.view.gameDay" :alive="update.view.aliveCount" :dead="update.view.deathCount" :blocked="busy" @menu="openGameMenu">
+                  <template #players>          <section class="players panel" aria-label="公开玩家列表" lang="zh-CN">
+            <header class="panel-heading"><span class="eyebrow" lang="zh-CN">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
+            <p id="player-list-help" class="list-help">人物は上下2段です。左右にスクロールできます。Tabで各候補へ移動できます。</p>
+            <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" lang="zh-CN" tabindex="0" aria-describedby="player-list-help">
+              <label v-for="(player,index) in players" :key="player.playerNumber" class="player-row" :style="{gridColumn:index%Math.ceil(players.length/2)+1,gridRow:index<Math.ceil(players.length/2)?1:2}" :data-player-number="player.playerNumber" :title="characterDisplayName(player.character) + ' · ' + playerVisual(player).roleText + ' ' + playerVisual(player).orderText" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
+                <PlayerPortrait :player="player" :revealed="finished" :actual-role="finished ? reveal.roles.get(player.playerNumber) : null" />
+                <span class="player-number">{{ String(player.playerNumber).padStart(2, '0') }}</span>
+                <span class="player-identity" lang="ja"><strong lang="ja">{{ characterDisplayName(player.character) }}</strong><small>{{ finished ? '実際の役職 · ' + (roles[reveal.roles.get(player.playerNumber)] || '身分不明（表示診断）') : playerVisual(player).roleText + (playerVisual(player).orderText ? ' · ' + playerVisual(player).orderText : '') }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日離場</span></small><small v-if="playerVisual(player).claimDiagnostic" class="visual-diagnostic">表示診断：CO図なし</small><small v-if="playerVisual(player).deathDiagnostic" class="visual-diagnostic">表示診断：死因図なし</small></span>
+                <input v-if="!finished" type="checkbox" :aria-label="'指定 ' + characterDisplayName(player.character) + '（' + player.playerNumber + '号）'" :checked="voteTargets.includes(player.playerNumber)" :disabled="!canDecide || !legalTargets.includes(player.playerNumber)" @click.prevent="toggleTarget(player.playerNumber, !voteTargets.includes(player.playerNumber))">
+                <span v-else class="player-state" lang="ja">{{ player.alive ? '生存' : '離場' }}</span>
+              </label>
+            </div>
+          </section></template>
+                  <template #information><PublicInformationPanel :information="update.publicInformation" :players="players" :finished="false" :player-name="name" /></template>
+                  <template #orders><GameOrders v-bind="orderBindings" :show-avoidance="false" /></template>
+                  <template #history><VoteHistoryPanel :history="update.voteHistory" :player-name="name" /></template>
+                  <template #avoidance>            <button class="desktop-art-button" role="switch" aria-label="投票回避CO"
+              :aria-checked="update.selections.avoidanceEnabled" :disabled="!canDecide"
+              @click="setAvoidance(!update.selections.avoidanceEnabled)"><AssetImage :name="update.selections.avoidanceEnabled ? 'images/关闭回避.png' : 'images/开启回避.png'" /><span class="visually-hidden">{{ update.selections.avoidanceEnabled ? '回避あり' : '回避なし' }}</span></button></template>
+                  <template #vote><button class="desktop-art-button" data-testid="vote" :disabled="!canVote" @click="vote('DESIGNATED')"><AssetImage name="images/goTohyo.png" /><span class="visually-hidden">{{ busy ? '処理中…' : '投票を確定' }}</span></button></template>
+                </DesktopVoteWindow>
+                <SettlementBoard v-if="finished" :players="players" :reveal="reveal" :result="update.view.result" />
               </template>
               <div v-if="presentationPhase==='day-text'" class="event-content" lang="ja" role="status" data-testid="day-start-text">{{ dayStartText }}</div>
               <div v-else-if="presentationPhase==='error'" class="event-content" lang="ja" role="status">夜明けの画像を表示できません。現在の出来事へ進めます。</div>
@@ -189,10 +212,6 @@ function name(number) {
                 <EventDialogue v-if="readingStep!=='consequence'" :event="currentEvent.event" :visible-text="readingText" aria-hidden="true" />
                 <p v-else class="event-consequence event-dialogue" lang="ja" aria-hidden="true" data-testid="event-consequence">{{ readingText }}</p>
                 <span class="visually-hidden" :lang="readingLanguage" data-testid="accessible-dialogue">{{ readingFullText }}</span>
-              </div>
-              <div v-else-if="presentationPhase==='event' && finished" class="event-content settlement" role="status" lang="ja">
-                <span class="event-number">THE FINAL VERDICT</span><AssetImage v-if="outcome" class="settlement-win-icon" :name="outcome.icon" /><h2 lang="ja">{{ outcome?.text || '勝敗不明（表示診断）' }}</h2><p>全イベントを確認しました。役職はサーバーの公開結果に従います。</p>
-                <p v-if="reveal.diagnostic" class="visual-diagnostic" role="status" data-testid="reveal-diagnostic">表示診断：身分情報が不完全です。人物の役職画像を表示できません。</p>
               </div>
               <div v-else-if="presentationPhase==='event'" class="event-content decision" lang="ja">
                 <span class="event-number">YOUR DECISION</span><h2>今日は、誰に投票しますか？</h2><p>プレイヤー一覧で指定候補にチェックして、投票を確定してください。</p><p>回避COがあれば発言を読んで再検討してください。共有者の回避後は候補を選び直せます。</p>
@@ -211,18 +230,18 @@ function name(number) {
               <p v-if="readingDiagnostic" role="status">表示診断：{{ readingDiagnostic }}。画像なしでも文章を読めます。</p>
             </details>
             <small v-if="presentationDiagnostic" class="visual-diagnostic" role="status" lang="ja">場面表示診断：{{ presentationDiagnostic }}</small>
-            <footer class="decision-footer" v-if="!finished">
+            <footer class="decision-footer" v-if="!finished && !decisionWindow">
               <div><span class="eyebrow">指定候補</span><p>{{ voteTargets.length ? voteTargets.map(name).join('、') : '未選択' }}</p></div>
               <button class="primary-button" data-testid="vote" :disabled="!canVote" @click="vote('DESIGNATED')">{{ busy ? '処理中…' : '投票を確定' }}</button>
               <small v-if="currentEvent">未確認のイベントを先に読み終えてください。</small><small v-else-if="uncertain">再同期してサーバーの状態を確認してください。</small>
             </footer>
           </section>
 
-          <section class="players panel" aria-label="公开玩家列表" lang="zh-CN">
+          <section v-if="!decisionWindow" class="players panel" aria-label="公开玩家列表" lang="zh-CN">
             <header class="panel-heading"><span class="eyebrow" lang="zh-CN">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
             <p id="player-list-help" class="list-help">名单较长时可在列表内滚动。按 Tab 聚焦列表后可用方向键；继续按 Tab 可逐个选择候补。</p>
             <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" lang="zh-CN" tabindex="0" aria-describedby="player-list-help">
-              <label v-for="player in players" :key="player.playerNumber" class="player-row" :data-player-number="player.playerNumber" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
+              <label v-for="player in players" :key="player.playerNumber" class="player-row" :data-player-number="player.playerNumber" :title="characterDisplayName(player.character) + ' · ' + playerVisual(player).roleText + ' ' + playerVisual(player).orderText" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
                 <PlayerPortrait :player="player" :revealed="finished" :actual-role="finished ? reveal.roles.get(player.playerNumber) : null" />
                 <span class="player-number">{{ String(player.playerNumber).padStart(2, '0') }}</span>
                 <span class="player-identity" lang="ja"><strong lang="ja">{{ characterDisplayName(player.character) }}</strong><small>{{ finished ? '実際の役職 · ' + (roles[reveal.roles.get(player.playerNumber)] || '身分不明（表示診断）') : playerVisual(player).roleText + (playerVisual(player).orderText ? ' · ' + playerVisual(player).orderText : '') }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日離場</span></small><small v-if="playerVisual(player).claimDiagnostic" class="visual-diagnostic">表示診断：CO図なし</small><small v-if="playerVisual(player).deathDiagnostic" class="visual-diagnostic">表示診断：死因図なし</small></span>
@@ -233,103 +252,9 @@ function name(number) {
           </section>
         </div>
 
-        <section v-if="update.phase === 'DAY_DECISION'" class="panel claim-inquiry" aria-label="自由・グレー投票" lang="ja">
-          <header class="panel-heading"><span>自由・グレー投票</span><span>候補はサーバーの最新状態に従います。</span></header>
-          <div v-for="action in alternativeVotes" :key="action.method" class="claim-actions">
-            <button class="primary-button" :data-testid="'vote-' + action.method" :disabled="!canDecide"
-              @click="vote(action.method)">{{ action.method === 'FREE' ? '自由投票' : 'グレー投票' }}</button>
-            <span :data-testid="'candidates-' + action.method">{{ action.candidates.map(name).join('、') }}</span>
-          </div>
-          <p v-if="!alternativeVotes.some(action => action.method === 'GREY')" class="avoidance-help">グレー投票の候補はいません。</p>
-        </section>
-
-        <section v-if="update.phase === 'DAY_DECISION'" class="panel claim-inquiry" aria-label="投票回避設定" lang="ja">
-          <header class="panel-heading"><span>投票回避CO</span>
-            <button class="primary-button" role="switch" aria-label="投票回避CO"
-              :aria-checked="update.selections.avoidanceEnabled" :disabled="!canDecide"
-              @click="setAvoidance(!update.selections.avoidanceEnabled)">{{ update.selections.avoidanceEnabled ? '回避あり' : '回避なし' }}</button>
-          </header>
-          <p class="avoidance-help">指定投票時の回避CO。共有の回避は無効化されません。</p>
-        </section>
-
-        <section v-if="divinationTargets.length" class="panel claim-inquiry" aria-label="全員の占い予約" lang="ja">
-          <header class="panel-heading"><span>全員の占い予約</span><span>当日の予約です。結果は確約されません。</span></header>
-          <p class="avoidance-help">潜伏・公開COの占い候補をまとめて設定／解除します。チェックは公開された予約のいずれかに対象が含まれることを示します。</p>
-          <p class="avoidance-help">全体操作は、この対象の個別設定も一括で上書きします。他の対象の設定は変更しません。</p>
-          <div class="claim-player-list">
-            <label v-for="target in divinationTargets" :key="target" class="claim-player">
-              <input type="checkbox" :aria-label="'全員占い対象 ' + target + '番 ' + name(target)"
-                :checked="selectedDivinationTargets.has(target)" :disabled="!canDecide"
-                @click.prevent="setDivinationTarget(target, !selectedDivinationTargets.has(target))">
-              <span>{{ name(target) }}</span>
-            </label>
-          </div>
-        </section>
-
-        <section v-if="guardTargets.length" class="panel claim-inquiry" aria-label="全員の護衛予約" lang="ja">
-          <header class="panel-heading"><span>全員の護衛予約</span><span>当日の予約です。結果は確約されません。</span></header>
-          <p class="avoidance-help">潜伏・公開COの護衛候補をまとめて設定／解除します。チェックは公開された予約のいずれかに対象が含まれることを示します。</p>
-          <p class="avoidance-help">全体操作は、この対象の個別設定も一括で上書きします。他の対象の設定は変更しません。</p>
-          <div class="claim-player-list">
-            <label v-for="target in guardTargets" :key="target" class="claim-player">
-              <input type="checkbox" :aria-label="'全員護衛対象 ' + target + '番 ' + name(target)"
-                :checked="selectedGuardTargets.has(target)" :disabled="!canDecide"
-                @click.prevent="setGuardTarget(target, !selectedGuardTargets.has(target))">
-              <span>{{ name(target) }}</span>
-            </label>
-          </div>
-        </section>
-
-        <div v-if="claimedSkills.length" class="claimed-skills-layout">
-          <section v-for="skill in claimedSkills" :key="skill.type" class="panel claim-inquiry" :aria-label="skill.label" lang="ja">
-            <header class="panel-heading"><span>{{ skill.label }} · {{ skill.actors.length }}人</span><span>公開COの行動者だけを表示します。予約は結果を保証しません。</span></header>
-            <p v-if="!skill.actors.length" class="avoidance-help">この技能の公開CO行動者はいません。</p>
-            <template v-else>
-              <p class="list-help" :id="'claimed-help-' + skill.type">行ごとに折りたためます。長い一覧は枠内でスクロールできます。Tabで枠に移動し、方向キーで閲覧できます。</p>
-              <div class="claimed-actor-list" role="region" :aria-label="skill.label + ' 一覧'" tabindex="0"
-                :aria-describedby="'claimed-help-' + skill.type">
-                <details v-for="actor in skill.actors" :key="actor.playerNumber" class="claimed-actor" open>
-                  <summary>{{ name(actor.playerNumber) }} · CO順 {{ actor.claimedRoleOrder }}<span>予約 {{ actor.targets.length }}件</span></summary>
-                  <fieldset class="claim-player-list" :data-testid="'claimed-' + skill.type + '-' + actor.playerNumber" :disabled="!canDecide">
-                    <legend class="visually-hidden">{{ name(actor.playerNumber) }} · CO順 {{ actor.claimedRoleOrder }}</legend>
-                    <label v-for="target in skill.targets" :key="target" class="claim-player">
-                      <input type="checkbox" :aria-label="skill.label + ' ' + actor.playerNumber + '番から' + target + '番へ'"
-                        :checked="actor.targets.includes(target)"
-                        @click.prevent="setClaimedTarget(skill.type, actor.playerNumber, target, !actor.targets.includes(target))">
-                      <span>{{ name(target) }}</span>
-                    </label>
-                  </fieldset>
-                </details>
-              </div>
-            </template>
-          </section>
-        </div>
-
-        <section v-if="claimRoles.length" class="panel claim-inquiry" aria-label="職業別CO確認" lang="ja">
-          <header class="panel-heading"><span>職業別CO確認</span><span>発言を読み終えてから操作してください。</span></header>
-          <div class="claim-actions">
-            <button v-for="role in claimRoles" :key="role" class="primary-button"
-              :disabled="!canDecide" @click="askClaimRole(role)">{{ claimRoleNames[role] || role }}のCOを聞く</button>
-          </div>
-        </section>
-
-        <section v-if="claimPlayers.length" class="panel claim-inquiry" aria-label="プレイヤー別CO確認" lang="ja">
-          <header class="panel-heading"><span>プレイヤー別CO確認</span><span>未送信の選択は再読み込み・同期で解除されます。</span></header>
-          <div class="claim-player-list">
-            <label v-for="player in claimCandidates" :key="player.playerNumber" class="claim-player">
-              <input type="checkbox" :aria-label="player.playerNumber + '番 ' + characterDisplayName(player.character) + 'をCO確認対象に選択'"
-                :checked="claimPlayerDraft.includes(player.playerNumber)" :disabled="!canDecide"
-                @change="toggleClaimPlayer(player.playerNumber, $event.target.checked)">
-              <span>{{ player.playerNumber }} · {{ characterDisplayName(player.character) }}</span>
-            </label>
-          </div>
-          <div class="claim-actions"><button class="primary-button" :disabled="!canAskClaimPlayers" @click="askClaimPlayers">選択したプレイヤーのCOを聞く</button></div>
-        </section>
-
-        <PublicInformationPanel v-if="update.phase === 'DAY_DECISION' || finished"
-          :information="update.publicInformation" :players="players" :finished="finished" :player-name="name" />
-
-        <VoteHistoryPanel :history="update.voteHistory" :player-name="name" />
+        <GameOrders v-if="!decisionWindow" v-bind="orderBindings" :show-avoidance="true" />
+        <PublicInformationPanel v-if="!decisionWindow && (update.phase === 'DAY_DECISION' || finished)" :information="update.publicInformation" :players="players" :finished="finished" :player-name="name" />
+        <VoteHistoryPanel v-if="!decisionWindow" :history="update.voteHistory" :player-name="name" />
 
         <footer class="session-footer">
           <span>一時セッション・このタブを再読み込みして再開できます。</span>

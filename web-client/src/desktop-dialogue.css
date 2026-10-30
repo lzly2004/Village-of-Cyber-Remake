@@ -25,3 +25,54 @@
   .game-stage .desktop-message .event-dialogue { font-size: max(14px,2.03125cqw); }
   .message-speaker { font-size: max(13px,2.03125cqw); }
 }
+/* Complete result board. At the 1280px baseline the first portrait starts
+   at (20,100). Narrow Web windows grow vertically rather than clip row two. */
+.game-stage:has(.settlement-board) .stage-surface { aspect-ratio: auto; min-height: 720px; }
+.stage-surface:has(.settlement-board) > .stage-artwork { position: absolute; inset: 0; }
+.game-stage .settlement-board { position: relative; inset: auto; max-height: none; padding: 25px 20px 20px; min-height: 720px; background: transparent; overflow: visible; color: #111; }
+.desktop-verdict { position: relative; margin: 0 0 35px 30px; height: 40px; display: flex; align-items: center; gap: 10px; }
+.game-stage .desktop-verdict h2 { margin: 0; font-size: max(18px,1.875cqw); color: #111; }
+.desktop-verdict .settlement-win-icon { margin: 0; }
+.settlement-roster { position: relative; overflow-x: auto; overflow-y: hidden; scrollbar-gutter: stable; }
+.settlement-roster:focus-visible, .settlement-card:focus-visible { outline: 2px solid #273d60; outline-offset: -2px; }
+.game-stage .settlement-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2,max-content); grid-template-columns: repeat(var(--settlement-columns),104px); column-gap: 0; row-gap: 14px; min-width: calc(var(--settlement-columns) * 104px); align-content: start; }
+.game-stage .settlement-card { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 0; padding: 0 6px 8px 0; font-size: 16px; line-height: 1.25; text-align: left; }
+.settlement-card .player-portrait { flex: none; }
+.settlement-card dl { margin: 0; }
+.settlement-card dd { margin: 0 0 5px; }
+.settlement-card dt { font-weight: normal; }
+.game-stage .settlement-card p { color: #111; font-size: inherit; line-height: inherit; margin: 0; overflow-wrap: anywhere; }
+.settlement-board footer { position: relative; margin-top: 16px; font-size: 11px; line-height: 1.3; background: #fff9e8dd; }
+.desktop-vote-window { position: absolute; inset: 0; color: #111; }
+.vote-background, .vote-background img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.desktop-vote-players { position: absolute; left: 12.5%; right: 32%; top: 0; height: 212px; overflow-x: auto; overflow-y: hidden; }
+.desktop-vote-players .panel { background: transparent; border: 0; margin: 0; }
+.desktop-vote-players .panel-heading, .desktop-vote-players .list-help { display: none; }
+.desktop-vote-players .player-list { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2,98px); grid-template-columns: none; grid-auto-columns: 64px; max-height: none; overflow: visible; gap: 0; border: 0; }
+.desktop-vote-players .player-row { position: relative; display: block; padding: 0; margin: 0; height: 98px; border: 0; min-width: 64px; }
+.desktop-vote-players .player-portrait { height: 98px; }
+.desktop-vote-players .portrait-image, .desktop-vote-players .portrait-image img { height: 98px; width: 64px; object-fit: contain; }
+.desktop-vote-players .character-title-image { position: absolute; top: 78px; }
+.desktop-vote-players .player-identity, .desktop-vote-players .player-number { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.desktop-vote-players .player-row input { position: absolute; inset: 0; appearance: none; width: 64px; height: 98px; opacity: 1; margin: 0; border: 0; background: transparent; cursor: pointer; }
+.desktop-vote-players .player-row input:checked { outline: 3px solid #f9d756; outline-offset: -3px; background: #ffd14733; }
+.desktop-vote-players .player-row input:disabled { cursor: default; }
+.desktop-vote-players .player-row input:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+.desktop-calendar { position: absolute; top: 2%; right: 21.8%; width: 10%; padding: 6px; background: #302414e8; color: white; font-weight: bold; font-size: max(12px,1.5625cqw); line-height: 1.2; }
+.desktop-vote-information { position: absolute; left: 0; top: 212px; right: 21%; bottom: 4.4444%; overflow: auto; background: #e6c78e; }
+.vote-board-background { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.vote-board-background img { width: 100%; height: 100%; object-fit: fill; }
+.vote-information-content { position: relative; padding: 16px 20px; font-size: max(14px,1.5625cqw); }
+.desktop-vote-information .panel { background: transparent; border: 0; margin: 0 0 20px; }
+.desktop-vote-information .panel-heading { padding: 0; background: transparent; color: #111; border: 0; }
+.desktop-vote-information .public-info-help { font-size: 12px; }
+.desktop-vote-actions { position: absolute; left: 82.8125%; right: 2.03125%; top: 1.3889%; bottom: 5.5556%; display: grid; grid-template-rows: repeat(5,minmax(0,1fr)); gap: 1.3889cqw; }
+.desktop-art-button { position: relative; display: block; border: 0; padding: 0; min-width: 0; background: #a60000; cursor: pointer; }
+.desktop-art-button .asset-image, .desktop-art-button img { display: block; width: 100%; height: 100%; object-fit: fill; }
+.desktop-art-button:disabled { opacity: .45; cursor: default; }
+.desktop-art-button:focus-visible { outline: 3px solid #ffe184; outline-offset: -3px; }
+.stage-surface:has(.desktop-vote-window) { min-height: 720px; }
+
+.settlement-background, .settlement-background img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+
+.vote-background img { object-fit: cover; max-width: none; max-height: none; }
