@@ -112,16 +112,19 @@ async function display(page, snapshot, beforeDrain = false) {
     }
   }
   if(await page.getByTestId('desktop-vote-window').count() && snapshot.voteHistory.length){
-    await desktopRecords(page,'history')
-    const previous=page.getByRole('button',{name:'前の投票結果',exact:true}),next=page.getByRole('button',{name:'次の投票結果',exact:true})
-    const rounds=snapshot.voteHistory.flatMap(v=>v.rounds.map(r=>({v,r})))
-    for(let i=1;i<rounds.length;i++)await previous.click()
     const short=n=>characters[snapshot.view.players.find(p=>p.playerNumber===n).character].shortName
-    for(const [i,{v,r}]of rounds.entries()){
-      await expect(page.locator('.desktop-history pre')).toContainText(v.day+'日目')
-      await expect(page.locator('.history-line')).toHaveText(r.lines.map(l=>`${short(l.playerNumber)}：${l.receivedVotes}票  投票先→${short(l.targetPlayerNumber)}`))
-      await expect(page.locator('.history-summary')).toContainText(r.leaders.length>1?'同点':r.maximumVotes+'票')
-      if(i+1<rounds.length)await next.click()
+    for(const v of snapshot.voteHistory){
+      await desktopRecords(page,'history')
+      await page.getByRole('button',{name:v.day+'日目の投票結果',exact:true}).click()
+      const previous=page.getByRole('button',{name:'前の投票結果',exact:true}),next=page.getByRole('button',{name:'次の投票結果',exact:true})
+      await expect(previous).toBeDisabled()
+      for(const [i,r]of v.rounds.entries()){
+        await expect(page.locator('.desktop-history pre').first()).toContainText(v.day+'日目')
+        await expect(page.locator('.history-line')).toHaveText(r.lines.map(l=>`${short(l.playerNumber)}：${l.receivedVotes}票  投票先→${short(l.targetPlayerNumber)}`))
+        await expect(page.locator('.history-summary')).toContainText(r.leaders.length>1?'同点':r.maximumVotes+'票')
+        if(i+1<v.rounds.length)await next.click()
+      }
+      await expect(next).toBeDisabled()
     }
     await desktopHome(page)
     return

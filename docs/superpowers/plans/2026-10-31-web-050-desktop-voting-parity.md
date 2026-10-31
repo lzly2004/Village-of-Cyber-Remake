@@ -75,3 +75,5 @@
 - Final cross-configuration gate15/15, assets5/5 (real wall time), native audio29/29 and unseeded production journey1/1 passed before this read-only menu follow-up. No production JVM/build changes or local full/package.
 
 - Final related22/22 passed after frozen-clock precondition fix; unit219/219 and final production build passed. Protected NTFS136 hashes all match and default porcelain status bytes unchanged; expanded-untracked status is a different format, not compared as identical.
+
+- Cloud73bf971: unit219/default217/Java650 passed; gate14/15 failed because its history traversal had not selected a date. Early local gate15 preceded this UI change and was insufficient coverage. Updated only gate traversal through original date buttons, preserving all authority/rows/command/oracle assertions; complete local gate15/15 then passed in9.9m. Failed ZIP official hash checked; strict reader rejects its293MB size, threshold retained. New final head/cloud/package required.
