@@ -30,6 +30,12 @@ for(const scene of ['vote','settlement'])test('same-state desktop public referen
  }else{
   await expect(page.getByTestId('settlement-board')).toBeVisible()
   await expect(page.getByTestId('settlement-fate')).toHaveCount(snapshot.view.players.length)
+  // UIHelpers.createCharacterText subtracts half the source image height:
+  // EndAnimeHandler passes y198, so the visible title starts at178, not198.
+  const card=page.locator('.settlement-card').first(),portrait=await card.locator('.portrait-image').boundingBox(),title=await card.locator('.character-title-image').boundingBox(),surface=await page.getByTestId('stage-surface').boundingBox()
+  expect(Math.abs((title.y-portrait.y)/surface.width-78/1280)).toBeLessThan(.001)
+  const detail=await card.locator('dl').boundingBox();expect(title.y+title.height).toBeLessThanOrEqual(detail.y)
+
   await capture(page,'settlement')
  }
  expect(writes).toEqual([])

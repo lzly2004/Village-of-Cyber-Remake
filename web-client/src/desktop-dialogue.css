@@ -173,7 +173,7 @@
 .game-stage .settlement-card{position:relative;display:block;width:7.8125cqw;height:19.375cqw;padding:0;font-size:1.25cqw;font-weight:bold;line-height:1.25}
 .settlement-card .player-portrait{width:5cqw;height:9.21875cqw}
 .settlement-card .portrait-image,.settlement-card .portrait-image img{width:5cqw;height:7.65625cqw}
-.settlement-card .character-title-image{position:absolute;left:1.171875cqw;top:7.65625cqw;width:3.046875cqw;height:1.5625cqw}
+.settlement-card .character-title-image{position:absolute;left:1.171875cqw;top:6.09375cqw;width:3.046875cqw;height:1.5625cqw}
 .settlement-card .character-title-image img{width:100%;height:100%}
 .settlement-card .claim-icon{left:0;right:auto;width:50%;height:20.338983%}
 .settlement-card .death-marker{left:7.8125%;top:8.474576%;width:82.8125%;height:60.169492%}
