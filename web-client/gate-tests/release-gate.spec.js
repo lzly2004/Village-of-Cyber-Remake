@@ -117,14 +117,14 @@ async function display(page, snapshot, beforeDrain = false) {
       await desktopRecords(page,'history')
       await page.getByRole('button',{name:v.day+'日目の投票結果',exact:true}).click()
       const previous=page.getByRole('button',{name:'前の投票結果',exact:true}),next=page.getByRole('button',{name:'次の投票結果',exact:true})
-      await expect(previous).toBeDisabled()
+      await expect(previous).toHaveCount(0)
       for(const [i,r]of v.rounds.entries()){
         await expect(page.locator('.desktop-history pre').first()).toContainText(v.day+'日目')
         await expect(page.locator('.history-line')).toHaveText(r.lines.map(l=>`${short(l.playerNumber)}：${l.receivedVotes}票  投票先→${short(l.targetPlayerNumber)}`))
         await expect(page.locator('.history-summary')).toContainText(r.leaders.length>1?'同点':r.maximumVotes+'票')
         if(i+1<v.rounds.length)await next.click()
       }
-      await expect(next).toBeDisabled()
+      await expect(next).toHaveCount(0)
     }
     await desktopHome(page)
     return

@@ -7,6 +7,7 @@ import DesktopInformation from './DesktopInformation.vue'
 import DesktopTargetSelection from './DesktopTargetSelection.vue'
 import { desktopVoteRound } from './desktopVoteText.js'
 import { suspicionText } from './publicInformationText.js'
+import { configurations } from './labels.js'
 const props=defineProps({day:Number,alive:Number,dead:Number,blocked:Boolean,update:Object,players:Array,bindings:Object,playerName:Function,voteTargets:Array,legalTargets:Array,toggleTarget:Function,markers:Map})
 const emit=defineEmits(['menu','music'])
 const mode=ref('home'),historyIndex=ref(0),message=ref('')
@@ -14,6 +15,8 @@ let tipTimer
 function tip(text){clearTimeout(tipTimer);message.value=text;tipTimer=setTimeout(()=>{message.value=''},1000)}
 onBeforeUnmount(()=>clearTimeout(tipTimer))
 const b=computed(()=>props.bindings)
+const historySetup=computed(()=>configurations.findIndex(c=>c.value===props.update.view.configuration)+1)
+const historySetupWidths=[0,155,206,206,232,232,232,255]
 const historyDay=ref(null)
 const rounds=computed(()=>props.update.voteHistory.filter(vote=>vote.day===historyDay.value).flatMap(vote=>vote.rounds.map((round,index)=>({vote,index}))))
 function chooseDay(day){historyDay.value=day;historyIndex.value=0}
@@ -46,7 +49,7 @@ const buttons=computed(()=>{
   }
   if(mode.value==='records'){add(2,'疑い先','checkUtagai',()=>open('suspicion'));add(3,'投票履歴','checkTohyo',()=>{historyDay.value=null;historyIndex.value=0;open('history')})}
   // The desktop designation sub-menu has three buttons; selecting a scene restores Return.
-  if(mode.value==='history'&&historyDay.value!==null){add(2,'前の投票結果','rirekiBack',()=>historyIndex.value--,{disabled:historyIndex.value<=0});add(3,'次の投票結果','rirekiNext',()=>historyIndex.value++,{disabled:historyIndex.value+1>=rounds.value.length})}
+  if(mode.value==='history'&&historyDay.value!==null){if(historyIndex.value>0)add(2,'前の投票結果','rirekiBack',()=>historyIndex.value--);if(historyIndex.value+1<rounds.value.length)add(3,'次の投票結果','rirekiNext',()=>historyIndex.value++)}
   if(mode.value!=='designations')add(4,'戻る','return',back)
  }
  return list
@@ -84,6 +87,7 @@ const selectionSummary=computed(()=>{
    </div>
   </div>
   <div v-if="mode==='history'&&historyDay===null" class="desktop-history-days" role="group" aria-label="投票履歴の日付"><button v-for="vote in update.voteHistory" :key="vote.day" class="desktop-art-button" :aria-label="vote.day+'日目の投票結果'" @click="chooseDay(vote.day)"><AssetImage :name="'images/'+vote.day+'day.png'" /></button></div>
+  <AssetImage v-if="mode==='history'&&historySetup" class="desktop-history-setup" :name="'images/game'+historySetup+'-1.png'" :style="{width:historySetupWidths[historySetup]/1280*100+'%'}" />
   <p v-if="message" class="desktop-transient-tip" role="status">{{ message }}</p>
   <nav class="desktop-vote-actions" aria-label="昼の操作">
    <template v-for="button in buttons" :key="button.label"><button class="desktop-art-button" :class="['desktop-slot-'+button.slot,{'desktop-claim-seer':button.left}]" :aria-label="button.label" :data-testid="button.test || (button.label==='投票へ'?'vote':undefined)" :disabled="blocked||button.disabled" @click="button.click"><AssetImage :name="'images/'+button.image+'.png'" /></button></template>

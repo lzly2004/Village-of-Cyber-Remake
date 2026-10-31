@@ -77,3 +77,5 @@
 - Final related22/22 passed after frozen-clock precondition fix; unit219/219 and final production build passed. Protected NTFS136 hashes all match and default porcelain status bytes unchanged; expanded-untracked status is a different format, not compared as identical.
 
 - Cloud73bf971: unit219/default217/Java650 passed; gate14/15 failed because its history traversal had not selected a date. Early local gate15 preceded this UI change and was insufficient coverage. Updated only gate traversal through original date buttons, preserving all authority/rows/command/oracle assertions; complete local gate15/15 then passed in9.9m. Failed ZIP official hash checked; strict reader rejects its293MB size, threshold retained. New final head/cloud/package required.
+
+- Last source audit aligned history arrows (hide when unavailable) and original setup image at700,600. Related22/22, complete gate15/15 in9.3m, unit219/219 and production build passed. Intermediate568b998 cloud reports success, but is not the final delivered source; no further product work is planned before final source-bound CI/package.

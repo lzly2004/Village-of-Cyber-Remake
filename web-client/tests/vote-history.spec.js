@@ -43,9 +43,14 @@ async function expectHistory(page, snapshot) {
   for(const vote of snapshot.voteHistory){
     await desktopRecords(page,'history')
     const date=page.getByRole('button',{name:vote.day+'日目の投票結果',exact:true})
-    await expect(date.locator('img')).toBeVisible();await date.click()
+    await expect(date.locator('img')).toBeVisible()
+    const setup=page.locator('.desktop-history-setup img');await expect(setup).toBeVisible()
+    const stage=await page.getByTestId('stage-surface').boundingBox(),label=await setup.boundingBox()
+    expect(Math.abs((label.x-stage.x)/stage.width-700/1280)).toBeLessThan(.002)
+    expect(Math.abs((label.y-stage.y)/stage.width-600/1280)).toBeLessThan(.002)
+    await date.click()
     const previous=page.getByRole('button',{name:'前の投票結果',exact:true})
-    await expect(previous).toBeDisabled()
+    await expect(previous).toHaveCount(0)
     for(const [i,round]of vote.rounds.entries()){
       await expect(panel.locator('pre').first()).toContainText(vote.day+'日目')
       await expect(panel.locator('pre').first()).toContainText(['FREE','GREY','DESIGNATED'].includes(vote.method)?({FREE:'自由投票',GREY:'グレラン',DESIGNATED:'指定投票'})[vote.method]:'未対応の投票方式')
@@ -54,7 +59,7 @@ async function expectHistory(page, snapshot) {
       await expect(panel.locator('.history-summary')).toHaveText(round.leaders.length>1?'投票が同点となりました。再投票を行います。':`${round.maximumVotes}票で${short(round.leaders[0])}さんが処刑されました。`)
       if(i+1<vote.rounds.length)await page.getByRole('button',{name:'次の投票結果',exact:true}).click()
     }
-    await expect(page.getByRole('button',{name:'次の投票結果',exact:true})).toBeDisabled()
+    await expect(page.getByRole('button',{name:'次の投票結果',exact:true})).toHaveCount(0)
   }
 }
 
@@ -74,7 +79,7 @@ test('実対局の全日全ラウンドを権威と照合し、閲覧と再読�
         const count = req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ }
         page.on('request', count)
         const previous=page.getByRole('button',{name:'前の投票結果',exact:true})
-        if(await previous.isEnabled()){await previous.focus();await page.keyboard.press('Enter')}
+        if(await previous.count()){await previous.focus();await page.keyboard.press('Enter')}
         await expect(page.getByRole('region',{name:'投票履歴',exact:true})).toBeVisible()
         await page.reload()
         await expectHistory(page, snapshot)
