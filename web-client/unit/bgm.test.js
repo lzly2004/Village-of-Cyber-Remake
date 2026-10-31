@@ -151,3 +151,10 @@ test('dispose cancels pending unlock immediately and reports a failed close rath
   const q=rig();await q.player.enable();q.context.close=()=>Promise.reject(Error('close failed'))
   q.player.dispose();await tick();assert.equal(q.states.at(-1).error,'BGM_RELEASE_FAILED')
 })
+
+test('desktop vote-result review keeps day playlist until local continue, without selecting execution sound',()=>{
+ const update={phase:'FINISHED',view:{gameDay:3,aliveCount:8,result:'WOLF_WIN'}}
+ assert.equal(bgmScene({sessionId:'test',update,currentEvent:null,finished:false,voteReviewing:true,presentationPhase:'event'}).playlist,'NORMAL_GAME_PLAYLIST')
+ assert.equal(bgmScene({sessionId:'test',update,currentEvent:{stage:'EXECUTION'},finished:false,voteReviewing:false,presentationPhase:'event'}).id,null)
+ assert.equal(bgmScene({sessionId:'test',update,currentEvent:null,finished:true,voteReviewing:false,presentationPhase:'event'}).id,'DEFEAT_SCREEN')
+})

@@ -1,6 +1,7 @@
-import { characterDisplayName } from '../src/characterDisplay.js'
-import { test, expect } from '@playwright/test'
-import { readFileSync, readdirSync } from 'node:fs'
+import {desktopHome,desktopClaims,desktopClaimPlayers,desktopSelection,desktopSkill,desktopVote,desktopRecords,completeVoteReview} from '../test-fixtures/desktop-navigation.js'
+import { characterDisplayName,characters } from '../src/characterDisplay.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
+import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
@@ -42,7 +43,9 @@ async function drain(page, snapshot) {
   for (const event of snapshot.presentedEvents) {
     await expect(page.getByTestId('next-event')).toBeVisible()
     if (event.event.ch1 && event.event.ch1 !== 'NONE')
-      await expect(page.getByRole('region', { name: '当前事件', exact: true })).toContainText(characterDisplayName(event.event.ch1))
+      // Speaker identity now lives in the desktop message-frame header rather
+      // than auxiliary metadata inside the body. Keep checking the same name.
+      await expect(page.getByTestId('desktop-message').locator('.message-speaker')).toHaveText(characterDisplayName(event.event.ch1))
     if (['DAY_DIALOGUE', 'AFTERNOON_DIALOGUE', 'NIGHT_RESULT', 'EXECUTION', 'SETTLEMENT'].includes(event.stage)) {
       await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready', 'true')
       await expect(page.getByTestId('stage-art-status')).toHaveCount(0)
@@ -65,9 +68,11 @@ async function drain(page, snapshot) {
 }
 
 async function display(page, snapshot, beforeDrain = false) {
-  await expect(page.locator('.player-row')).toHaveCount(snapshot.view.players.length)
+  await completeVoteReview(page)
+  if(await page.getByTestId('desktop-vote-window').count())await desktopHome(page)
+  await expect(page.locator('.player-row,.desktop-roster-row')).toHaveCount(snapshot.view.players.length)
   for (const player of snapshot.view.players) {
-    const row = page.locator('.player-row').nth(player.playerNumber - 1)
+    const row = page.locator('.player-row,.desktop-roster-row').nth(player.playerNumber - 1)
     await expect(row.locator('strong')).toHaveText(characterDisplayName(player.character))
     if (!player.alive) await expect(row).toHaveClass(/departed/)
   }
@@ -84,22 +89,47 @@ async function display(page, snapshot, beforeDrain = false) {
       const number = Object.keys(stageMapping).indexOf(player.character)+1
       const suffix = !player.alive ? 'gs' : ({mao:'cs',yaohu:'fs',beidezhe:'hs',renlang:'ws',kuangren:'ks',kuangxinzhe:'ks'}[role]||'s')
       const name = 'images/'+String(number).padStart(2,'0')+suffix+'.png'
-      await page.locator('.player-row').first().scrollIntoViewIfNeeded()
-      await expect(page.locator('.player-row').first().locator('.portrait-image img')).toHaveAttribute('src','/assets/images/'+imageManifest.images[name].file)
+      await page.locator('.player-row,.desktop-roster-row').first().scrollIntoViewIfNeeded()
+      await expect(page.locator('.player-row,.desktop-roster-row').first().locator('.portrait-image img')).toHaveAttribute('src','/assets/images/'+imageManifest.images[name].file)
       await expect(page.getByTestId('stage-background')).toHaveAttribute('href','/assets/images/'+imageManifest.images['images/frame #19252.png'].file)
       await expect(page.getByRole('region', { name: '公開死亡履歴', exact: true })).toBeVisible()
     }
   } else {
-    // Deliberate narrative difference under evaluation: latest aggregate is visible before drain.
-    await expect(page.getByRole('region', { name: '公開情報', exact: true })).toBeVisible()
-    await expect(page.getByRole('region', { name: '公開技能報告', exact: true }).locator('article'))
-      .toHaveCount(snapshot.publicInformation.skillReports.length)
-    await expect(page.getByRole('switch', { name: '投票回避CO' }))
-      .toHaveAttribute('aria-checked', String(snapshot.selections.avoidanceEnabled))
-    for (const method of ['FREE', 'GREY'])
-      await expect(page.getByTestId('vote-' + method)).toHaveCount(
-        snapshot.legalVoteActions.some(action => action.method === method) ? 1 : 0)
+    const window=page.getByTestId('desktop-vote-window')
+    if(await window.count()){
+      await desktopHome(page)
+      const text=await page.getByTestId('desktop-information').textContent()
+      expect(text.match(/\[[^\]]+\]/g)).toEqual(['[占い師]','[霊能者]','[処刑]','[死体]','[護衛先]'])
+      for(const report of snapshot.publicInformation.skillReports){
+        const player=snapshot.view.players.find(p=>p.playerNumber===report.playerNumber)
+        expect(text).toContain(characters[player.character].shortName+' :')
+      }
+      await expect(page.getByRole('switch',{name:'投票回避CO'})).toHaveAttribute('aria-checked',String(snapshot.selections.avoidanceEnabled))
+    }else{
+      await expect(page.getByRole('region',{name:'公開情報',exact:true})).toBeVisible()
+      await expect(page.getByRole('region',{name:'公開技能報告',exact:true}).locator('article')).toHaveCount(snapshot.publicInformation.skillReports.length)
+      await expect(page.getByRole('switch',{name:'投票回避CO'})).toHaveCount(0)
+    }
   }
+  if(await page.getByTestId('desktop-vote-window').count() && snapshot.voteHistory.length){
+    const short=n=>characters[snapshot.view.players.find(p=>p.playerNumber===n).character].shortName
+    for(const v of snapshot.voteHistory){
+      await desktopRecords(page,'history')
+      await page.getByRole('button',{name:v.day+'日目の投票結果',exact:true}).click()
+      const previous=page.getByRole('button',{name:'前の投票結果',exact:true}),next=page.getByRole('button',{name:'次の投票結果',exact:true})
+      await expect(previous).toHaveCount(0)
+      for(const [i,r]of v.rounds.entries()){
+        await expect(page.locator('.desktop-history pre').first()).toContainText(v.day+'日目')
+        await expect(page.locator('.history-line')).toHaveText(r.lines.map(l=>`${short(l.playerNumber)}：${l.receivedVotes}票  投票先→${short(l.targetPlayerNumber)}`))
+        await expect(page.locator('.history-summary')).toContainText(r.leaders.length>1?'同点':r.maximumVotes+'票')
+        if(i+1<v.rounds.length)await next.click()
+      }
+      await expect(next).toHaveCount(0)
+    }
+    await desktopHome(page)
+    return
+  }
+
   const history = page.getByRole('region', { name: '最近投票结果', exact: true })
   if (!snapshot.voteHistory.length) await expect(history).toHaveCount(0)
   else {
@@ -120,27 +150,32 @@ async function display(page, snapshot, beforeDrain = false) {
 }
 
 async function operate(page, step) {
-  const body = step.body
-  switch (step.path) {
+  const body=step.body
+  switch(step.path){
     case '/claims/by-role':
-      await page.getByRole('button', { name: roles[body.role] + 'のCOを聞く', exact: true }).click(); break
+      await desktopClaims(page);await page.getByRole('button',{name:roles[body.role]+'のCOを聞く',exact:true}).click();break
     case '/claims/by-players':
-      for (const number of body.players)
-        await page.getByRole('checkbox', { name: new RegExp('^' + number + '番 .*をCO確認対象に選択$') }).check()
-      await page.getByRole('button', { name: '選択したプレイヤーのCOを聞く', exact: true }).click(); break
+      await desktopClaimPlayers(page)
+      for(const number of body.players)await page.getByRole('checkbox',{name:new RegExp('^'+number+'番 .*をCO確認対象に選択$')}).check()
+      await page.getByRole('button',{name:'戻る',exact:true}).click();break
     case '/avoidance':
-      await page.getByRole('switch', { name: '投票回避CO' }).click(); break
+      await desktopHome(page);await page.getByRole('switch',{name:'投票回避CO'}).click();break
     case '/target-selections':
-      await page.getByRole('checkbox', { name: new RegExp('^全員' + (body.type === 'DIVINATION' ? '占い' : '護衛') + '対象 ' + body.target + '番 ') }).click(); break
-    case '/claimed-target-selections':
-      await page.getByRole('checkbox', { name: (body.type === 'DIVINATION' ? '個別の占い予約' : '個別の護衛予約')
-        + ' ' + body.claimedPlayer + '番から' + body.target + '番へ', exact: true }).click(); break
+      await desktopSkill(page,body.type==='DIVINATION'?'divination':'guard')
+      await page.locator('.desktop-target-row[data-player-number="'+body.target+'"]').getByRole('checkbox').click();break
+    case '/claimed-target-selections':{
+      const row=page.locator('.desktop-roster-row[data-player-number="'+body.claimedPlayer+'"]')
+      const full=await row.locator('strong').textContent()
+      // Resolve the tool from the public roster name; no hidden role is read.
+      await desktopSelection(page,body.type==='DIVINATION'?'divination':'guard')
+      const publicName=Object.keys(characters).find(key=>characterDisplayName(key)===full)
+      await desktopSkill(page,body.type==='DIVINATION'?'divination':'guard',characters[publicName].shortName)
+      await page.locator('.desktop-target-row[data-player-number="'+body.target+'"]').getByRole('checkbox').click();break
+    }
     case '/vote-target':
-      await page.locator('.player-row').filter({ has: page.locator('input[aria-label$="（' + body.target + '号）"]') })
-        .getByRole('checkbox').click(); break
-    case '/votes':
-      await page.getByTestId(body.method === 'DESIGNATED' ? 'vote' : 'vote-' + body.method).click(); break
-    default: throw new Error('unknown UI policy command: ' + step.path)
+      await desktopSelection(page);await page.locator('.desktop-target-row[data-player-number="'+body.target+'"]').getByRole('checkbox').click();break
+    case '/votes':await desktopVote(page,body.method);break
+    default:throw new Error('unknown UI policy command: '+step.path)
   }
 }
 
@@ -196,6 +231,14 @@ async function journey(page, request, testInfo, configuration, strategy) {
       await page.getByRole('region', { name: '公开玩家列表', exact: true })
         .screenshot({ path: testInfo.outputPath('settlement-players.png') })
       await page.screenshot({ path: testInfo.outputPath('settlement.png'), fullPage: true })
+      // One real seeded API journey documents the implemented core window;
+      // synthetic layout cases have a separate provenance index.
+      if(configuration==='jianyi' && strategy==='designated') {
+        const folder=resolve(root,'build/verify/desktop-core')
+        mkdirSync(folder,{recursive:true})
+        const image=await page.getByTestId('stage-surface').screenshot({path:resolve(folder,'settlement-real-jianyi.png')})
+        writeFileSync(resolve(folder,'settlement-real-jianyi.json'),JSON.stringify({source:'Real seeded API/HTTP/browser gate journey; not user random playtest',configuration,strategy,seed:data.seed,bytes:image.length,sha256:createHash('sha256').update(image).digest('hex')},null,2)+'\n')
+      }
     }
     for (const endpoint of ['/debug', '/context', '/recorder', '/suspicion'])
       expect((await request.get(path + endpoint)).status()).toBe(404)

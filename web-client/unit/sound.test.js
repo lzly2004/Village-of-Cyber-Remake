@@ -35,7 +35,8 @@ test('settings strict versioned namespace, roundtrip, defaults and storage denia
   assert.equal(saveAudioSettings(denied,settings),'AUDIO_SETTINGS_WRITE_FAILED')
 })
 test('all nine sound purposes follow desktop call sites, with no hidden subtype or future-result lookup',()=>{
-  assert.deepEqual(enteringSounds(event('NIGHT_RESULT','wsw'),false,null,true),['NIGHTFALL','WOLF_HOWL','PEACEFUL_NIGHT'])
+  // Nightfall/howl now follow their decoded pure backgrounds, not this result event.
+  assert.deepEqual(enteringSounds(event('NIGHT_RESULT','wsw'),false,null,true),['PEACEFUL_NIGHT'])
   assert.deepEqual(enteringSounds(event('NIGHT_RESULT','yjsw'),false,null,false),[])
   assert.equal(transitionSound(event('NIGHT_RESULT','yjsw')),'NIGHT_DEATH')
   for(const name of ['cxs','hzsw','mzsw'])assert.equal(transitionSound(event('EXECUTION',name)),'DAY_EXECUTION')

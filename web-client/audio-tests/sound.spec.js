@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test'
+import {completeNativeReading} from '../test-fixtures/native-reading.js'
 import {readFileSync} from 'node:fs'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 test.setTimeout(30000)
@@ -74,14 +75,19 @@ test('WEB-028 mute cancels a held effect and suppresses future/retroactive playb
   expect((await probe(page)).contexts).toEqual(['running']);expect((await probe(page)).active).toBe(1)
 })
 
-for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])test('WEB-028 current night serial intro/result '+eventname+'; native ended releases and manual frame never replays death',async({page})=>{
+for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])test('night/day backgrounds gate intro/result '+eventname+'; native ended releases and manual frame never replays death',async({page})=>{
   const snapshot=presented(publicSnapshot(),'NIGHT_RESULT',eventname)
   const paths=await setup(page,{snapshot});await enable(page)
   await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(ui(page)).toHaveAttribute('data-sound','NIGHTFALL');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   expect(paths).not.toContain(soundPath('WOLF_HOWL'));await finishSound(page)
-  await expect(ui(page)).toHaveAttribute('data-sound','WOLF_HOWL');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
-  await finishSound(page);await expect(ui(page)).toHaveAttribute('data-sound',last);await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
+  await expect(page.getByTestId('game-stage')).toHaveAttribute('data-presentation-phase','night')
+  await expect(ui(page)).toHaveAttribute('data-sound','WOLF_HOWL',{timeout:8000});await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
+  await finishSound(page)
+  await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:4000})
+  expect(paths).not.toContain(soundPath(last))
+  await page.getByTestId('day-start-continue').click()
+  await expect(ui(page)).toHaveAttribute('data-sound',last);await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   expect((await probe(page)).active).toBe(1);expect((await probe(page)).effects).toBe(1)
   await finishSound(page);await expect(ui(page)).toHaveAttribute('data-sound-status','idle');expect((await probe(page)).active).toBe(0)
   if(eventname==='yjsw'){
@@ -95,9 +101,11 @@ test('WEB-028 execution sound follows second displayed frame once and is cancele
   const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
   expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
+  await page.getByTestId('stage-text').click();await expect(page.getByTestId('execution-continue')).toBeVisible()
+  await page.getByTestId('execution-continue').click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','2')
   await expect(ui(page)).toHaveAttribute('data-sound','DAY_EXECUTION');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
-  await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound-status','idle')
+  await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound-status','idle')
   expect(paths.filter(p=>p===soundPath('DAY_EXECUTION'))).toHaveLength(1)
 })
 
@@ -106,7 +114,7 @@ for(const [result,effect] of [['VILLAGE_WIN','VILLAGE_VICTORY'],['WOLF_WIN','WOL
   snapshot.phase='FINISHED';snapshot.view.result=result
   const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('next-event')).toBeVisible();expect(paths).not.toContain(soundPath(effect))
-  await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound',effect)
+  await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound',effect)
   await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   await page.getByRole('button',{name:'再同期'}).click();expect(paths.filter(p=>p===soundPath(effect))).toHaveLength(1)
   expect((await probe(page)).active).toBeLessThanOrEqual(2)
@@ -118,10 +126,10 @@ test('WEB-028 same-day refresh preserves pending playlist selection (027 array-g
   await setup(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await page.getByRole('button',{name:'音楽を有効にする'}).click();const route=await intercepted
   await expect(ui(page)).toHaveAttribute('data-status','loading')
-  await page.getByRole('button',{name:'曲を切替'}).click()
-  await expect(page.getByRole('button',{name:'曲を切替'})).toBeDisabled()
+  await page.getByRole('button',{name:'曲を切替',exact:true}).click()
+  await expect(page.getByRole('button',{name:'曲を切替',exact:true})).toBeDisabled()
   await page.getByRole('button',{name:'再同期'}).click()
-  await expect(page.getByRole('button',{name:'曲を切替'})).toBeDisabled()
+  await expect(page.getByRole('button',{name:'曲を切替',exact:true})).toBeDisabled()
   await route.fulfill({json:catalog})
   await expect(ui(page)).toHaveAttribute('data-track',catalog.playlists.NORMAL_GAME_PLAYLIST[0])
   await expect(ui(page)).toHaveAttribute('data-status','playing')
@@ -144,16 +152,19 @@ for(const denied of [false,true])test('WEB-028 invalid/blocked settings remain e
   expect((await probe(page)).contexts).toEqual([])
 })
 
-test('WEB-028 early confirmation cancels delayed execution sound; reduced motion emits second-frame sound immediately',async({page})=>{
+test('execution sound requires explicit local result; refresh cancels old scene and reduced motion retains that gate',async({page})=>{
   const snapshot=presented(publicSnapshot(),'EXECUTION','cxs')
   const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
-  await page.getByTestId('next-event').click()
-  // Deliberately outlive the 2000ms transition; no stale audio may arrive after confirmation.
+  await page.reload()
+  // Outlive the former automatic transition: an unconfirmed old scene cannot sound.
   await page.waitForTimeout(2200);expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
   await page.emulateMedia({reducedMotion:'reduce'})
   await page.evaluate(()=>sessionStorage.clear());await page.reload();await enable(page)
   await page.getByRole('button',{name:'対局を始める'}).click()
+  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
+  expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
+  await page.getByTestId('execution-continue').click()
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','2')
   await expect(ui(page)).toHaveAttribute('data-sound','DAY_EXECUTION')
 })
@@ -196,6 +207,7 @@ test('WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK w
   const samples=[]
   try {
     for(const mode of ['mouse','keyboard']){
+      await completeNativeReading(page)
       if(mode==='mouse')await page.getByTestId('next-event').click()
       else {await page.getByTestId('next-event').focus();await page.keyboard.press('Enter')}
       await expect(ui(page)).toHaveAttribute('data-sound','CLICK')
@@ -216,4 +228,38 @@ test('WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK w
     console.info('review CLICK evidence: '+JSON.stringify(evidence))
     await info.attach('review-click.json',{body:JSON.stringify(evidence),contentType:'application/json'})
   }
+})
+
+test('night enable does not replay past NIGHTFALL; future dawn sounds once and stop suppresses result',async({page})=>{
+ const paths=await setup(page,{snapshot:presented(publicSnapshot(),'NIGHT_RESULT','wsw')})
+ await page.getByRole('button',{name:'対局を始める'}).click()
+ await expect(page.getByTestId('game-stage')).toHaveAttribute('data-presentation-phase','night')
+ expect(paths).toEqual([])
+ await page.getByRole('button',{name:'音楽を有効にする'}).click()
+ await expect(ui(page)).toHaveAttribute('data-status','silent')
+ expect(paths).not.toContain(soundPath('NIGHTFALL'))
+ await expect(ui(page)).toHaveAttribute('data-sound','WOLF_HOWL',{timeout:8000})
+ expect(paths.filter(p=>p===soundPath('WOLF_HOWL'))).toHaveLength(1)
+ await page.getByRole('button',{name:'音楽を停止',exact:true}).click()
+ await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:4000})
+ await page.getByTestId('day-start-continue').click()
+ await expect(page.getByTestId('next-event')).toBeEnabled()
+ expect(paths).not.toContain(soundPath('PEACEFUL_NIGHT'))
+})
+
+test('NIGHTFALL waits for the held background publication instead of merely receiving the event',async({page})=>{
+ const images=JSON.parse(readFileSync(new URL('../public/assets/images/manifest.json',import.meta.url),'utf8'))
+ let release,seen=false
+ const gate=new Promise(resolve=>{release=resolve})
+ await page.route('**/assets/images/'+images.images['images/komorebi000night01.png'].file,async route=>{seen=true;await gate;await route.continue()})
+ const paths=await setup(page,{snapshot:presented(publicSnapshot(),'NIGHT_RESULT','wsw')})
+ try{
+  await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
+  await expect.poll(()=>seen).toBe(true)
+  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','false')
+  expect(paths).not.toContain(soundPath('NIGHTFALL'));expect(paths).not.toContain(soundPath('WOLF_HOWL'))
+  release();await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
+  await expect(ui(page)).toHaveAttribute('data-sound','NIGHTFALL')
+  expect(paths.filter(p=>p===soundPath('NIGHTFALL'))).toHaveLength(1)
+ }finally{release()}
 })

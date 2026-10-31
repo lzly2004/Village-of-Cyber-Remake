@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { completeNativeReading } from '../test-fixtures/native-reading.js'
 import { readFileSync } from 'node:fs'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 const manifest=JSON.parse(readFileSync(new URL('../public/assets/audio/manifest.json',import.meta.url),'utf8'))
@@ -77,18 +78,18 @@ test('WEB-027 day dialogue and CO keep one track; decision playlist cycles exact
   const snapshot=events(publicSnapshot(),[['DAY_DIALOGUE','gyfo1'],['AFTERNOON_DIALOGUE','gyfo1r']])
   const paths=await setup(page,snapshot)
   await page.getByRole('button',{name:'対局を始める'}).click();await enable(page,'EMOTIONALLY_UNSTABLE')
-  await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
-  await page.getByTestId('next-event').click();await expect(page.getByRole('button',{name:'曲を切替'})).toBeEnabled()
+  await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
+  await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(page.getByRole('button',{name:'曲を切替',exact:true})).toBeEnabled()
   expect(paths.filter(p=>p.includes('/bgm/') && p.endsWith('.mp3'))).toEqual([path('EMOTIONALLY_UNSTABLE')])
   for(const id of manifest.playlists.NORMAL_GAME_PLAYLIST.slice(0,2)){
-    await page.getByRole('button',{name:'曲を切替'}).click()
+    await page.getByRole('button',{name:'曲を切替',exact:true}).click()
     await expect(ui(page)).toHaveAttribute('data-status','playing');await expect(ui(page)).toHaveAttribute('data-track',id)
     expect((await probe(page)).active).toBe(1)
   }
   expect((await probe(page)).contexts).toEqual(['running'])
   const before=paths.length;await page.reload();await expect(ui(page)).toHaveAttribute('data-status','off')
   expect(paths.length).toBe(before);expect((await probe(page)).contexts).toEqual([])
-  await expect(page.getByRole('button',{name:'曲を切替'})).toBeDisabled()
+  await expect(page.getByRole('button',{name:'曲を切替',exact:true})).toBeDisabled()
 })
 
 test('WEB-027 execution/night are silent; settlement music waits for displayed stage, never leaks future result',async({page})=>{
@@ -98,14 +99,16 @@ test('WEB-027 execution/night are silent; settlement music waits for displayed s
   await page.getByRole('button',{name:'対局を始める'}).click()
   await page.getByRole('button',{name:'音楽を有効にする'}).click();await expect(ui(page)).toHaveAttribute('data-status','silent')
   expect(paths).toEqual([])
-  await page.getByTestId('next-event').click();expect(paths.filter(p=>p.includes('/bgm/'))).toEqual([])
-  await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
+  await completeNativeReading(page);await page.getByTestId('next-event').click();expect(paths.filter(p=>p.includes('/bgm/'))).toEqual([])
+  await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:12000})
+  await page.getByTestId('day-start-continue').click()
+  await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   expect(paths).not.toContain(path('VICTORY_SCREEN'))
-  await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','VICTORY_SCREEN')
+  await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','VICTORY_SCREEN')
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   expect((await probe(page)).active).toBe(1)
-  const count=paths.filter(p=>p.includes('/bgm/')).length;await page.getByTestId('next-event').click()
+  const count=paths.filter(p=>p.includes('/bgm/')).length;await completeNativeReading(page);await page.getByTestId('next-event').click()
   await expect(page.getByTestId('settlement-board')).toBeVisible();expect(paths.filter(p=>p.includes('/bgm/')).length).toBe(count)
 })
 
@@ -113,7 +116,7 @@ test('WEB-027 late playlist uses four survivors too; release selects lobby and h
   const snapshot=publicSnapshot();snapshot.view.aliveCount=4
   const paths=await setup(page,snapshot)
   await page.getByRole('button',{name:'対局を始める'}).click();await enable(page,'LIGHTLESS_GAZE')
-  await page.getByRole('button',{name:'曲を切替'}).click()
+  await page.getByRole('button',{name:'曲を切替',exact:true}).click()
   await expect(ui(page)).toHaveAttribute('data-track',manifest.playlists.LATE_GAME_PLAYLIST[0])
   await expect(ui(page)).toHaveAttribute('data-status','playing')
   // Actual visibility event contract: js property override is confined to this test.
@@ -159,7 +162,7 @@ test('WEB-027 corruption and denied play are visible, silent failures; game cont
   await page.getByRole('button',{name:'音楽を有効にする'}).click()
   await expect(ui(page)).toHaveAttribute('data-status','error');await expect(ui(page)).toContainText('AUDIO_INTEGRITY_FAILED')
   expect((await probe(page)).active).toBe(0)
-  await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.locator('.player-row')).toHaveCount(44)
+  await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.locator('.player-row,.desktop-roster-row')).toHaveCount(44)
   // Simulate browser/device denial, preserving actual resource loading and the UI failure path.
   await page.evaluate(()=>{HTMLMediaElement.prototype.play=()=>Promise.reject(new DOMException('denied','NotAllowedError'))})
   await page.getByRole('button',{name:'音楽を有効にする'}).click()

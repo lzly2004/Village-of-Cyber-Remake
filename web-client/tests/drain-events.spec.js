@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { drainEvents } from './drain-events.js'
 
 for (const end of ['decision', 'settlement']) {

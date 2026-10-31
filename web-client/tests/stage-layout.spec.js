@@ -1,4 +1,6 @@
-import { test, expect } from '@playwright/test'
+import {desktopHome,desktopSelection,desktopSkill,expectNoEnabledVote} from '../test-fixtures/desktop-navigation.js'
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { characterNames } from '../src/characterNames.js'
 
 const storageKey = 'vocr.guest.v1'
@@ -67,6 +69,7 @@ test('WEB-021 real session stage scales uniformly at desktop widths without chan
   const id = await start(page)
   try {
     const state = await saved(page)
+    await completeLocalReading(page)
     const text = await page.getByTestId('event-dialogue').textContent()
     for (const viewport of [{ width: 1920, height: 1080 }, { width: 1440, height: 900 },
       { width: 1280, height: 720 }, { width: 1024, height: 768 }]) {
@@ -74,7 +77,7 @@ test('WEB-021 real session stage scales uniformly at desktop widths without chan
       await expectContainedStage(page)
       await expect(page.getByTestId('event-dialogue')).toHaveJSProperty('textContent', text)
       expect(await saved(page)).toEqual(state)
-      await expect(page.getByTestId('vote')).toBeDisabled()
+      await expectNoEnabledVote(page)
       if (viewport.width === 1280 || viewport.width === 1440) {
         await page.getByRole('region', { name: '事件展示', exact: true })
           .screenshot({ path: testInfo.outputPath('stage-' + viewport.width + '.png') })
@@ -156,77 +159,52 @@ test('WEB-021 synthetic long dialogue scrolls by keyboard; confirmation stays ou
   } finally { await request.delete('/api/v1/games/' + id) }
 })
 
-test('WEB-021 synthetic long player list exposes scroll instructions and supports keyboard and wheel', async ({ page, request }) => {
+test('WEB-050 two-row public roster supports keyboard and wheel without command checkboxes', async ({ page, request }) => {
   const { id } = await synthetic(page, request, snapshot => manyPlayers(snapshot))
   let writes = 0
   page.on('request', req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ })
   try {
     const list = page.getByRole('region', { name: '公开玩家列表滚动区域', exact: true })
-    await expect(page.locator('#player-list-help')).toContainText('按 Tab')
-    await expect(list.getByRole('checkbox')).toHaveCount(44)
-    expect(await list.evaluate(node => node.scrollHeight > node.clientHeight)).toBe(true)
+    await expect(list.getByRole('checkbox')).toHaveCount(0)
+    await expect(list.locator('.desktop-roster-row')).toHaveCount(44)
+    const viewport=page.locator('.desktop-vote-players')
+    expect(await viewport.evaluate(node=>node.scrollWidth>node.clientWidth)).toBe(true)
     await list.focus()
-    await page.keyboard.press('End')
-    await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeGreaterThan(0)
-    await list.getByRole('checkbox').last().focus()
-    await expect(list.getByRole('checkbox').last()).toBeFocused()
-    // Wheel scrolling is independent; finish native End animation first.
-    const before = await list.evaluate(async node => {
-      let previous = node.scrollTop
-      let stable = 0
-      for (let frame = 0; frame < 60; frame++) {
-        await new Promise(resolve => requestAnimationFrame(resolve))
-        const current = node.scrollTop
-        stable = current === previous ? stable + 1 : 0
-        previous = current
-        if (stable === 4) return current
-      }
-      throw new Error('End key scrolling did not settle before wheel input')
-    })
-    await list.hover()
-    await page.mouse.wheel(0, -1000)
-    await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeLessThan(before)
+    for(let i=0;i<44;i++)await page.keyboard.press('Tab')
+    await expect(list.locator('.desktop-roster-row').last()).toBeFocused()
+    await expect.poll(()=>viewport.evaluate(node=>node.scrollLeft)).toBeGreaterThan(0)
+    const before=await viewport.evaluate(node=>node.scrollLeft)
+    await viewport.hover();await page.mouse.wheel(-1000,0)
+    await expect.poll(()=>viewport.evaluate(node=>node.scrollLeft)).toBeLessThan(before)
     expect(writes).toBe(0)
     expect((await saved(page)).eventCursor).toBe(0)
     await expect(page.locator('.player-identity').first()).not.toContainText('実際の役職')
   } finally { await request.delete('/api/v1/games/' + id) }
 })
 
-test('WEB-021 synthetic many public actors remain bounded, fold with keyboard, and reset browsing on refresh', async ({ page, request }, testInfo) => {
-  const { id } = await synthetic(page, request, snapshot => manyPlayers(snapshot, true))
-  let writes = 0
-  page.on('request', req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ })
-  try {
-    const before = await saved(page)
-    for (const label of ['個別の占い予約', '個別の護衛予約']) {
-      const list = page.getByRole('region', { name: label + ' 一覧', exact: true })
-      expect(await list.evaluate(node => node.scrollHeight > node.clientHeight)).toBe(true)
-      expect((await list.boundingBox()).height).toBeLessThan(430)
-      await list.focus()
-      await page.keyboard.press('PageDown')
-      await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeGreaterThan(0)
-      const first = list.locator('summary').first()
-      await first.focus()
-      await page.keyboard.press('Enter')
-      await expect(list.locator('details').first()).not.toHaveAttribute('open')
-      await expect(list.locator('fieldset').first()).toBeHidden()
-      await page.keyboard.press('Tab')
-      await expect(list.locator('summary').nth(1)).toBeFocused()
-      await first.focus()
-      await page.keyboard.press('Enter')
-      await page.keyboard.press('Tab')
-      await expect(list.locator('fieldset').first().getByRole('checkbox').first()).toBeFocused()
-      await first.focus()
-      await page.keyboard.press('Enter')
-    }
-    expect(writes).toBe(0)
-    expect(await saved(page)).toEqual(before)
-    await page.reload()
-    await expect(page.getByTestId('claimed-DIVINATION-1')).toBeVisible()
-    expect(await saved(page)).toEqual(before)
-    expect(Object.keys(before).sort()).toEqual(['eventCursor', 'sessionId'])
-    await page.locator('.claimed-skills-layout').screenshot({ path: testInfo.outputPath('bounded-actor-panels.png') })
-  } finally { await request.delete('/api/v1/games/' + id) }
+test('WEB-050 public actor tools and 44 selection targets remain keyboard accessible without writes', async ({page,request},testInfo)=>{
+ const {id}=await synthetic(page,request,snapshot=>manyPlayers(snapshot,true));let writes=0
+ page.on('request',req=>{if(['POST','PUT','DELETE'].includes(req.method()))writes++})
+ try{
+  const before=await saved(page)
+  for(const [skill,count]of [['divination',5],['guard',4]]){
+   await desktopSelection(page,skill)
+   const scene=page.locator('.desktop-target-scene'),viewport=scene.locator('.desktop-target-roster')
+   await expect(scene.getByRole('checkbox')).toHaveCount(44)
+   await expect(scene.locator('.desktop-drag-tools button')).toHaveCount(count+2)
+   await scene.getByRole('checkbox').last().focus();await expect(scene.getByRole('checkbox').last()).toBeFocused()
+   expect(await viewport.evaluate(n=>n.scrollLeft)).toBeGreaterThan(0)
+   expect(await viewport.evaluate(n=>n.scrollHeight<=n.clientHeight+1)).toBe(true)
+   const tools=scene.locator('.desktop-drag-tools button');await tools.first().focus()
+   for(let i=1;i<count+2;i++)await page.keyboard.press('Tab')
+   await expect(tools.last()).toBeFocused()
+  }
+  expect(writes).toBe(0);expect(await saved(page)).toEqual(before)
+  await page.reload();await expect(page.getByTestId('desktop-vote-window')).toHaveAttribute('data-menu','home')
+  expect(await saved(page)).toEqual(before)
+  await desktopSelection(page,'divination')
+  await page.locator('.desktop-target-scene').screenshot({path:testInfo.outputPath('desktop-actor-selection.png')})
+ }finally{await request.delete('/api/v1/games/'+id)}
 })
 
 test('WEB-021 CSS zoom stress keeps stage ratio, readable text and controls within the viewport', async ({ page, request }) => {
@@ -235,7 +213,7 @@ test('WEB-021 CSS zoom stress keeps stage ratio, readable text and controls with
     for (const zoom of [1.25, 2]) {
       await page.evaluate(zoom => { document.body.style.zoom = String(zoom) }, zoom)
       await expectContainedStage(page)
-      expect(await page.getByTestId('stage-text').evaluate(node => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(14)
+      expect(await page.locator('.vote-information-content').evaluate(node => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(14)
       await page.getByTestId('vote').focus()
       await expect(page.getByTestId('vote')).toBeFocused()
     }

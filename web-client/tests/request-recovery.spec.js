@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test'
+import { desktopVote, desktopVoteConfirmation, desktopSelectionIfAvailable, expectNoEnabledVote } from '../test-fixtures/desktop-navigation.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { drainEvents } from './drain-events.js'
 
 const key='vocr.guest.v1'
@@ -22,13 +23,17 @@ test('known 429 write rejection does not execute or retry and keeps authoritativ
     await page.route('**/vote-target',route=>{
       writes++;return route.fulfill({status:429,contentType:'application/json',headers:{'Retry-After':'1'},body:errorBody('REQUEST_LIMIT')})
     })
+    await desktopSelectionIfAvailable(page)
     const choice=page.locator('.player-row:not(.departed)').getByRole('checkbox').first()
+    await desktopSelectionIfAvailable(page)
     await choice.click()
     await expect(page.getByRole('alert')).toContainText('本次操作未执行')
+    await desktopSelectionIfAvailable(page)
     await expect(choice).toBeEnabled()
     expect(writes).toBe(1);expect(await saved(page)).toEqual(local)
     expect(await read(request,id)).toEqual(before)
     await page.unroute('**/vote-target')
+    await desktopSelectionIfAvailable(page)
     await choice.click();await expect(choice).toBeChecked()
     expect((await read(request,id)).revision).toBe(before.revision+1)
   }finally{await request.delete('/api/v1/games/'+id)}
@@ -46,9 +51,11 @@ test('known 429 read preserves cursor, locks decisions, and never performs the c
     await sync(page).click()
     await expect(page.getByRole('alert')).toContainText('读取暂被限流')
     expect(reads).toEqual([String(before.eventCursor)]);expect(await saved(page)).toEqual(before)
+    await desktopSelectionIfAvailable(page)
     await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeDisabled()
     await page.unroute('**/api/v1/games/'+id+'?*')
     await sync(page).click()
+    await desktopSelectionIfAvailable(page)
     await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeEnabled()
   }finally{await request.delete('/api/v1/games/'+id)}
 })
@@ -73,13 +80,15 @@ test('known 409 INVALID_STATE synchronizes exactly once without replaying the re
   const id=await start(page)
   try{
     await drainEvents(page)
+    await desktopSelectionIfAvailable(page)
     const choice=page.locator('.player-row:not(.departed)').getByRole('checkbox').first()
+    await desktopSelectionIfAvailable(page)
     await choice.click();await expect(choice).toBeChecked()
-    await expect(page.getByTestId('vote')).toBeEnabled()
+    await expect(await desktopVoteConfirmation(page)).toBeEnabled()
     const before=await read(request,id),local=await saved(page),reads=[];let writes=0
     page.on('request',req=>{if(req.method()==='GET'&&new URL(req.url()).pathname==='/api/v1/games/'+id)reads.push(req.url())})
     await page.route('**/votes',route=>{writes++;return route.fulfill({status:409,contentType:'application/json',body:errorBody('INVALID_STATE')})})
-    await page.getByTestId('vote').click()
+    await desktopVote(page,'DESIGNATED')
     await expect(page.getByRole('alert')).toContainText('已重新同步')
     expect(writes).toBe(1);expect(reads).toHaveLength(1)
     expect(await saved(page)).toEqual(local);expect(await read(request,id)).toEqual(before)
@@ -91,9 +100,11 @@ for(const [status,code] of [[400,'HTTP_ERROR'],[400,'OTHER'],[409,'STALE_REVISIO
     const id=await start(page)
     try{
       await drainEvents(page)
+      await desktopSelectionIfAvailable(page)
       await page.locator('.player-row:not(.departed)').getByRole('checkbox').first().click()
+    await desktopSelectionIfAvailable(page)
     await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeChecked()
-      await expect(page.getByTestId('vote')).toBeEnabled()
+      await expect(await desktopVoteConfirmation(page)).toBeEnabled()
       const before=await saved(page), authoritative=await read(request,id), reads=[]
       await page.route('**/api/v1/games/'+id+'?*',route=>{
         reads.push(new URL(route.request().url()).searchParams.get('eventCursor'))
@@ -103,11 +114,11 @@ for(const [status,code] of [[400,'HTTP_ERROR'],[400,'OTHER'],[409,'STALE_REVISIO
       await expect(page.getByRole('alert')).toContainText('无法读取权威状态')
       expect(reads).toEqual([String(before.eventCursor)])
       expect(await saved(page)).toEqual(before)
-      await expect(page.getByTestId('vote')).toBeDisabled()
+      await expectNoEnabledVote(page)
       expect(await read(request,id)).toEqual(authoritative)
       await page.unroute('**/api/v1/games/'+id+'?*')
       await sync(page).click()
-      await expect(page.getByTestId('vote')).toBeEnabled()
+      await expect(await desktopVoteConfirmation(page)).toBeEnabled()
       expect(await saved(page)).toEqual(before)
     }finally{await request.delete('/api/v1/games/'+id)}
   })
@@ -164,14 +175,15 @@ for(const [status,code] of [[400,'HTTP_ERROR'],[404,'HTTP_ERROR'],[409,'HTTP_ERR
         expect(committed.status()).toBe(200)
         await route.fulfill({status,contentType:'application/json',body:errorBody(code)})
       })
+      await desktopSelectionIfAvailable(page)
       await page.locator('.player-row:not(.departed)').getByRole('checkbox').first().click()
       await expect(page.getByRole('alert')).toContainText('操作可能已在服务器完成')
-      await expect(page.getByTestId('vote')).toBeDisabled()
+      await expectNoEnabledVote(page)
       expect(writes).toBe(1);expect(await saved(page)).toEqual(local)
       const after=await read(request,id)
       expect(after.revision).toBe(before.revision+1)
       await sync(page).click()
-      await expect(page.getByTestId('vote')).toBeEnabled()
+      await expect(await desktopVoteConfirmation(page)).toBeEnabled()
       expect(writes).toBe(1)
       expect((await read(request,id)).revision).toBe(after.revision)
     }finally{await request.delete('/api/v1/games/'+id)}
@@ -182,16 +194,19 @@ test('known INVALID_REQUEST rejects without rewinding, auto sync or command repl
   const id=await start(page)
   try{
     await drainEvents(page)
+    await desktopSelectionIfAvailable(page)
     await page.locator('.player-row:not(.departed)').getByRole('checkbox').first().click()
+    await desktopSelectionIfAvailable(page)
     await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeChecked()
-    await expect(page.getByTestId('vote')).toBeEnabled()
+    await expect(await desktopVoteConfirmation(page)).toBeEnabled()
     const before=await saved(page), authority=await read(request,id)
     let writes=0,reads=0
     page.on('request',req=>{if(req.method()==='GET'&&new URL(req.url()).pathname==='/api/v1/games/'+id)reads++})
     await page.route('**/vote-target',route=>{writes++;return route.fulfill({status:400,contentType:'application/json',body:errorBody('INVALID_REQUEST')})})
+    await desktopSelectionIfAvailable(page)
     await page.locator('.player-row:not(.departed)').getByRole('checkbox').nth(1).click()
     await expect(page.getByRole('alert')).toHaveText('controlled rejection')
-    await expect(page.getByTestId('vote')).toBeEnabled()
+    await expect(await desktopVoteConfirmation(page)).toBeEnabled()
     expect(writes).toBe(1);expect(reads).toBe(0)
     expect(await saved(page)).toEqual(before);expect(await read(request,id)).toEqual(authority)
   }finally{await request.delete('/api/v1/games/'+id)}
@@ -201,18 +216,20 @@ test('offline GET preserves cursor, blocks decisions, and explicit online sync r
   const id=await start(page)
   try{
     await drainEvents(page)
+    await desktopSelectionIfAvailable(page)
     await page.locator('.player-row:not(.departed)').getByRole('checkbox').first().click()
+    await desktopSelectionIfAvailable(page)
     await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeChecked()
-    await expect(page.getByTestId('vote')).toBeEnabled()
+    await expect(await desktopVoteConfirmation(page)).toBeEnabled()
     const before=await saved(page)
     await context.setOffline(true)
     await sync(page).click()
     await expect(page.getByRole('alert')).toContainText('无法读取权威状态')
     expect(await saved(page)).toEqual(before)
-    await expect(page.getByTestId('vote')).toBeDisabled()
+    await expectNoEnabledVote(page)
     await context.setOffline(false)
     await sync(page).click()
-    await expect(page.getByTestId('vote')).toBeEnabled()
+    await expect(await desktopVoteConfirmation(page)).toBeEnabled()
     expect(await saved(page)).toEqual(before)
   }finally{await context.setOffline(false);await request.delete('/api/v1/games/'+id)}
 })
@@ -240,15 +257,23 @@ test('two pages sharing one capability conflict once; local reading makes no bac
   try{
     await drainEvents(page);const local=await saved(page)
     await other.addInitScript(({key,local})=>sessionStorage.setItem(key,JSON.stringify(local)),{key,local})
-    await other.goto('/');await expect(other.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeEnabled()
+    await other.goto('/')
+    await expect(other.getByTestId('desktop-vote-window')).toBeVisible()
+    await desktopSelectionIfAvailable(other)
+    await expect(other.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeEnabled()
     let writes=0
     other.on('request',req=>{if(req.method()!=='GET'&&req.url().includes('/api/v1/games'))writes++})
+    await desktopSelectionIfAvailable(page)
     await page.locator('.player-row:not(.departed)').getByRole('checkbox').first().click()
+    await desktopSelectionIfAvailable(page)
     await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeChecked()
+    await desktopSelectionIfAvailable(other)
     await other.locator('.player-row:not(.departed)').getByRole('checkbox').nth(1).click()
     await expect(other.getByRole('alert')).toContainText('已重新同步')
     expect(writes).toBe(1)
+    await desktopSelectionIfAvailable(other)
     await expect(other.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeChecked()
+    await desktopSelectionIfAvailable(other)
     await expect(other.locator('.player-row:not(.departed)').getByRole('checkbox').nth(1)).not.toBeChecked()
     expect((await saved(other)).eventCursor).toBe(local.eventCursor)
     // Explicitly re-read full events; the confirmation loop itself performs no HTTP.
@@ -282,7 +307,7 @@ test('GET timeout aborts after the real client deadline, keeps the cursor, and h
   try{
     await drainEvents(page)
     const before=await saved(page)
-    await page.clock.install()
+    // Clock is already installed by the local-presentation fixture.
     let reads=0
     await page.route('**/api/v1/games/'+id+'?*',async route=>{reads++;await hold;try{await route.continue()}catch{/* timed-out browser request */}})
     const sent=page.waitForRequest(req=>req.method()==='GET'&&new URL(req.url()).pathname==='/api/v1/games/'+id)
@@ -303,13 +328,15 @@ test('rapid double vote sends one command while in flight; accepted response is 
   const hold=new Promise(resolve=>{unblock=resolve})
   try{
     await drainEvents(page)
+    await desktopSelectionIfAvailable(page)
     await page.locator('.player-row:not(.departed)').getByRole('checkbox').first().click()
+    await desktopSelectionIfAvailable(page)
     await expect(page.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeChecked()
-    await expect(page.getByTestId('vote')).toBeEnabled()
+    await expect(await desktopVoteConfirmation(page)).toBeEnabled()
     const before=await read(request,id);let writes=0
     await page.route('**/votes',async route=>{writes++;await hold;const result=await route.fetch();await route.fulfill({response:result})})
-    await page.getByTestId('vote').dblclick({force:true})
-    await expect(page.getByTestId('vote')).toBeDisabled()
+    await (await desktopVoteConfirmation(page)).dblclick({force:true})
+    await expectNoEnabledVote(page)
     expect(writes).toBe(1);expect((await read(request,id)).revision).toBe(before.revision)
     unblock()
     await expect(page.getByTestId('next-event')).toBeVisible()

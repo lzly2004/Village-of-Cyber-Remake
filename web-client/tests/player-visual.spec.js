@@ -1,4 +1,6 @@
-import { test, expect } from '@playwright/test'
+import {desktopSelection} from '../test-fixtures/desktop-navigation.js'
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { characterDisplayName } from '../src/characterDisplay.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
@@ -20,7 +22,7 @@ async function synthetic(page, request, edit = () => {}) {
     if (!sessionStorage.getItem(key)) sessionStorage.setItem(key, JSON.stringify({ sessionId: id, eventCursor: 0 }))
   }, { key, id: created.sessionId })
   await page.goto('/')
-  await expect(page.locator('.player-row')).toHaveCount(snapshot.view.players.length)
+  await expect(page.locator('.player-row,.desktop-roster-row')).toHaveCount(snapshot.view.players.length)
   return { id: created.sessionId, snapshot }
 }
 async function expectImage(locator, name) {
@@ -35,12 +37,14 @@ test('WEB-023 real public players use ordinal Japanese names and status images, 
   const created = await (await createdResponse).json()
   try {
     const state = await saved(page)
+    await expect(page.getByTestId('event-dialogue')).toBeVisible()
+    await completeLocalReading(page)
     const text = await page.getByTestId('event-dialogue').textContent()
     for (const player of created.update.view.players) {
       const row = page.locator(`[data-player-number="${player.playerNumber}"]`)
       await expect(row.locator('.player-identity strong')).toHaveText(characterDisplayName(player.character))
     }
-    const row = page.locator('.player-row').first()
+    const row = page.locator('.player-row,.desktop-roster-row').first()
     await row.scrollIntoViewIfNeeded()
     await expect.poll(() => row.locator('.portrait-image img').evaluateAll(images => images.length === 1 && images[0].naturalWidth === 64)).toBe(true)
     await expect(row.getByRole('checkbox')).toBeDisabled()
@@ -62,7 +66,7 @@ test('WEB-023 all 44 appearances and public gray/death states are independent of
   page.on('request', req => { if (['POST','PUT','DELETE'].includes(req.method())) writes++ })
   try {
     for (const [i, player] of snapshot.view.players.entries()) {
-      const row = page.locator('.player-row').nth(i)
+      const row = page.locator('.player-row,.desktop-roster-row').nth(i)
       await row.scrollIntoViewIfNeeded()
       await expect(row.locator('.player-identity strong')).toHaveText(characterDisplayName(player.character))
       await expectImage(row.locator('.portrait-image img'), String(44-i).padStart(2,'0') + (player.alive ? 's' : 'gs') + '.png')
@@ -88,7 +92,7 @@ test('WEB-023 public CO icons preserve exact order, overflow has text fallback a
   try {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('第 14 日')
     for(const [i,[role,order,name]] of cases.entries()) {
-      const row=page.locator('.player-row').nth(i)
+      const row=page.locator('.player-row,.desktop-roster-row').nth(i)
       await row.scrollIntoViewIfNeeded()
       if(name) await expectImage(row.locator('.claim-icon img'),name)
       else {
@@ -112,7 +116,7 @@ test('WEB-023 unknown characters and roles remain pure-text diagnostics without 
   })
   try {
     await expect(page.getByRole('heading',{level:1})).toContainText('第 50 日')
-    await page.locator('.player-row').first().scrollIntoViewIfNeeded()
+    await page.locator('.player-row,.desktop-roster-row').first().scrollIntoViewIfNeeded()
     await expect(page.locator('.player-identity strong')).toHaveText(Array(3).fill('人物不明（表示診断）'))
     await expect(page.locator('.player-list img')).toHaveCount(0)
     await expect(page.locator('.portrait-image .asset-diagnostic')).toHaveCount(3)
@@ -134,7 +138,7 @@ test('WEB-023 broken image retains explicit fallback and cannot skip terminal di
   let writes=0
   page.on('request',req=>{if(['POST','PUT','DELETE'].includes(req.method()))writes++})
   try{
-    const row=page.locator('.player-row').first()
+    const row=page.locator('.player-row,.desktop-roster-row').first()
     await row.scrollIntoViewIfNeeded()
     await expect(row.locator('.portrait-image .asset-diagnostic')).toBeVisible()
     await expect(row.locator('.portrait-image img')).toHaveCount(0)
@@ -155,10 +159,11 @@ test('WEB-023 manifest failure is visible; reload can recover images without alt
   await page.route('**/assets/images/manifest.json',block)
   const {id}=await synthetic(page,request,s=>{s.view.players=s.view.players.slice(0,2)})
   try{
-    const row=page.locator('.player-row').first()
+    const row=page.locator('.player-row,.desktop-roster-row').first()
     await row.scrollIntoViewIfNeeded()
     await expect(row.locator('.portrait-image .asset-diagnostic')).toBeVisible()
-    await expect(row.getByRole('checkbox')).toBeEnabled()
+    await desktopSelection(page)
+    await expect(page.locator('.desktop-target').first()).toBeEnabled()
     const before=await saved(page)
     await page.unroute('**/assets/images/manifest.json',block)
     await page.reload()

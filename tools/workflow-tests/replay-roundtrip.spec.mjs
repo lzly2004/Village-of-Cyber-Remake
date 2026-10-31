@@ -1,7 +1,5 @@
-import { createRequire } from 'node:module'
+import { test, expect } from '../../web-client/test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
-const require = createRequire(new URL('../../web-client/package.json', import.meta.url))
-const { test, expect } = require('@playwright/test')
 // Required: never fall back to a committed fixture or an unrelated prior run.
 if (!process.env.VOCR_VERIFY_DESKTOP_EXPORT) throw new Error('VOCR_VERIFY_DESKTOP_EXPORT is required')
 const bytes = readFileSync(process.env.VOCR_VERIFY_DESKTOP_EXPORT)

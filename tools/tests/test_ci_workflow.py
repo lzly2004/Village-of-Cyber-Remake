@@ -427,6 +427,12 @@ import test_ci_evidence
 EvidenceTest = test_ci_evidence.EvidenceTest
 DownloadTest = test_ci_evidence.DownloadTest
 ProgressTest = test_ci_evidence.ProgressTest
+import test_playtest
+PlaytestCandidateTest = test_playtest.CandidateTest
+PlaytestStoreTest = test_playtest.LocalStoreTest
+PlaytestRuntimeTest = test_playtest.RuntimeTest
+PlaytestPreviewBuildTest = test_playtest.PreviewBuildTest
+PreviewEvidenceTest = test_ci_evidence.PreviewEvidenceTest
 
 if __name__ == '__main__':
     unittest.main()

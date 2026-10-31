@@ -1,4 +1,5 @@
-import { test,expect } from '@playwright/test'
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
+import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { replayId } from '../src/replayStore.js'
 const fixture=JSON.parse(readFileSync(new URL('../../src/test/resources/replay/exchange-v3.json',import.meta.url),'utf8'))[0]
@@ -42,6 +43,7 @@ test('frozen desktop dates/portraits play read-only beside a real running game, 
   const credentials=await saved(page),path='/api/v1/games/'+credentials.sessionId+'?eventCursor='+credentials.eventCursor
   try{
     const before=await(await request.get(path)).json()
+    await completeLocalReading(page)
     const current=await page.getByTestId('event-dialogue').textContent()
     await seed(page)
     let writes=0,reads=0,audio=0
@@ -178,7 +180,7 @@ test('timed-out lazy save does not auto-save when the chunk eventually arrives',
   snapshot.events=[];snapshot.presentedEvents=[];snapshot.eventCursor=0;snapshot.nextEventCursor=0
   await page.route('**/api/v1/games/'+id+'?**',r=>r.fulfill({json:snapshot}))
   await page.addInitScript(id=>sessionStorage.setItem('vocr.guest.v1',JSON.stringify({sessionId:id,eventCursor:0})),id)
-  await page.clock.install()
+  // Clock is already installed by the local-presentation fixture.
   let resume,held=false,reads=0
   const gate=new Promise(resolve=>{resume=resolve})
   await page.route('**/src/ReplayLibrary.vue*',async r=>{const response=await r.fetch();held=true;await gate;await r.fulfill({response})})

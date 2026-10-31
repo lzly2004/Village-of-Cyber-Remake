@@ -1,4 +1,5 @@
-import { test,expect } from '@playwright/test'
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
+import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { replayId } from '../src/replayStore.js'
 const displayCases=JSON.parse(readFileSync(new URL('../../src/test/resources/replay/web034-display-cases.json',import.meta.url),'utf8'))
@@ -29,6 +30,7 @@ test('real running game stays authoritative while history, vote rounds and final
   const stored=await saved(page),credentials=JSON.parse(stored)
   const endpoint='/api/v1/games/'+credentials.sessionId+'?eventCursor='+credentials.eventCursor
   try{
+    await completeLocalReading(page)
     const before=await(await request.get(endpoint)).json(),dialogue=await page.getByTestId('event-dialogue').textContent()
     await seed(page);let writes=0,replayReads=0
     page.on('request',r=>{if(r.url().includes('/api/v1/games')){if(r.method()!=='GET')writes++;if(r.url().includes('/replay?'))replayReads++}})

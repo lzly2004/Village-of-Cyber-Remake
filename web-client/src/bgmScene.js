@@ -1,8 +1,9 @@
 // Desktop integer division intentionally selects BOTH 3 and 4 living players.
 export const isLateBgm = alive => Number.isSafeInteger(alive) && Math.trunc((alive - 1) / 2) === 1
-export function bgmScene({ sessionId, update, currentEvent, finished, uncertain, replaying }) {
+export function bgmScene({ sessionId, update, currentEvent, finished, uncertain, replaying, presentationPhase, voteReviewing }) {
   if (replaying) return { key:'replay', id:'REPLAY_PLAYER' }
   if (uncertain) return { key: 'uncertain', id: null }
+  if(presentationPhase && presentationPhase!=='event')return {key:'presentation-'+presentationPhase,id:null}
   if (!update) return { key: sessionId ? 'restoring' : 'lobby', id: sessionId ? null : 'START_MENU' }
   const stage = currentEvent?.stage
   if (stage === 'SETTLEMENT' || finished) {
@@ -12,7 +13,7 @@ export function bgmScene({ sessionId, update, currentEvent, finished, uncertain,
     return { key: 'settlement-' + (id || 'unknown'), id }
   }
   if (stage === 'NIGHT_RESULT' || stage === 'EXECUTION') return { key: stage, id: null }
-  if (['DAY_DIALOGUE', 'AFTERNOON_DIALOGUE'].includes(stage) || (!currentEvent && update.phase === 'DAY_DECISION')) {
+  if (['DAY_DIALOGUE', 'AFTERNOON_DIALOGUE'].includes(stage) || (!currentEvent && (update.phase === 'DAY_DECISION'||voteReviewing))) {
     const late = isLateBgm(update.view.aliveCount)
     return { key: 'day-' + update.view.gameDay, id: late ? 'LIGHTLESS_GAZE' : 'EMOTIONALLY_UNSTABLE',
       playlist: late ? 'LATE_GAME_PLAYLIST' : 'NORMAL_GAME_PLAYLIST' }

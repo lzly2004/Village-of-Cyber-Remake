@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test'
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { helpGroups } from '../src/helpContent.js'
 import { configurations, roles } from '../src/labels.js'
@@ -70,6 +71,7 @@ test('reading guide during a real pending event preserves game node, cursor, scr
   const before = await saved(page), id = JSON.parse(before).sessionId
   try {
     const authority = await (await request.get('/api/v1/games/' + id)).json()
+    await completeLocalReading(page)
     const text = await page.getByTestId('stage-text').textContent()
     await page.getByTestId('stage-text').evaluate(el => { el.dataset.helpProbe = 'same-node'; el.scrollTop = 4 })
     const scroll = await page.getByTestId('stage-text').evaluate(el => el.scrollTop)
@@ -107,7 +109,9 @@ test('retained Chinese structural copy declares its language; Japanese player na
   const id = JSON.parse(await saved(page)).sessionId
   try {
   const reading = page.getByTestId('stage-text')
-  await expect(reading).toHaveAttribute('lang', 'zh-CN')
+  // The desktop message body now contains Japanese dialogue only; the Chinese
+  // instructions remain outside the frame with their own language declaration.
+  await expect(reading).toHaveAttribute('lang', 'ja')
   await expect(page.locator('#stage-reading-help')).toHaveAttribute('lang', 'zh-CN')
   await expect(page.getByRole('region', { name: '公开玩家列表', exact: true })).toHaveAttribute('lang', 'zh-CN')
   await expect(page.locator('.pill')).toHaveAttribute('lang', 'zh-CN')

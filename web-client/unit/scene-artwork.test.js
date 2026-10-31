@@ -1,9 +1,10 @@
+import { nightDayPlan, nightDayImages, nightDayTimes, dayStartFormat } from '../src/nightDayPresentation.js'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { sceneArtwork, sceneImages, outcomes, consequenceFormats, transitionTimes } from '../src/sceneArtwork.js'
 import { dialogueArtwork, eventImageNames } from '../src/eventArtwork.js'
-import { settlementReveal, settlementPortrait } from '../src/settlementVisual.js'
+import { settlementReveal, settlementPortrait, settlementDetails } from '../src/settlementVisual.js'
 import { characters } from '../src/characterDisplay.js'
 import { roles } from '../src/labels.js'
 const read = path => readFileSync(new URL('../../' + path, import.meta.url),'utf8')
@@ -96,4 +97,88 @@ test('44x11 alive/dead result portraits match ImageNames role switch and hit exi
   }
   assert.equal(settlementPortrait({character:'NONE',alive:true},'wu'),null)
   assert.equal(settlementPortrait({character:'Abel',alive:true},'toString'),null)
+})
+
+
+// Public local-night presentation contracts share the existing scene test entry.
+{
+const nightEvent = (stage,eventname) => ({stage,event:{eventname}})
+test('night/day desktop images, timing and day text are source locked',()=>{
+ const image=readFileSync(new URL('../../src/main/java/com/vocr/resources/UiImage.java',import.meta.url),'utf8')
+ const constants=readFileSync(new URL('../../src/main/java/com/vocr/ui/UIConstants.java',import.meta.url),'utf8')
+ const strings=readFileSync(new URL('../../src/main/java/com/vocr/ui/GameStrings.java',import.meta.url),'utf8')
+ for(const [key,name] of [['night','NIGHT_BACKGROUND'],['dawn','GAME_SETUP_DIALOGUE_BACKGROUND']])assert.equal(nightDayImages[key],'images/'+image.match(new RegExp(name+'\\("([^"]+)"\\)'))[1])
+ for(const [key,name] of [['night','NIGHT_SCREEN_DURATION_MS'],['dawn','HOWL_TRANSITION_MS'],['character','TYPEWRITER_DELAY_MS']])assert.equal(nightDayTimes[key],Number(constants.match(new RegExp(name+'\\s*=\\s*(\\d+)'))[1]))
+ assert.equal(dayStartFormat,strings.match(/DAY_START_FORMAT\s*=\s*"([^"]+)"/)[1])
+})
+test('one introduction per public contiguous night group, including initial night',()=>{
+ const history=[nightEvent('NIGHT_RESULT','wsw'),nightEvent('DAY_DIALOGUE','gyfo1'),nightEvent('EXECUTION','cxs'),nightEvent('NIGHT_RESULT','yjsw'),nightEvent('NIGHT_RESULT','yjsw')]
+ assert.deepEqual(nightDayPlan(history,0,history[0],1),{key:0,nightOnly:false,dayText:'1日目になりました。'})
+ assert.equal(nightDayPlan(history,1,history[1],1),null)
+ assert.deepEqual(nightDayPlan(history,3,history[3],2),{key:3,nightOnly:false,dayText:'2日目になりました。'})
+ assert.equal(nightDayPlan(history,4,history[4],2),null)
+})
+test('public settlement after execution has night only; no future outcome or private getter read',()=>{
+ const history=[nightEvent('EXECUTION','cxs'),nightEvent('SETTLEMENT','crsl')]
+ Object.defineProperty(history[1],'result',{get(){throw Error('result read')}})
+ Object.defineProperty(history[1],'actualRole',{get(){throw Error('private read')}})
+ assert.deepEqual(nightDayPlan(history,1,history[1],2),{key:1,nightOnly:true,dayText:''})
+ assert.equal(nightDayPlan([history[1]],0,history[1],2),null)
+ const followed=[nightEvent('NIGHT_RESULT','yjsw'),history[1]]
+ assert.equal(nightDayPlan(followed,1,followed[1],2),null)
+})
+test('missing or mismatched history is diagnosed, never guessed as another night',()=>{
+ const current=nightEvent('NIGHT_RESULT','yjsw')
+ assert.equal(nightDayPlan([],4,current,2).diagnostic,'NIGHT_CONTEXT_UNAVAILABLE')
+ const gap=[];gap[4]=current;assert.equal(nightDayPlan(gap,4,current,2).diagnostic,'NIGHT_CONTEXT_UNAVAILABLE')
+ assert.equal(nightDayPlan([nightEvent('DAY_DIALOGUE','gyfo1')],0,current,1).diagnostic,'NIGHT_CONTEXT_UNAVAILABLE')
+ assert.equal(nightDayPlan([current],0,current,0).diagnostic,'DAY_NUMBER_UNAVAILABLE')
+ assert.equal(nightDayPlan([nightEvent('NIGHT_RESULT','invalid')],0,nightEvent('NIGHT_RESULT','invalid'),1),null)
+})
+
+test('local presentation mutes BGM without consulting an already-public future outcome',async()=>{
+ const {bgmScene}=await import('../src/bgmScene.js')
+ const view={};Object.defineProperty(view,'result',{get(){throw Error('early outcome read')}})
+ for(const presentationPhase of ['night','dawn','day-text','error']){
+  assert.equal(bgmScene({sessionId:'test',update:{view},currentEvent:nightEvent('SETTLEMENT','crsl'),presentationPhase}).id,null)
+ }
+})
+}
+
+test('desktop settlement details preserve claims, exact death days and all seven core reasons', () => {
+  const suffixes={beiyao:'狼噛',chuxing:'処刑',zhousha:'呪殺',dayhouzhui:'後追',nighthouzhui:'後追',daymaozhou:'猫呪',nightmaozhou:'猫呪'}
+  for(const [deathReason,suffix] of Object.entries(suffixes)) {
+    const value=settlementDetails(true,{alive:false,deathReason,deathDay:4,claimedRole:'zhan'},'renlang','WOLF_WIN')
+    assert.equal(value.claim,'占い師');assert.equal(value.actual,'人狼');assert.equal(value.fate,'4日目'+suffix);assert.equal(value.diagnostic,null)
+  }
+})
+test('desktop alive outcome matches EndAnimeHandler factions rather than fabricating death dates',()=>{
+  for(const role of Object.keys(roles).filter(r=>r!=='NONE'))for(const result of ['VILLAGE_WIN','WOLF_WIN','FOX_WIN']) {
+    const value=settlementDetails(true,{alive:true,deathReason:'NONE',deathDay:0,claimedRole:'NONE'},role,result)
+    const winner=result==='WOLF_WIN'?['renlang','kuangren','kuangxinzhe'].includes(role):['yaohu','beidezhe'].includes(role)
+    assert.equal(value.fate,result==='VILLAGE_WIN'?'最終存活':winner?'最終胜利':'最終死亡')
+    assert.equal(value.claim,'無し');assert.equal(value.actual,roles[role]);assert.equal(value.diagnostic,null)
+  }
+})
+test('settlement details do not read fields before reveal and diagnose missing or sanitized terminal facts',()=>{
+  const poison=new Proxy({},{get(){throw Error('premature read')}})
+  assert.equal(settlementDetails(false,poison,poison,poison),null)
+  for(const deathReason of ['NIGHT_DEATH','EXECUTION','toString',null]){
+    const v=settlementDetails(true,{alive:false,deathDay:2,deathReason,claimedRole:'NONE'},'wu','VILLAGE_WIN')
+    assert.equal(v.fate,'死因不明（表示診断）');assert.equal(v.diagnostic,'INVALID_DEATH_REASON')
+  }
+  for(const day of [null,0,-1,2.5,'3']){
+    const v=settlementDetails(true,{alive:false,deathDay:day,deathReason:'beiyao',claimedRole:'NONE'},'wu','VILLAGE_WIN')
+    assert.equal(v.fate,'死亡日不明（表示診断）');assert.equal(v.diagnostic,'INVALID_DEATH_DAY')
+  }
+  assert.match(settlementDetails(true,{alive:true,claimedRole:'toString'},'bad','bad').actual,/不明/)
+})
+
+test('settlement fate wording follows GameStrings, normalizing only invisible trailing whitespace',()=>{
+ const java=read('src/main/java/com/vocr/ui/GameStrings.java')
+ const constant=key=>JSON.parse(java.match(new RegExp('String\\s+'+key+'\\s*=\\s*("(?:\\\\.|[^"\\\\])*")'))[1])
+ for(const [reason,key]of [['beiyao','DEATH_BITE_FORMAT'],['chuxing','DEATH_EXECUTE_FORMAT'],['zhousha','DEATH_CURSE_FORMAT'],['dayhouzhui','DEATH_FOLLOW_FORMAT'],['nighthouzhui','DEATH_FOLLOW_FORMAT'],['daymaozhou','DEATH_CAT_FORMAT'],['nightmaozhou','DEATH_CAT_FORMAT']]){
+  assert.equal(settlementDetails(true,{alive:false,deathReason:reason,deathDay:4,claimedRole:'NONE'},'wu','VILLAGE_WIN').fate,constant(key).replace('%d','4').trimEnd())
+ }
+ for(const [result,role,key]of [['VILLAGE_WIN','wu','END_SURVIVE'],['WOLF_WIN','renlang','END_WIN'],['WOLF_WIN','wu','END_DEAD'],['FOX_WIN','yaohu','END_WIN'],['FOX_WIN','zhan','END_DEAD']])assert.equal(settlementDetails(true,{alive:true,claimedRole:'NONE'},role,result).fate,constant(key))
 })
