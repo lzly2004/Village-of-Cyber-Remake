@@ -88,3 +88,7 @@
 ## 2026-10-30核心窗口交付顺序修正
 
 用户确认停止重复试玩117旧界面，直接承接本地B1，优先做050-C的完整结算子项和050-B2投票窗口，然后交同head新候选。已有B1不代表已交付给用户，C的其余入口/字体/全量日文化也不因此完成。实现/差异/验证见[核心窗口](web-desktop-core-window.md)，执行计划见superpowers/plans/2026-10-30-web-050-core-window.md。新候选须清楚区分旧117和新head；收到完整试玩反馈并处置后才申请合流，不能要求用户先认可旧界面来换取新包。
+
+## 2026-10-31完整试玩后的纠偏
+
+用户指出cd682cb虽改善外框与结算，但默认信息板仍混入说明/疑心/全部指示表单，日数未用hiduke.png，缺少投票结果停留与占灵黑白球，日数文字字号不一致。明确拒绝“旧Web表单套桌面外框”作为完成；按桌面VoteInfoRenderer/VoteButtonPanel/CharacterSelectionPanel/VoteResultRenderer重建场景与菜单，六项合为一批后再交完整试玩。用户本轮不召唤独立CR，授权Coder直接实施与内部验证；不等于Ready/合流、外部发布或本机Java全量授权。执行见superpowers/plans/2026-10-31-web-050-desktop-voting-parity.md。
