@@ -10,6 +10,7 @@ export function useGuestGame() {
   const cursor = ref(0)
   const update = shallowRef(null)
   const presentationHistory = shallowRef([])
+  const completedVotePresentation = shallowRef(null)
   let presentationVersion = 0
   function rememberPresentation(snapshot) {
     const version = ++presentationVersion
@@ -79,6 +80,7 @@ export function useGuestGame() {
     update.value = null
     presentationVersion++
     presentationHistory.value = []
+    completedVotePresentation.value = null
     uncertain.value = false
     persist()
   }
@@ -212,6 +214,9 @@ export function useGuestGame() {
     const action = update.value?.legalVoteActions.find(action => action.method === method)
     if (!canDecide.value || !action) return
     return run(async () => {
+      const voteSession=sessionId.value, voteDay=update.value.view.gameDay
+      // Keep only the already-public pre-vote display, matching the still-mounted Swing scene.
+      const before={view:update.value.view,information:update.value.publicInformation}
       const result = await request('/' + sessionId.value + '/votes', {
         method: 'POST', body: {
           expectedRevision: update.value.revision,
@@ -221,6 +226,10 @@ export function useGuestGame() {
       })
       if (typeof result?.voteCompleted !== 'boolean') throw new Error('投票响应无法确认')
       await accept(result.update)
+      if(result.voteCompleted && sessionId.value===voteSession && update.value.revision===result.update.revision){
+        const completed=result.update.voteHistory.find(item=>item.day===voteDay)
+        if(completed)completedVotePresentation.value={sessionId:voteSession,vote:completed,before}
+      }
       if (!result.voteCompleted) notice.value = '投票被回避 CO 中断。读完新发言后，请重新确认投票目标。'
     })
   }
@@ -322,7 +331,7 @@ export function useGuestGame() {
   })
 
   return {
-    sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory,
+    sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory, completedVotePresentation,
     pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
     divinationTargets, selectedDivinationTargets, setDivinationTarget,
     guardTargets, selectedGuardTargets, setGuardTarget,

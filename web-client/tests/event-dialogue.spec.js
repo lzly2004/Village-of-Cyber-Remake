@@ -1,3 +1,4 @@
+import {expectNoEnabledVote} from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 
@@ -58,7 +59,7 @@ test('WEB-019 real API events render desktop resources in order and survive refr
       }
       await expect(page.getByTestId('event-dialogue')).toHaveJSProperty('textContent', text)
       await expect(page.locator('[data-dialogue-source="fallback"]')).toHaveCount(0)
-      await expect(page.getByTestId('vote')).toBeDisabled()
+      await expectNoEnabledVote(page)
       expect((await saved(page)).eventCursor).toBe(index)
       if (index === 1) {
         await page.reload()
@@ -102,7 +103,7 @@ test('WEB-019 synthetic display edges: default, special, Unicode, narrative, sys
       await expect(warning).toContainText('此为界面诊断，非日文原文')
       await expect(page.getByTestId('accessible-dialogue')).toHaveAttribute('lang','zh-CN')
       await expect(page.getByTestId('event-dialogue')).toHaveCount(0)
-      await expect(page.getByTestId('vote')).toBeDisabled()
+      await expectNoEnabledVote(page)
       await page.getByTestId('next-event').click()
     }
     expect((await saved(page)).eventCursor).toBe(events.length)

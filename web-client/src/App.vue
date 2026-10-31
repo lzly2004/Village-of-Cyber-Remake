@@ -11,7 +11,9 @@ import ReplayEntry from './ReplayEntry.vue'
 import RecordSettlement from './RecordSettlement.vue'
 import SettlementBoard from './SettlementBoard.vue'
 import DesktopVoteWindow from './DesktopVoteWindow.vue'
-import GameOrders from './GameOrders.vue'
+import DesktopVoteReview from './DesktopVoteReview.vue'
+import { publicSkillMarkers } from './desktopVoteText.js'
+import { characters } from './characterDisplay.js'
 import RecordPage from './RecordPage.vue'
 import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
@@ -23,24 +25,40 @@ import { useNightDayPresentation } from './useNightDayPresentation.js'
 import { configurations, configurationName, roles, claimRoleNames, stages } from './labels'
 
 const {
-  sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory,
+  sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory, completedVotePresentation,
   pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
   divinationTargets, selectedDivinationTargets, setDivinationTarget,
   guardTargets, selectedGuardTargets, setGuardTarget,
   setClaimedTarget,
   start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
+const voteReview=ref(null)
+const voteReviewVisual=ref(null)
 const {phase:presentationPhase,artwork:preludeArtwork,text:dayStartText,completeText:dayStartReady,
   diagnostic:presentationDiagnostic,sceneReady,continueLocal,fail:failPrelude} = useNightDayPresentation(()=>({
-  sessionId:sessionId.value,cursor:cursor.value,current:currentEvent.value,history:presentationHistory.value,
+  sessionId:sessionId.value,cursor:cursor.value,current:voteReview.value?null:currentEvent.value,history:presentationHistory.value,
   day:update.value?.view.gameDay,uncertain:uncertain.value,
 }))
-const decisionWindow = computed(()=>update.value?.phase==='DAY_DECISION' && !currentEvent.value && presentationPhase.value==='event')
-const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value)
+const reviewedVotes=new Set()
+let reviewSession=''
+watch([sessionId,completedVotePresentation,update,currentEvent,busy,uncertain],()=>{
+  if(reviewSession!==sessionId.value){reviewSession=sessionId.value;reviewedVotes.clear();voteReview.value=null;voteReviewVisual.value=null}
+  if(busy.value||uncertain.value||!update.value)return
+  const explicit=completedVotePresentation.value
+  const vote=explicit?.sessionId===sessionId.value && explicit.vote.day===update.value.voteHistory.at(-1)?.day?explicit.vote:
+    currentEvent.value?.stage==='EXECUTION'?update.value.voteHistory.at(-1):null
+  if(!vote||reviewedVotes.has(vote.day))return
+  if(!update.value.voteHistory.some(v=>v.day===vote.day))return
+  voteReviewVisual.value=explicit?.vote===vote?explicit.before:null
+  voteReview.value=vote
+},{flush:'sync'})
+function continueVoteReview(){if(busy.value||uncertain.value||!voteReview.value)return;reviewedVotes.add(voteReview.value.day);voteReview.value=null;voteReviewVisual.value=null}
+const decisionWindow = computed(()=>!voteReview.value && update.value?.phase==='DAY_DECISION' && !currentEvent.value && presentationPhase.value==='event')
+const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value && !voteReview.value)
 const artwork = computed(() => preludeArtwork.value || sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
 const audioControl = ref(null)
 const reading = useEventReading(()=>({key:sessionId.value+':'+cursor.value,
-  enabled:presentationPhase.value==='event',current:currentEvent.value,artwork:artwork.value,
+  enabled:presentationPhase.value==='event' && !voteReview.value,current:currentEvent.value,artwork:artwork.value,
   blocked:busy.value||uncertain.value}))
 const {text:readingText,fullText:readingFullText,complete:readingComplete,visible:readingVisible,
   step:readingStep,controlledFrame,diagnostic:readingDiagnostic,language:readingLanguage}=reading
@@ -88,6 +106,7 @@ const helpPage = ref('')
 const recordPage = ref(false)
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
+async function switchDesktopMusic(){if(!audioControl.value?.status?.enabled)await audioControl.value?.enable();await audioControl.value?.nextTrack()}
 async function openGameMenu(){
   confirmingExit.value=true
   await nextTick()
@@ -95,6 +114,11 @@ async function openGameMenu(){
   menu?.scrollIntoView({block:'nearest'});menu?.querySelector('button')?.focus({preventScroll:true})
 }
 const players = computed(() => update.value?.view.players || [])
+const skillMarkers=computed(()=>publicSkillMarkers(update.value?.publicInformation,players.value,update.value?.view.gameDay))
+function shortName(number){const player=players.value.find(p=>p.playerNumber===number);return characters[player?.character]?.shortName || String(number)}
+const voteReviewPlayers=computed(()=>voteReviewVisual.value?.view.players || players.value)
+const voteReviewMarkers=computed(()=>publicSkillMarkers(voteReviewVisual.value?.information || update.value?.publicInformation,voteReviewPlayers.value,voteReview.value?.day))
+const audioUpdate=computed(()=>voteReviewVisual.value?{...update.value,view:voteReviewVisual.value.view}:update.value)
 const claimCandidates = computed(() => players.value.filter(player => claimPlayers.value.includes(player.playerNumber)))
 const voteTargets = computed(() => update.value?.selections.voteTargets || [])
 const legalTargets = computed(() =>
@@ -132,7 +156,7 @@ function name(number) {
         <button class="quiet-button" :disabled="busy" @click="refresh">再同期</button>
       </div>
       <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button><button class="quiet-button" @click="recordPage = true">戦績を見る</button></nav>
-      <BgmControl :presentation-phase="presentationPhase" :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="update" :current-event="currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" />
+      <BgmControl :presentation-phase="presentationPhase" :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="audioUpdate" :current-event="voteReview ? null : currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" :vote-reviewing="Boolean(voteReview)" />
       <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。通信のない状態が30分続くか、開村から24時間経過すると無効になります。サービス再起動・解放でも無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
 
@@ -179,31 +203,16 @@ function name(number) {
             <span id="journal-label" class="visually-hidden" lang="zh-CN">事件展示</span>
             <header class="panel-heading"><span class="eyebrow" lang="zh-CN">01 / 村落纪事</span><span class="pill" :lang="currentEvent ? 'zh-CN' : 'ja'">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
-            <GameStage :key="(currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!finished && !decisionWindow && !['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="currentEvent?.event" :stage="currentEvent?.stage" :artwork="artwork">
+            <GameStage :key="(voteReview ? 'vote-review-' : currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!voteReview && !finished && !decisionWindow && !['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="!voteReview && Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="voteReview ? null : currentEvent?.event" :stage="currentEvent?.stage" :artwork="voteReview ? {mode:'deferred'} : artwork">
               <template #scene-overlay>
-                <DesktopVoteWindow v-if="decisionWindow" :day="update.view.gameDay" :alive="update.view.aliveCount" :dead="update.view.deathCount" :blocked="busy" @menu="openGameMenu">
-                  <template #players>          <section class="players panel" aria-label="公开玩家列表" lang="zh-CN">
-            <header class="panel-heading"><span class="eyebrow" lang="zh-CN">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
-            <p id="player-list-help" class="list-help">人物は上下2段です。左右にスクロールできます。Tabで各候補へ移動できます。</p>
-            <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" lang="zh-CN" tabindex="0" aria-describedby="player-list-help">
-              <label v-for="(player,index) in players" :key="player.playerNumber" class="player-row" :style="{gridColumn:index%Math.ceil(players.length/2)+1,gridRow:index<Math.ceil(players.length/2)?1:2}" :data-player-number="player.playerNumber" :title="characterDisplayName(player.character) + ' · ' + playerVisual(player).roleText + ' ' + playerVisual(player).orderText" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
-                <PlayerPortrait :player="player" :revealed="finished" :actual-role="finished ? reveal.roles.get(player.playerNumber) : null" />
-                <span class="player-number">{{ String(player.playerNumber).padStart(2, '0') }}</span>
-                <span class="player-identity" lang="ja"><strong lang="ja">{{ characterDisplayName(player.character) }}</strong><small>{{ finished ? '実際の役職 · ' + (roles[reveal.roles.get(player.playerNumber)] || '身分不明（表示診断）') : playerVisual(player).roleText + (playerVisual(player).orderText ? ' · ' + playerVisual(player).orderText : '') }}<span v-if="!player.alive"> · 第 {{ player.deathDay }} 日離場</span></small><small v-if="playerVisual(player).claimDiagnostic" class="visual-diagnostic">表示診断：CO図なし</small><small v-if="playerVisual(player).deathDiagnostic" class="visual-diagnostic">表示診断：死因図なし</small></span>
-                <input v-if="!finished" type="checkbox" :aria-label="'指定 ' + characterDisplayName(player.character) + '（' + player.playerNumber + '号）'" :checked="voteTargets.includes(player.playerNumber)" :disabled="!canDecide || !legalTargets.includes(player.playerNumber)" @click.prevent="toggleTarget(player.playerNumber, !voteTargets.includes(player.playerNumber))">
-                <span v-else class="player-state" lang="ja">{{ player.alive ? '生存' : '離場' }}</span>
-              </label>
-            </div>
-          </section></template>
-                  <template #information><PublicInformationPanel :information="update.publicInformation" :players="players" :finished="false" :player-name="name" /></template>
-                  <template #orders><GameOrders v-bind="orderBindings" :show-avoidance="false" /></template>
-                  <template #history><VoteHistoryPanel :history="update.voteHistory" :player-name="name" /></template>
+                <DesktopVoteReview v-if="voteReview" :vote="voteReview" :players="voteReviewPlayers" :markers="voteReviewMarkers" :day="voteReview.day" :alive="voteReviewVisual?.view.aliveCount ?? update.view.aliveCount" :dead="voteReviewVisual?.view.deathCount ?? update.view.deathCount" :player-name="shortName" :blocked="busy||uncertain" @continue="continueVoteReview" @menu="openGameMenu" @music="switchDesktopMusic" />
+                <DesktopVoteWindow v-if="decisionWindow" :update="update" :players="players" :bindings="orderBindings" :player-name="shortName" :vote-targets="voteTargets" :legal-targets="legalTargets" :toggle-target="toggleTarget" :markers="skillMarkers" :day="update.view.gameDay" :alive="update.view.aliveCount" :dead="update.view.deathCount" :blocked="busy" @menu="openGameMenu" @music="switchDesktopMusic">
                   <template #avoidance>            <button class="desktop-art-button" role="switch" aria-label="投票回避CO"
               :aria-checked="update.selections.avoidanceEnabled" :disabled="!canDecide"
               @click="setAvoidance(!update.selections.avoidanceEnabled)"><AssetImage :name="update.selections.avoidanceEnabled ? 'images/关闭回避.png' : 'images/开启回避.png'" /><span class="visually-hidden">{{ update.selections.avoidanceEnabled ? '回避あり' : '回避なし' }}</span></button></template>
-                  <template #vote><button class="desktop-art-button" data-testid="vote" :disabled="!canVote" @click="vote('DESIGNATED')"><AssetImage name="images/goTohyo.png" /><span class="visually-hidden">{{ busy ? '処理中…' : '投票を確定' }}</span></button></template>
+
                 </DesktopVoteWindow>
-                <SettlementBoard v-if="finished" :players="players" :reveal="reveal" :result="update.view.result" />
+                <SettlementBoard v-if="finished" :players="players" :reveal="reveal" :result="update.view.result" @menu="openGameMenu" />
               </template>
               <div v-if="presentationPhase==='day-text'" class="event-content" lang="ja" role="status" data-testid="day-start-text">{{ dayStartText }}</div>
               <div v-else-if="presentationPhase==='error'" class="event-content" lang="ja" role="status">場面の画像を表示できません。現在の出来事へ進めます。</div>
@@ -221,23 +230,9 @@ function name(number) {
                 <button v-else-if="currentEvent && presentationPhase==='event'" :data-testid="readingStep==='primary' && controlledFrame===0 && readingComplete ? 'execution-continue' : 'next-event'" class="message-continue" :disabled="busy || uncertain || !readingVisible" @click.stop="advanceReading">{{ readingVisible ? '続きを読む' : '場面表示中…' }}</button>
               </template>
             </GameStage>
-            <button v-if="currentEvent && readingStep==='waiting-image'" class="quiet-button image-reading-fallback" data-testid="read-without-image" :disabled="busy || uncertain" @click="reading.imageFailed()">画像なしで文章を読む</button>
-            <details v-if="currentEvent" class="display-details" lang="ja">
-              <summary>表示情報・読み方</summary>
-              <p>未確認 {{ pending.length }} 件 · {{ currentEvent.stage }} · イベント {{ cursor + 1 }}</p>
-              <p>台詞・叙述は既存リソースを使用しています。COと報告は公開発言であり、真偽を保証しません。</p>
-              <p>文章の表示中に続きを読むを押すと全文を表示します。読み終わってからもう一度押すと進みます。</p>
-              <p v-if="readingDiagnostic" role="status">表示診断：{{ readingDiagnostic }}。画像なしでも文章を読めます。</p>
-            </details>
-            <small v-if="presentationDiagnostic" class="visual-diagnostic" role="status" lang="ja">場面表示診断：{{ presentationDiagnostic }}</small>
-            <footer class="decision-footer" v-if="!finished && !decisionWindow">
-              <div><span class="eyebrow">指定候補</span><p>{{ voteTargets.length ? voteTargets.map(name).join('、') : '未選択' }}</p></div>
-              <button class="primary-button" data-testid="vote" :disabled="!canVote" @click="vote('DESIGNATED')">{{ busy ? '処理中…' : '投票を確定' }}</button>
-              <small v-if="currentEvent">未確認のイベントを先に読み終えてください。</small><small v-else-if="uncertain">再同期してサーバーの状態を確認してください。</small>
-            </footer>
           </section>
 
-          <section v-if="!decisionWindow" class="players panel" aria-label="公开玩家列表" lang="zh-CN">
+          <section v-if="!voteReview && !decisionWindow" class="players panel" aria-label="公开玩家列表" lang="zh-CN">
             <header class="panel-heading"><span class="eyebrow" lang="zh-CN">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
             <p id="player-list-help" class="list-help">名单较长时可在列表内滚动。按 Tab 聚焦列表后可用方向键；继续按 Tab 可逐个选择候补。</p>
             <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" lang="zh-CN" tabindex="0" aria-describedby="player-list-help">
@@ -252,9 +247,19 @@ function name(number) {
           </section>
         </div>
 
-        <GameOrders v-if="!decisionWindow" v-bind="orderBindings" :show-avoidance="true" />
-        <PublicInformationPanel v-if="!decisionWindow && (update.phase === 'DAY_DECISION' || finished)" :information="update.publicInformation" :players="players" :finished="finished" :player-name="name" />
-        <VoteHistoryPanel v-if="!decisionWindow" :history="update.voteHistory" :player-name="name" />
+        <button v-if="!voteReview && currentEvent && readingStep==='waiting-image'" class="quiet-button image-reading-fallback" data-testid="read-without-image" :disabled="busy || uncertain" @click="reading.imageFailed()">画像なしで文章を読む</button>
+
+        <details v-if="currentEvent" class="display-details" lang="ja">
+              <summary>表示情報・読み方</summary>
+              <p>未確認 {{ pending.length }} 件 · {{ currentEvent.stage }} · イベント {{ cursor + 1 }}</p>
+              <p>台詞・叙述は既存リソースを使用しています。COと報告は公開発言であり、真偽を保証しません。</p>
+              <p>文章の表示中に続きを読むを押すと全文を表示します。読み終わってからもう一度押すと進みます。</p>
+              <p v-if="readingDiagnostic" role="status">表示診断：{{ readingDiagnostic }}。画像なしでも文章を読めます。</p>
+        </details>
+        <small v-if="presentationDiagnostic" class="visual-diagnostic" role="status" lang="ja">場面表示診断：{{ presentationDiagnostic }}</small>
+
+        <PublicInformationPanel v-if="!voteReview && !decisionWindow && (update.phase === 'DAY_DECISION' || finished)" :information="update.publicInformation" :players="players" :finished="finished" :player-name="name" />
+        <VoteHistoryPanel v-if="!voteReview && !decisionWindow" :history="update.voteHistory" :player-name="name" />
 
         <footer class="session-footer">
           <span>一時セッション・このタブを再読み込みして再開できます。</span>

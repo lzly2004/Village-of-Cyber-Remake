@@ -49,15 +49,15 @@
 .desktop-vote-players .panel { background: transparent; border: 0; margin: 0; }
 .desktop-vote-players .panel-heading, .desktop-vote-players .list-help { display: none; }
 .desktop-vote-players .player-list { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2,98px); grid-template-columns: none; grid-auto-columns: 64px; max-height: none; overflow: visible; gap: 0; border: 0; }
-.desktop-vote-players .player-row { position: relative; display: block; padding: 0; margin: 0; height: 98px; border: 0; min-width: 64px; }
+.desktop-vote-players .desktop-roster-row { position: relative; display: block; padding: 0; margin: 0; height: 98px; border: 0; min-width: 64px; }
 .desktop-vote-players .player-portrait { height: 98px; }
 .desktop-vote-players .portrait-image, .desktop-vote-players .portrait-image img { height: 98px; width: 64px; object-fit: contain; }
 .desktop-vote-players .character-title-image { position: absolute; top: 78px; }
 .desktop-vote-players .player-identity, .desktop-vote-players .player-number { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.desktop-vote-players .player-row input { position: absolute; inset: 0; appearance: none; width: 64px; height: 98px; opacity: 1; margin: 0; border: 0; background: transparent; cursor: pointer; }
-.desktop-vote-players .player-row input:checked { outline: 3px solid #f9d756; outline-offset: -3px; background: #ffd14733; }
-.desktop-vote-players .player-row input:disabled { cursor: default; }
-.desktop-vote-players .player-row input:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+.desktop-vote-players .desktop-roster-row input { position: absolute; inset: 0; appearance: none; width: 64px; height: 98px; opacity: 1; margin: 0; border: 0; background: transparent; cursor: pointer; }
+.desktop-vote-players .desktop-roster-row input:checked { outline: 3px solid #f9d756; outline-offset: -3px; background: #ffd14733; }
+.desktop-vote-players .desktop-roster-row input:disabled { cursor: default; }
+.desktop-vote-players .desktop-roster-row input:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
 .desktop-calendar { position: absolute; top: 2%; right: 21.8%; width: 10%; padding: 6px; background: #302414e8; color: white; font-weight: bold; font-size: max(12px,1.5625cqw); line-height: 1.2; }
 .desktop-vote-information { position: absolute; left: 0; top: 212px; right: 21%; bottom: 4.4444%; overflow: auto; background: #e6c78e; }
 .vote-board-background { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -76,3 +76,136 @@
 .settlement-background, .settlement-background img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
 
 .vote-background img { object-fit: cover; max-width: none; max-height: none; }
+
+/* 2026-10-31: desktop text is a single typography contract, including day-start. */
+.game-stage .desktop-message .event-content { font-size:2.03125cqw; line-height:1.25; white-space:pre-wrap; }
+@media(max-width:1100px){.game-stage .desktop-message .event-content{font-size:max(14px,2.03125cqw)}}
+.desktop-information-text,.desktop-result-content,.desktop-selection-summary,.desktop-suspicion { font-family:inherit; font-size:1.875cqw; font-weight:bold; line-height:1.25; white-space:pre-wrap; margin:0; color:#000; }
+.desktop-vote-information { top:27.5%; bottom:4.4444%; overflow:hidden; }
+.vote-information-content { position:absolute; left:3.8314%; right:3.8314%; top:6.224%; bottom:2.075%; padding:0; overflow:auto; }
+.desktop-information-text { min-height:100%; }
+.desktop-calendar { top:1.388889%; left:68.75%; right:auto; width:10.15625%; height:20.833333%; padding:0; background:transparent; }
+.desktop-calendar>.asset-image,.desktop-calendar>.asset-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
+.desktop-calendar-text{position:absolute;left:7.6923%;top:10%;font-size:1.5625cqw;line-height:1.2;white-space:pre;font-weight:bold;color:white}
+.desktop-target-roster{overflow:auto;max-height:280px;}
+.desktop-target-grid{display:grid;grid-template-rows:repeat(2,108px);grid-template-columns:repeat(var(--columns),74px);row-gap:0;min-width:calc(var(--columns)*74px);padding:0 20px;}
+.desktop-target{position:relative;padding:0;border:0;width:64px;height:98px;background:none;cursor:pointer}
+.desktop-target:disabled{cursor:default;opacity:.65}
+.desktop-target .player-portrait{height:98px}.desktop-target .portrait-image,.desktop-target .portrait-image img{height:98px;width:64px}
+.desktop-target .target-frame,.desktop-target .target-frame img{position:absolute;inset:0;width:64px;height:98px;pointer-events:none}
+.target-result-all{position:absolute;left:5px;top:20px;pointer-events:none}
+.desktop-drag-tools{display:flex;align-items:start;gap:20px;flex-wrap:wrap;margin:35px 0 0 210px}
+.desktop-drag-tool{border:0;padding:0;background:transparent;max-width:150px;cursor:grab}
+.desktop-drag-tool .asset-image,.desktop-drag-tool img{display:block;width:100%;height:auto}
+.desktop-drag-tool[aria-pressed=true]{outline:2px solid #c64624}
+.desktop-vote-actions{display:block;top:0;bottom:0;right:auto;width:15.15625%}
+.desktop-vote-actions>.desktop-art-button{position:absolute;left:0;width:100%;height:17.5%}
+.desktop-slot-0{top:1.388889%}.desktop-slot-1{top:20.277778%}.desktop-slot-2{top:39.166667%}.desktop-slot-3{top:58.055556%}.desktop-slot-4{top:76.944444%}
+.desktop-vote-actions>.desktop-claim-seer{left:-115.4639%}
+.desktop-vote-review{position:absolute;inset:0;color:black}.desktop-result-board{position:absolute;left:0;top:27.5%;width:81.5625%;height:68.05556%}
+.desktop-result-content{position:absolute;left:3.8314%;right:3.8314%;top:6.12245%;bottom:3%;overflow:auto}.desktop-result-content pre{font:inherit;margin:0;white-space:pre-wrap}
+.desktop-ballot-columns{columns:2;column-gap:20px;min-height:250px}.desktop-ballot-columns>div{break-inside:avoid;white-space:pre-wrap}
+.desktop-result-next{position:absolute;left:82.8125%;top:76.944444%;width:15.15625%;height:17.5%}
+.skill-report-marker{position:absolute;pointer-events:none;width:16px;height:16px;z-index:4}.skill-report-marker img{width:100%;height:100%}
+.desktop-vote-actions>[role=switch]{top:20.277778%}
+.desktop-history pre{font:inherit;margin:0;white-space:pre-wrap}.desktop-history-navigation{display:flex;gap:40px;margin-top:20px}.desktop-history-navigation button{width:100px}
+/* Keep all desktop regions on one 1280x720 scale instead of stretching a narrow
+   window to720px while leaving avatars/text at unrelated fixed pixel sizes. */
+.stage-surface:has(.desktop-vote-window){min-height:0;aspect-ratio:16/9}
+.desktop-vote-players{height:15.3125cqw;scrollbar-width:none}
+.desktop-vote-players::-webkit-scrollbar{display:none}
+.desktop-vote-players .player-list{grid-template-rows:repeat(2,7.65625cqw);grid-auto-columns:5cqw}
+.desktop-vote-players .desktop-roster-row,.desktop-vote-players .player-portrait{height:7.65625cqw;min-width:5cqw}
+.desktop-vote-players .portrait-image,.desktop-vote-players .portrait-image img{height:7.65625cqw;width:5cqw}
+.desktop-vote-players .character-title-image{top:6.09375cqw;width:5cqw}
+.desktop-vote-players .player-portrait{width:5cqw}
+.desktop-vote-players .claim-icon{width:50%;height:24.4898%}.desktop-vote-players .death-marker{left:7.8125%;top:10.2041%;width:82.8125%;height:72.449%}
+.skill-report-marker{width:25%;height:16.32653%}
+.desktop-target-scene{position:relative;min-height:33.59375cqw}
+.desktop-target-roster{max-height:21.875cqw}.desktop-target-grid{grid-template-rows:repeat(2,8.4375cqw);grid-template-columns:repeat(var(--columns),5.78125cqw);min-width:calc(var(--columns)*5.78125cqw);padding-left:1.5625cqw}
+.desktop-target,.desktop-target .player-portrait,.desktop-target .portrait-image,.desktop-target .portrait-image img{width:5cqw;height:7.65625cqw}
+.desktop-target .target-frame,.desktop-target .target-frame img{width:5cqw;height:7.65625cqw}
+.desktop-drag-tools{position:absolute;top:25cqw;left:16.40625cqw;margin:0;gap:1.5625cqw;flex-wrap:nowrap}.desktop-drag-tool{max-width:11.71875cqw}
+.desktop-vote-players .player-list{padding:0}
+.desktop-vote-players .character-title-image{height:1.5625cqw}
+.desktop-vote-players .character-title-image img{width:100%;height:100%}
+.desktop-target .claim-icon{width:50%;height:24.4898%}.desktop-target .death-marker{left:7.8125%;top:10.2041%;width:82.8125%;height:72.449%}
+.desktop-target .character-title-image{position:absolute;top:79.5918%;width:100%;height:20.4082%}.desktop-target .character-title-image img{width:100%;height:100%}
+.desktop-ballot-columns{columns:auto;display:grid;grid-template-columns:51% 49%;min-height:250px}
+/* Values checked against the captured real Swing component bounds, not guessed
+   from the old Web layout: one-based desktop row index makes first x224. */
+.desktop-vote-players{left:17.5%;right:31.25%}
+.desktop-vote-players .claim-icon,.desktop-target .claim-icon{left:0;right:auto}
+.desktop-vote-players .character-title-image{left:23.4375%;width:60.9375%;top:79.591837%;height:20.408163%}
+.desktop-target .character-title-image{left:23.4375%;width:60.9375%}
+.desktop-calendar{width:9.53125%;height:24.166667%}
+.desktop-calendar-text{left:8.196721%;top:8.62069%;width:81.967213%;height:74.712644%}
+.desktop-vote-information,.desktop-result-board{left:0;right:auto;top:27.5%;bottom:auto;width:78.90625%;height:68.055556%}
+.vote-information-content,.desktop-result-content{left:3.960396%;right:3.960396%;top:6.122449%;bottom:6.122449%}
+.skill-report-marker{width:28.125%;height:17.346939%}
+.desktop-target-grid{padding-top:0;grid-template-rows:repeat(2,8.4375cqw);padding-left:7.34375cqw}
+.desktop-target-scene .desktop-target-roster{padding-top:0}
+.desktop-drag-tool{width:4.1015625cqw;max-width:none;min-width:0}
+.vote-information-content:has(.desktop-target-scene){inset:0}
+.desktop-target-grid{padding-left:10.46875cqw;padding-top:1.5625cqw}
+.desktop-target-roster{max-height:21.875cqw}
+.desktop-drag-tools{left:19.53125cqw;top:27.34375cqw}
+.desktop-drag-tools .desktop-drag-tool:last-child{position:absolute;left:42.96875cqw}
+.desktop-target-scene:has([aria-label="指定投票を設定"]) .desktop-drag-tools .desktop-drag-tool:last-child{left:19.53125cqw}
+.target-actor-selection{position:absolute;left:7.8125%;width:28.125%;height:17.346939%;z-index:4;pointer-events:none}
+.desktop-music-button{position:absolute;left:1.171875%;top:4.861111%;width:15.15625%;height:17.638889%}
+.desktop-result-menu{position:absolute;left:82.8125%;top:1.388889%;width:15.15625%;height:17.638889%}
+.desktop-roster-row{position:relative;display:block;padding:0;margin:0;border:0;width:5cqw;height:7.65625cqw;min-width:0;outline-offset:-2px}
+.desktop-roster-row:focus-visible{outline:2px solid white}
+.desktop-target-grid>.desktop-target-row{display:block;width:5cqw;height:7.65625cqw;min-width:0;margin:0;padding:0;border:0}
+.desktop-ballot-columns{min-height:23.4375cqw}
+
+/* EndAnimeHandler uses the same one-based column index as the top roster.
+   At1280px: portrait124,100; row2y348; metadata210/460; title1130,593. */
+.game-stage:has(.settlement-board) .stage-surface{aspect-ratio:16/9;min-height:0}
+.game-stage .settlement-board{position:absolute;inset:0;padding:0;min-height:0;overflow:hidden}
+.desktop-verdict{position:absolute;left:3.90625%;top:3.472222%;height:5.555556%;margin:0;gap:.78125cqw}
+.desktop-verdict .settlement-win-icon{width:3.125cqw;height:3.125cqw}
+.game-stage .desktop-verdict h2{font-size:1.875cqw;font-weight:bold}
+.settlement-roster{position:absolute;left:0;right:0;top:13.888889%;height:70.833333%;scrollbar-width:none;scrollbar-gutter:auto}
+.settlement-roster::-webkit-scrollbar{display:none}
+.game-stage .settlement-grid{grid-template-columns:repeat(var(--settlement-columns),8.125cqw);grid-template-rows:repeat(2,19.375cqw);gap:0;padding-left:9.6875cqw;min-width:calc(var(--settlement-columns)*8.125cqw + 9.6875cqw)}
+.game-stage .settlement-card{position:relative;display:block;width:7.8125cqw;height:19.375cqw;padding:0;font-size:1.25cqw;font-weight:bold;line-height:1.25}
+.settlement-card .player-portrait{width:5cqw;height:9.21875cqw}
+.settlement-card .portrait-image,.settlement-card .portrait-image img{width:5cqw;height:7.65625cqw}
+.settlement-card .character-title-image{position:absolute;left:1.171875cqw;top:7.65625cqw;width:3.046875cqw;height:1.5625cqw}
+.settlement-card .character-title-image img{width:100%;height:100%}
+.settlement-card .claim-icon{left:0;right:auto;width:50%;height:20.338983%}
+.settlement-card .death-marker{left:7.8125%;top:8.474576%;width:82.8125%;height:60.169492%}
+.settlement-card dl{position:absolute;left:0;top:8.59375cqw;margin:0}
+.settlement-card dt{font-weight:bold}.settlement-card dd{margin:0}
+.game-stage .settlement-card p{position:absolute;left:0;top:14.84375cqw;margin:0;font-size:inherit}
+.settlement-title{position:absolute;left:88.28125%;top:82.361111%;width:9.0625%;height:10.555556%}
+
+.desktop-ballot-columns{grid-template-columns:52.688172% 47.311828%;min-height:0}
+.desktop-vote-conclusion{margin:0;color:black;font:inherit}
+.target-result-all,.target-result-all img,.target-vote-result,.target-vote-result img{width:1.40625cqw;height:1.328125cqw}
+.target-result-all{left:.390625cqw;top:1.5625cqw}
+.target-vote-result{position:absolute;left:.390625cqw;top:0;z-index:5;pointer-events:none}
+.target-actor-selection{left:35.9375%}
+.desktop-actor-tool{position:absolute;top:0}
+/* Swing puts all-seer and seer1 at the same x250, making one unreachable.
+   Keep each numbered tool's original position; expose the all-tool at x150. */
+.desktop-tools-overlap>.desktop-drag-tool:first-child{position:relative;left:-7.8125cqw}
+.desktop-target-scene[data-selection-type="claim"] .portrait-image{transform:translateY(.78125cqw)}
+
+.game-stage .settlement-board{scrollbar-gutter:auto}
+.game-stage .settlement-card{line-height:1.1875}
+.game-stage .settlement-card p{top:14.53125cqw}
+.settlement-title{background:transparent}
+
+/* Native desktop controls do not animate out from under a held pointer.
+   Position left-column CO buttons with left, independent of global :active. */
+.game-stage button,.game-stage button:not(:disabled):active{transition:none;transform:none}
+
+/* VoteHistoryBrowser/createTishi: original day buttons and one-second overlay. */
+.desktop-history-days{position:absolute;left:0;top:27.5%;width:81.5625%;height:68.05556%;overflow:auto;display:grid;grid-template-columns:repeat(5,15.15625cqw);grid-auto-rows:9.921875cqw;gap:.78125cqw;align-content:start;padding:.78125cqw 0;box-sizing:border-box}
+.desktop-history-days button{position:relative;width:15.15625cqw;height:9.921875cqw;padding:0;border:0}
+.desktop-transient-tip{position:absolute;left:23.4375%;top:41.666667%;width:39.0625%;height:27.777778%;margin:0;background:rgba(0,0,0,.6);color:white;font-size:1.875cqw;font-weight:bold;white-space:pre-wrap;z-index:12}
+
+.desktop-suspicion [data-testid^="suspicion-"]{min-height:1.25em}

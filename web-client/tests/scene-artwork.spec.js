@@ -1,3 +1,4 @@
+import {desktopHome} from '../test-fixtures/desktop-navigation.js'
 import { sceneTest as test, expect, completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -269,21 +270,25 @@ for(const width of [1440,1024,800])test('WEB-050 desktop voting window exposes o
     await expect(page.getByTestId('desktop-message')).toHaveCount(0)
     await expect(page.getByTestId('stage-text')).toHaveCount(0)
     const list=page.getByRole('region',{name:'公开玩家列表滚动区域',exact:true})
-    await expect(list.getByRole('checkbox')).toHaveCount(44)
+    await expect(list.getByRole('checkbox')).toHaveCount(0)
+    await expect(list.locator('.desktop-roster-row')).toHaveCount(44)
     await list.focus()
     for(let i=0;i<44;i++)await page.keyboard.press('Tab')
-    await expect(list.getByRole('checkbox').last()).toBeFocused()
+    await expect(list.locator('.desktop-roster-row').last()).toBeFocused()
     expect(await page.locator('.desktop-vote-players').evaluate(n=>n.scrollLeft)).toBeGreaterThan(0)
     // Both rows including their name artwork remain inside the vertical viewport.
     expect(await page.locator('.desktop-vote-players').evaluate(n=>{
-      const r=n.getBoundingClientRect();return [...n.querySelectorAll('.player-row')].every(p=>{const c=p.getBoundingClientRect();return c.top>=r.top-1&&c.bottom<=r.top+n.clientHeight+1})
+      const r=n.getBoundingClientRect();return [...n.querySelectorAll('.desktop-roster-row')].every(p=>{const c=p.getBoundingClientRect();return c.top>=r.top-1&&c.bottom<=r.top+n.clientHeight+1})
     })).toBe(true)
     await page.getByRole('button',{name:'指示する',exact:true}).click()
-    await expect(page.locator('.vote-orders')).toBeFocused()
+    await expect(page.locator('.vote-information-content')).toBeFocused()
+    await expect(window).toHaveAttribute('data-menu','orders')
+    await desktopHome(page)
     await page.getByRole('button',{name:'記録確認',exact:true}).click()
-    await expect(page.getByRole('region',{name:'公開情報',exact:true})).toBeFocused()
     await expect(page.getByRole('region',{name:'公開情報',exact:true})).toBeVisible()
-    await expect(page.getByTestId('vote')).toBeDisabled()
+    await expect(page.getByRole('region',{name:'公開情報',exact:true})).toBeVisible()
+    await desktopHome(page)
+    await expect(page.getByTestId('vote')).toBeEnabled()
     await page.locator('.desktop-vote-players').evaluate(n=>{n.scrollLeft=0})
     await captureCore(page,info,'vote-'+width+'.png')
     await page.getByRole('button',{name:'メニュー',exact:true}).click()

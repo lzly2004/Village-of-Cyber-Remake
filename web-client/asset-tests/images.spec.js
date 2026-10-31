@@ -113,8 +113,11 @@ test('night/dawn and current result together obey the unchanged first-game trans
  await page.goto('/');await expect(page.getByRole('button',{name:'対局を始める'})).toBeEnabled()
  await page.waitForLoadState('networkidle')
  const since=await page.evaluate(()=>performance.now())
+ const wallStart=Date.now() // Base Playwright fixture: no clock installation or fast-forward.
  await page.getByRole('button',{name:'対局を始める'}).click()
  await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:12000})
+ const wallElapsedMs=Date.now()-wallStart
+ expect(wallElapsedMs).toBeGreaterThanOrEqual(9500)
  await page.getByTestId('day-start-continue').click()
  await expect(page.getByTestId('stage-character')).toHaveCount(1)
  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
@@ -125,6 +128,6 @@ test('night/dawn and current result together obey the unchanged first-game trans
  for(const name of stage)expect(paths).toContain('/assets/images/'+manifest.images[name].file)
  const firstGameBytes=await page.evaluate(since=>performance.getEntriesByType('resource').filter(r=>r.startTime>=since).reduce((sum,r)=>sum+r.transferSize,0),since)
  expect(firstGameBytes).toBeGreaterThan(0);expect(firstGameBytes).toBeLessThanOrEqual(3*1024**2)
- console.info('Night/dawn first-game transfer: '+JSON.stringify({firstGameBytes,stageImages:stage.length}))
- await info.attach('night-first-game-transfer.json',{body:JSON.stringify({firstGameBytes,stageImages:stage.length}),contentType:'application/json'})
+ console.info('Night/dawn first-game transfer: '+JSON.stringify({firstGameBytes,stageImages:stage.length,wallElapsedMs,virtualClock:false}))
+ await info.attach('night-first-game-transfer.json',{body:JSON.stringify({firstGameBytes,stageImages:stage.length,wallElapsedMs,virtualClock:false}),contentType:'application/json'})
 })

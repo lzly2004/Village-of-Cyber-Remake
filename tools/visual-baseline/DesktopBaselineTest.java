@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * PNGs are observations, never automatically approved visual goldens. */
 class DesktopBaselineTest {
     @TempDir Path temporary;
-    final Path output=Path.of("build/web050/desktop-baseline");
+    final Path output=Path.of("build/web050/desktop-parity-baseline");
     final List<Map<String,Object>> scenes=new ArrayList<>();
     final Map<String,ImageIcon> images=new HashMap<>();
 
@@ -63,6 +63,18 @@ class DesktopBaselineTest {
     }
     <T> T find(Container c,Class<T> type) {for(var child:c.getComponents()){if(type.isInstance(child))return type.cast(child);if(child instanceof Container inner){T found=find(inner,type);if(found!=null)return found;}}return null;}
 
+    void publicSnapshot(UI ui,String name)throws Exception {
+        var current=ui.gameSession.currentUpdate();
+        new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(output.resolve(name+"-public.json").toFile(),ui.gameSession.currentUpdate(current.nextEventCursor()));
+    }
+
+    void click(UI ui,int x,int y) {
+        for(Component child:ui.jPanel.getComponents()) {
+            if(child instanceof JButton button && button.isVisible() && button.getX()==x && button.getY()==y){button.doClick();return;}
+        }
+        throw new AssertionError("Visible desktop button missing at "+x+","+y);
+    }
+
     @Test @Timeout(60)
     void captureActualDesktopHandlersWithoutUserFilesOrAudio()throws Exception {
         assertFalse(GraphicsEnvironment.isHeadless());Files.createDirectories(output);
@@ -91,7 +103,17 @@ class DesktopBaselineTest {
                     assertEquals(following,ui.peekPresentedEvent());assertEquals(pending,ui.pendingEventCount());
                     capture(ui,"dialogue");
                     while(ui.hasPendingEvents())ui.pollPresentedEvent();
-                    ui.currentScene=UI.Scene.GAME_SCENE_VOTE;ui.run();capture(ui,"vote");
+                    ui.currentScene=UI.Scene.GAME_SCENE_VOTE;ui.run();capture(ui,"vote");publicSnapshot(ui,"vote");
+                    click(ui,1060,282);capture(ui,"orders-menu");
+                    click(ui,1060,282);capture(ui,"claims-menu");
+                    click(ui,1060,554);
+                    click(ui,1060,282);click(ui,1060,418);capture(ui,"designation-menu");
+                    click(ui,1060,282);capture(ui,"vote-selection");
+                    click(ui,1060,554);click(ui,1060,554);capture(ui,"vote-confirm");
+                    click(ui,1060,554);
+                    click(ui,1060,282);click(ui,1060,418);click(ui,1060,418);capture(ui,"divination-selection");
+                    click(ui,1060,554);click(ui,1060,282);click(ui,1060,418);click(ui,1060,554);capture(ui,"guard-selection");
+                    click(ui,1060,554);click(ui,1060,282);click(ui,1060,282);click(ui,1060,146);capture(ui,"claim-selection");click(ui,1060,554);
                     var session=ui.gameSession;session.setAvoidance(new SetAvoidanceCommand(session.currentRevision(),false));int rounds=0;
                     while(session.state()!=GameSession.State.FINISHED) {
                         assertTrue(++rounds<=40);var ctx=session.contextView();int target=0;
@@ -100,12 +122,12 @@ class DesktopBaselineTest {
                         session.setTargetSelection(new SetAllTargetSelectionCommand(session.currentRevision(),SelectionType.VOTE,target,true));
                         assertTrue(session.executeVote(new ExecuteVoteCommand(session.currentRevision(),VotingMethod.DESIGNATED,List.of(target))).voteCompleted());
                     }
-                    ui.ctx=session.contextView();ui.currentScene=UI.Scene.END_ANIME;ui.run();capture(ui,"settlement");
+                    ui.ctx=session.contextView();ui.currentScene=UI.Scene.END_ANIME;ui.run();capture(ui,"settlement");publicSnapshot(ui,"settlement");
                 }catch(Exception e){throw new RuntimeException(e);}
             });
             var root=new LinkedHashMap<String,Object>();root.put("source",System.getProperty("vocr.baseline.source"));root.put("java",System.getProperty("java.runtime.version"));root.put("os",System.getProperty("os.name"));root.put("dpi",Toolkit.getDefaultToolkit().getScreenResolution());root.put("declaredFont",UIConstants.FONT_FAMILY);root.put("declaredFontInstalled",Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames(Locale.ROOT)).contains(UIConstants.FONT_FAMILY));root.put("audio","disabled in capture proxy; no listening claim");root.put("data","temporary Replay and in-memory record; deterministic test session");root.put("scenes",scenes);
             new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(output.resolve("desktop.json").toFile(),root);
-            assertEquals(5,scenes.size());
+            assertEquals(13,scenes.size());
         } finally {SwingUtilities.invokeAndWait(()->{if(ui.getJFrame()!=null){for(Window w:ui.getJFrame().getOwnedWindows())w.dispose();ui.getJFrame().dispose();}});if(ui.gameSession!=null)ui.gameSession.close();}
     }
 }

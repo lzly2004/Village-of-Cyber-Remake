@@ -173,3 +173,12 @@ test('settlement details do not read fields before reveal and diagnose missing o
   }
   assert.match(settlementDetails(true,{alive:true,claimedRole:'toString'},'bad','bad').actual,/不明/)
 })
+
+test('settlement fate wording follows GameStrings, normalizing only invisible trailing whitespace',()=>{
+ const java=read('src/main/java/com/vocr/ui/GameStrings.java')
+ const constant=key=>JSON.parse(java.match(new RegExp('String\\s+'+key+'\\s*=\\s*("(?:\\\\.|[^"\\\\])*")'))[1])
+ for(const [reason,key]of [['beiyao','DEATH_BITE_FORMAT'],['chuxing','DEATH_EXECUTE_FORMAT'],['zhousha','DEATH_CURSE_FORMAT'],['dayhouzhui','DEATH_FOLLOW_FORMAT'],['nighthouzhui','DEATH_FOLLOW_FORMAT'],['daymaozhou','DEATH_CAT_FORMAT'],['nightmaozhou','DEATH_CAT_FORMAT']]){
+  assert.equal(settlementDetails(true,{alive:false,deathReason:reason,deathDay:4,claimedRole:'NONE'},'wu','VILLAGE_WIN').fate,constant(key).replace('%d','4').trimEnd())
+ }
+ for(const [result,role,key]of [['VILLAGE_WIN','wu','END_SURVIVE'],['WOLF_WIN','renlang','END_WIN'],['WOLF_WIN','wu','END_DEAD'],['FOX_WIN','yaohu','END_WIN'],['FOX_WIN','zhan','END_DEAD']])assert.equal(settlementDetails(true,{alive:true,claimedRole:'NONE'},role,result).fate,constant(key))
+})

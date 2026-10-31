@@ -1,4 +1,5 @@
 import { test as base, expect } from '@playwright/test'
+import { completeVoteReview } from './desktop-navigation.js'
 
 // Legacy business/geometry journeys explicitly opt into completing the new local
 // presentation. Dedicated night-day.spec.js uses the base fixture and checks every
@@ -37,6 +38,9 @@ export async function preparePresentation(page,{reading=true}={}) {
     if (prepared.has(page)) return
     prepared.add(page)
     await page.clock.install()
+    // Explicit legacy-journey precondition: finish only the newly introduced
+    // local authoritative vote-result pages, never submit/repeat a vote or ack.
+    await page.addLocatorHandler(page.getByTestId('desktop-vote-review'),()=>completeVoteReview(page),{noWaitAfter:true})
     // Explicit callers may click the local execution button themselves. Do not
     // recursively consume that same button from its actionability handler.
     if(reading)await page.addLocatorHandler(page.locator('[data-testid="game-stage"][data-reading-blocking="true"]'),()=>completeLocalReading(page),{noWaitAfter:true})

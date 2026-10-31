@@ -5,7 +5,7 @@ import { bgmScene } from './bgmScene.js'
 import { createBgmPlayer } from './bgmPlayer.js'
 import { defaultAudioSettings, readAudioSettings, saveAudioSettings } from './audioSettings.js'
 import { enteringSounds, transitionSound } from './soundScene.js'
-const props = defineProps(['sessionId', 'update', 'currentEvent', 'finished', 'uncertain', 'canDecide', 'cursor', 'replaying','presentationPhase'])
+const props = defineProps(['sessionId', 'update', 'currentEvent', 'finished', 'uncertain', 'canDecide', 'cursor', 'replaying','presentationPhase','voteReviewing'])
 const state = ref({ enabled: false, status: 'off', id: null, error: null })
 const scene = computed(() => bgmScene(props))
 const player = createBgmPlayer({ notify: next => { state.value = next } })
@@ -44,14 +44,14 @@ function transition(key) {
   if (id) player.effects([id])
 }
 watch(()=>props.replaying,()=>player.cancelSounds({preserveClick:true}))
-defineExpose({ status:state, enable:()=>player.enable(), stop:()=>stop(), click: () => player.click(), transition, presented, presentation })
+defineExpose({ status:state, enable:()=>player.enable(), stop:()=>stop(), click: () => player.click(), transition, presented, presentation, nextTrack })
 async function nextTrack() {
-  if (!state.value.enabled || props.replaying || !props.canDecide || choosing.value || !scene.value.playlist) return
+  if (!state.value.enabled || props.replaying || (!props.canDecide && !props.voteReviewing) || choosing.value || !scene.value.playlist) return
   const token = ++selectionVersion
   choosing.value = true
   try {
     const catalog = await audioResources.manifest()
-    if (token !== selectionVersion || !state.value.enabled || !props.canDecide) return
+    if (token !== selectionVersion || !state.value.enabled || (!props.canDecide && !props.voteReviewing)) return
     const list = catalog.playlists[scene.value.playlist]
     player.select(list[count++ % list.length])
   } catch { if (token === selectionVersion) player.disable('MANIFEST_LOAD_FAILED') }

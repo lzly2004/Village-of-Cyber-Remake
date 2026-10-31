@@ -1,3 +1,4 @@
+import {desktopHome,desktopSelection,desktopSkill,expectNoEnabledVote} from '../test-fixtures/desktop-navigation.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { characterNames } from '../src/characterNames.js'
@@ -52,8 +53,7 @@ function manyPlayers(snapshot, withActors = false) {
 }
 async function expectContainedStage(page) {
   const rect = await page.getByTestId('stage-surface').boundingBox()
-  if(await page.getByTestId('desktop-vote-window').count())expect(rect.height).toBeGreaterThanOrEqual(720)
-  else expect(Math.abs(rect.width / rect.height - 16 / 9)).toBeLessThan(0.005)
+  expect(Math.abs(rect.width / rect.height - 16 / 9)).toBeLessThan(0.005)
   const drawing = await page.getByTestId('stage-artwork').boundingBox()
   expect(Math.abs(drawing.width - rect.width)).toBeLessThan(1)
   expect(Math.abs(drawing.height - rect.height)).toBeLessThan(1)
@@ -77,7 +77,7 @@ test('WEB-021 real session stage scales uniformly at desktop widths without chan
       await expectContainedStage(page)
       await expect(page.getByTestId('event-dialogue')).toHaveJSProperty('textContent', text)
       expect(await saved(page)).toEqual(state)
-      await expect(page.getByTestId('vote')).toBeDisabled()
+      await expectNoEnabledVote(page)
       if (viewport.width === 1280 || viewport.width === 1440) {
         await page.getByRole('region', { name: '事件展示', exact: true })
           .screenshot({ path: testInfo.outputPath('stage-' + viewport.width + '.png') })
@@ -159,19 +159,19 @@ test('WEB-021 synthetic long dialogue scrolls by keyboard; confirmation stays ou
   } finally { await request.delete('/api/v1/games/' + id) }
 })
 
-test('WEB-021 synthetic long player list exposes scroll instructions and supports keyboard and wheel', async ({ page, request }) => {
+test('WEB-050 two-row public roster supports keyboard and wheel without command checkboxes', async ({ page, request }) => {
   const { id } = await synthetic(page, request, snapshot => manyPlayers(snapshot))
   let writes = 0
   page.on('request', req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ })
   try {
     const list = page.getByRole('region', { name: '公开玩家列表滚动区域', exact: true })
-    await expect(page.locator('#player-list-help')).toContainText('Tab')
-    await expect(list.getByRole('checkbox')).toHaveCount(44)
+    await expect(list.getByRole('checkbox')).toHaveCount(0)
+    await expect(list.locator('.desktop-roster-row')).toHaveCount(44)
     const viewport=page.locator('.desktop-vote-players')
     expect(await viewport.evaluate(node=>node.scrollWidth>node.clientWidth)).toBe(true)
     await list.focus()
     for(let i=0;i<44;i++)await page.keyboard.press('Tab')
-    await expect(list.getByRole('checkbox').last()).toBeFocused()
+    await expect(list.locator('.desktop-roster-row').last()).toBeFocused()
     await expect.poll(()=>viewport.evaluate(node=>node.scrollLeft)).toBeGreaterThan(0)
     const before=await viewport.evaluate(node=>node.scrollLeft)
     await viewport.hover();await page.mouse.wheel(-1000,0)
@@ -182,41 +182,29 @@ test('WEB-021 synthetic long player list exposes scroll instructions and support
   } finally { await request.delete('/api/v1/games/' + id) }
 })
 
-test('WEB-021 synthetic many public actors remain bounded, fold with keyboard, and reset browsing on refresh', async ({ page, request }, testInfo) => {
-  const { id } = await synthetic(page, request, snapshot => manyPlayers(snapshot, true))
-  let writes = 0
-  page.on('request', req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ })
-  try {
-    const before = await saved(page)
-    for (const label of ['個別の占い予約', '個別の護衛予約']) {
-      const list = page.getByRole('region', { name: label + ' 一覧', exact: true })
-      expect(await list.evaluate(node => node.scrollHeight > node.clientHeight)).toBe(true)
-      expect((await list.boundingBox()).height).toBeLessThan(430)
-      await list.focus()
-      await page.keyboard.press('PageDown')
-      await expect.poll(() => list.evaluate(node => node.scrollTop)).toBeGreaterThan(0)
-      const first = list.locator('summary').first()
-      await first.focus()
-      await page.keyboard.press('Enter')
-      await expect(list.locator('details').first()).not.toHaveAttribute('open')
-      await expect(list.locator('fieldset').first()).toBeHidden()
-      await page.keyboard.press('Tab')
-      await expect(list.locator('summary').nth(1)).toBeFocused()
-      await first.focus()
-      await page.keyboard.press('Enter')
-      await page.keyboard.press('Tab')
-      await expect(list.locator('fieldset').first().getByRole('checkbox').first()).toBeFocused()
-      await first.focus()
-      await page.keyboard.press('Enter')
-    }
-    expect(writes).toBe(0)
-    expect(await saved(page)).toEqual(before)
-    await page.reload()
-    await expect(page.getByTestId('claimed-DIVINATION-1')).toBeVisible()
-    expect(await saved(page)).toEqual(before)
-    expect(Object.keys(before).sort()).toEqual(['eventCursor', 'sessionId'])
-    await page.locator('.claimed-skills-layout').screenshot({ path: testInfo.outputPath('bounded-actor-panels.png') })
-  } finally { await request.delete('/api/v1/games/' + id) }
+test('WEB-050 public actor tools and 44 selection targets remain keyboard accessible without writes', async ({page,request},testInfo)=>{
+ const {id}=await synthetic(page,request,snapshot=>manyPlayers(snapshot,true));let writes=0
+ page.on('request',req=>{if(['POST','PUT','DELETE'].includes(req.method()))writes++})
+ try{
+  const before=await saved(page)
+  for(const [skill,count]of [['divination',5],['guard',4]]){
+   await desktopSelection(page,skill)
+   const scene=page.locator('.desktop-target-scene'),viewport=scene.locator('.desktop-target-roster')
+   await expect(scene.getByRole('checkbox')).toHaveCount(44)
+   await expect(scene.locator('.desktop-drag-tools button')).toHaveCount(count+2)
+   await scene.getByRole('checkbox').last().focus();await expect(scene.getByRole('checkbox').last()).toBeFocused()
+   expect(await viewport.evaluate(n=>n.scrollLeft)).toBeGreaterThan(0)
+   expect(await viewport.evaluate(n=>n.scrollHeight<=n.clientHeight+1)).toBe(true)
+   const tools=scene.locator('.desktop-drag-tools button');await tools.first().focus()
+   for(let i=1;i<count+2;i++)await page.keyboard.press('Tab')
+   await expect(tools.last()).toBeFocused()
+  }
+  expect(writes).toBe(0);expect(await saved(page)).toEqual(before)
+  await page.reload();await expect(page.getByTestId('desktop-vote-window')).toHaveAttribute('data-menu','home')
+  expect(await saved(page)).toEqual(before)
+  await desktopSelection(page,'divination')
+  await page.locator('.desktop-target-scene').screenshot({path:testInfo.outputPath('desktop-actor-selection.png')})
+ }finally{await request.delete('/api/v1/games/'+id)}
 })
 
 test('WEB-021 CSS zoom stress keeps stage ratio, readable text and controls within the viewport', async ({ page, request }) => {

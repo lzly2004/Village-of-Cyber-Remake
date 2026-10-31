@@ -1,3 +1,4 @@
+import { desktopVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { drainEvents } from './drain-events.js'
@@ -73,7 +74,7 @@ test('two real completed games accumulate, abandoning and replay import do not; 
       for(let turn=0;turn<40;turn++){
         await drainEvents(page)
         if(await page.locator('.settlement').count())break
-        await page.getByTestId('vote-FREE').click()
+        await desktopVote(page,'FREE')
       }
       await expect(page.locator('.settlement')).toBeVisible();await expect(status(page)).toContainText('保存しました')
       expect((await read(page)).totalPlayCnt).toBe(game+1)

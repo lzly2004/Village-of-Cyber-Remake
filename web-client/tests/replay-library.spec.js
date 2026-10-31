@@ -1,3 +1,4 @@
+import { desktopVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
@@ -39,7 +40,7 @@ test('real finished game saves compatible v3 exactly once; search/detail/delete/
       await drainEvents(page)
       if(await page.locator('.settlement').count())break
       expect(++turns).toBeLessThan(40)
-      await page.getByTestId('vote-FREE').click();await expect(page.getByTestId('next-event')).toBeVisible()
+      await desktopVote(page,'FREE');await expect(page.getByTestId('next-event')).toBeVisible()
       await expect(page.getByTestId('save-replay')).toHaveCount(0)
     }
     expect(replayReads).toBe(0)

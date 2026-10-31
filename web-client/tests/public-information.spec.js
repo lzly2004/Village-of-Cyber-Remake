@@ -1,5 +1,6 @@
+import {desktopHome,desktopClaims,desktopRecords,desktopVote} from '../test-fixtures/desktop-navigation.js'
 import { drainEvents as drain } from './drain-events.js'
-import { characterDisplayName } from '../src/characterDisplay.js'
+import { characterDisplayName, characters } from '../src/characterDisplay.js'
 import { test as base, expect } from '../test-fixtures/presentation-test.js'
 import { publicInformationDiagnostics } from './public-information-diagnostics.js'
 const test = base.extend({
@@ -11,7 +12,7 @@ const test = base.extend({
 })
 
 const key = 'vocr.guest.v1'
-const name = (snapshot, number) => number + ' · ' + characterDisplayName(snapshot.view.players.find(player => player.playerNumber === number).character)
+const name = (snapshot, number) => characters[snapshot.view.players.find(player => player.playerNumber === number).character]?.shortName || String(number)
 const read = async (request, id) => (await request.get('/api/v1/games/' + id)).json()
 async function saved(page) { return page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), key) }
 async function start(page) {
@@ -23,28 +24,30 @@ async function start(page) {
 }
 
 async function expectReports(page, snapshot) {
-  const panel = page.getByRole('region', { name: '公開技能報告', exact: true })
-  await expect(panel.locator('article')).toHaveCount(snapshot.publicInformation.skillReports.length)
-  for (const report of snapshot.publicInformation.skillReports) {
-    const row = panel.getByTestId('report-' + report.playerNumber)
-    await expect(row.locator('h4')).toContainText(name(snapshot, report.playerNumber))
-    await expect(row.locator('h4')).toContainText('CO順 ' + report.claimedRoleOrder)
-    await expect(row.locator('li')).toHaveText(report.results.map(result =>
-      `第${result.skillDay}日：${name(snapshot, result.targetPlayerNumber)}`
-        + ({ WHITE: '○', BLACK: '●', NOT_APPLICABLE: '' })[result.color]))
-    if (!snapshot.view.players.find(player => player.playerNumber === report.playerNumber).alive)
-      await expect(row.locator('h4')).toContainText('離場済み')
-    if (report.exposed) await expect(row.locator('h4')).toContainText('破綻')
+  const panel = page.getByTestId('desktop-information')
+  await expect(panel).toBeVisible()
+  const reportText={zhan:[],ling:[],lie:[]}
+  for(const report of snapshot.publicInformation.skillReports){
+    const results=report.results.map(r=>name(snapshot,r.targetPlayerNumber)+({WHITE:'○',BLACK:'●',NOT_APPLICABLE:''})[r.color])
+    if(report.exposed)results.push('破绽')
+    reportText[report.claimedRole].push((name(snapshot,report.playerNumber)+' : '+results.join('→')).trimEnd())
   }
+  const text=await panel.textContent()
+  const headings=['[占い師]','[霊能者]','[処刑]','[死体]','[護衛先]']
+  expect(text.match(/\[[^\]]+\]/g)).toEqual(headings)
+  for(const reports of Object.values(reportText))for(const line of reports)expect(text).toContain(line)
+  expect(text).not.toContain('公開技能報告')
+  expect(text).not.toContain('CO順')
 }
 
 test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再読込で書き込まない', async ({ page, request, diagnostics }, testInfo) => {
   const id = await diagnostics.step('start and first event visible', () => start(page))
   let sawDead = false, sawSuspicion = false, checkedRefresh = false
   try {
-    await diagnostics.step('assert initial suspicion availability', () => expect(page.getByRole('region', { name: '疑い先', exact: true })).toContainText('第3日以降'))
+    expect((await read(request,id)).publicInformation.suspicion.available).toBe(false)
     await diagnostics.step('drain public events', () => drain(page))
     for (const role of ['占い師', '霊能者', '狩人']) {
+      await desktopClaims(page)
       await diagnostics.step('CO inquiry ' + role, () => page.getByRole('button', { name: role + 'のCOを聞く', exact: true }).click())
       await diagnostics.step('drain public events', () => drain(page))
     }
@@ -71,6 +74,7 @@ test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再
         !snapshot.view.players.find(player => player.playerNumber === report.playerNumber).alive)
       if (snapshot.publicInformation.suspicion.available) {
         sawSuspicion = true
+        await desktopRecords(page,'suspicion')
         const symbols = { CLOSE: '=', SLIGHTLY_GREATER: '≧', GREATER: '>', MUCH_GREATER: '≫' }
         for (const row of snapshot.publicInformation.suspicion.rows) {
           const expected = row.targets.length ? name(snapshot, row.playerNumber) + '：'
@@ -79,6 +83,7 @@ test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再
           await diagnostics.step('assert suspicion day ' + snapshot.view.gameDay + ' player ' + row.playerNumber, () => expect(page.getByTestId('suspicion-' + row.playerNumber)).toHaveText(expected))
         }
         if (!checkedRefresh) {
+          await desktopHome(page)
           const beforeText = await page.getByRole('region', { name: '公開情報', exact: true }).textContent()
           const beforeStorage = await saved(page)
           let writes = 0
@@ -97,7 +102,7 @@ test('公開情報は実対局のCO・跨日・終局に追従し、閲覧と再
           checkedRefresh = true
         }
       }
-      await diagnostics.step('free vote day ' + snapshot.view.gameDay, () => page.getByTestId('vote-FREE').click())
+      await diagnostics.step('free vote day ' + snapshot.view.gameDay, () => desktopVote(page,'FREE'))
       await diagnostics.step('wait for current event', () => expect(page.getByTestId('next-event')).toBeVisible())
     }
     expect(sawDead).toBe(true)
@@ -117,7 +122,8 @@ async function fixture(page, request, edit) {
   await page.addInitScript(({ key, id }) => sessionStorage.setItem(key, JSON.stringify({ sessionId: id, eventCursor: 0 })),
     { key, id: created.sessionId })
   await page.goto('/')
-  await expect(page.getByRole('region', { name: '公開情報', exact: true })).toBeVisible()
+  await drain(page)
+  await expect(page.getByTestId('desktop-information')).toBeVisible()
   return { id: created.sessionId, snapshot }
 }
 
@@ -163,16 +169,18 @@ test('表示端の合成境界：死亡CO・過去報告・球・破綻・空行
   })
   try {
     await expectReports(page, snapshot)
-    await expect(page.getByTestId('report-4')).toContainText('公開された結果はまだありません')
-    await expect(page.getByTestId('report-3')).not.toContainText('○')
-    await expect(page.getByTestId('report-3')).not.toContainText('●')
+    await expect(page.getByTestId('desktop-information')).toContainText(name(snapshot,4)+' :')
+    const guard=(await page.getByTestId('desktop-information').textContent()).split('[護衛先]')[1]
+    expect(guard).not.toMatch(/[○●]/)
+    const publicText=await page.getByTestId('desktop-information').textContent()
+    expect(publicText).toContain(name(snapshot,8)+'+'+name(snapshot,7)+'(猫呪)')
+    expect(publicText).toContain('平和→平和→'+name(snapshot,1))
+    await desktopRecords(page,'suspicion')
     await expect(page.getByTestId('suspicion-4')).toHaveText('')
     await expect(page.getByTestId('suspicion-2')).toHaveText(name(snapshot, 2) + '：' + name(snapshot, 4) + '=' + name(snapshot, 3) + '≧' + name(snapshot, 5))
     await expect(page.getByTestId('suspicion-3')).toHaveText(name(snapshot, 3) + '：' + name(snapshot, 5) + '>' + name(snapshot, 2) + '≫' + name(snapshot, 4))
-    await expect(page.getByTestId('death-day-1')).toContainText('死体：平和')
-    await expect(page.getByTestId('death-day-2')).toContainText(name(snapshot, 8) + '+' + name(snapshot, 7) + '（猫呪）')
-    await expect(page.getByTestId('death-day-3')).toContainText('死体：' + name(snapshot, 1))
-    await expect(page.getByRole('region', { name: '公開情報', exact: true })).not.toContainText('DO_NOT_RENDER_PRIVATE_SENTINEL')
+    await desktopHome(page)
+    await expect(page.getByTestId('desktop-information')).not.toContainText('DO_NOT_RENDER_PRIVATE_SENTINEL')
   } finally { await request.delete('/api/v1/games/' + id) }
 })
 
@@ -184,7 +192,7 @@ for (const missing of [false, true]) {
     })
     try {
       const panel = page.getByRole('region', { name: '公開情報', exact: true })
-      await expect(panel).toContainText(missing ? '対応していません' : '公開COの技能報告はありません')
+      await expect(panel).toContainText(missing ? '対応していません' : '[占い師]')
       if (!missing) await expect(panel).not.toContainText('対応していません')
     } finally { await request.delete('/api/v1/games/' + id) }
   })
@@ -201,6 +209,7 @@ test('会話失効後は公開情報も消え、新局に持ち越さない', as
   const nextId = (await saved(page)).sessionId
   try {
     expect(nextId).not.toBe(id)
+    await drain(page)
     await expectReports(page, await read(request, nextId))
   } finally { await request.delete('/api/v1/games/' + nextId) }
 })
@@ -222,9 +231,12 @@ for (const lost of [false, true]) {
         if (lost) { authority = await (await route.fetch()).json(); await route.abort() }
         else await route.continue()
       })
+      await desktopClaims(page)
       await page.getByRole('button', { name: '占い師のCOを聞く', exact: true }).click()
       await expect(page.getByRole('alert')).toContainText(lost ? '重新同步' : '已重新同步')
       if (lost) await page.getByRole('button', { name: '再同期', exact: true }).click()
+      await drain(page)
+      await desktopHome(page)
       await expectReports(page, authority)
       expect(writes).toBe(1)
     } finally { await request.delete('/api/v1/games/' + id) }

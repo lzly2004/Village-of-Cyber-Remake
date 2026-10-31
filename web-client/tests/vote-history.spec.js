@@ -1,5 +1,6 @@
+import { desktopVote, desktopRecords, completeVoteReview } from '../test-fixtures/desktop-navigation.js'
 import { drainEvents as drain } from './drain-events.js'
-import { characterDisplayName } from '../src/characterDisplay.js'
+import { characterDisplayName, characters } from '../src/characterDisplay.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 
 const key = 'vocr.guest.v1'
@@ -15,27 +16,45 @@ async function start(page) {
 }
 
 async function expectHistory(page, snapshot) {
-  const panel = page.getByRole('region', { name: '最近投票结果', exact: true })
-  if (!snapshot.voteHistory.length) { await expect(panel).toHaveCount(0); return }
-  await expect(panel.locator('details')).toHaveCount(snapshot.voteHistory.length)
-  for (const vote of snapshot.voteHistory) {
-    const day = page.getByTestId('vote-day-' + vote.day)
-    if (!await day.evaluate(element => element.open)) await day.locator('summary').click()
-    await expect(day.locator('summary')).toContainText(
-      ({ DESIGNATED: '指定投票', FREE: '自由投票', GREY: 'グレー投票' })[vote.method] || '未対応の投票方式')
-    await expect(day.locator('.history-candidates')).toHaveText('候補：' + vote.candidates.map(n => playerName(snapshot, n)).join('・'))
-    await expect(day.locator('.history-round')).toHaveCount(vote.rounds.length)
-    for (const round of vote.rounds) {
-      const section = page.getByTestId(`vote-round-${vote.day}-${round.round}`)
-      await expect(section.locator('.round-summary')).toHaveText(`${round.maximumVotes}票：`
-        + round.leaders.map(n => playerName(snapshot, n)).join('・')
-        + (round.leaders.length > 1 ? '（同票・再投票）' : '（処刑）'))
-      const rows = section.locator('tbody tr')
-      await expect(rows).toHaveCount(round.lines.length)
-      for (const [index, line] of round.lines.entries())
-        expect((await rows.nth(index).locator('th, td').allTextContents()).map(text => text.trim()))
-          .toEqual([playerName(snapshot, line.playerNumber), playerName(snapshot, line.targetPlayerNumber), line.receivedVotes + '票'])
+  await expect(page.locator('.session-meta')).toContainText('状態バージョン '+snapshot.revision)
+  await expect(page.getByRole('button',{name:'再同期',exact:true})).toBeEnabled()
+  await completeVoteReview(page)
+  const window=page.getByTestId('desktop-vote-window')
+  if(!await window.count()){
+    const panel=page.getByRole('region',{name:'最近投票结果',exact:true})
+    if(!snapshot.voteHistory.length){await expect(panel).toHaveCount(0);return}
+    await expect(panel.locator('details')).toHaveCount(snapshot.voteHistory.length)
+    for(const vote of snapshot.voteHistory){
+      const day=page.getByTestId('vote-day-'+vote.day)
+      if(!await day.evaluate(e=>e.open))await day.locator('summary').click()
+      for(const round of vote.rounds){
+        const section=page.getByTestId(`vote-round-${vote.day}-${round.round}`)
+        await expect(section.locator('.round-summary')).toHaveText(`${round.maximumVotes}票：`+round.leaders.map(n=>playerName(snapshot,n)).join('・')+(round.leaders.length>1?'（同票・再投票）':'（処刑）'))
+        const rows=section.locator('tbody tr');await expect(rows).toHaveCount(round.lines.length)
+        for(const [index,line]of round.lines.entries())expect((await rows.nth(index).locator('th,td').allTextContents()).map(t=>t.trim())).toEqual([playerName(snapshot,line.playerNumber),playerName(snapshot,line.targetPlayerNumber),line.receivedVotes+'票'])
+      }
     }
+    return
+  }
+  if(!snapshot.voteHistory.length)return
+  await desktopRecords(page,'history')
+  const panel=page.getByRole('region',{name:'投票履歴',exact:true})
+  const short=n=>characters[snapshot.view.players.find(p=>p.playerNumber===n).character]?.shortName||String(n)
+  for(const vote of snapshot.voteHistory){
+    await desktopRecords(page,'history')
+    const date=page.getByRole('button',{name:vote.day+'日目の投票結果',exact:true})
+    await expect(date.locator('img')).toBeVisible();await date.click()
+    const previous=page.getByRole('button',{name:'前の投票結果',exact:true})
+    await expect(previous).toBeDisabled()
+    for(const [i,round]of vote.rounds.entries()){
+      await expect(panel.locator('pre').first()).toContainText(vote.day+'日目')
+      await expect(panel.locator('pre').first()).toContainText(['FREE','GREY','DESIGNATED'].includes(vote.method)?({FREE:'自由投票',GREY:'グレラン',DESIGNATED:'指定投票'})[vote.method]:'未対応の投票方式')
+      if(['GREY','DESIGNATED'].includes(vote.method))for(const n of vote.candidates)await expect(panel.locator('pre').first()).toContainText(short(n))
+      await expect(panel.locator('.history-line')).toHaveText(round.lines.map(l=>`${short(l.playerNumber)}：${l.receivedVotes}票  投票先→${short(l.targetPlayerNumber)}`))
+      await expect(panel.locator('.history-summary')).toHaveText(round.leaders.length>1?'投票が同点となりました。再投票を行います。':`${round.maximumVotes}票で${short(round.leaders[0])}さんが処刑されました。`)
+      if(i+1<vote.rounds.length)await page.getByRole('button',{name:'次の投票結果',exact:true}).click()
+    }
+    await expect(page.getByRole('button',{name:'次の投票結果',exact:true})).toBeDisabled()
   }
 }
 
@@ -54,12 +73,9 @@ test('実対局の全日全ラウンドを権威と照合し、閲覧と再読�
         let writes = 0
         const count = req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ }
         page.on('request', count)
-        const firstDay = page.getByTestId('vote-day-' + snapshot.voteHistory[0].day)
-        await firstDay.locator('summary').focus()
-        await page.keyboard.press('Enter')
-        await expect(firstDay).not.toHaveAttribute('open', '')
-        await page.keyboard.press('Enter')
-        await expect(firstDay).toHaveAttribute('open', '')
+        const previous=page.getByRole('button',{name:'前の投票結果',exact:true})
+        if(await previous.isEnabled()){await previous.focus();await page.keyboard.press('Enter')}
+        await expect(page.getByRole('region',{name:'投票履歴',exact:true})).toBeVisible()
         await page.reload()
         await expectHistory(page, snapshot)
         expect(await saved(page)).toEqual(before)
@@ -67,11 +83,11 @@ test('実対局の全日全ラウンドを権威と照合し、閲覧と再読�
         expect(await read(request, id)).toEqual(snapshot)
         expect(writes).toBe(0)
         page.off('request', count)
-        await page.getByRole('region', { name: '最近投票结果' }).screenshot({ path: testInfo.outputPath('vote-history.png') })
+        await page.getByRole('region', { name: '投票履歴',exact:true }).screenshot({ path: testInfo.outputPath('vote-history.png') })
         checkedReadOnly = true
       }
       if (snapshot.phase === 'FINISHED') break
-      await page.getByTestId('vote-FREE').click()
+      await desktopVote(page,'FREE')
       await expect(page.getByTestId('next-event')).toBeVisible()
     }
     expect(checkedReadOnly).toBe(true)
@@ -96,6 +112,7 @@ async function fixture(page, request, unknown) {
     { playerNumber: 3, receivedVotes: 0, targetPlayerNumber: 2 },
     { playerNumber: 4, receivedVotes: 0, targetPlayerNumber: 2 },
   ] }
+  snapshot.view.gameDay=4
   snapshot.voteHistory = ['DESIGNATED', 'FREE', 'GREY'].map((method, index) => ({
     day: index + 1, method: unknown ? 'FUTURE_METHOD' : method, candidates: [2, 1],
     rounds: [structuredClone(tie), structuredClone(final)], ignoredPrivateField: 'DO_NOT_RENDER_PRIVATE_SENTINEL',
@@ -116,9 +133,7 @@ for (const unknown of [false, true]) {
   test(unknown ? '未知の投票方式は既知方式に偽装せず、公開票型は閲覧できる' : '合成表示境界：全方式・同票の全首位・再投票・ゼロ票・候補順序', async ({ page, request }) => {
     const { id, snapshot } = await fixture(page, request, unknown)
     try {
-      const panel = page.getByRole('region', { name: '最近投票结果' })
-      await expect(page.getByTestId('vote-day-3')).toHaveAttribute('open', '')
-      await expect(page.getByTestId('vote-day-1')).not.toHaveAttribute('open', '')
+      const panel = page.getByRole('region', { name: '投票履歴',exact:true })
       await expectHistory(page, snapshot)
       await expect(panel).not.toContainText('DO_NOT_RENDER_PRIVATE_SENTINEL')
       if (unknown) {
@@ -147,7 +162,7 @@ for (const lost of [false, true]) {
         if (lost) { authority = (await (await route.fetch()).json()).update; await route.abort() }
         else await route.continue()
       })
-      await page.getByTestId('vote-FREE').click()
+      await desktopVote(page,'FREE')
       await expect(page.getByRole('alert')).toContainText(lost ? '重新同步' : '已重新同步')
       if (lost) await page.getByRole('button', { name: '再同期', exact: true }).click()
       expect(authority.voteHistory.length).toBe(1)
@@ -172,7 +187,7 @@ test('CO中断は未完了の票型を追加せず、再読込でも同じ履歴
     await page.getByRole('button', { name: '再同期', exact: true }).click()
     await expect(page.getByTestId('vote')).toBeEnabled()
     const response = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/votes'))
-    await page.getByTestId('vote').click()
+    await desktopVote(page,'DESIGNATED')
     const result = await (await response).json()
     expect(result.voteCompleted).toBe(false)
     expect(result.update.voteHistory).toEqual(snapshot.voteHistory)
@@ -190,7 +205,7 @@ test('失効と新局で前局の票型を持ち越さない', async ({ page, re
     await drain(page)
     const before = await read(request, id)
     expect(before.voteHistory).toEqual([])
-    await page.getByTestId('vote-FREE').click()
+    await desktopVote(page,'FREE')
     await expect(page.getByTestId('next-event')).toBeVisible()
     const after = await read(request, id)
     expect(after.voteHistory.length).toBe(1)

@@ -1,3 +1,4 @@
+import { desktopVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { drainEvents } from '../tests/drain-events.js'
 
@@ -25,8 +26,8 @@ test('unseeded production game restores, reaches settlement and opens local reco
       await drainEvents(page)
       if (await page.locator('.settlement').count()) break
       await expect(page.getByRole('region', { name: 'ローカル戦績保存' })).toHaveCount(0)
-      await expect(page.getByTestId('vote-FREE')).toBeEnabled()
-      await page.getByTestId('vote-FREE').click()
+      await expect(page.getByTestId('desktop-vote-window')).toHaveAttribute('data-command-blocked','false')
+      await desktopVote(page,'FREE')
     }
     expect(turns, 'a single unseeded game must converge without replacing it').toBeLessThan(80)
     await expect(page.locator('.settlement')).toBeVisible()

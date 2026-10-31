@@ -8,13 +8,13 @@ test('WEB-027/028 real session audio controls and settings never write game stat
   await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
   await expect(page.getByTestId('next-event')).toBeVisible()
   await drainEvents(page)
-  await expect(page.getByRole('button',{name:'曲を切替'})).toBeVisible()
+  await expect(page.getByRole('button',{name:'曲を切替',exact:true})).toBeVisible()
   const before=await saved(page)
   const state=await(await request.get('/api/v1/games/'+before.sessionId+'?eventCursor='+before.eventCursor)).json()
   const count=writes.length
   await page.getByRole('button',{name:'音楽を有効にする'}).click()
   await expect(page.locator('.bgm-control')).toHaveAttribute('data-status','playing')
-  await page.getByRole('button',{name:'曲を切替'}).click()
+  await page.getByRole('button',{name:'曲を切替',exact:true}).click()
   await expect(page.locator('.bgm-control')).toHaveAttribute('data-status','playing')
   for (const [name,value] of [['BGM音量',25],['効果音量',50]]) {
     await page.getByRole('slider',{name,exact:true}).evaluate((node,value)=>{node.value=String(value);node.dispatchEvent(new Event('input',{bubbles:true}))},value)

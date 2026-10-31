@@ -126,10 +126,10 @@ test('WEB-028 same-day refresh preserves pending playlist selection (027 array-g
   await setup(page);await page.getByRole('button',{name:'対局を始める'}).click()
   await page.getByRole('button',{name:'音楽を有効にする'}).click();const route=await intercepted
   await expect(ui(page)).toHaveAttribute('data-status','loading')
-  await page.getByRole('button',{name:'曲を切替'}).click()
-  await expect(page.getByRole('button',{name:'曲を切替'})).toBeDisabled()
+  await page.getByRole('button',{name:'曲を切替',exact:true}).click()
+  await expect(page.getByRole('button',{name:'曲を切替',exact:true})).toBeDisabled()
   await page.getByRole('button',{name:'再同期'}).click()
-  await expect(page.getByRole('button',{name:'曲を切替'})).toBeDisabled()
+  await expect(page.getByRole('button',{name:'曲を切替',exact:true})).toBeDisabled()
   await route.fulfill({json:catalog})
   await expect(ui(page)).toHaveAttribute('data-track',catalog.playlists.NORMAL_GAME_PLAYLIST[0])
   await expect(ui(page)).toHaveAttribute('data-status','playing')
