@@ -1,3 +1,4 @@
+import { startDesktopGame, chooseDesktopConfiguration } from '../test-fixtures/desktop-start.js'
 import {desktopHome,desktopClaims,desktopRecords,desktopVote} from '../test-fixtures/desktop-navigation.js'
 import { drainEvents as drain } from './drain-events.js'
 import { characterDisplayName, characters } from '../src/characterDisplay.js'
@@ -17,8 +18,8 @@ const read = async (request, id) => (await request.get('/api/v1/games/' + id)).j
 async function saved(page) { return page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), key) }
 async function start(page) {
   await page.goto('/')
-  await page.getByRole('radio', { name: '通常配役' }).check()
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await chooseDesktopConfiguration(page, 'tongchang')
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
@@ -203,8 +204,8 @@ test('会話失効後は公開情報も消え、新局に持ち越さない', as
   await request.delete('/api/v1/games/' + id)
   await page.getByRole('button', { name: '再同期', exact: true }).click()
   await expect(page.getByRole('region', { name: '公開情報', exact: true })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: '対局を始める' })).toBeVisible()
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeVisible()
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   const nextId = (await saved(page)).sessionId
   try {

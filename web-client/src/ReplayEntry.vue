@@ -4,6 +4,7 @@ const props = defineProps(['sessionId','cursor','eligible','audioControls'])
 const emit = defineEmits(['playing'])
 const active = ref(false), action = ref('open'), intent=ref(null)
 function enter(next) { intent.value={sessionId:props.sessionId,cursor:props.cursor}; action.value = next; active.value = true }
+defineExpose({open:()=>enter('open'),close:()=>{active.value=false;emit('playing',false)}})
 const ReplayLibrary = defineAsyncComponent({
   loader: () => import('./ReplayLibrary.vue'), timeout:15000, delay:0,
   loadingComponent:{render:()=>h('section',{class:'replay-library panel',role:'region','aria-label':'ローカルReplay',lang:'ja'},'Replayを読み込んでいます…')},

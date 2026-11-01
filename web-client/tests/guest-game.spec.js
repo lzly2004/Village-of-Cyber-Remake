@@ -1,3 +1,4 @@
+import { startDesktopGame, chooseDesktopConfiguration } from '../test-fixtures/desktop-start.js'
 import { desktopVote, desktopSelection, desktopClaims, desktopClaimPlayers, desktopHome, desktopSkill, expectNoEnabledVote } from '../test-fixtures/desktop-navigation.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { drainEvents as readEvents } from './drain-events.js'
@@ -12,8 +13,8 @@ async function saved(page) {
 
 async function start(page, configuration = '簡易') {
   await page.goto('/')
-  await page.getByRole('radio', { name: configuration + '配役' }).check()
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await chooseDesktopConfiguration(page, configuration)
+  await startDesktopGame(page)
   await expect(page.getByRole('region', { name: '当前事件' })).toBeVisible()
 }
 
@@ -76,7 +77,7 @@ test('真实对局从浏览器指定投票直至终局，并刷新恢复揭晓',
     await page.screenshot({ path: testInfo.outputPath('finished.png'), fullPage: true })
     await page.reload()
     await expect(page.getByRole('heading', { name: /村人勝利|人狼勝利|妖狐勝利/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: '新しい対局' })).toBeVisible()
+    await expect(page.locator('.session-footer').getByRole('button', { name: 'タイトルに戻る' })).toBeVisible()
     await expect(page.getByRole('region', { name: '職業別CO確認' })).toHaveCount(0)
     await expect(page.getByRole('region', { name: 'プレイヤー別CO確認' })).toHaveCount(0)
     await expect(page.getByRole('switch', { name: '投票回避CO' })).toHaveCount(0)
@@ -159,7 +160,7 @@ test('失效会话清除本地记录并可重新开局', async ({ page, request 
   await release(request, id)
   await page.reload()
   await expect(page.getByRole('alert')).toContainText('已失效')
-  await expect(page.getByRole('button', { name: '対局を始める' })).toBeVisible()
+  await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeVisible()
   expect(await saved(page)).toBeNull()
 })
 
@@ -190,7 +191,7 @@ test('显式释放后回到配役选择', async ({ page }) => {
   await start(page)
   await page.getByRole('button', { name: '試遊を終了' }).click()
   await page.getByRole('button', { name: '解放を確定' }).click()
-  await expect(page.getByRole('button', { name: '対局を始める' })).toBeVisible()
+  await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeVisible()
   expect(await saved(page)).toBeNull()
 })
 
@@ -687,7 +688,7 @@ for (const { type, skill, label } of [
       }
       await expect(panel).toHaveCount(0)
       await page.reload()
-      await expect(page.getByRole('button', { name: '新しい対局' })).toBeVisible()
+      await expect(page.locator('.session-footer').getByRole('button', { name: 'タイトルに戻る' })).toBeVisible()
       await expect(panel).toHaveCount(0)
     } finally { await release(request, id) }
   })
@@ -820,7 +821,7 @@ for (const type of ['DIVINATION','GUARD']) {
     await page.reload();await expect(page.getByTestId('desktop-vote-window')).toHaveAttribute('data-command-blocked','false')
    }
    await expect(page.getByTestId('desktop-vote-window')).toHaveCount(0)
-   await page.reload();await expect(page.getByRole('button',{name:'新しい対局'})).toBeVisible()
+   await page.reload();await expect(page.locator('.session-footer').getByRole('button',{name:'タイトルに戻る'})).toBeVisible()
   }finally{await release(request,id)}
  })
  test(type+' 409は同期のみで個体予約を再送しない',async({page,request})=>{
@@ -871,8 +872,8 @@ test('安全公开投影与夜死分类在刷新后保持一致', async ({ page,
 test('手机视口无横向溢出，配役与主要操作仍可访问', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
-  await expect(page.getByRole('radio')).toHaveCount(7)
-  await expect(page.getByRole('button', { name: '対局を始める' })).toBeVisible()
+  await page.getByTestId('title-start').click();await expect(page.locator('.desktop-setup-button')).toHaveCount(7)
+  await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
   await page.screenshot({ path: testInfo.outputPath('mobile.png'), fullPage: true })
 })

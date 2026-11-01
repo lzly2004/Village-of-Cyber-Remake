@@ -1,10 +1,11 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 
 // The launcher uses this already-existing 404 contract; never create a "probe game".
 test('read-only playtest readiness probes preserve a live game and browser history', async ({ page, request }) => {
   await page.goto('/')
   const created = page.waitForResponse(r => r.request().method() === 'POST' && new URL(r.url()).pathname === '/api/v1/games')
-  await page.getByRole('button', { name: '対局を始める', exact: true }).click()
+  await startDesktopGame(page)
   const response = await created
   expect(response.status()).toBe(201)
   const { sessionId } = await response.json()

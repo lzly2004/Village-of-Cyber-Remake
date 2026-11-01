@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
@@ -14,6 +15,8 @@ test('Japanese guide covers every help topic and source; keyboard modal closes b
   })
   await page.goto('/')
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja')
+  await page.waitForLoadState('networkidle')
+  media.length=0 // Title art is now intentionally visible; opening help must add no media.
   const before = await saved(page)
   const opener = page.getByRole('button', { name: '遊び方・ヘルプ', exact: true })
   await opener.focus(); await page.keyboard.press('Enter')
@@ -60,13 +63,13 @@ test('configuration page contains all seven exact public rosters, scrolls and ne
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await dialog.screenshot({ path: info.outputPath('configuration-help-1024.png') })
   await dialog.getByRole('button', { name: '閉じる', exact: true }).click()
-  await expect(page.getByRole('radio', { name: '簡易配役' })).toBeChecked()
+  await expect(page.getByTestId('desktop-title')).toBeVisible()
   expect(writes).toBe(0); expect(await saved(page)).toBeNull()
 })
 
 test('reading guide during a real pending event preserves game node, cursor, scroll, storage and authority', async ({ page, request }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   const before = await saved(page), id = JSON.parse(before).sessionId
   try {
@@ -96,7 +99,7 @@ test('failed lazy help chunk shows a bounded diagnosis and leaves game controls 
   await page.goto('/')
   await page.getByRole('button', { name: '遊び方・ヘルプ', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('HELP_LOAD_FAILED')
-  await expect(page.getByRole('button', { name: '対局を始める' })).toBeEnabled()
+  await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeEnabled()
   expect(await saved(page)).toBeNull()
   await page.getByRole('button', { name: 'ヘルプを閉じる', exact: true }).click()
   await expect(page.getByRole('alert')).toHaveCount(0)
@@ -104,7 +107,7 @@ test('failed lazy help chunk shows a bounded diagnosis and leaves game controls 
 
 test('retained Chinese structural copy declares its language; Japanese player names override it', async ({ page, request }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   const id = JSON.parse(await saved(page)).sessionId
   try {
@@ -114,7 +117,7 @@ test('retained Chinese structural copy declares its language; Japanese player na
   await expect(reading).toHaveAttribute('lang', 'ja')
   await expect(page.locator('#stage-reading-help')).toHaveAttribute('lang', 'zh-CN')
   await expect(page.getByRole('region', { name: '公开玩家列表', exact: true })).toHaveAttribute('lang', 'zh-CN')
-  await expect(page.locator('.pill')).toHaveAttribute('lang', 'zh-CN')
+  await expect(page.locator('.journal:not(.desktop-menu-journal) .pill')).toHaveAttribute('lang', 'zh-CN')
   await expect(page.locator('.player-identity').first()).toHaveAttribute('lang', 'ja')
   await expect(page.getByTestId('event-dialogue')).toHaveAttribute('lang', 'ja')
   await page.route('**/api/v1/games/*?eventCursor=*', r => r.abort())

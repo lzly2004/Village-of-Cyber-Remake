@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import {test,expect} from '../test-fixtures/presentation-test.js'
 import {readFileSync} from 'node:fs'
@@ -52,7 +53,7 @@ test('WEB-024 exact special, previous-left/current-right and triple swap use sou
 
 test('WEB-024 actual API event images preserve geometry across widths and refresh without changing dialogue/cursor',async({page,request})=>{
  await page.goto('/');const created=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/api/v1/games'))
- await page.getByRole('button',{name:'対局を始める'}).click();const data=await(await created).json()
+ await startDesktopGame(page);const data=await(await created).json()
  try{
   let cursor=0
   while(data.update.presentedEvents[cursor]?.stage!=='DAY_DIALOGUE'){

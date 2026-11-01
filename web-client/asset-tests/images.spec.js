@@ -1,14 +1,20 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { test, expect } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 
-test('WEB-022/023 static manifest images decode at original dimensions; lobby requests no player assets', async ({ page, request }) => {
+test('WEB-022/023 static manifest images decode at original dimensions; title requests only menu assets', async ({ page, request }) => {
   const imageRequests = []
   page.on('request', req => { if (req.url().endsWith('.webp')) imageRequests.push(req.url()) })
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /一つひとつの発言/ })).toBeVisible()
+  await expect(page.getByTestId('desktop-title')).toBeVisible()
   await expect(page.locator('.player-row')).toHaveCount(0)
-  expect(imageRequests).toEqual([])
+  await page.waitForLoadState('networkidle')
+  const titleManifest=await (await request.get('/assets/images/manifest.json')).json()
+  const titleNames=['title_base_resized','titleLogo','startButton','continueButton','replayButton','recordButton','infoButton','collectionsButton']
+  const titleFiles=new Set(titleNames.map(name=>'/assets/images/'+titleManifest.images['images/'+name+'.png'].file))
+  expect(imageRequests.length).toBeGreaterThan(0)
+  expect(imageRequests.every(url=>titleFiles.has(new URL(url).pathname))).toBe(true)
   const response = await request.get('/assets/images/manifest.json')
   expect(response.ok()).toBe(true)
   expect(response.headers()['content-type']).toContain('application/json')
@@ -55,15 +61,17 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
     sessionId: '00000000-0000-4000-8000-000000000023', update: snapshot,
   }}))
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /一つひとつの発言/ })).toBeVisible()
+  await expect(page.getByTestId('desktop-title')).toBeVisible()
   await page.waitForLoadState('networkidle')
-  expect(paths).toEqual([])
+  const menuNames=['title_base_resized','titleLogo','startButton','continueButton','replayButton','recordButton','infoButton','collectionsButton','PVBtitile',...Array.from({length:7},(_,i)=>'game'+(i+1))]
+  const menuFiles=menuNames.map(name=>'/assets/images/'+manifest.images['images/'+name+'.png'].file)
+  expect(paths.filter(path=>path.endsWith('.webp')).every(path=>menuFiles.includes(path))).toBe(true)
   const lobbyBytes = await page.evaluate(() => performance.getEntriesByType('navigation')[0].transferSize
     + performance.getEntriesByType('resource').reduce((sum, entry) => sum + entry.transferSize, 0))
   expect(lobbyBytes).toBeGreaterThan(0)
   expect(lobbyBytes).toBeLessThanOrEqual(1.5 * 1024 ** 2)
   const firstGame = await page.evaluate(() => performance.now())
-  await page.getByRole('button', {name:'対局を始める'}).click()
+  await startDesktopGame(page)
   const rows = page.locator('.player-row')
   await expect(rows).toHaveCount(44)
   await rows.first().scrollIntoViewIfNeeded()
@@ -74,7 +82,7 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
   const allowed = new Set(Array.from({length:44},(_,i)=>[
     '/assets/images/'+manifest.images['images/'+String(i+1).padStart(2,'0')+'s.png'].file,
     '/assets/images/'+manifest.images['images/'+(i+1)+'job.png'].file,
-  ]).flat().concat(stageFiles.map(name=>'/assets/images/'+manifest.images[name].file)))
+  ]).flat().concat(stageFiles.map(name=>'/assets/images/'+manifest.images[name].file),menuFiles))
   const requested = paths.filter(path=>path.endsWith('.webp'))
   expect(requested.length).toBeGreaterThan(0)
   expect(requested.length).toBeLessThan(90)
@@ -110,11 +118,11 @@ test('night/dawn and current result together obey the unchanged first-game trans
  snapshot.events=[event];snapshot.presentedEvents=[{stage:'NIGHT_RESULT',event}];snapshot.nextEventCursor=1
  await page.route('**/api/v1/games',r=>r.fulfill({status:201,json:{sessionId:'00000000-0000-4000-8000-000000000052',update:snapshot}}))
  const paths=[];page.on('request',r=>{if(r.url().endsWith('.webp'))paths.push(new URL(r.url()).pathname)})
- await page.goto('/');await expect(page.getByRole('button',{name:'対局を始める'})).toBeEnabled()
+ await page.goto('/');await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeEnabled()
  await page.waitForLoadState('networkidle')
  const since=await page.evaluate(()=>performance.now())
  const wallStart=Date.now() // Base Playwright fixture: no clock installation or fast-forward.
- await page.getByRole('button',{name:'対局を始める'}).click()
+ await startDesktopGame(page)
  await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:12000})
  const wallElapsedMs=Date.now()-wallStart
  expect(wallElapsedMs).toBeGreaterThanOrEqual(9500)
@@ -123,7 +131,8 @@ test('night/dawn and current result together obey the unchanged first-game trans
  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
  await page.waitForLoadState('networkidle')
  const stage=['images/komorebi000night01.png','images/komorebi002.png','images/haikei3.png','images/messageframe.png',...mapping.Abel.yjsw.default.map(n=>'images/'+n)]
- const allowed=new Set([...stage,...Array.from({length:44},(_,i)=>'images/'+String(i+1).padStart(2,'0')+'s.png'),...Array.from({length:44},(_,i)=>'images/'+(i+1)+'job.png')].map(n=>'/assets/images/'+manifest.images[n].file))
+ const menu=['title_base_resized','titleLogo','startButton','continueButton','replayButton','recordButton','infoButton','collectionsButton','PVBtitile',...Array.from({length:7},(_,i)=>'game'+(i+1))].map(n=>'images/'+n+'.png')
+ const allowed=new Set([...menu,...stage,...Array.from({length:44},(_,i)=>'images/'+String(i+1).padStart(2,'0')+'s.png'),...Array.from({length:44},(_,i)=>'images/'+(i+1)+'job.png')].map(n=>'/assets/images/'+manifest.images[n].file))
  expect(paths.every(p=>allowed.has(p))).toBe(true)
  for(const name of stage)expect(paths).toContain('/assets/images/'+manifest.images[name].file)
  const firstGameBytes=await page.evaluate(since=>performance.getEntriesByType('resource').filter(r=>r.startTime>=since).reduce((sum,r)=>sum+r.transferSize,0),since)

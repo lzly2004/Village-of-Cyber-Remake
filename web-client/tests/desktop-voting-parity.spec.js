@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import {test,expect} from '@playwright/test'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 import {mkdirSync,writeFileSync} from 'node:fs'
@@ -11,7 +12,7 @@ async function setup(page){
  snapshot.view.players[0].claimedRole='zhan';snapshot.view.players[0].claimedRoleOrder=1
  await page.route('**/api/v1/games',r=>r.fulfill({status:201,json:{sessionId:id,update:snapshot}}))
  await page.route('**/api/v1/games/'+id+'?**',r=>r.fulfill({json:snapshot}))
- await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.getByTestId('desktop-vote-window')).toBeVisible()
+ await page.goto('/');await startDesktopGame(page);await expect(page.getByTestId('desktop-vote-window')).toBeVisible()
  return snapshot
 }
 async function capture(page,name){const data=await page.getByTestId('stage-surface').screenshot();const dir=new URL('../../build/verify/desktop-voting-parity/',import.meta.url);mkdirSync(dir,{recursive:true});writeFileSync(new URL(name+'.png',dir),data);writeFileSync(new URL(name+'.json',dir),JSON.stringify({source:'Synthetic audited public DTO; actual browser render, not user playtest',bytes:data.length,sha256:createHash('sha256').update(data).digest('hex')},null,2))}

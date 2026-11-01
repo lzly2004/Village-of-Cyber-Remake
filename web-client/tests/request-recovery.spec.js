@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { desktopVote, desktopVoteConfirmation, desktopSelectionIfAvailable, expectNoEnabledVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { drainEvents } from './drain-events.js'
@@ -8,7 +9,7 @@ const sync=page=>page.getByRole('button',{name:'再同期',exact:true})
 const errorBody=code=>JSON.stringify({code,message:'controlled rejection',currentRevision:null})
 async function start(page){
   await page.goto('/')
-  await page.getByRole('button',{name:'対局を始める',exact:true}).click()
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
@@ -66,12 +67,12 @@ test('known 429 creation is rejected without capability and only an explicit new
   await page.route('**/api/v1/games',route=>{
     creates++;return route.fulfill({status:429,contentType:'application/json',body:errorBody('REQUEST_LIMIT')})
   })
-  await page.getByRole('button',{name:'対局を始める',exact:true}).click()
+  await startDesktopGame(page)
   await expect(page.getByRole('alert')).toContainText('本次操作未执行')
   expect(creates).toBe(1);expect(await saved(page)).toBeNull()
   await page.unroute('**/api/v1/games')
   try{
-    await page.getByRole('button',{name:'対局を始める',exact:true}).click()
+    await startDesktopGame(page)
     await expect(page.getByTestId('next-event')).toBeVisible();id=(await saved(page)).sessionId
   }finally{if(id)await request.delete('/api/v1/games/'+id)}
 })
@@ -243,11 +244,11 @@ test('create committed but response lost: no credential or automatic retry; expl
   })
   try{
     await page.goto('/')
-    const begin=page.getByRole('button',{name:'対局を始める',exact:true})
-    await begin.click()
+    const begin=page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')
+    await startDesktopGame(page)
     await expect(page.getByRole('alert')).toContainText('服务器可能已创建对局')
     expect(posts).toBe(1);expect(await saved(page)).toBeNull()
-    await begin.click();await expect(page.getByTestId('next-event')).toBeVisible()
+    await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
     expect(posts).toBe(2);expect((await saved(page)).sessionId).toBe(ids[1]);expect(ids[0]).not.toBe(ids[1])
   }finally{for(const id of ids)await request.delete('/api/v1/games/'+id)}
 })
@@ -370,7 +371,7 @@ test('create with a valid capability but malformed update retains only that capa
     await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({...created,update:{}})})
   })
   try{
-    await page.goto('/');await page.getByRole('button',{name:'対局を始める',exact:true}).click()
+    await page.goto('/');await startDesktopGame(page)
     await expect(page.getByRole('alert')).toContainText('已保留本局凭据')
     expect(await saved(page)).toEqual({sessionId:id,eventCursor:0});expect(posts).toBe(1)
     // Both sidebar and reconnect-panel buttons invoke the same explicit read.

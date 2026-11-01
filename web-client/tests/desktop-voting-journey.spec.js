@@ -1,8 +1,9 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import {test,expect} from '../test-fixtures/presentation-test.js'
 import {desktopVote,desktopClaims} from '../test-fixtures/desktop-navigation.js'
 import {drainEvents} from './drain-events.js'
 test('real complete game uses desktop menus, CO inquiry and authoritative vote review without lost events',async({page,request})=>{
- await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+ await page.goto('/');await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
  const id=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId)
  try{
   await drainEvents(page);await desktopClaims(page);await page.getByRole('button',{name:'占い師のCOを聞く',exact:true}).click();await drainEvents(page)

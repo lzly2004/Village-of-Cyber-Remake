@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { desktopVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { drainEvents } from '../tests/drain-events.js'
@@ -8,9 +9,9 @@ test('unseeded production game restores, reaches settlement and opens local reco
   const errors = []
   page.on('pageerror', error => errors.push(error.name))
   await page.goto('/')
-  await expect(page.getByRole('button', { name: '対局を始める', exact: true })).toBeEnabled()
+  await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeEnabled()
   const created = page.waitForResponse(r => r.request().method() === 'POST' && new URL(r.url()).pathname === '/api/v1/games')
-  await page.getByRole('button', { name: '対局を始める', exact: true }).click()
+  await startDesktopGame(page)
   const response = await created
   expect(response.status()).toBe(201)
   expect(Object.keys(response.request().postDataJSON())).toEqual(['configuration'])

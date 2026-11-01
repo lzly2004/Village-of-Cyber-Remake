@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 const dialog=page=>page.getByRole('dialog',{name:'ブラウザーの戦績'})
 const opener=page=>page.getByRole('button',{name:'戦績を見る',exact:true})
@@ -61,7 +62,7 @@ test('empty ledger is zero, keyboard focus stays modal and every metric is reach
   await page.keyboard.press('Escape');await expect(dialog(page)).toHaveCount(0);await expect(opener(page)).toBeFocused()
 })
 test('viewing and refreshing during a live game does not read/write authority, move cursor or change storage',async({page,request})=>{
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める',exact:true}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+  await page.goto('/');await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
   const state=()=>page.evaluate(()=>({session:{...sessionStorage},local:{...localStorage}}))
   const before=await state(),id=JSON.parse(before.session['vocr.guest.v1']).sessionId
   const authority=await (await request.get('/api/v1/games/'+id+'?eventCursor=0')).json()

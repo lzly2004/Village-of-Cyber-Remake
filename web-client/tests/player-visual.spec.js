@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import {desktopSelection} from '../test-fixtures/desktop-navigation.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
@@ -33,7 +34,7 @@ async function expectImage(locator, name) {
 test('WEB-023 real public players use ordinal Japanese names and status images, refresh preserves cursor', async ({ page, request }, testInfo) => {
   await page.goto('/')
   const createdResponse = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/api/v1/games'))
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await startDesktopGame(page)
   const created = await (await createdResponse).json()
   try {
     const state = await saved(page)

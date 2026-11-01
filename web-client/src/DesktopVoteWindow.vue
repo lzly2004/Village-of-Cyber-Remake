@@ -24,20 +24,21 @@ const historyText=computed(()=>{const r=rounds.value[historyIndex.value];return 
 async function open(value){mode.value=value;message.value='';await nextTick();document.querySelector('[data-testid="desktop-vote-window"] .vote-information-content')?.focus({preventScroll:true})}
 async function back(){
  const previous=mode.value
- if(previous==='claimPlayers'&&b.value.canAskClaimPlayers)await b.value.askClaimPlayers()
- await open('home');await nextTick()
+ let outcome
+ if(previous==='claimPlayers'&&b.value.canAskClaimPlayers)outcome=await b.value.askClaimPlayers()
+ await open('home');if(outcome?.kind==='empty')tip('無人CO');await nextTick()
  const label=['records','suspicion','history'].includes(previous)?'記録確認':previous==='voteConfirm'?'投票へ':'指示する'
  document.querySelector('[data-testid="desktop-vote-window"] [aria-label="'+label+'"]')?.focus({preventScroll:true})
 }
 const buttons=computed(()=>{
- const list=[{slot:0,label:'メニュー',image:'IntroTitle',click:()=>emit('menu')}]
+ const list=[{slot:0,label:'メニュー',image:'IntroTitle',disabled:!b.value.canDecide,click:()=>emit('menu')}]
  const add=(slot,label,image,click,extra={})=>list.push({slot,label,image,click,...extra})
  if(mode.value==='home'){
   add(2,'指示する','shiji',()=>open('orders'));add(3,'記録確認','check',()=>{if(props.day===2){tip('まだ特に疑い先もなく、\n投票の履歴もないようだ。');return}open('records')});add(4,'投票へ','goTohyo',()=>open('voteConfirm'),{disabled:!b.value.canDecide})
  }else{
   if(mode.value==='orders'){add(2,'COを聞く','doCO',()=>open('claims'));add(3,'指定する','doShitei',()=>open('designations'))}
   if(mode.value==='claims'){
-   for(const [role,label,image,slot,left] of [['zhan','占い師','uranaiCO',2,true],['ling','霊能者','reiCO',2,false],['lie','狩人','kariCO',3,false],['gong','共有','kyouyuCO',3,true],['mao','猫又','catCO',4,true]])add(slot,label+'のCOを聞く',image,()=>{if(b.value.claimRoles.includes(role))b.value.askClaimRole(role);else tip(label+'はいないようだ')},{left,disabled:!b.value.canDecide})
+   for(const [role,label,image,slot,left] of [['zhan','占い師','uranaiCO',2,true],['ling','霊能者','reiCO',2,false],['lie','狩人','kariCO',3,false],['gong','共有','kyouyuCO',3,true],['mao','猫又','catCO',4,true]])add(slot,label+'のCOを聞く',image,async()=>{if(b.value.claimRoles.includes(role)){const outcome=await b.value.askClaimRole(role);if(outcome?.kind==='empty')tip(label+'はいないようだ')}else tip(label+'はいないようだ')},{left,disabled:!b.value.canDecide})
    add(1,'プレイヤーのCOを聞く','询问CO',()=>open('claimPlayers'))
   }
   if(mode.value==='designations'){
@@ -90,7 +91,7 @@ const selectionSummary=computed(()=>{
   <AssetImage v-if="mode==='history'&&historySetup" class="desktop-history-setup" :name="'images/game'+historySetup+'-1.png'" :style="{width:historySetupWidths[historySetup]/1280*100+'%'}" />
   <p v-if="message" class="desktop-transient-tip" role="status">{{ message }}</p>
   <nav class="desktop-vote-actions" aria-label="昼の操作">
-   <template v-for="button in buttons" :key="button.label"><button class="desktop-art-button" :class="['desktop-slot-'+button.slot,{'desktop-claim-seer':button.left}]" :aria-label="button.label" :data-testid="button.test || (button.label==='投票へ'?'vote':undefined)" :disabled="blocked||button.disabled" @click="button.click"><AssetImage :name="'images/'+button.image+'.png'" /></button></template>
+   <template v-for="button in buttons" :key="button.label"><button class="desktop-art-button" :class="['desktop-slot-'+button.slot,{'desktop-claim-seer':button.left}]" :aria-label="button.label" :data-no-click-sound="button.label==='メニュー'?'':undefined" :data-testid="button.test || (button.label==='投票へ'?'vote':undefined)" :disabled="blocked||button.disabled" @click="button.click"><AssetImage :name="'images/'+button.image+'.png'" /></button></template>
    <slot v-if="mode==='home'" name="avoidance" />
   </nav>
  </section>

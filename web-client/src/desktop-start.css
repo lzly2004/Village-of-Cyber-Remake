@@ -1,0 +1,14 @@
+/* StartSceneHandler / GameSceneHandler.renderSelect: original 1280×720 client coordinates. */
+.desktop-start-surface { position:relative; width:100%; min-width:0; aspect-ratio:16/9; overflow:hidden; container-type:inline-size; color:#111; }
+.desktop-start-background,.desktop-start-background img { position:absolute; inset:0; width:100%; height:100%; }
+.desktop-title-logo { position:absolute; left:46.875%; top:27.777778%; width:43.28125%; height:19.166667%; }
+.desktop-title-logo img { width:100%; height:100%; }
+.desktop-start-surface .desktop-art-button { position:absolute; padding:0; margin:0; min-width:0; border:0; border-radius:0; background:transparent; transition:none; }
+.desktop-start-surface .desktop-art-button img,.desktop-start-surface .desktop-art-button .asset-image { width:100%; height:100%; display:block; }
+.desktop-title-button { width:24.140625%; height:9.444444%; }
+.desktop-setup-button { width:33.984375%; height:19.166667%; }
+.desktop-setup-return { left:82.03125%; top:77.777778%; width:9.0625%; height:10.555556%; }
+.desktop-start-surface .desktop-art-button:hover,.desktop-start-surface .desktop-art-button:active { transform:none; }
+.desktop-start-surface .desktop-art-button:focus-visible { outline:3px solid white; outline-offset:-3px; }
+.desktop-menu-journal { margin-bottom:24px; overflow:auto; }
+.desktop-library-content { position:absolute; inset:2% 17% 22% 2%; overflow:auto; background:#fff9e8ee; padding:16px; }

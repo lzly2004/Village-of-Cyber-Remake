@@ -146,7 +146,7 @@ for(const mode of ['missing','duplicate','unknown-role','not-array']){
       await expect(page.locator('.player-identity')).toContainText(Array(3).fill('身分不明（表示診断）'))
       await expect(page.locator('.portrait-image img')).toHaveCount(0)
       await expect(page.locator('.player-list')).not.toContainText('undefined')
-      await expect(page.getByRole('button',{name:'新しい対局'})).toBeEnabled()
+      await expect(page.locator('.session-footer').getByRole('button',{name:'タイトルに戻る'})).toBeEnabled()
       expect((await saved(page)).eventCursor).toBe(1)
     }finally{await request.delete('/api/v1/games/'+id)}
   })
@@ -292,7 +292,8 @@ for(const width of [1440,1024,800])test('WEB-050 desktop voting window exposes o
     await page.locator('.desktop-vote-players').evaluate(n=>{n.scrollLeft=0})
     await captureCore(page,info,'vote-'+width+'.png')
     await page.getByRole('button',{name:'メニュー',exact:true}).click()
-    await expect(page.getByRole('button',{name:'対局を残す',exact:true})).toBeFocused()
+    await expect(page.getByTestId('title-start')).toBeFocused()
+    await page.getByTestId('resume-current-game').click()
     expect(writes).toEqual([]);expect((await saved(page)).eventCursor).toBe(0)
   }finally{await request.delete('/api/v1/games/'+id)}
 })

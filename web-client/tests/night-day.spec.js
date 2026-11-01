@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import {test,expect} from '@playwright/test'
 import {completeLocalReading} from '../test-fixtures/presentation-test.js'
 import {readFileSync,mkdirSync,writeFileSync} from 'node:fs'
@@ -13,7 +14,7 @@ async function setup(page,list,{terminal=false}={}){
  if(terminal){snap.phase='FINISHED';snap.view.result='VILLAGE_WIN'}
  await page.route('**/api/v1/games',async r=>{if(frozen.has(page)){const now=Date.now();await page.clock.install({time:new Date(now)});await page.clock.setFixedTime(new Date(now));await page.clock.pauseAt(new Date(now));await page.clock.setSystemTime(new Date(now))}await r.fulfill({status:201,json:{sessionId:id,update:snap}})})
  await page.route('**/api/v1/games/'+id+'?**',r=>{const cursor=Number(new URL(r.request().url()).searchParams.get('eventCursor'));return r.fulfill({json:{...snap,eventCursor:cursor,events:snap.events.slice(cursor),presentedEvents:snap.presentedEvents.slice(cursor)}})})
- await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
+ await page.goto('/');await startDesktopGame(page)
 }
 async function ready(page,value){
  await expect(phase(page)).toHaveAttribute('data-presentation-phase',value)

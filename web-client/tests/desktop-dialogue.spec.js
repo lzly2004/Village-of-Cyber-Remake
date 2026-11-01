@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import {test,expect} from '@playwright/test'
 import {mkdirSync,writeFileSync} from 'node:fs'
 import {createHash} from 'node:crypto'
@@ -11,7 +12,7 @@ async function setup(page,{kind='DAY_DIALOGUE',name='gyfo1',long=false}={}){
  if(long)await page.route('**/src/eventDialogue.js',r=>r.fulfill({contentType:'text/javascript',body:`export function eventDialogue(){return ${JSON.stringify({source:'character',diagnostic:null,text:Array.from({length:80},(_,i)=>`${i}行目：長い台詞を最後まで読む。`).join('\n')})}}`}))
  await page.route('**/api/v1/games',async r=>{const now=new Date(Date.now());await page.clock.install({time:now});await page.clock.setFixedTime(now);await page.clock.pauseAt(now);await page.clock.setSystemTime(now);await page.clock.runFor(0);await r.fulfill({status:201,json:{sessionId:id,update:snapshot}})})
  await page.route('**/api/v1/games/'+id+'?**',r=>{const cursor=Number(new URL(r.request().url()).searchParams.get('eventCursor'));return r.fulfill({json:{...snapshot,eventCursor:cursor,events:snapshot.events.slice(cursor),presentedEvents:snapshot.presentedEvents.slice(cursor)}})})
- await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
+ await page.goto('/');await startDesktopGame(page)
  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
  return {snapshot,event}
 }

@@ -206,7 +206,7 @@
 /* VoteHistoryBrowser/createTishi: original day buttons and one-second overlay. */
 .desktop-history-days{position:absolute;left:0;top:27.5%;width:81.5625%;height:68.05556%;overflow:auto;display:grid;grid-template-columns:repeat(5,15.15625cqw);grid-auto-rows:9.921875cqw;gap:.78125cqw;align-content:start;padding:.78125cqw 0;box-sizing:border-box}
 .desktop-history-days button{position:relative;width:15.15625cqw;height:9.921875cqw;padding:0;border:0}
-.desktop-transient-tip{position:absolute;left:23.4375%;top:41.666667%;width:39.0625%;height:27.777778%;margin:0;background:rgba(0,0,0,.6);color:white;font-size:1.875cqw;font-weight:bold;white-space:pre-wrap;z-index:12}
+.desktop-transient-tip{position:absolute;left:23.4375%;top:41.666667%;width:39.0625%;height:27.777778%;margin:0;background:rgba(0,0,0,.7058823529);color:white;font-size:1.875cqw;font-weight:bold;white-space:pre-wrap;z-index:12}
 
 .desktop-suspicion [data-testid^="suspicion-"]{min-height:1.25em}
 

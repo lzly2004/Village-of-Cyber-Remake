@@ -1,3 +1,4 @@
+import { startDesktopGame, chooseDesktopConfiguration } from '../test-fixtures/desktop-start.js'
 import {expectNoEnabledVote} from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
@@ -36,9 +37,9 @@ async function synthetic(page, request, events, finished = false) {
 // No API or text fixtures: checks actual initial event dialogue against the desktop JSON.
 test('WEB-019 real API events render desktop resources in order and survive refresh', async ({ page, request }) => {
   await page.goto('/')
-  await page.getByRole('radio', { name: '通常配役' }).check()
+  await chooseDesktopConfiguration(page, 'tongchang')
   const response = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/api/v1/games'))
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await startDesktopGame(page)
   const created = await (await response).json()
   try {
     const english = readFileSync(new URL('../../src/main/java/com/vocr/domain/CharacterEnglishName.java', import.meta.url), 'utf8')

@@ -1,3 +1,4 @@
+import { startDesktopGame, chooseDesktopConfiguration } from '../test-fixtures/desktop-start.js'
 import { desktopVote, desktopRecords, completeVoteReview } from '../test-fixtures/desktop-navigation.js'
 import { drainEvents as drain } from './drain-events.js'
 import { characterDisplayName, characters } from '../src/characterDisplay.js'
@@ -9,8 +10,8 @@ const read = async (request, id) => (await request.get('/api/v1/games/' + id)).j
 const playerName = (snapshot, number) => number + ' · ' + characterDisplayName(snapshot.view.players.find(player => player.playerNumber === number).character)
 async function start(page) {
   await page.goto('/')
-  await page.getByRole('radio', { name: '通常配役' }).check()
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await chooseDesktopConfiguration(page, 'tongchang')
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
@@ -219,7 +220,7 @@ test('失効と新局で前局の票型を持ち越さない', async ({ page, re
     await request.delete('/api/v1/games/' + id)
     await page.getByRole('button', { name: '再同期', exact: true }).click()
     await expect(page.getByRole('region', { name: '最近投票结果' })).toHaveCount(0)
-    await page.getByRole('button', { name: '対局を始める' }).click()
+    await startDesktopGame(page)
     await expect(page.getByTestId('next-event')).toBeVisible()
     nextId = (await saved(page)).sessionId
     expect(nextId).not.toBe(id)

@@ -5,7 +5,7 @@ import { bgmScene } from './bgmScene.js'
 import { createBgmPlayer } from './bgmPlayer.js'
 import { defaultAudioSettings, readAudioSettings, saveAudioSettings } from './audioSettings.js'
 import { enteringSounds, transitionSound } from './soundScene.js'
-const props = defineProps(['sessionId', 'update', 'currentEvent', 'finished', 'uncertain', 'canDecide', 'cursor', 'replaying','presentationPhase','voteReviewing'])
+const props = defineProps(['sessionId', 'update', 'currentEvent', 'finished', 'uncertain', 'canDecide', 'cursor', 'replaying','presentationPhase','voteReviewing','menuMusic'])
 const state = ref({ enabled: false, status: 'off', id: null, error: null })
 const scene = computed(() => bgmScene(props))
 const player = createBgmPlayer({ notify: next => { state.value = next } })
@@ -24,21 +24,21 @@ watch([() => props.sessionId, () => scene.value.key], () => {
   ++selectionVersion; choosing.value = false
   player.select(scene.value.id)
 }, { immediate: true })
-watch([() => props.sessionId, () => props.cursor, () => props.currentEvent?.stage, () => props.finished, () => props.uncertain, () => props.presentationPhase], () => {
+watch([() => props.sessionId, () => props.cursor, () => props.currentEvent?.stage, () => props.finished, () => props.uncertain, () => props.presentationPhase, () => props.menuMusic], () => {
   transitioned = false; player.cancelSounds({preserveClick:!props.uncertain})
 }, {immediate:true})
 function presented(key) {
-  if(props.uncertain || props.replaying || props.presentationPhase!=='event' || key!==props.sessionId+':'+props.cursor || presentedKey===key)return
+  if(props.menuMusic || props.uncertain || props.replaying || props.presentationPhase!=='event' || key!==props.sessionId+':'+props.cursor || presentedKey===key)return
   presentedKey=key
   player.effects(enteringSounds(props.currentEvent,props.finished,props.finished ? props.update?.view.result : null))
 }
 function presentation(phase,key) {
-  if(props.uncertain || props.replaying || phase!==props.presentationPhase || key!==props.sessionId+':'+props.cursor || presentationKey===key+':'+phase)return
+  if(props.menuMusic || props.uncertain || props.replaying || phase!==props.presentationPhase || key!==props.sessionId+':'+props.cursor || presentationKey===key+':'+phase)return
   const id={night:'NIGHTFALL',dawn:'WOLF_HOWL'}[phase]
   if(id){presentationKey=key+':'+phase;player.effects([id])}
 }
 function transition(key) {
-  if (transitioned || props.uncertain || props.replaying || props.presentationPhase!=='event' || key !== props.sessionId + ':' + props.cursor) return
+  if (props.menuMusic || transitioned || props.uncertain || props.replaying || props.presentationPhase!=='event' || key !== props.sessionId + ':' + props.cursor) return
   transitioned = true
   const id = transitionSound(props.currentEvent)
   if (id) player.effects([id])

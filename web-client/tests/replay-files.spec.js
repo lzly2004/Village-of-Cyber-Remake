@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync,mkdirSync,writeFileSync } from 'node:fs'
 const read=p=>readFileSync(new URL(p,import.meta.url))
@@ -27,7 +28,7 @@ async function raw(page){return page.evaluate(async()=>new Promise((resolve,reje
 async function download(page,button){const event=page.waitForEvent('download');await button.click();const item=await event;return {item,bytes:readFileSync(await item.path())}}
 
 test('desktop actual saved game imports only after confirmation, plays, exports through browser and preserves raw records; live authority is untouched',async({page,request},info)=>{
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+  await page.goto('/');await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
   const stored=await page.evaluate(()=>sessionStorage.getItem('vocr.guest.v1')),credentials=JSON.parse(stored)
   const path='/api/v1/games/'+credentials.sessionId+'?eventCursor='+credentials.eventCursor
   try{

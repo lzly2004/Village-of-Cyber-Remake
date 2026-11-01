@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
@@ -26,7 +27,7 @@ const selectDay=(page,day)=>dialog(page).getByRole('combobox',{name:'再生日',
 const saved=page=>page.evaluate(()=>sessionStorage.getItem('vocr.guest.v1'))
 
 test('real running game stays authoritative while history, vote rounds and final role groups are browsed and closed',async({page,request},info)=>{
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+  await page.goto('/');await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
   const stored=await saved(page),credentials=JSON.parse(stored)
   const endpoint='/api/v1/games/'+credentials.sessionId+'?eventCursor='+credentials.eventCursor
   try{

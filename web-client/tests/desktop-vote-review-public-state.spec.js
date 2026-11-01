@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import {test,expect} from '@playwright/test'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 
@@ -9,7 +10,7 @@ test('vote result keeps the already displayed day and public roster until execut
  const after={...before,revision:2,view:{...before.view,gameDay:4,aliveCount:43,deathCount:1,players:before.view.players.map((p,i)=>i===0?{...p,alive:false,deathDay:3,deathReason:'EXECUTION'}:p)},voteHistory:[vote],events:[event],presentedEvents:[{stage:'EXECUTION',event}],nextEventCursor:1}
  await page.route('**/api/v1/games',r=>r.fulfill({status:201,json:{sessionId:id,update:before}}))
  await page.route('**/api/v1/games/'+id+'/votes',r=>r.fulfill({json:{voteCompleted:true,update:after}}))
- await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
+ await page.goto('/');await startDesktopGame(page)
  await expect(page.getByTestId('desktop-vote-window')).toBeVisible()
  await page.getByTestId('vote').click();await page.getByTestId('vote-FREE').click()
  const review=page.getByTestId('desktop-vote-review')

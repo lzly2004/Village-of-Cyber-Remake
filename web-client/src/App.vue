@@ -10,6 +10,8 @@ import PlayerPortrait from './PlayerPortrait.vue'
 import ReplayEntry from './ReplayEntry.vue'
 import RecordSettlement from './RecordSettlement.vue'
 import SettlementBoard from './SettlementBoard.vue'
+import DesktopStartScene from './DesktopStartScene.vue'
+import './desktop-start.css'
 import DesktopVoteWindow from './DesktopVoteWindow.vue'
 import DesktopVoteReview from './DesktopVoteReview.vue'
 import { publicSkillMarkers } from './desktopVoteText.js'
@@ -30,7 +32,7 @@ const {
   divinationTargets, selectedDivinationTargets, setDivinationTarget,
   guardTargets, selectedGuardTargets, setGuardTarget,
   setClaimedTarget,
-  start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
+  start, startReplacing, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
 } = useGuestGame()
 const voteReview=ref(null)
 const voteReviewVisual=ref(null)
@@ -92,7 +94,7 @@ const replayPlaying = ref(false)
 const replayAudio = { state:()=>audioControl.value?.status, enable:()=>audioControl.value?.enable(), stop:()=>audioControl.value?.stop() }
 function clickSound(event) {
   const button = event.target.closest('main button')
-  if (button && !button.disabled) audioControl.value?.click()
+  if (button && !button.disabled && !button.hasAttribute('data-no-click-sound')) audioControl.value?.click()
 }
 const HelpDialog = defineAsyncComponent({
   loader: () => import('./HelpDialog.vue'),
@@ -107,12 +109,32 @@ const recordPage = ref(false)
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
 async function switchDesktopMusic(){if(!audioControl.value?.status?.enabled)await audioControl.value?.enable();await audioControl.value?.nextTrack()}
+const menuScene=ref('title')
+const replayEntry=ref(null)
+watch(update,(value,previous)=>{
+  if(value&&!previous)menuScene.value='game'
+  if(!value&&previous)menuScene.value='title'
+})
+const menuMusic=computed(()=>sessionId.value&&!update.value?null:helpPage.value?'INFO':menuScene.value==='replay'?'REPLAY_BROWSER':menuScene.value!=='game'?'START_MENU':null)
 async function openGameMenu(){
-  confirmingExit.value=true
-  await nextTick()
-  const menu=document.querySelector('.exit-confirm')
-  menu?.scrollIntoView({block:'nearest'});menu?.querySelector('button')?.focus({preventScroll:true})
+  if(busy.value||uncertain.value)return
+  menuScene.value='title';confirmingExit.value=false
+  await nextTick();document.querySelector('[data-testid=title-start]')?.focus({preventScroll:true})
 }
+async function navigateMenu(target){
+  if(busy.value||(uncertain.value&&sessionId.value))return
+  if(target==='continue'||target==='collections')return // Desktop source listeners are intentionally empty.
+  if(target==='start')menuScene.value='select'
+  else if(target==='records')recordPage.value=true
+  else if(target==='help')helpPage.value='help'
+  else if(target==='replay'){menuScene.value='replay';await nextTick();replayEntry.value?.open()}
+  else {replayEntry.value?.close();menuScene.value='title'}
+}
+async function startConfiguration(value){
+  configuration.value=value
+  await startReplacing(value)
+}
+
 const players = computed(() => update.value?.view.players || [])
 const skillMarkers=computed(()=>publicSkillMarkers(update.value?.publicInformation,players.value,update.value?.view.gameDay))
 function shortName(number){const player=players.value.find(p=>p.playerNumber===number);return characters[player?.character]?.shortName || String(number)}
@@ -156,7 +178,7 @@ function name(number) {
         <button class="quiet-button" :disabled="busy" @click="refresh">再同期</button>
       </div>
       <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button><button class="quiet-button" @click="recordPage = true">戦績を見る</button></nav>
-      <BgmControl :presentation-phase="presentationPhase" :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="audioUpdate" :current-event="voteReview ? null : currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" :vote-reviewing="Boolean(voteReview)" />
+      <BgmControl :menu-music="menuMusic" :presentation-phase="presentationPhase" :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="audioUpdate" :current-event="voteReview ? null : currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" :vote-reviewing="Boolean(voteReview)" />
       <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。通信のない状態が30分続くか、開村から24時間経過すると無効になります。サービス再起動・解放でも無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
 
@@ -165,34 +187,30 @@ function name(number) {
       <div v-if="notice" class="notice" role="alert" lang="zh-CN">{{ notice }}</div>
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
-      <ReplayEntry :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" @playing="replayPlaying=$event" />
+      <div id="replay-home"></div>
+      <Teleport :to="menuScene==='replay' ? '#desktop-replay-slot' : '#replay-home'" defer><ReplayEntry ref="replayEntry" :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" @playing="replayPlaying=$event" /></Teleport>
       <RecordPage v-if="recordPage" @close="recordPage=false" />
       <RecordSettlement :session-id="sessionId" :update="update" :eligible="finished && !busy && !uncertain && !replayPlaying" />
 
-      <section v-if="!update && !sessionId" class="lobby">
-        <span class="eyebrow">WELCOME TO THE VILLAGE</span>
-        <h1>一つひとつの発言が、<br>手掛かりになる。</h1>
-        <p class="intro">配役を選び、発言を読み、今日の投票を決めましょう。<br>ブラウザーから、村の推理を。</p>
-        <fieldset class="configuration-picker" :disabled="busy">
-          <legend>配役を選択<span>七つの村から選べます</span></legend>
-          <label v-for="(item, index) in configurations" :key="item.value" class="configuration-card" :class="{ chosen: configuration === item.value }">
-            <input v-model="configuration" type="radio" name="configuration" :value="item.value" :aria-label="item.name + '配役'">
-            <span class="configuration-number">0{{ index + 1 }}</span>
-            <strong>{{ item.name }}</strong><small>{{ item.description }}</small>
-            <span class="radio-mark" aria-hidden="true"></span>
-          </label>
-        </fieldset>
-        <div class="start-row"><button class="primary-button" :disabled="busy" @click="start(configuration)">{{ busy ? '開村中…' : '対局を始める' }} <span aria-hidden="true">↗</span></button><span>ログイン不要・戦績はこのブラウザーに保存します</span></div>
+      <section v-show="menuScene!=='game' && (!sessionId || update)" class="journal panel desktop-menu-journal" aria-label="村落紀事のメニュー">
+        <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ menuScene==='select'?'配役選択':menuScene==='replay'?'録画':'タイトル' }}</span></header>
+        <DesktopStartScene v-show="menuScene!=='replay'" :scene="menuScene==='select' ? 'select' : 'title'" :blocked="busy||(uncertain&&Boolean(sessionId))" @navigate="navigateMenu" @start="startConfiguration" />
+        <section v-show="menuScene==='replay'" class="desktop-start-surface" lang="ja" data-testid="desktop-replay">
+          <AssetImage class="desktop-start-background" name="images/title_base_resized.png" />
+          <div id="desktop-replay-slot" class="desktop-library-content"></div>
+          <button class="desktop-art-button desktop-setup-return" aria-label="タイトルに戻る" data-testid="replay-return" @click="navigateMenu('title')"><AssetImage name="images/PVBtitile.png" /></button>
+        </section>
+        <button v-if="update" class="quiet-button" data-testid="resume-current-game" :disabled="busy||uncertain" @click="menuScene='game'">{{finished?'現在の結末に戻る':'現在の対局に戻る'}}</button>
       </section>
 
-      <section v-else-if="!update" class="restoring" aria-live="polite">
+      <section v-if="!update && sessionId" class="restoring" aria-live="polite">
         <span class="eyebrow">RECONNECTING</span><h1>村へ戻りましょう。</h1>
         <p>{{ busy ? 'セッションと未確認の発言を読み込んでいます…' : '保存済みのセッションがあります。ローカルサーバーへの再接続を待っています。' }}</p>
         <button class="primary-button" :disabled="busy" @click="refresh">再同期</button>
         <button class="quiet-button" :disabled="busy" @click="release">セッションを解放</button>
       </section>
 
-      <template v-else>
+      <div v-if="update" v-show="menuScene==='game'">
         <section class="game-heading">
           <div><span class="eyebrow">THE VILLAGE JOURNAL</span><h1>{{ configurationName(update.view.configuration) }}村 <span>第 {{ update.view.gameDay }} 日</span></h1></div>
           <div class="population"><strong>{{ update.view.aliveCount }}<small> 生存</small></strong><span>{{ update.view.deathCount }} 人離場</span></div>
@@ -212,7 +230,7 @@ function name(number) {
               @click="setAvoidance(!update.selections.avoidanceEnabled)"><AssetImage :name="update.selections.avoidanceEnabled ? 'images/关闭回避.png' : 'images/开启回避.png'" /><span class="visually-hidden">{{ update.selections.avoidanceEnabled ? '回避あり' : '回避なし' }}</span></button></template>
 
                 </DesktopVoteWindow>
-                <SettlementBoard v-if="finished" :players="players" :reveal="reveal" :result="update.view.result" @menu="openGameMenu" />
+                <SettlementBoard :blocked="busy||uncertain" v-if="finished" :players="players" :reveal="reveal" :result="update.view.result" @menu="openGameMenu" />
               </template>
               <div v-if="presentationPhase==='day-text'" class="event-content" lang="ja" role="status" data-testid="day-start-text">{{ dayStartText }}</div>
               <div v-else-if="presentationPhase==='error'" class="event-content" lang="ja" role="status">場面の画像を表示できません。現在の出来事へ進めます。</div>
@@ -263,10 +281,11 @@ function name(number) {
 
         <footer class="session-footer">
           <span>一時セッション・このタブを再読み込みして再開できます。</span>
-          <button v-if="!confirmingExit" class="quiet-button" :disabled="busy" @click="confirmingExit = true">{{ finished ? '新しい対局' : '試遊を終了' }}</button>
-          <div v-else class="exit-confirm"><span>解放すると、この対局は再開できません。</span><button class="quiet-button" :disabled="busy" @click="confirmingExit = false">対局を残す</button><button class="danger-button" :disabled="busy" @click="release().then(() => confirmingExit = false)">解放を確定</button></div>
+          <button v-if="finished" class="quiet-button" :disabled="busy||uncertain" @click="openGameMenu">タイトルに戻る</button>
+          <button v-else-if="!confirmingExit" class="quiet-button" :disabled="busy" @click="confirmingExit = true">試遊を終了</button>
+          <div v-else-if="!finished" class="exit-confirm"><span>解放すると、この対局は再開できません。</span><button class="quiet-button" :disabled="busy" @click="confirmingExit = false">対局を残す</button><button class="danger-button" :disabled="busy" @click="release().then(() => confirmingExit = false)">解放を確定</button></div>
         </footer>
-      </template>
+      </div>
     </main>
     <HelpDialog v-if="helpPage" :initial-page="helpPage" @close="helpPage = ''" />
   </div>

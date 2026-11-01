@@ -17,7 +17,7 @@ function next(){if(props.blocked)return;if(index.value+1<props.vote.rounds.lengt
   <DesktopRoster :players="players" :markers="markers" />
   <DesktopCalendar :day="day" :alive="alive" :dead="dead" />
   <button class="desktop-art-button desktop-music-button" aria-label="ゲーム画面の曲を切替" :disabled="blocked" @click="emit('music')"><AssetImage name="images/musicBtn.png" /></button>
-  <button class="desktop-art-button desktop-result-menu" aria-label="メニュー" :disabled="blocked" @click="emit('menu')"><AssetImage name="images/IntroTitle.png" /></button>
+  <button class="desktop-art-button desktop-result-menu" data-no-click-sound aria-label="メニュー" :disabled="blocked" @click="emit('menu')"><AssetImage name="images/IntroTitle.png" /></button>
   <div class="desktop-result-board"><AssetImage class="vote-board-background" name="images/frame #19252.png" />
    <div v-if="text" class="desktop-result-content" tabindex="0">
     <div class="desktop-ballot-columns"><div><pre>{{ text.title }}</pre><div v-for="(line,i) in text.lines.slice(0,10)" :key="i">{{ line }}</div><div :style="{height:Math.max(0,10-text.lines.length)*2.34375+'cqw'}" aria-hidden="true"></div><p class="desktop-vote-conclusion">{{ text.conclusion }}</p></div><div><pre aria-hidden="true">{{ '\n\n' }}</pre><div v-for="(line,i) in text.lines.slice(10)" :key="i">{{ line }}</div></div></div>

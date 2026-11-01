@@ -1,3 +1,4 @@
+import { startDesktopGame, chooseDesktopConfiguration } from '../test-fixtures/desktop-start.js'
 import {desktopHome,desktopSelection,desktopSkill,expectNoEnabledVote} from '../test-fixtures/desktop-navigation.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
@@ -7,8 +8,8 @@ const storageKey = 'vocr.guest.v1'
 const saved = page => page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), storageKey)
 async function start(page) {
   await page.goto('/')
-  await page.getByRole('radio', { name: '通常配役' }).check()
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await chooseDesktopConfiguration(page, 'tongchang')
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }

@@ -5,7 +5,7 @@ import AssetImage from './AssetImage.vue'
 import { characterDisplayName } from './characterDisplay.js'
 import { settlementDetails } from './settlementVisual.js'
 import { outcomes } from './sceneArtwork.js'
-const props=defineProps({players:{type:Array,required:true},reveal:{type:Object,required:true},result:{type:String,required:true}})
+const props=defineProps({players:{type:Array,required:true},reveal:{type:Object,required:true},result:{type:String,required:true},blocked:Boolean})
 const emit=defineEmits(['menu'])
 const outcome=computed(()=>Object.hasOwn(outcomes,props.result)?outcomes[props.result]:null)
 const cards=computed(()=>props.players.map(player=>({player,
@@ -30,7 +30,7 @@ const cards=computed(()=>props.players.map(player=>({player,
         </article>
       </div>
     </div>
-    <button class="desktop-art-button settlement-title" aria-label="タイトルに戻る" @click="emit('menu')"><AssetImage name="images/PVBtitile.png" /></button>
+    <button class="desktop-art-button settlement-title" data-no-click-sound :disabled="blocked" aria-label="タイトルに戻る" @click="emit('menu')"><AssetImage name="images/PVBtitile.png" /></button>
     <footer id="settlement-help" class="visually-hidden">上下2段の一覧です。左右・上下にスクロールできます。Tabで各人物へ移動できます。
       <span v-if="reveal.diagnostic" class="visual-diagnostic" role="status" data-testid="reveal-diagnostic">表示診断：身分情報が不完全です。人物の役職画像を表示できません。</span>
     </footer>

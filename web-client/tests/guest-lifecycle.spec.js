@@ -1,16 +1,17 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test, expect, preparePresentation } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 const replayFixture = JSON.parse(readFileSync(new URL('../../src/test/resources/replay/exchange-v3.json', import.meta.url), 'utf8'))
 
 const key = 'vocr.guest.v1'
-const begin = page => page.getByRole('button', { name: '対局を始める', exact: true })
+const begin = page => page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')
 const saved = page => page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), key)
 async function start(page) {
   await preparePresentation(page)
   await page.goto('/')
   await expect(page.locator('.side-footer')).toContainText('30分')
   await expect(page.locator('.side-footer')).toContainText('24時間')
-  await begin(page).click()
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   return (await saved(page)).sessionId
 }
@@ -111,12 +112,12 @@ test('capacity rejection does not create or automatically replay; explicit retry
   let id
   try {
     await page.goto('/')
-    await begin(page).click()
+    await startDesktopGame(page)
     await expect(page.getByRole('alert')).toContainText('未创建新局')
     await expect(begin(page)).toBeEnabled()
     expect(await saved(page)).toBeNull()
     expect(posts).toBe(1)
-    await begin(page).click()
+    await startDesktopGame(page)
     await expect(page.getByTestId('next-event')).toBeVisible()
     id = (await saved(page)).sessionId
     expect(posts).toBe(2)

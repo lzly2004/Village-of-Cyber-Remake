@@ -159,7 +159,7 @@ export function useGuestGame() {
     busy.value = true
     notice.value = ''
     try {
-      await action()
+      return await action()
     } catch (error) {
       try {
         await handleError(error, operation)
@@ -237,9 +237,13 @@ export function useGuestGame() {
   function askClaimRole(role) {
     if (!canDecide.value || !claimRoles.value.includes(role)) return
     return run(async () => {
-      await accept(await request('/' + sessionId.value + '/claims/by-role', {
+      const id = sessionId.value
+      const snapshot = await request('/' + id + '/claims/by-role', {
         method: 'POST', body: { expectedRevision: update.value.revision, role },
-      }))
+      })
+      await accept(snapshot)
+      if (sessionId.value === id && update.value === snapshot && !uncertain.value)
+        return { kind: snapshot.nextEventCursor > cursor.value ? 'events' : 'empty' }
     })
   }
 
@@ -298,9 +302,13 @@ export function useGuestGame() {
     if (!canAskClaimPlayers.value) return
     const players = [...claimPlayerDraft.value]
     return run(async () => {
-      await accept(await request('/' + sessionId.value + '/claims/by-players', {
+      const id = sessionId.value
+      const snapshot = await request('/' + id + '/claims/by-players', {
         method: 'POST', body: { expectedRevision: update.value.revision, players },
-      }))
+      })
+      await accept(snapshot)
+      if (sessionId.value === id && update.value === snapshot && !uncertain.value)
+        return { kind: snapshot.nextEventCursor > cursor.value ? 'events' : 'empty' }
     })
   }
 
@@ -309,7 +317,14 @@ export function useGuestGame() {
       await request('/' + sessionId.value, { method: 'DELETE' })
       forget()
       notice.value = '已结束这次试玩，可以开始新的一局。'
+      return true
     })
+  }
+
+  async function startReplacing(configuration) {
+    if (busy.value || (uncertain.value && sessionId.value)) return
+    if (sessionId.value && await release() !== true) return
+    return start(configuration)
   }
 
   onMounted(() => {
@@ -336,6 +351,6 @@ export function useGuestGame() {
     divinationTargets, selectedDivinationTargets, setDivinationTarget,
     guardTargets, selectedGuardTargets, setGuardTarget,
     setClaimedTarget,
-    start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
+    start, startReplacing, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
   }
 }

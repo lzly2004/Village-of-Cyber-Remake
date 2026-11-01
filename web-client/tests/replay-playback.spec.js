@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
@@ -38,7 +39,7 @@ async function completeCards(page) {
 const saved=page=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')))
 
 test('frozen desktop dates/portraits play read-only beside a real running game, Escape and refresh preserve authority and local records',async({page,request},info)=>{
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
+  await page.goto('/');await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   const credentials=await saved(page),path='/api/v1/games/'+credentials.sessionId+'?eventCursor='+credentials.eventCursor
   try{
@@ -137,7 +138,7 @@ test('an already-open recording stays detached when another tab deletes it; clos
 
 test('lazy Replay module failure is bounded and leaves the current game usable',async({page,request})=>{
   await page.route('**/src/ReplayLibrary.vue*',r=>r.abort())
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+  await page.goto('/');await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
   const before=await saved(page)
   try{
     await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click()
@@ -162,9 +163,8 @@ test('lazy save intent cannot attach to a different session when the module arri
   let reads=0;page.on('request',r=>{if(r.url().includes('/replay?'))reads++})
   await page.goto('/')
   await page.getByTestId('save-replay').click()
-  await page.getByRole('button',{name:'新しい対局',exact:true}).click()
-  await page.getByRole('button',{name:'解放を確定',exact:true}).click()
-  await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+  await page.locator('.session-footer').getByRole('button',{name:'タイトルに戻る',exact:true}).click()
+  await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
   const current=await saved(page)
   try{
     resume()

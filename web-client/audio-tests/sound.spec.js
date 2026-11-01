@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import {test,expect} from '@playwright/test'
 import {completeNativeReading} from '../test-fixtures/native-reading.js'
 import {readFileSync} from 'node:fs'
@@ -45,7 +46,7 @@ test('WEB-028 live BGM/effect gain, keyboard volume, serial click cleanup and re
   const paths=await setup(page,{settings:JSON.stringify({version:1,bgmVolume:40,soundVolume:60,muted:false})})
   expect(paths).toEqual([]);expect((await probe(page)).contexts).toEqual([])
   await expect(page.getByRole('slider',{name:'BGM音量',exact:true})).toHaveValue('40')
-  await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  await startDesktopGame(page);await enable(page)
   await page.getByRole('button',{name:'試遊を終了'}).click()
   await expect(ui(page)).toHaveAttribute('data-sound-status','playing');await expect(ui(page)).toHaveAttribute('data-sound','CLICK')
   expect(await probe(page)).toMatchObject({contexts:['running'],bgm:1,effects:1,active:2})
@@ -64,7 +65,7 @@ test('WEB-028 live BGM/effect gain, keyboard volume, serial click cleanup and re
 test('WEB-028 mute cancels a held effect and suppresses future/retroactive playback; no second context',async({page})=>{
   let held;const intercepted=new Promise(resolve=>{held=resolve})
   await page.route('**'+soundPath('CLICK'),r=>held(r))
-  const paths=await setup(page);await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  const paths=await setup(page);await startDesktopGame(page);await enable(page)
   await page.getByRole('button',{name:'試遊を終了'}).click();const route=await intercepted
   await page.getByRole('switch',{name:'消音',exact:true}).click();await route.abort('aborted')
   await expect(ui(page)).toHaveAttribute('data-sound-status','idle')
@@ -78,7 +79,7 @@ test('WEB-028 mute cancels a held effect and suppresses future/retroactive playb
 for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])test('night/day backgrounds gate intro/result '+eventname+'; native ended releases and manual frame never replays death',async({page})=>{
   const snapshot=presented(publicSnapshot(),'NIGHT_RESULT',eventname)
   const paths=await setup(page,{snapshot});await enable(page)
-  await page.getByRole('button',{name:'対局を始める'}).click()
+  await startDesktopGame(page)
   await expect(ui(page)).toHaveAttribute('data-sound','NIGHTFALL');await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   expect(paths).not.toContain(soundPath('WOLF_HOWL'));await finishSound(page)
   await expect(page.getByTestId('game-stage')).toHaveAttribute('data-presentation-phase','night')
@@ -98,7 +99,7 @@ for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])
 
 test('WEB-028 execution sound follows second displayed frame once and is canceled on confirmation',async({page})=>{
   const snapshot=presented(publicSnapshot(),'EXECUTION','cxs')
-  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
+  const paths=await setup(page,{snapshot});await enable(page);await startDesktopGame(page)
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
   expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
   await page.getByTestId('stage-text').click();await expect(page.getByTestId('execution-continue')).toBeVisible()
@@ -112,7 +113,7 @@ test('WEB-028 execution sound follows second displayed frame once and is cancele
 for(const [result,effect] of [['VILLAGE_WIN','VILLAGE_VICTORY'],['WOLF_WIN','WOLF_VICTORY'],['FOX_WIN','FOX_VICTORY']])test('WEB-028 win effect gated by final confirmation '+result,async({page})=>{
   const snapshot=presented(publicSnapshot(),'SETTLEMENT',result==='VILLAGE_WIN'?'crsl':result==='WOLF_WIN'?'rlsl':'yhsl')
   snapshot.phase='FINISHED';snapshot.view.result=result
-  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
+  const paths=await setup(page,{snapshot});await enable(page);await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible();expect(paths).not.toContain(soundPath(effect))
   await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-sound',effect)
   await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
@@ -123,7 +124,7 @@ for(const [result,effect] of [['VILLAGE_WIN','VILLAGE_VICTORY'],['WOLF_WIN','WOL
 test('WEB-028 same-day refresh preserves pending playlist selection (027 array-getter observation)',async({page})=>{
   let held;const intercepted=new Promise(resolve=>{held=resolve})
   await page.route('**/assets/audio/manifest.json',r=>held(r))
-  await setup(page);await page.getByRole('button',{name:'対局を始める'}).click()
+  await setup(page);await startDesktopGame(page)
   await page.getByRole('button',{name:'音楽を有効にする'}).click();const route=await intercepted
   await expect(ui(page)).toHaveAttribute('data-status','loading')
   await page.getByRole('button',{name:'曲を切替',exact:true}).click()
@@ -137,7 +138,7 @@ test('WEB-028 same-day refresh preserves pending playlist selection (027 array-g
 
 test('WEB-028 corrupt effect is diagnosed without stopping BGM or game sync',async({page})=>{
   await page.route('**'+soundPath('CLICK'),r=>r.fulfill({status:200,contentType:'text/html',body:'<html>SPA</html>'}))
-  await setup(page);await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  await setup(page);await startDesktopGame(page);await enable(page)
   await page.getByRole('button',{name:'試遊を終了'}).click()
   await expect(ui(page)).toContainText('AUDIO_INTEGRITY_FAILED');await expect(ui(page)).toHaveAttribute('data-status','playing')
   expect((await probe(page)).active).toBe(1);await expect(page.getByRole('button',{name:'再同期'})).toBeEnabled()
@@ -154,14 +155,14 @@ for(const denied of [false,true])test('WEB-028 invalid/blocked settings remain e
 
 test('execution sound requires explicit local result; refresh cancels old scene and reduced motion retains that gate',async({page})=>{
   const snapshot=presented(publicSnapshot(),'EXECUTION','cxs')
-  const paths=await setup(page,{snapshot});await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
+  const paths=await setup(page,{snapshot});await enable(page);await startDesktopGame(page)
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
   await page.reload()
   // Outlive the former automatic transition: an unconfirmed old scene cannot sound.
   await page.waitForTimeout(2200);expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
   await page.emulateMedia({reducedMotion:'reduce'})
   await page.evaluate(()=>sessionStorage.clear());await page.reload();await enable(page)
-  await page.getByRole('button',{name:'対局を始める'}).click()
+  await startDesktopGame(page)
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-frame','1')
   expect(paths).not.toContain(soundPath('DAY_EXECUTION'))
   await page.getByTestId('execution-continue').click()
@@ -170,7 +171,7 @@ test('execution sound requires explicit local result; refresh cancels old scene 
 })
 
 test('WEB-028 actual browser mix contains signal and master mute produces zero samples',async({page})=>{
-  await setup(page);await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  await setup(page);await startDesktopGame(page);await enable(page)
   await page.getByRole('button',{name:'試遊を終了'}).click()
   await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   await page.evaluate(()=>{
@@ -203,7 +204,7 @@ test('WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK w
   const failures=[]
   page.on('requestfailed',request=>{if(new URL(request.url()).pathname===soundPath('CLICK'))failures.push(request.failure()?.errorText)})
   const paths=await setup(page,{snapshot})
-  await page.getByRole('button',{name:'対局を始める'}).click();await enable(page)
+  await startDesktopGame(page);await enable(page)
   const samples=[]
   try {
     for(const mode of ['mouse','keyboard']){
@@ -232,7 +233,7 @@ test('WEB-028 review F1/F2/F3 advancing mouse and keyboard each play one CLICK w
 
 test('night enable does not replay past NIGHTFALL; future dawn sounds once and stop suppresses result',async({page})=>{
  const paths=await setup(page,{snapshot:presented(publicSnapshot(),'NIGHT_RESULT','wsw')})
- await page.getByRole('button',{name:'対局を始める'}).click()
+ await startDesktopGame(page)
  await expect(page.getByTestId('game-stage')).toHaveAttribute('data-presentation-phase','night')
  expect(paths).toEqual([])
  await page.getByRole('button',{name:'音楽を有効にする'}).click()
@@ -254,7 +255,7 @@ test('NIGHTFALL waits for the held background publication instead of merely rece
  await page.route('**/assets/images/'+images.images['images/komorebi000night01.png'].file,async route=>{seen=true;await gate;await route.continue()})
  const paths=await setup(page,{snapshot:presented(publicSnapshot(),'NIGHT_RESULT','wsw')})
  try{
-  await enable(page);await page.getByRole('button',{name:'対局を始める'}).click()
+  await enable(page);await startDesktopGame(page)
   await expect.poll(()=>seen).toBe(true)
   await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','false')
   expect(paths).not.toContain(soundPath('NIGHTFALL'));expect(paths).not.toContain(soundPath('WOLF_HOWL'))

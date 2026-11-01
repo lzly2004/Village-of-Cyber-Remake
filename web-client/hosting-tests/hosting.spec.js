@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { spawn } from 'node:child_process'
@@ -37,7 +38,7 @@ async function seed(page,url){
  await library(page).getByLabel('録画ファイルを選ぶ').setInputFiles({name:'fixture.json',mimeType:'application/json',buffer:replay})
  const preview=library(page).getByRole('group',{name:'取り込みの確認（未保存）'});await preview.getByRole('checkbox').first().check();await preview.getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click();await expect(library(page).locator('.replay-entries > li')).toHaveCount(1)
  await page.evaluate(()=>localStorage.setItem('vocr.audio.v1',JSON.stringify({version:1,bgmVolume:23,soundVolume:41,muted:true})))
- await page.getByRole('button',{name:'対局を始める',exact:true}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+ await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
  return inspect(page)
 }
 async function emptyOrigin(page,url){

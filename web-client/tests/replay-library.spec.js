@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { desktopVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
@@ -29,7 +30,7 @@ async function synthetic(page, response=file) {
 test('real finished game saves compatible v3 exactly once; search/detail/delete/reload stay local and preserve authority',async({page,request},info)=>{
   let replayReads=0
   page.on('request',req=>{if(req.url().includes('/replay?'))replayReads++})
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
+  await page.goto('/');await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   const id=(await saved(page)).sessionId
   try {
@@ -70,7 +71,7 @@ test('real finished game saves compatible v3 exactly once; search/detail/delete/
     await expect(rows(page)).toHaveCount(1)
     await page.screenshot({path:info.outputPath('replay-library.png'),fullPage:true})
     await request.delete('/api/v1/games/'+id)
-    await page.reload();await expect(page.getByRole('button',{name:'対局を始める'})).toBeVisible()
+    await page.reload();await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeVisible()
     await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click()
     await expect(rows(page)).toHaveCount(1)
     await rows(page).getByRole('button',{name:'削除',exact:true}).click()
@@ -155,9 +156,9 @@ test('late read after session release is discarded without storing the previous 
   const sent=page.waitForRequest(r=>r.url().includes('/replay?'))
   await page.getByTestId('save-replay').click();await sent
   await page.route('**/api/v1/games/*',route=>route.request().method()==='DELETE'?route.fulfill({status:204}):route.continue())
-  await page.getByRole('button',{name:'新しい対局',exact:true}).click()
-  await page.getByRole('button',{name:'解放を確定',exact:true}).click()
-  await expect(page.getByRole('button',{name:'対局を始める'})).toBeVisible()
+  await page.locator('.session-footer').getByRole('button',{name:'タイトルに戻る',exact:true}).click()
+  await startDesktopGame(page)
+  await expect(page.getByTestId('next-event')).toBeVisible()
   proceed()
   await expect(library(page).getByRole('alert')).toContainText('SESSION_CHANGED')
   expect(await stored(page)).toHaveLength(0)
@@ -176,7 +177,7 @@ test('IndexedDB getter denied at boot still allows normal play and reports local
   await page.goto('/')
   await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click()
   await expect(library(page).getByRole('alert')).toContainText('STORAGE_UNAVAILABLE')
-  await page.getByRole('button',{name:'対局を始める'}).click()
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   await request.delete('/api/v1/games/'+(await saved(page)).sessionId)
 })

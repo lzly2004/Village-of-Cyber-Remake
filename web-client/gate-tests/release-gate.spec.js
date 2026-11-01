@@ -1,3 +1,4 @@
+import { startDesktopGame, chooseDesktopConfiguration } from '../test-fixtures/desktop-start.js'
 import {desktopHome,desktopClaims,desktopClaimPlayers,desktopSelection,desktopSkill,desktopVote,desktopRecords,completeVoteReview} from '../test-fixtures/desktop-navigation.js'
 import { characterDisplayName,characters } from '../src/characterDisplay.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
@@ -182,9 +183,9 @@ async function operate(page, step) {
 async function journey(page, request, testInfo, configuration, strategy) {
   const data = oracle(configuration, strategy)
   await page.goto('/')
-  await page.getByRole('radio', { name: names[configurations.indexOf(configuration)] + '配役' }).check()
+  await chooseDesktopConfiguration(page, configuration)
   const createdResponse = page.waitForResponse(res => res.request().method() === 'POST' && res.url().endsWith('/api/v1/games'))
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await startDesktopGame(page)
   const created = await (await createdResponse).json()
   const id = created.sessionId
   const path = '/api/v1/games/' + id
@@ -238,6 +239,24 @@ async function journey(page, request, testInfo, configuration, strategy) {
         mkdirSync(folder,{recursive:true})
         const image=await page.getByTestId('stage-surface').screenshot({path:resolve(folder,'settlement-real-jianyi.png')})
         writeFileSync(resolve(folder,'settlement-real-jianyi.json'),JSON.stringify({source:'Real seeded API/HTTP/browser gate journey; not user random playtest',configuration,strategy,seed:data.seed,bytes:image.length,sha256:createHash('sha256').update(image).digest('hex')},null,2)+'\n')
+        await expect(page.getByRole('region',{name:'ローカル戦績保存'})).toContainText(/保存しました|保存済み/)
+        const beforeTitle=await saved(page)
+        await page.locator('.settlement-board').getByRole('button',{name:'タイトルに戻る',exact:true}).click()
+        await expect(page.getByTestId('desktop-title')).toBeVisible()
+        expect(await saved(page)).toEqual(beforeTitle)
+        await page.getByTestId('desktop-title').screenshot({path:resolve(folder,'title-after-real-game.png')})
+        await startDesktopGame(page,'tongchang')
+        await expect(page.getByTestId('next-event')).toBeVisible()
+        const second=(await saved(page)).sessionId
+        try {
+          expect(second).not.toBe(id)
+          expect((await request.get(path)).status()).toBe(404)
+          const secondState=await(await request.get('/api/v1/games/'+second)).json()
+          expect(secondState.view.configuration).toBe('tongchang')
+          expect(secondState.view.result).toBe('NONE')
+          await page.getByTestId('stage-surface').screenshot({path:resolve(folder,'second-game-real.png')})
+        } finally {await request.delete('/api/v1/games/'+second)}
+
       }
     }
     for (const endpoint of ['/debug', '/context', '/recorder', '/suspicion'])

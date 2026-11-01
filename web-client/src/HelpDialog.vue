@@ -56,7 +56,7 @@ onMounted(() => dialog.value.showModal())
           <dl><template v-for="(count, role) in item.roleCounts" :key="role"><dt>{{ roles[role] }}</dt><dd>{{ count }}人</dd></template></dl>
         </article>
       </div>
-      <p>役職は対局ごとに割り振られます。ここで配役を閲覧しても開村・投票は行いません。対局を始めるには閉じて配役を選び、「対局を始める」を押してください。</p>
+      <p>役職は対局ごとに割り振られます。ここで配役を閲覧しても開村・投票は行いません。対局を始めるには閉じてタイトルの「Start」から配役画像を選んでください。</p>
     </section>
   </dialog>
 </template>
