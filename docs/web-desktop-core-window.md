@@ -148,3 +148,9 @@ run41192653772 attempt1失败：单测219、默认217、Java650及此前资源/�
 ### 履历菜单最后两项外观补齐
 
 按VoteHistoryBrowser继续核对：无上一/下一轮时原版不显示翻页图，而非保留禁用图；履历还显示当前配役`gameN-1.png`原图于(700,600)，原尺寸高度51、宽度155/206/232/255。本批补齐这两项，既有日期选择、各轮票型和返回操作不变。相关22/22、完整gate15/15（9.3分钟）、单测219/219及生产构建通过（代码642607B/gzip175289B，全站77815639B）；不改资源预算、规则/接口或存储。日志为parity-history-chrome-{related,gate,build}.log及parity-unit-delivery-final.log。中间568b998的run41213381187 API已success，但不下载/交付中间包来替代此最后展示补修；最终候选仍须绑定后续最终head的真实完整CI和产物。
+
+### 主菜单闭环的云端交换前提补修
+
+`bdfa19c` 的 run41290943549 attempt1：默认浏览器、Java全量及gate均通过，但desktop-exchange失败，未生成发布包。`tools/workflow-tests/replay-roundtrip.spec.mjs`仍只点击旧的“対局を始める”入口，现该点击仅进入配役选择，未真正开局，等待next-event超时。修正为复用图形开局前提startDesktopGame，实际点击配役图片；交换、零写入、零Replay API读取、凭据和权威快照不变的断言全部保留，无产品代码变化。
+
+失败verify产物39119177B，官方SHA256 `4fdf559afb404ca619a0d4dc416afbd242d19e74f688dea905f676fbe106716c`，已按官方digest核验下载字节。本机使用此轮云端Java实际生成的desktop-actual.json重新跑交换用例，1/1通过（6.9s）；该文件来源明确为云端本轮，不冒称本机重新生成或本机同job完整交换。新head仍须独立完整CI与同job新文件交换，不能以这轮红灯或局部通过替代最终试玩包。

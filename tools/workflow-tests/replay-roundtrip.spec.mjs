@@ -1,4 +1,5 @@
 import { test, expect } from '../../web-client/test-fixtures/presentation-test.js'
+import { startDesktopGame } from '../../web-client/test-fixtures/desktop-start.js'
 import { readFileSync } from 'node:fs'
 // Required: never fall back to a committed fixture or an unrelated prior run.
 if (!process.env.VOCR_VERIFY_DESKTOP_EXPORT) throw new Error('VOCR_VERIFY_DESKTOP_EXPORT is required')
@@ -9,7 +10,7 @@ if (!expected || slots.slice(1).some(Boolean) || expected.slotIndex !== 0) throw
 
 test('current desktop file imports, plays and exports through browser without changing live authority', async ({ page, request }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: '対局を始める' }).click()
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   const stored = await page.evaluate(() => sessionStorage.getItem('vocr.guest.v1'))
   const credentials = JSON.parse(stored)
