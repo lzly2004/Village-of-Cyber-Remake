@@ -124,7 +124,10 @@ export function useGuestGame() {
   async function handleError(error, operation) {
     if (error instanceof ReadFailure) { error = error.cause; operation = 'read' }
     const kind = recoveryKind(error, operation)
-    if (kind === 'limited') {
+    if (kind === 'playtest-stopped') {
+      uncertain.value = Boolean(sessionId.value)
+      notice.value = error.message + ' 请回到试玩终端查看停止原因；不会自动重试。'
+    } else if (kind === 'limited') {
       if (operation === 'read') uncertain.value = Boolean(sessionId.value)
       notice.value = operation === 'read'
         ? '读取暂被限流，已保留本局与确认游标；请稍后主动重新同步。'

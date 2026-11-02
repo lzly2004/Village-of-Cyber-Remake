@@ -11,6 +11,7 @@ test('recovery requires exact status/code AND operation; unknown replies never p
     [409,'GATEWAY','write','unknown'], [404,'GAME_NOT_FOUND','read','expired'],
     [404,'HTTP_ERROR','write','unknown'], [404,'GAME_NOT_FOUND','create','unknown'],
     [503,'SESSION_LIMIT','create','capacity'], [503,'SESSION_LIMIT','write','unknown'],
+    [503,'PLAYTEST_SERVICE_STOPPED','write','playtest-stopped'], [503,'PLAYTEST_SERVICE_STOPPED','read','playtest-stopped'],
     [503,'HTTP_ERROR','create','unknown'], [500,'INTERNAL_ERROR','write','unknown'],
     [413,'HTTP_ERROR','write','rejected'], [415,'JSON_REQUIRED','create','rejected'],
     [429,'HTTP_ERROR','write','unknown'], [200,'INVALID_REQUEST','write','unknown'],

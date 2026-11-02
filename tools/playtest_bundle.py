@@ -3,7 +3,7 @@ from pathlib import Path
 import web_release as R
 
 FILES = ('playtest.py', 'playtest.sh', 'playtest_candidate.py', 'playtest_store.py',
-         'playtest_runtime.py', 'playtest_service.py', 'guarded-process.py',
+         'playtest_runtime.py', 'playtest_service.py', 'playtest_stopped.py', 'guarded-process.py',
          'web_release.py', 'web_hosting.py', 'hosting-toolchain.json', 'host-web.py',
          'ci/download.py', 'ci/evidence.py', 'ci/bootstrap.py', 'ci/toolchain.json')
 

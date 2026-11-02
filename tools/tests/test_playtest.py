@@ -2,6 +2,7 @@
 import copy
 import importlib.util
 import io
+import http.client
 import json
 import os
 from pathlib import Path
@@ -10,6 +11,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 from unittest.mock import patch
 import zipfile
@@ -168,6 +170,80 @@ class LocalStoreTest(unittest.TestCase):
 
 
 class RuntimeTest(unittest.TestCase):
+    def test_stopped_page_reports_reason_without_serving_payload_or_echoing_credentials(self):
+        from playtest_stopped import StoppedSite
+        with StoppedSite('LOW_MEMORY', port=0) as site:
+            port=site.server.server_address[1]
+            def read(path, host=None):
+                t=threading.Thread(target=site.poll);t.start()
+                c=http.client.HTTPConnection('127.0.0.1',port,timeout=3)
+                c.request('GET',path,headers={'Host':host or 'localhost:'+str(port)})
+                r=c.getresponse();data=r.read();status=r.status;headers=dict(r.getheaders());c.close();t.join(3)
+                return status,data,headers
+            status,body,headers=read('/')
+            self.assertEqual(503,status);self.assertIn(b'LOW_MEMORY',body);self.assertEqual('no-store',headers['Cache-Control'])
+            status,body,_=read('/api/v1/games/private-capability?secret=do-not-reflect')
+            self.assertEqual(503,status);value=json.loads(body)
+            self.assertEqual('PLAYTEST_SERVICE_STOPPED',value['code']);self.assertEqual('LOW_MEMORY',value['reason'])
+            self.assertNotIn(b'private-capability',body);self.assertNotIn(b'do-not-reflect',body)
+            self.assertEqual(421,read('/',host='evil.invalid')[0])
+
+    def test_partial_http_request_cannot_hold_terminal_coordinator(self):
+        from playtest_stopped import StoppedSite
+        with StoppedSite('LOW_MEMORY',port=0) as site:
+            with socket.create_connection(site.server.server_address,timeout=2) as client:
+                client.sendall(b'GET / HTTP/1.1\r\n')
+                thread=threading.Thread(target=site.poll);thread.start();thread.join(2)
+                self.assertFalse(thread.is_alive(),'Incomplete request blocked coordinator polling')
+
+    def test_stopped_page_never_publishes_arbitrary_reason(self):
+        from playtest_stopped import StoppedSite
+        with self.assertRaisesRegex(ValueError,'INVALID_STOP_REASON'):StoppedSite('<script>untrusted</script>',port=0)
+
+    def test_exited_owned_worker_preserves_real_status_stop_and_refresh_explanation(self):
+        # Separate Python coordinator, real loopback/control sockets, fake worker exits 75.
+        # No JVM, browser, intentional memory pressure or existing user directory is involved.
+        code = r"""
+import sys,os,time,json,socket,tempfile,threading
+from pathlib import Path
+from unittest.mock import patch
+sys.path.insert(0,sys.argv[1]);import playtest_runtime as V
+from playtest_stopped import StoppedSite
+with tempfile.TemporaryDirectory() as directory:
+ root=Path(directory);home=root/'home';home.mkdir(mode=0o700);runtime=root/'runtime';runtime.mkdir(mode=0o700)
+ tool=root/'tool';tool.write_text('fixture');tools=root/'tools';tools.mkdir()
+ (tools/'guarded-process.py').write_text('MIN_AVAILABLE_KIB=2097152\ndef available_kib():return 9999999\nif __name__=="__main__":raise SystemExit(75)\n')
+ with socket.socket() as listener:
+  listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]
+ results=[];errors=[]
+ def client():
+  try:
+   deadline=time.monotonic()+6
+   while time.monotonic()<deadline:
+    state=V.control('status')
+    if state.get('state')=='FAILED':break
+    time.sleep(.03)
+   else:raise AssertionError('Coordinator did not publish FAILED')
+   import http.client
+   c=http.client.HTTPConnection('127.0.0.1',port,timeout=2);c.request('GET','/',headers={'Host':'localhost:'+str(port)})
+   r=c.getresponse();body=r.read();c.close()
+   assert r.status==503 and b'LOW_MEMORY' in body
+   results.append(state);results.append(V.control('stop'))
+  except Exception as error:errors.append(repr(error))
+ with patch.object(V,'TOOLS',tools),patch.object(V,'runtime_directory',return_value=runtime),patch.object(V.S,'candidate',return_value=({'sourceSha':'a'*40},root)),patch.object(V.S,'profiles',return_value=(root/'profile',root/'downloads')),patch.object(V.H,'checked_caddy',return_value=tool),patch.object(V,'tool_version',return_value='fixture'),patch.object(V,'check_ports'),patch.object(V,'StoppedSite',side_effect=lambda reason:StoppedSite(reason,port)),patch.dict(os.environ,{'DISPLAY':':fixture'}):
+  thread=threading.Thread(target=client,daemon=True);thread.start()
+  rc=V.start(home,'full-'+'a'*40+'-'+'b'*64,tool,tool,tool)
+  thread.join(3)
+ assert not errors,errors
+ assert rc==75 and len(results)==2
+ assert results[0]['reason']=='LOW_MEMORY' and results[1]['state']=='STOPPING'
+ assert not (runtime/'control.sock').exists()
+ print('COORDINATOR_STOPPED_PAGE_PASS')
+"""
+        result=subprocess.run([sys.executable,'-B','-c',code,str(ROOT/'tools')],capture_output=True,text=True,timeout=12)
+        self.assertEqual(0,result.returncode,result.stdout+result.stderr)
+        self.assertIn('COORDINATOR_STOPPED_PAGE_PASS',result.stdout)
+
     def test_plain_routes_match_043_boundaries_but_do_not_claim_tls(self):
         import playtest_service as V
         import web_hosting as H

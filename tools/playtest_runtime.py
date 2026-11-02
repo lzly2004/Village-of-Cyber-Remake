@@ -14,6 +14,7 @@ import playtest_store as S
 import playtest_service as V
 import web_hosting as H
 import web_release as R
+from playtest_stopped import StoppedSite
 
 TOOLS = Path(__file__).resolve().parent
 URL = 'http://localhost:18500/'
@@ -76,7 +77,12 @@ def control(command):
         return R.load_json(data)
     except (OSError, KeyError):
         last = R.load_json((d / 'last.json').read_bytes()) if (d / 'last.json').is_file() else {'state': 'STOPPED'}
-        return {**last, 'liveCoordinator': False, 'note': 'No process was signalled; stale records do not prove services are absent.'}
+        try:
+            check_ports()
+            state = last.get('state') if last.get('state') == 'FAILED' else 'STOPPED'
+        except ValueError:
+            state = 'PORT_IN_USE_WITHOUT_COORDINATOR'
+        return {**last, 'state':state, 'liveCoordinator': False, 'note': 'No process was signalled; occupied ports may be orphaned playtest or unrelated services. Never stop them using stored PIDs.'}
 
 
 def start(home, key, java, caddy, browser):
@@ -106,12 +112,12 @@ def start(home, key, java, caddy, browser):
         stopping = [False]; interrupted = [False]; handlers = {}
         for sig in (signal.SIGINT, signal.SIGTERM):
             handlers[sig] = signal.signal(sig, lambda *_: (stopping.__setitem__(0, True), interrupted.__setitem__(0, True)))
-        token = uuid.uuid4().hex; worker = None; browser_process = None; failure = None
+        token = uuid.uuid4().hex; worker = None; browser_process = None; failure = None; stopped_site = None
         with socket.socket(socket.AF_UNIX) as server, (run_dir / 'guardian.log').open('wb') as log:
             server.bind(str(socket_path)); os.chmod(socket_path, 0o600); server.listen(4); server.settimeout(0.15)
             S.atomic_json(d / 'owner.json', {'token': token, 'runDirectory': str(run_dir)})
             try:
-                argv = [sys.executable, '-B', str(TOOLS / 'guarded-process.py'), '--', sys.executable, '-B',
+                argv = [sys.executable, '-B', str(TOOLS / 'guarded-process.py'), '--watch-parent=' + str(os.getpid()), '--', sys.executable, '-B',
                         str(TOOLS / 'playtest_service.py'), '--payload', str(payload), '--run-dir', str(run_dir),
                         '--java', str(java), '--caddy', str(caddy)]
                 worker = subprocess.Popen(argv, stdout=log, stderr=subprocess.STDOUT)
@@ -119,8 +125,15 @@ def start(home, key, java, caddy, browser):
                 print('STARTING ' + key + '\n' + URL + '\n停止服务会使活局失效；关闭浏览器不会自动停止服务。Ctrl+C停止自身服务。', flush=True)
                 while not stopping[0]:
                     code = worker.poll()
-                    if code is not None:
-                        failure = 'LOW_MEMORY' if code == 75 else 'CLEANUP_FAILED' if code == 70 else 'START_FAILED'; break
+                    if code is not None and config['state'] != 'FAILED':
+                        failure = 'LOW_MEMORY' if code == 75 else 'CLEANUP_FAILED' if code == 70 else 'START_FAILED'
+                        if failure == 'CLEANUP_FAILED': break  # Never seize a possibly still-owned port.
+                        config.update(state='FAILED',reason=failure)
+                        S.atomic_json(run_dir / 'status.json', config)
+                        try: stopped_site = StoppedSite(failure)
+                        except OSError: break  # An unrelated port occupant must not be displaced.
+                        print(MESSAGES.get(failure, failure)+'\n说明页保留在 '+URL+'；status/stop 或 Ctrl+C 可关闭。',flush=True)
+                    if stopped_site is not None: stopped_site.poll()
                     if config['state'] == 'STARTING':
                         if (run_dir / 'ready.json').is_file():
                             ready = R.load_json((run_dir / 'ready.json').read_bytes())
@@ -133,7 +146,7 @@ def start(home, key, java, caddy, browser):
                             config['state'] = 'READY'; S.atomic_json(run_dir / 'status.json', config)
                             print('READY ' + meta['sourceSha'] + '\n正常玩完整一局；终端控制不注入浏览器游戏页。', flush=True)
                         elif time.monotonic() >= deadline: failure = 'START_FAILED'; break
-                    if browser_process is not None and browser_process.poll() is not None:
+                    if config['state'] != 'FAILED' and browser_process is not None and browser_process.poll() is not None:
                         # May exit after delegating to an already-live profile; never assume it is safe to reuse.
                         config['browserProcessExited'] = True
                         if browser_process.returncode != 0:
@@ -150,6 +163,7 @@ def start(home, key, java, caddy, browser):
                             connection.sendall(R.json_bytes({**config, 'state': 'STOPPING' if stopping[0] else config['state']}))
                         except (OSError, ValueError): pass
             finally:
+                if stopped_site is not None: stopped_site.close()
                 config['state'] = 'STOPPING'; S.atomic_json(run_dir / 'status.json', config)
                 if worker is not None:
                     owned_signal(worker, signal.SIGTERM)

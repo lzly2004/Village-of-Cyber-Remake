@@ -380,3 +380,22 @@ test('create with a valid capability but malformed update retains only that capa
     expect(posts).toBe(1);expect((await saved(page)).sessionId).toBe(id)
   }finally{if(id)await request.delete('/api/v1/games/'+id)}
 })
+
+
+test('playtest service stopped names the cause, retains authority and never retries an interrupted read',async({page,request})=>{
+  const id=await start(page)
+  try{
+    await drainEvents(page)
+    const local=await saved(page),authoritative=await read(request,id),reads=[]
+    await page.route('**/api/v1/games/'+id+'?*',route=>{
+      reads.push(route.request().url())
+      return route.fulfill({status:503,json:{code:'PLAYTEST_SERVICE_STOPPED',reason:'LOW_MEMORY',message:'可用内存低于 2 GiB，试玩安全监护已停止服务。'}})
+    })
+    await sync(page).click()
+    await expect(page.getByRole('alert')).toContainText('可用内存低于 2 GiB')
+    await expect(page.getByRole('alert')).toContainText('不会自动重试')
+    expect(reads).toHaveLength(1);expect(await saved(page)).toEqual(local)
+    await expectNoEnabledVote(page)
+    expect(await read(request,id)).toEqual(authoritative)
+  }finally{await request.delete('/api/v1/games/'+id)}
+})

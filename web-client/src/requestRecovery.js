@@ -4,6 +4,7 @@ import { ApiError } from './api.js'
 export function recoveryKind(error, operation) {
   if (!(error instanceof ApiError)) return 'unknown'
   const pair = error.status + ':' + error.code
+  if (pair === '503:PLAYTEST_SERVICE_STOPPED') return 'playtest-stopped'
   if (pair === '429:REQUEST_LIMIT') return 'limited'
   if (pair === '404:GAME_NOT_FOUND' && operation !== 'create') return 'expired'
   if (operation === 'read') return pair === '400:INVALID_REQUEST' ? 'cursor' : 'unknown'

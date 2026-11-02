@@ -41,6 +41,24 @@ def available_kib():
     raise RuntimeError("MemAvailable is unavailable")
 
 
+def bind_parent_exit(parent_pid):
+    """Opt-in Linux parent-death notification; never signal a recorded parent PID."""
+    if parent_pid <= 1 or os.getppid() != parent_pid:
+        raise RuntimeError('Coordinator already exited or changed')
+    libc = ctypes.CDLL(None, use_errno=True)
+    prctl = libc.prctl
+    prctl.argtypes = [ctypes.c_int] + [ctypes.c_ulong] * 4
+    prctl.restype = ctypes.c_int
+    if prctl(1, signal.SIGTERM, 0, 0, 0) != 0:  # PR_SET_PDEATHSIG
+        raise OSError(ctypes.get_errno(), 'Cannot bind parent exit')
+    configured = ctypes.c_int()
+    if prctl(2, ctypes.addressof(configured), 0, 0, 0) != 0 or configured.value != signal.SIGTERM:
+        raise RuntimeError('Parent exit notification could not be verified')
+    # Close the race in which the parent exited immediately before registration.
+    if os.getppid() != parent_pid:
+        raise RuntimeError('Coordinator exited during registration')
+
+
 def direct_children():
     # Kernel-provided direct children only, NOT the global process table.
     value = Path("/proc/self/task/{}/children".format(os.getpid())).read_text()
@@ -93,7 +111,7 @@ def cleanup_children(process):
     return not direct_children()
 
 
-def run(command, memory_reader=available_kib):
+def run(command, memory_reader=available_kib, parent_pid=None):
     process = None
     requested_signal = [0]
     old_handlers = {}
@@ -110,6 +128,10 @@ def run(command, memory_reader=available_kib):
             return 75
         for sig in (signal.SIGTERM, signal.SIGINT):
             old_handlers[sig] = signal.signal(sig, request_stop)
+        if parent_pid is not None:
+            bind_parent_exit(parent_pid)
+            if requested_signal[0]:
+                raise RuntimeError('Coordinator exited before launch')
         process = subprocess.Popen(command, start_new_session=True, close_fds=True)
         while True:
             if requested_signal[0]:
@@ -144,9 +166,13 @@ def run(command, memory_reader=available_kib):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
+    parent_pid = None
+    if args and args[0].startswith('--watch-parent='):
+        try: parent_pid = int(args.pop(0).split('=', 1)[1])
+        except ValueError: sys.exit(64)
     if args[:1] == ["--"]:
         args = args[1:]
     if not args:
         print("Supply a command after --", file=sys.stderr)
         sys.exit(64)
-    sys.exit(run(args))
+    sys.exit(run(args, parent_pid=parent_pid))
