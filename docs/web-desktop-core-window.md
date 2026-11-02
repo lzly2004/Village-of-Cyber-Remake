@@ -154,3 +154,42 @@ run41192653772 attempt1失败：单测219、默认217、Java650及此前资源/�
 `bdfa19c` 的 run41290943549 attempt1：默认浏览器、Java全量及gate均通过，但desktop-exchange失败，未生成发布包。`tools/workflow-tests/replay-roundtrip.spec.mjs`仍只点击旧的“対局を始める”入口，现该点击仅进入配役选择，未真正开局，等待next-event超时。修正为复用图形开局前提startDesktopGame，实际点击配役图片；交换、零写入、零Replay API读取、凭据和权威快照不变的断言全部保留，无产品代码变化。
 
 失败verify产物39119177B，官方SHA256 `4fdf559afb404ca619a0d4dc416afbd242d19e74f688dea905f676fbe106716c`，已按官方digest核验下载字节。本机使用此轮云端Java实际生成的desktop-actual.json重新跑交换用例，1/1通过（6.9s）；该文件来源明确为云端本轮，不冒称本机重新生成或本机同job完整交换。新head仍须独立完整CI与同job新文件交换，不能以这轮红灯或局部通过替代最终试玩包。
+
+
+## f961bee 后的试玩补修（本机最终验收通过，尚未发布新候选）
+
+用户报告日数框不响应、额外续读/图片分段按钮、Replay版式和运行中断。本批统一修改：框体成为点击/键盘按钮，首次补全、二次继续；日数继续不确认服务器事件，移除可见续读和图片切换标记。Replay主菜单以原版每页三槽/九槽及ReplayPlayerHandler坐标显示；右键/Shift+F10先确认保存，覆盖取消不请求，槽位并发变化拒绝覆盖；相同录像可保存到不同槽，本地内容仍去重。导入导出格式及原录像对象不变；管理区去重删除会清空所有引用该录像的槽，整库导出沿既有密集排列，不转移本地槽位空洞。外部管理区保留原详细诊断播放器，与主菜单核心场景明确分开，不把它当作桌面视觉基线。
+
+用户运行目录03675f2f0eb34583bdcbc075251973f2的status与guardian.log显示LOW_MEMORY、MemAvailable跌破2GiB；这是安全停服的已取证原因，不能据截图推断为大型村规则死循环。试玩协调器保留时，后端退出后提供仅回环的503停止说明页，API返回PLAYTEST_SERVICE_STOPPED且不执行命令，界面不自动重试、不重置凭据。协调器退出通知已绑定至监护父进程，仍只清理waitid核实的自身子进程；不杀浏览器、不读历史PID杀进程、不清锁。监护本身SIGKILL或协调器也消失时不能保证说明页存活，不能宣称任何退出都无残留。
+
+验证日志集中于build/web050/scene-loop/next-batch-*及guard-parent-latest.log、stopped-runtime-latest.log。旧候选f961bee未包含本批改动；PR #13保持草稿、main未动。本轮已获用户2026-11-02明确授权并完成最终默认回归、full24、真实托管及打包，结果见下；统一云端候选与用户完整试玩仍待，不以本机通过代替交付结案。
+
+
+### 2026-11-02 源码实画面对照与最终冻结前补齐
+
+显式opt-in `tools/visual-baseline/DesktopReplayBaselineTest.java`在自建显示和临时ReplayManager中采集同一个公开exchange-v3[0]：一条记录的列表、日2信息、日2票型、终局角色四场景。`build/web050/desktop-parity-baseline/replay-desktop.json`记录组件坐标和字体，`build/verify/desktop-replay/`为对应Web图；采集禁止创建活局，关闭声音，不触碰用户存档。它不进入普通CI test发现，也不把额外1项计入正常650项。Takao Mincho本机未安装，Swing解析为Dialog；Web系统回退仍不等同跨设备字体方案，A06/A07不因此放行。
+
+最终对照补齐ReplayFileDialogs原有的两个顶部文件按钮，而非把基础功能仅放在外侧管理页。导入逐步选择候选和目标槽，最后确认写入；取消不写入，配额失败保持原槽并允许明确重试。导出只读选定一局，沿既有九槽格式输出位置0；浏览器选择/下载机制替代JFileChooser，不声称可控制浏览器的磁盘路径或覆盖提示。源码这两个按钮不播放CLICK，Web保留该分支；右键保存的CLICK仍只在事务完成后播放。覆盖读到的Vue对象先转回已校验的普通JSON再交给存储，避免DataCloneError；失败与修复日志均保留。
+
+色条按源码实际peiyiOrdinal数组索引（包括NONE偏移）复现，空槽RGB85,85,85；不是按注释猜颜色。卡片图片只内缩一次，补x12/宽758断言；按钮补x90/300,y20,190×40断言。Swing层次把卡片背景盖在文字之上，实图中文字较暗；Web保留文字在背景前以确保可读，此项是待用户确认的明确差异，不以原版完全一致销项。战绩/帮助、字体/DPI和完整日文化仍在050后续范围。
+
+本机第一次full于assets失败：旧测试只等待框体可用便点击，此时新交互可能只是补全文字；保持真实≥9.5s和3MiB预算，改为等日数句完整。第二次full的Java650、默认243、gate15与交换1通过，但hosting的旧读取器强制打开Replay DB v1导致VersionError；改为读取现有版本，主机/端口/协议隔离、零请求和原数据不变断言未删，随后7/7通过。显式构建失败、断言失败均非环境失败或成功重试，不与成功结果混写。上述两轮失败日志分别保留；最终冻结输入重新串行运行完整24项及解包冒烟全部通过，不拼接失败轮生成通过证据。
+
+
+### 2026-11-02 本批最终本机验收（独立 LF 快照）
+
+最终验证源提交为隔离验证库的 `6516ae17b6459f5e934cd3c521bd131b0159dac8`，不是交付分支 head，也不是云端 SHA。相对 f961bee 的42个输入文件在验证完成时逐文件相同；交付提交仅重新组织提交并追加文档/任务状态，产品与测试代码须由本机交接的 source-equivalence.json 对照。运行目录 `build/verify/20261102T034448Z-a81c4c17`，结果 SHA-256 `f5b1bce4ea1ede09af381ea6bca493479c6a4b8f7329cd382f4615e938c4c210`。
+
+| 本轮实际执行 | 最终结果 |
+|---|---|
+| full24 | 24/24 passed，所有套件重新执行，未拼接前两轮 |
+| Java完整test/check与FatJAR | 650项 / 65 XML，0失败、错误、跳过 |
+| 前端单测 / 默认浏览器 / gate | 224 / 245 / 15 全通过 |
+| assets / audio / files-repeat | 5 / 30 / 30 全通过 |
+| production / desktop-exchange / hosting-smoke | 1 / 1 / 7 全通过 |
+| ci-tests / guarded-tests | 95 / 17 全通过 |
+| 发布 ZIP 实际解包整局 | 1/1 passed，真实无种子后端；非用户人工试玩 |
+
+本机发布ZIP为86,067,635B，SHA-256 `238b309cc1ec453ad311a10611b45c43c8aaa206b88393228c3a2439f227c5a0`；试玩工具包51,520B，SHA-256 `0ab8c7923988b8539cedf62ddf06c866665847decb9c1cfe4b34510b18903c14`，16个工具文件核对通过。它们绑定上述隔离验证SHA，不能冒充最终分支head的云端发布产物。完整本机证据在 `build/web050/replay-runtime/final-local-summary.json`，原NTFS工作区136文件哈希无差异、137项porcelain状态字节相同，没有检出原树。
+
+发布前仍须获得本批范围推送/产物授权，验证最终交付head的真实云端full24、证据和回执，再提供一个新自助入口供用户完整试玩。旧f961bee入口不含本批补修。用户目视、物理听审、独立CR及任何人工/容量/发布门均不由上述自动通过代替；PR #13保持草稿，PR #12和main未动。
