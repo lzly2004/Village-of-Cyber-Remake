@@ -11,9 +11,9 @@ const rows=page=>library(page).locator('.replay-entries > li')
 async function seed(page,replay=fixture) {
   const id=await replayId(replay)
   await page.evaluate(async entry=>new Promise((resolve,reject)=>{
-    const r=indexedDB.open('vocr.replays.v1',1)
+    const r=indexedDB.open('vocr.replays.v1')
     r.onupgradeneeded=()=>r.result.createObjectStore('recordings',{keyPath:'id'})
-    r.onsuccess=()=>{const db=r.result,tx=db.transaction('recordings','readwrite');tx.objectStore('recordings').clear();tx.objectStore('recordings').put(entry);tx.oncomplete=()=>{db.close();resolve()};tx.onabort=()=>reject(tx.error)}
+    r.onsuccess=()=>{const db=r.result,tx=db.transaction([...db.objectStoreNames],'readwrite');if(db.objectStoreNames.contains('slot-layout'))tx.objectStore('slot-layout').clear();tx.objectStore('recordings').clear();tx.objectStore('recordings').put(entry);tx.oncomplete=()=>{db.close();resolve()};tx.onabort=()=>reject(tx.error)}
     r.onerror=()=>reject(r.error)
   }),{id,replay,bytes:Buffer.byteLength(JSON.stringify(replay)),savedAt:'2026-01-02T03:04:05.000Z'})
 }

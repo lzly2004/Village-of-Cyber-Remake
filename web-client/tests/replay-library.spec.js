@@ -135,7 +135,7 @@ for(const failure of ['invalid','network','html','storage','corrupt','hash'])tes
   if(failure==='html')await page.route('**/replay?*',route=>route.fulfill({body:'<b>DO_NOT_RENDER</b>',contentType:'text/html'}))
   if(failure==='storage')await page.evaluate(()=>{window.originalReplayOpen=indexedDB.open.bind(indexedDB);indexedDB.open=()=>{throw new DOMException('denied','SecurityError')}})
   if(['corrupt','hash'].includes(failure))await page.evaluate(async failure=>{
-    await new Promise((resolve,reject)=>{const req=indexedDB.open('vocr.replays.v1',1);req.onsuccess=()=>{const db=req.result,tx=db.transaction('recordings','readwrite'),s=tx.objectStore('recordings'),all=s.getAll();all.onsuccess=()=>{const entry=all.result[0];if(failure==='corrupt')entry.bytes=0;else entry.replay.daySnapshots[0].players[0].actualRole=2;s.put(entry)};tx.oncomplete=()=>{db.close();resolve()};tx.onabort=()=>reject(tx.error)}})
+    await new Promise((resolve,reject)=>{const req=indexedDB.open('vocr.replays.v1');req.onsuccess=()=>{const db=req.result,tx=db.transaction('recordings','readwrite'),s=tx.objectStore('recordings'),all=s.getAll();all.onsuccess=()=>{const entry=all.result[0];if(failure==='corrupt')entry.bytes=0;else entry.replay.daySnapshots[0].players[0].actualRole=2;s.put(entry)};tx.oncomplete=()=>{db.close();resolve()};tx.onabort=()=>reject(tx.error)}})
   },failure)
   const rawBefore=failure==='storage'?before:await rawEntries(page)
   await page.getByTestId('save-replay').click()
@@ -166,7 +166,7 @@ test('late read after session release is discarded without storing the previous 
 
 async function rawEntries(page) {
   return page.evaluate(async()=>new Promise((resolve,reject)=>{
-    const req=indexedDB.open('vocr.replays.v1',1)
+    const req=indexedDB.open('vocr.replays.v1')
     req.onsuccess=()=>{const db=req.result,tx=db.transaction('recordings','readonly'),get=tx.objectStore('recordings').getAll();get.onsuccess=()=>{db.close();resolve(get.result)};get.onerror=()=>reject(get.error)}
     req.onerror=()=>reject(req.error)
   }))

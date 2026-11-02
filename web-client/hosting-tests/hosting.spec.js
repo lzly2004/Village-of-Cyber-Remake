@@ -24,7 +24,7 @@ async function caddy(config,ready){
 }
 async function inspect(page){
  return page.evaluate(async()=>{
-  const rows=async(name,store)=>new Promise((resolve,reject)=>{const q=indexedDB.open(name,1);q.onsuccess=()=>{const db=q.result;if(!db.objectStoreNames.contains(store)){db.close();reject(Error('STORE_NOT_INITIALIZED'));return}const t=db.transaction(store),r=t.objectStore(store).getAll();r.onsuccess=()=>resolve(r.result);t.oncomplete=()=>db.close();t.onabort=()=>reject(t.error)};q.onerror=()=>reject(q.error)})
+  const rows=async(name,store)=>new Promise((resolve,reject)=>{const q=indexedDB.open(name);q.onsuccess=()=>{const db=q.result;if(!db.objectStoreNames.contains(store)){db.close();reject(Error('STORE_NOT_INITIALIZED'));return}const t=db.transaction(store),r=t.objectStore(store).getAll();r.onsuccess=()=>resolve(r.result);t.oncomplete=()=>db.close();t.onabort=()=>reject(t.error)};q.onerror=()=>reject(q.error)})
   return {guest:sessionStorage.getItem('vocr.guest.v1'),preference:localStorage.getItem('vocr.audio.v1'),records:await rows('vocr.records.v1','results'),replays:await rows('vocr.replays.v1','recordings')}
  })
 }

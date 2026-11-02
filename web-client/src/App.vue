@@ -96,7 +96,7 @@ function artReady() {
   else if(sceneReady())audioControl.value?.presentation(presentationPhase.value,sessionId.value+':'+cursor.value)
 }
 const replayPlaying = ref(false)
-const replayAudio = { state:()=>audioControl.value?.status, enable:()=>audioControl.value?.enable(), stop:()=>audioControl.value?.stop() }
+const replayAudio = { click:()=>audioControl.value?.click(), state:()=>audioControl.value?.status, enable:()=>audioControl.value?.enable(), stop:()=>audioControl.value?.stop() }
 function clickSound(event) {
   const button = event.target.closest('main button')
   if (button && !button.disabled && !button.hasAttribute('data-no-click-sound')) audioControl.value?.click()
@@ -135,6 +135,7 @@ async function navigateMenu(target){
   else if(target==='replay'){menuScene.value='replay';await nextTick();replayEntry.value?.open()}
   else {replayEntry.value?.close();menuScene.value='title'}
 }
+function closeReplayScene(){replayEntry.value?.close();if(menuScene.value==='replay')menuScene.value='title'}
 async function startConfiguration(value){
   configuration.value=value
   await startReplacing(value)
@@ -193,18 +194,14 @@ function name(number) {
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
       <div id="replay-home"></div>
-      <Teleport :to="menuScene==='replay' ? '#desktop-replay-slot' : '#replay-home'" defer><ReplayEntry ref="replayEntry" :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" @playing="replayPlaying=$event" /></Teleport>
+      <Teleport :to="menuScene==='replay' ? '#desktop-replay-slot' : '#replay-home'" defer><ReplayEntry ref="replayEntry" :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" :desktop="menuScene==='replay'" @close="closeReplayScene" @playing="replayPlaying=$event" /></Teleport>
       <RecordPage v-if="recordPage" @close="recordPage=false" />
       <RecordSettlement :session-id="sessionId" :update="update" :eligible="finished && !busy && !uncertain && !replayPlaying" />
 
       <section v-show="menuScene!=='game' && (!sessionId || update)" class="journal panel desktop-menu-journal" aria-label="村落紀事のメニュー">
         <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ menuScene==='select'?'配役選択':menuScene==='replay'?'録画':'タイトル' }}</span></header>
         <DesktopStartScene v-show="menuScene!=='replay'" :scene="menuScene==='select' ? 'select' : 'title'" :blocked="busy||(uncertain&&Boolean(sessionId))" @navigate="navigateMenu" @start="startConfiguration" />
-        <section v-show="menuScene==='replay'" class="desktop-start-surface" lang="ja" data-testid="desktop-replay">
-          <AssetImage class="desktop-start-background" name="images/title_base_resized.png" />
-          <div id="desktop-replay-slot" class="desktop-library-content"></div>
-          <button class="desktop-art-button desktop-setup-return" aria-label="タイトルに戻る" data-testid="replay-return" @click="navigateMenu('title')"><AssetImage name="images/PVBtitile.png" /></button>
-        </section>
+        <section v-show="menuScene==='replay'" lang="ja" data-testid="desktop-replay"><div id="desktop-replay-slot"></div></section>
         <button v-if="update" class="quiet-button" data-testid="resume-current-game" :disabled="busy||uncertain" @click="menuScene='game'">{{finished?'現在の結末に戻る':'現在の対局に戻る'}}</button>
       </section>
 

@@ -9,7 +9,7 @@ const entries=page=>library(page).locator('.replay-entries > li')
 const fileInput=page=>library(page).getByLabel('録画ファイルを選ぶ')
 const preview=page=>library(page).getByRole('group',{name:'取り込みの確認（未保存）'})
 async function open(page){await page.goto('/');await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click()}
-async function upload(page,buffer){await fileInput(page).setInputFiles({name:'recording.json',mimeType:'application/json',buffer:Buffer.from(buffer)})}
+async function upload(page,buffer){await expect(fileInput(page)).toBeEnabled();await fileInput(page).setInputFiles({name:'recording.json',mimeType:'application/json',buffer:Buffer.from(buffer)})}
 async function selectAll(page,expected){
   const checks=preview(page).getByRole('checkbox')
   await expect(checks).toHaveCount(expected)
@@ -24,7 +24,7 @@ async function imported(page,expected){
   await expect(library(page)).toContainText(/\d+局を取り込みました。重複\d+局/)
 }
 async function confirm(page,expected){await submit(page);await imported(page,expected)}
-async function raw(page){return page.evaluate(async()=>new Promise((resolve,reject)=>{const r=indexedDB.open('vocr.replays.v1',1);r.onsuccess=()=>{const db=r.result,t=db.transaction('recordings'),q=t.objectStore('recordings').getAll();q.onsuccess=()=>{db.close();resolve(q.result)};q.onerror=()=>reject(q.error)};r.onerror=()=>reject(r.error)}))}
+async function raw(page){return page.evaluate(async()=>new Promise((resolve,reject)=>{const r=indexedDB.open('vocr.replays.v1');r.onsuccess=()=>{const db=r.result,t=db.transaction('recordings'),q=t.objectStore('recordings').getAll();q.onsuccess=()=>{db.close();resolve(q.result)};q.onerror=()=>reject(q.error)};r.onerror=()=>reject(r.error)}))}
 async function download(page,button){const event=page.waitForEvent('download');await button.click();const item=await event;return {item,bytes:readFileSync(await item.path())}}
 
 test('desktop actual saved game imports only after confirmation, plays, exports through browser and preserves raw records; live authority is untouched',async({page,request},info)=>{
@@ -101,7 +101,7 @@ test('storage quota aborts the whole selected batch and a corrupt library can be
   await open(page)
   await page.evaluate(()=>{const original=IDBObjectStore.prototype.add;globalThis.restoreAdd=()=>{IDBObjectStore.prototype.add=original};IDBObjectStore.prototype.add=function(value){if(this.name==='recordings')throw new DOMException('controlled quota','QuotaExceededError');return original.apply(this,arguments)}})
   await upload(page,desktop);await submit(page);await expect(library(page).getByRole('alert')).toContainText('QUOTA_EXCEEDED');expect(await raw(page)).toEqual([])
-  await page.evaluate(async()=>{globalThis.restoreAdd();await new Promise((resolve,reject)=>{const r=indexedDB.open('vocr.replays.v1',1);r.onsuccess=()=>{const db=r.result,t=db.transaction('recordings','readwrite');t.objectStore('recordings').put({id:'corrupt',replay:{kept:'DO_NOT_DELETE'}});t.oncomplete=()=>{db.close();resolve()};t.onabort=()=>reject(t.error)}})})
+  await page.evaluate(async()=>{globalThis.restoreAdd();await new Promise((resolve,reject)=>{const r=indexedDB.open('vocr.replays.v1');r.onsuccess=()=>{const db=r.result,t=db.transaction('recordings','readwrite');t.objectStore('recordings').put({id:'corrupt',replay:{kept:'DO_NOT_DELETE'}});t.oncomplete=()=>{db.close();resolve()};t.onabort=()=>reject(t.error)}})})
   const before=await raw(page);await library(page).getByRole('button',{name:'一覧を再読込',exact:true}).click();await expect(library(page).getByRole('alert')).toContainText('INVALID_LIBRARY')
   const backup=await download(page,library(page).getByRole('button',{name:'ローカル庫の修復資料を保存',exact:true}));expect(JSON.parse(backup.bytes)).toEqual(before);expect(await raw(page)).toEqual(before)
   await upload(page,backup.bytes);await expect(library(page).getByRole('alert')).toBeVisible();expect(await raw(page)).toEqual(before)
