@@ -102,6 +102,7 @@ test('WEB-027 execution/night are silent; settlement music waits for displayed s
   expect(paths).toEqual([])
   await completeNativeReading(page);await page.getByTestId('next-event').click();expect(paths.filter(p=>p.includes('/bgm/'))).toEqual([])
   await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:12000})
+  await expect(page.getByTestId('day-start-text')).toHaveText(/^\d+日目になりました。$/)
   await page.getByTestId('day-start-continue').click()
   await completeNativeReading(page);await page.getByTestId('next-event').click();await expect(ui(page)).toHaveAttribute('data-track','EMOTIONALLY_UNSTABLE')
   await expect(ui(page)).toHaveAttribute('data-status','playing')

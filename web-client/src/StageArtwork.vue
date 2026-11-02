@@ -21,10 +21,6 @@ function startTransition(current) {
   timer = setTimeout(() => { if (current === version) showFrame(1) }, props.plan.transitionMs)
 }
 watch(()=>props.frameIndex,value=>{if(value!==null&&assets.value)showFrame(value)})
-function toggleFrame() {
-  clearTimeout(timer)
-  showFrame((frame.value + 1) % frames.value.length)
-}
 function markFailed() { clearTimeout(timer);if(!failed.value){failed.value=true;emit('failed')} }
 function publishReady(current) {
   nextTick(()=>{if(current===version && assets.value && !failed.value){emit('ready');if(props.frameIndex!==null)showFrame(props.frameIndex);startTransition(current)}})
@@ -57,7 +53,6 @@ const actors = computed(() => assets.value ? frames.value[frame.value].map(actor
         :data-source="actor.name" :data-layer="actor.layer" data-testid="stage-character" @error="markFailed" />
     </g>
   </svg>
-  <button v-if="assets && !failed && frames.length > 1 && (frameIndex===null || (frameIndex===1 && reviewAllowed))" class="stage-frame-toggle quiet-button" data-testid="stage-frame-toggle" @click="toggleFrame">画像を切替（{{ frame + 1 }}/{{ frames.length }}）</button>
   <span v-if="failed || plan.diagnostic || !assets" class="stage-art-status" role="status" data-testid="stage-art-status">
     {{ failed ? '画像表示診断：立ち絵を読み込めません。台詞は引き続き読めます。'
       : plan.diagnostic ? '画像表示診断：表示情報が不足しているため代替表示です。'

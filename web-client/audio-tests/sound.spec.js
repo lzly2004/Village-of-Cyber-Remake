@@ -14,7 +14,7 @@ async function setup(page,{snapshot=publicSnapshot(),settings,denied=false}={}) 
     if(settings!==undefined && !localStorage.getItem(key))localStorage.setItem(key,settings)
     if(denied)Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError')}})
     window.soundProbe={media:[],gains:[],contexts:[],urls:[],revoked:[],effectPlays:0,nextClicks:0}
-    document.addEventListener('click',event=>{if(event.target.closest?.('[data-testid="next-event"]'))window.soundProbe.nextClicks++},true)
+    document.addEventListener('click',event=>{if(event.target.closest?.('[data-testid="next-event"]')?.closest('[data-reading-complete="true"]'))window.soundProbe.nextClicks++},true)
     const p=window.soundProbe,Context=window.AudioContext,Audio=window.Audio
     window.AudioContext=class extends Context{
       constructor(...args){super(...args);p.contexts.push(this)}
@@ -86,13 +86,14 @@ for(const [eventname,last] of [['yjsw','NIGHT_DEATH'],['wsw','PEACEFUL_NIGHT']])
   await expect(ui(page)).toHaveAttribute('data-sound','WOLF_HOWL',{timeout:8000});await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   await finishSound(page)
   await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:4000})
+  await expect(page.getByTestId('day-start-text')).toContainText('日目になりました。')
   expect(paths).not.toContain(soundPath(last))
   await page.getByTestId('day-start-continue').click()
   await expect(ui(page)).toHaveAttribute('data-sound',last);await expect(ui(page)).toHaveAttribute('data-sound-status','playing')
   expect((await probe(page)).active).toBe(1);expect((await probe(page)).effects).toBe(1)
   await finishSound(page);await expect(ui(page)).toHaveAttribute('data-sound-status','idle');expect((await probe(page)).active).toBe(0)
   if(eventname==='yjsw'){
-    await page.getByTestId('stage-frame-toggle').click();await page.getByTestId('stage-frame-toggle').click()
+    await expect(page.getByTestId('stage-frame-toggle')).toHaveCount(0)
     expect(paths.filter(p=>p===soundPath(last))).toHaveLength(1)
   }
 })
@@ -243,6 +244,7 @@ test('night enable does not replay past NIGHTFALL; future dawn sounds once and s
  expect(paths.filter(p=>p===soundPath('WOLF_HOWL'))).toHaveLength(1)
  await page.getByRole('button',{name:'音楽を停止',exact:true}).click()
  await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:4000})
+  await expect(page.getByTestId('day-start-text')).toContainText('日目になりました。')
  await page.getByTestId('day-start-continue').click()
  await expect(page.getByTestId('next-event')).toBeEnabled()
  expect(paths).not.toContain(soundPath('PEACEFUL_NIGHT'))

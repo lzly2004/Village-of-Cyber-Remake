@@ -40,7 +40,8 @@ export function useNightDayPresentation(input) {
     cancel();phase.value='error';diagnostic.value=code;completeText.value=true
   }
   function continueLocal() {
-    if((phase.value==='day-text' && completeText.value) || phase.value==='error')finish()
+    if(phase.value==='day-text' && !completeText.value)writer.reveal()
+    else if(phase.value==='day-text' || phase.value==='error')finish()
   }
   watch(input,value=>{
     if(value.sessionId!==session){done.clear();session=value.sessionId;cancel();active.value=null;phase.value='event'}

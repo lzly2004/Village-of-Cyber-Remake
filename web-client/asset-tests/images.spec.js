@@ -126,6 +126,8 @@ test('night/dawn and current result together obey the unchanged first-game trans
  await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:12000})
  const wallElapsedMs=Date.now()-wallStart
  expect(wallElapsedMs).toBeGreaterThanOrEqual(9500)
+ // A now-enabled frame can still be typing: first require the complete local line.
+ await expect(page.getByTestId('day-start-text')).toHaveText(/^\d+日目になりました。$/)
  await page.getByTestId('day-start-continue').click()
  await expect(page.getByTestId('stage-character')).toHaveCount(1)
  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')

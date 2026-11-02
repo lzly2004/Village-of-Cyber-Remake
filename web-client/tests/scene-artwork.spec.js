@@ -81,14 +81,14 @@ test('WEB-025 night/death/execution frames follow ordered source, centered with 
   }finally{await request.delete('/api/v1/games/'+id)}
 })
 
-test('WEB-025 reduced motion starts final frame, keyboard can revisit first without changing cursor; refresh repeats local presentation',async({page,request})=>{
+test('WEB-025 reduced motion starts final frame without extra frame-switch UI; refresh repeats local presentation',async({page,request})=>{
   await page.emulateMedia({reducedMotion:'reduce'})
   const id=await synthetic(page,request,[p('yjsw','NIGHT_RESULT')])
   const names=mapping.Abel.yjsw.default
   try{
     await ready(page);await image(page,names[1])
-    const button=page.getByTestId('stage-frame-toggle');await button.focus();await page.keyboard.press('Enter')
-    await image(page,names[0]);expect((await saved(page)).eventCursor).toBe(0)
+    await expect(page.getByTestId('stage-frame-toggle')).toHaveCount(0)
+    expect((await saved(page)).eventCursor).toBe(0)
     await page.reload();await ready(page);await image(page,names[1])
     expect(Object.keys(await saved(page)).sort()).toEqual(['eventCursor','sessionId'])
   }finally{await request.delete('/api/v1/games/'+id)}

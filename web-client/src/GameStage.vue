@@ -15,10 +15,13 @@ const props = defineProps({
   speaker: { type: String, default: '' },
   frameIndex: { type: Number, default: null },
   reviewAllowed: { type: Boolean, default: true },
+  readTestId: { type: String, default: 'next-event' },
+  readDisabled: { type: Boolean, default: false },
 })
 function readClick(event) {
-  if(!event.target.closest('button,a,input') && !window.getSelection()?.toString())emit('read-continue')
+  if(!props.readDisabled && !event.target.closest('button,a,input') && !window.getSelection()?.toString())emit('read-continue')
 }
+function readKey(event){if(!props.readDisabled)event.currentTarget.click()}
 // Only the already-public event's character keys. This is NOT the final image mapping.
 const participants = computed(() => props.event?.eventname === 'wsw' ? []
   : [...new Set([props.event?.ch1, props.event?.ch2, props.event?.ch3]
@@ -51,18 +54,18 @@ const positions = computed(() => participants.value.map((character, index, all) 
       <slot name="scene-overlay" />
       <div v-if="reading && message" class="desktop-message" data-testid="desktop-message">
         <AssetImage class="message-frame" name="images/messageframe.png" />
+        <div class="message-surface" role="button" tabindex="0" aria-label="続きを読む" :aria-disabled="readDisabled" :data-testid="readTestId" @click="readClick" @keydown.enter.prevent="readKey" @keydown.space.self.prevent="readKey">
         <div class="message-speaker" lang="ja">{{ speaker }}</div>
         <div class="stage-text" role="region" lang="ja" aria-label="舞台文字阅读区" tabindex="0"
           aria-describedby="stage-reading-help" data-testid="stage-text"
-          @click="readClick"
-          @keydown.enter.self.prevent="emit('read-continue')">
+          >
           <slot />
         </div>
-        <div class="message-actions"><slot name="controls" /></div>
+        </div>
       </div>
       <div v-else-if="reading" class="stage-text" role="region" lang="ja" aria-label="舞台文字阅读区" tabindex="0"
         aria-describedby="stage-reading-help" data-testid="stage-text"><slot /></div>
     </div>
-    <p v-if="reading" id="stage-reading-help" lang="zh-CN" class="stage-reading-help visually-hidden">文字较长时可在阅读区滚动；按 Tab 聚焦后，可用方向键阅读。{{ message ? '继续按钮位于对话框右下角；文字显示中先补全文字，读完后再继续。' : '确认按钮位于舞台下方。' }}</p>
+    <p v-if="reading" id="stage-reading-help" lang="zh-CN" class="stage-reading-help visually-hidden">文字较长时可在阅读区滚动；按 Tab 聚焦后，可用方向键阅读。{{ message ? '点击对话框，或聚焦后按Enter或空格；文字显示中先补全，读完后再继续。' : '确认按钮位于舞台下方。' }}</p>
   </div>
 </template>

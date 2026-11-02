@@ -66,20 +66,25 @@ const {text:readingText,fullText:readingFullText,complete:readingComplete,visibl
   step:readingStep,controlledFrame,diagnostic:readingDiagnostic,language:readingLanguage}=reading
 const pendingContinueFocus=ref(false)
 function rememberContinueFocus() {
-  if(document.activeElement?.closest('.message-actions'))pendingContinueFocus.value=true
+  if(document.activeElement?.closest('.message-surface'))pendingContinueFocus.value=true
 }
 watch([pendingContinueFocus,cursor,presentationPhase,readingVisible,readingComplete,readingStep,dayStartReady,busy,uncertain],()=>{
   if(!pendingContinueFocus.value||busy.value||uncertain.value)return
   // Restore only focus lost with the old frame; do not steal it from a menu,
   // modal, resync control or any other place the user deliberately selected.
-  if(document.activeElement!==document.body&&!document.activeElement?.closest('.message-actions')){
+  if(document.activeElement!==document.body&&!document.activeElement?.closest('.message-surface')){
     pendingContinueFocus.value=false;return
   }
-  const button=document.querySelector('[data-testid="game-stage"] .message-actions button:not(:disabled)')
+  const button=document.querySelector('[data-testid="game-stage"] .message-surface:not([aria-disabled="true"])')
   if(button){button.focus();pendingContinueFocus.value=false}
 },{flush:'post'})
 function advanceReading() {
   if(busy.value||uncertain.value)return
+  if(['day-text','error'].includes(presentationPhase.value)){
+    if(dayStartReady.value)audioControl.value?.click()
+    return advanceDayReading()
+  }
+  if(reading.complete.value)audioControl.value?.click()
   rememberContinueFocus()
   if(reading.canConfirm.value)nextEvent()
   else reading.advanceLocal()
@@ -221,7 +226,7 @@ function name(number) {
             <span id="journal-label" class="visually-hidden" lang="zh-CN">事件展示</span>
             <header class="panel-heading"><span class="eyebrow" lang="zh-CN">01 / 村落纪事</span><span class="pill" :lang="currentEvent ? 'zh-CN' : 'ja'">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
-            <GameStage :key="(voteReview ? 'vote-review-' : currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!voteReview && !finished && !decisionWindow && !['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="!voteReview && Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="voteReview ? null : currentEvent?.event" :stage="currentEvent?.stage" :artwork="voteReview ? {mode:'deferred'} : artwork">
+            <GameStage :key="(voteReview ? 'vote-review-' : currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!voteReview && !finished && !decisionWindow && !['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :read-test-id="['day-text','error'].includes(presentationPhase) ? 'day-start-continue' : readingStep==='primary' && controlledFrame===0 && readingComplete ? 'execution-continue' : 'next-event'" :read-disabled="busy || uncertain || (presentationPhase==='event' && !readingVisible)" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="!voteReview && Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="voteReview ? null : currentEvent?.event" :stage="currentEvent?.stage" :artwork="voteReview ? {mode:'deferred'} : artwork">
               <template #scene-overlay>
                 <DesktopVoteReview v-if="voteReview" :vote="voteReview" :players="voteReviewPlayers" :markers="voteReviewMarkers" :day="voteReview.day" :alive="voteReviewVisual?.view.aliveCount ?? update.view.aliveCount" :dead="voteReviewVisual?.view.deathCount ?? update.view.deathCount" :player-name="shortName" :blocked="busy||uncertain" @continue="continueVoteReview" @menu="openGameMenu" @music="switchDesktopMusic" />
                 <DesktopVoteWindow v-if="decisionWindow" :update="update" :players="players" :bindings="orderBindings" :player-name="shortName" :vote-targets="voteTargets" :legal-targets="legalTargets" :toggle-target="toggleTarget" :markers="skillMarkers" :day="update.view.gameDay" :alive="update.view.aliveCount" :dead="update.view.deathCount" :blocked="busy" @menu="openGameMenu" @music="switchDesktopMusic">
@@ -243,10 +248,7 @@ function name(number) {
               <div v-else-if="presentationPhase==='event'" class="event-content decision" lang="ja">
                 <span class="event-number">YOUR DECISION</span><h2>今日は、誰に投票しますか？</h2><p>プレイヤー一覧で指定候補にチェックして、投票を確定してください。</p><p>回避COがあれば発言を読んで再検討してください。共有者の回避後は候補を選び直せます。</p>
               </div>
-              <template #controls>
-                <button v-if="['day-text','error'].includes(presentationPhase)" data-testid="day-start-continue" class="message-continue" :disabled="!dayStartReady" @click.stop="advanceDayReading">続きを読む</button>
-                <button v-else-if="currentEvent && presentationPhase==='event'" :data-testid="readingStep==='primary' && controlledFrame===0 && readingComplete ? 'execution-continue' : 'next-event'" class="message-continue" :disabled="busy || uncertain || !readingVisible" @click.stop="advanceReading">{{ readingVisible ? '続きを読む' : '場面表示中…' }}</button>
-              </template>
+
             </GameStage>
           </section>
 
@@ -271,7 +273,7 @@ function name(number) {
               <summary>表示情報・読み方</summary>
               <p>未確認 {{ pending.length }} 件 · {{ currentEvent.stage }} · イベント {{ cursor + 1 }}</p>
               <p>台詞・叙述は既存リソースを使用しています。COと報告は公開発言であり、真偽を保証しません。</p>
-              <p>文章の表示中に続きを読むを押すと全文を表示します。読み終わってからもう一度押すと進みます。</p>
+              <p>文章の表示中に対話枠を押すと全文を表示します。読み終わってからもう一度押すと進みます。</p>
               <p v-if="readingDiagnostic" role="status">表示診断：{{ readingDiagnostic }}。画像なしでも文章を読めます。</p>
         </details>
         <small v-if="presentationDiagnostic" class="visual-diagnostic" role="status" lang="ja">場面表示診断：{{ presentationDiagnostic }}</small>
