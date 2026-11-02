@@ -7,42 +7,35 @@ import { configurations, roles } from '../src/labels.js'
 
 const saved = page => page.evaluate(() => sessionStorage.getItem('vocr.guest.v1'))
 
-test('Japanese guide covers every help topic and source; keyboard modal closes back to its opener', async ({ page }) => {
+test('Japanese guide covers every help topic and source; native hierarchy closes back to its opener', async ({ page }) => {
   const media = [], writes = []
   page.on('request', req => {
-    if (req.url().includes('/assets/')) media.push(req.url())
+    if (/\.mp3(?:\?|$)/.test(req.url())) media.push(req.url())
     if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes.push(req.url())
   })
   await page.goto('/')
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja')
-  await page.waitForLoadState('networkidle')
-  media.length=0 // Title art is now intentionally visible; opening help must add no media.
-  const before = await saved(page)
-  const opener = page.getByRole('button', { name: '遊び方・ヘルプ', exact: true })
-  await opener.focus(); await page.keyboard.press('Enter')
-  const dialog = page.getByRole('dialog', { name: '電脳村ガイド' })
-  await expect(dialog).toBeVisible()
-  await expect(dialog).toContainText('原版の日本語原文ではありません')
-  for (const group of helpGroups) {
-    await dialog.getByLabel('分類', { exact: true }).selectOption(group.id)
-    for (const topic of group.topics) {
-      await dialog.getByLabel('項目', { exact: true }).selectOption(topic.id)
-      await expect(dialog.getByRole('heading', { name: topic.title, exact: true })).toBeVisible()
-      const original = readFileSync(new URL('../../src/main/resources/help/' + topic.source, import.meta.url), 'utf8').replaceAll('\r\n', '\n')
-      await dialog.getByText('参照した原文（中国語・デスクトップ版）', { exact: true }).click()
-      await expect(dialog.locator('pre')).toHaveText(original)
-      if (topic.webNote) await expect(dialog).toContainText(topic.webNote)
+  const before=await saved(page),opener=page.getByRole('button',{name:'遊び方・ヘルプ',exact:true})
+  await opener.focus();await page.keyboard.press('Enter')
+  const scene=page.getByTestId('desktop-help'),notes=page.locator('.desktop-browser-notes')
+  await expect(scene).toBeVisible();await notes.locator('summary').click()
+  await expect(notes).toContainText('原版の日本語原文ではありません')
+  for(const group of helpGroups){
+    await scene.getByRole('button',{name:group.title,exact:true}).click()
+    for(const topic of group.topics){
+      await scene.getByRole('button',{name:topic.title,exact:true}).click()
+      await expect(scene.getByRole('heading',{name:topic.title,exact:true})).toBeVisible()
+      await expect(scene.getByTestId('desktop-help-body')).toHaveText(topic.body)
+      const original=readFileSync(new URL('../../src/main/resources/help/'+topic.source,import.meta.url),'utf8').replaceAll('\r\n','\n')
+      await expect(notes.locator('pre')).toHaveText(original)
+      if(topic.webNote)await expect(notes).toContainText(topic.webNote)
+      await scene.getByTestId('help-return').click()
     }
+    await scene.getByTestId('help-return').click()
   }
-  for (let n = 0; n < 12; n++) {
-    await page.keyboard.press('Tab')
-    expect(await dialog.evaluate(el => el.contains(document.activeElement))).toBe(true)
-  }
-  await page.keyboard.press('Escape')
-  await expect(dialog).toHaveCount(0)
-  await expect(opener).toBeFocused()
-  expect(await saved(page)).toBe(before)
-  expect(writes).toEqual([]); expect(media).toEqual([])
+  await scene.getByTestId('help-title-return').focus();await page.keyboard.press('Escape')
+  await expect(scene).toHaveCount(0);await expect(opener).toBeFocused()
+  expect(await saved(page)).toBe(before);expect(writes).toEqual([]);expect(media).toEqual([])
 })
 
 test('configuration page contains all seven exact public rosters, scrolls and never starts a game', async ({ page }, info) => {
@@ -51,7 +44,7 @@ test('configuration page contains all seven exact public rosters, scrolls and ne
   page.on('request', req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ })
   await page.goto('/')
   await page.getByRole('button', { name: '配役説明', exact: true }).click()
-  const dialog = page.getByRole('dialog')
+  const dialog = page.getByRole('region',{name:'電脳村ガイド',exact:true});await dialog.locator('.desktop-browser-notes summary').click()
   for (const item of configurations) {
     const row = dialog.locator('[data-configuration="' + item.value + '"]')
     await row.scrollIntoViewIfNeeded()
@@ -59,10 +52,10 @@ test('configuration page contains all seven exact public rosters, scrolls and ne
     await expect(row.locator('dt')).toHaveText(Object.keys(item.roleCounts).map(key => roles[key]))
     await expect(row.locator('dd')).toHaveText(Object.values(item.roleCounts).map(n => n + '人'))
   }
-  await dialog.getByRole('heading', { name: '電脳村ガイド' }).scrollIntoViewIfNeeded()
+  await page.getByTestId('desktop-help').scrollIntoViewIfNeeded()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await dialog.screenshot({ path: info.outputPath('configuration-help-1024.png') })
-  await dialog.getByRole('button', { name: '閉じる', exact: true }).click()
+  await page.getByTestId('help-title-return').click()
   await expect(page.getByTestId('desktop-title')).toBeVisible()
   expect(writes).toBe(0); expect(await saved(page)).toBeNull()
 })
@@ -81,7 +74,7 @@ test('reading guide during a real pending event preserves game node, cursor, scr
     let writes = 0
     page.on('request', req => { if (['POST', 'PUT', 'DELETE'].includes(req.method())) writes++ })
     await page.getByRole('button', { name: '遊び方・ヘルプ', exact: true }).click()
-    await page.getByRole('dialog').getByRole('button', { name: '配役説明', exact: true }).click()
+    await page.getByRole('button', { name: '配役説明', exact: true }).click();await expect(page.getByTestId('desktop-help-body')).toBeVisible();await page.getByTestId('help-title-return').focus()
     await page.keyboard.press('Escape')
     await expect(page.getByTestId('stage-text')).toHaveAttribute('data-help-probe', 'same-node')
     await expect(page.getByTestId('stage-text')).toHaveText(text)
@@ -95,7 +88,7 @@ test('reading guide during a real pending event preserves game node, cursor, scr
 })
 
 test('failed lazy help chunk shows a bounded diagnosis and leaves game controls usable', async ({ page }) => {
-  await page.route('**/src/HelpDialog.vue', route => route.abort('failed'))
+  await page.route('**/src/DesktopHelpScene.vue', route => route.abort('failed'))
   await page.goto('/')
   await page.getByRole('button', { name: '遊び方・ヘルプ', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('HELP_LOAD_FAILED')

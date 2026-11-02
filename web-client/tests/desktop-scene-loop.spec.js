@@ -47,8 +47,8 @@ test('scene-entry-return: replay, record and help return to the same title with 
  const {calls}=await mock(page);await page.goto('/')
  await page.getByTestId('title-replay').click();await expect(page.getByTestId('desktop-replay')).toBeVisible();await expect(page.locator('#desktop-replay-slot .replay-library')).toBeVisible()
  await page.getByTestId('replay-return').click();await expect(page.getByTestId('desktop-title')).toBeVisible()
- await page.getByTestId('title-records').click();await expect(page.getByRole('dialog')).toBeVisible();await page.keyboard.press('Escape')
- await page.getByTestId('title-help').click();await expect(page.getByRole('dialog')).toBeVisible();await page.getByRole('dialog').getByRole('button',{name:'閉じる',exact:true}).click()
+ await page.getByTestId('title-records').click();await expect(page.getByTestId('desktop-records')).toBeVisible();await page.keyboard.press('Escape')
+ await page.getByTestId('title-help').click();await expect(page.getByTestId('desktop-help')).toBeVisible();await page.getByTestId('help-title-return').click()
  await expect(page.getByTestId('desktop-title')).toBeVisible();expect(calls).toEqual([]);expect(await saved(page)).toBeNull()
 })
 

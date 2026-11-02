@@ -12,6 +12,9 @@ import RecordSettlement from './RecordSettlement.vue'
 import SettlementBoard from './SettlementBoard.vue'
 import DesktopStartScene from './DesktopStartScene.vue'
 import './desktop-start.css'
+import './desktop-information.css'
+import './desktop-interaction.css'
+
 import DesktopVoteWindow from './DesktopVoteWindow.vue'
 import DesktopVoteReview from './DesktopVoteReview.vue'
 import { publicSkillMarkers } from './desktopVoteText.js'
@@ -101,16 +104,10 @@ function clickSound(event) {
   const button = event.target.closest('main button')
   if (button && !button.disabled && !button.hasAttribute('data-no-click-sound')) audioControl.value?.click()
 }
-const HelpDialog = defineAsyncComponent({
-  loader: () => import('./HelpDialog.vue'),
-  timeout: 15000,
-  errorComponent: { render: () => h('section', { class: 'notice', role: 'alert', lang: 'ja' }, [
-    h('p', 'ヘルプを読み込めません（HELP_LOAD_FAILED）。対局の操作は続けられます。'),
-    h('button', { class: 'quiet-button', onClick: () => { helpPage.value = '' } }, 'ヘルプを閉じる'),
-  ]) },
+const DesktopHelpScene = defineAsyncComponent({
+  loader:()=>import('./DesktopHelpScene.vue'),timeout:15000,
+  errorComponent:{render:()=>h('section',{class:'notice',role:'alert',lang:'ja'},[h('p','ヘルプを読み込めません（HELP_LOAD_FAILED）。対局の操作は続けられます。'),h('button',{class:'quiet-button',onClick:closeCoreScene},'ヘルプを閉じる')])},
 })
-const helpPage = ref('')
-const recordPage = ref(false)
 const configuration = ref('jianyi')
 const confirmingExit = ref(false)
 async function switchDesktopMusic(){if(!audioControl.value?.status?.enabled)await audioControl.value?.enable();await audioControl.value?.nextTrack()}
@@ -120,7 +117,7 @@ watch(update,(value,previous)=>{
   if(value&&!previous)menuScene.value='game'
   if(!value&&previous)menuScene.value='title'
 })
-const menuMusic=computed(()=>sessionId.value&&!update.value?null:helpPage.value?'INFO':menuScene.value==='replay'?'REPLAY_BROWSER':menuScene.value!=='game'?'START_MENU':null)
+const menuMusic=computed(()=>sessionId.value&&!update.value?null:(menuScene.value==='help')?'INFO':menuScene.value==='replay'?'REPLAY_BROWSER':menuScene.value!=='game'?'START_MENU':null)
 async function openGameMenu(){
   if(busy.value||uncertain.value)return
   menuScene.value='title';confirmingExit.value=false
@@ -130,11 +127,17 @@ async function navigateMenu(target){
   if(busy.value||(uncertain.value&&sessionId.value))return
   if(target==='continue'||target==='collections')return // Desktop source listeners are intentionally empty.
   if(target==='start')menuScene.value='select'
-  else if(target==='records')recordPage.value=true
-  else if(target==='help')helpPage.value='help'
+  else if(target==='records')openCoreScene('records')
+  else if(target==='help')openCoreScene('help')
   else if(target==='replay'){menuScene.value='replay';await nextTick();replayEntry.value?.open()}
   else {replayEntry.value?.close();menuScene.value='title'}
 }
+let coreOpener=null,corePreviousScene='title'
+const coreEntrySerial=ref(0)
+const coreHelpPage=ref('help')
+function openCoreScene(scene,page='help'){coreOpener=document.activeElement;if(!['help','records'].includes(menuScene.value))corePreviousScene=menuScene.value;coreHelpPage.value=page;coreEntrySerial.value++;menuScene.value=scene}
+const replayInCore=computed(()=>menuScene.value==='replay'||(['help','records'].includes(menuScene.value)&&corePreviousScene==='replay'))
+async function closeCoreScene(target){menuScene.value=target==='title'?'title':corePreviousScene;await nextTick();if(coreOpener?.isConnected)coreOpener.focus({preventScroll:true});else document.querySelector('[data-testid=title-start]')?.focus({preventScroll:true})}
 function closeReplayScene(){replayEntry.value?.close();if(menuScene.value==='replay')menuScene.value='title'}
 async function startConfiguration(value){
   configuration.value=value
@@ -183,7 +186,7 @@ function name(number) {
         <span>確認済みイベント {{ cursor }}</span>
         <button class="quiet-button" :disabled="busy" @click="refresh">再同期</button>
       </div>
-      <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="helpPage = 'help'">遊び方・ヘルプ</button><button class="quiet-button" @click="helpPage = 'configurations'">配役説明</button><button class="quiet-button" @click="recordPage = true">戦績を見る</button></nav>
+      <nav class="help-menu" aria-label="メニュー"><button class="quiet-button" @click="openCoreScene('help')">遊び方・ヘルプ</button><button class="quiet-button" @click="openCoreScene('help','configurations')">配役説明</button><button class="quiet-button" @click="openCoreScene('records')">戦績を見る</button></nav>
       <BgmControl :menu-music="menuMusic" :presentation-phase="presentationPhase" :replaying="replayPlaying" ref="audioControl" :cursor="cursor" :session-id="sessionId" :update="audioUpdate" :current-event="voteReview ? null : currentEvent" :finished="finished" :uncertain="uncertain" :can-decide="canDecide" :vote-reviewing="Boolean(voteReview)" />
       <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。通信のない状態が30分続くか、開村から24時間経過すると無効になります。サービス再起動・解放でも無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
@@ -194,13 +197,15 @@ function name(number) {
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
       <div id="replay-home"></div>
-      <Teleport :to="menuScene==='replay' ? '#desktop-replay-slot' : '#replay-home'" defer><ReplayEntry ref="replayEntry" :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" :desktop="menuScene==='replay'" @close="closeReplayScene" @playing="replayPlaying=$event" /></Teleport>
-      <RecordPage v-if="recordPage" @close="recordPage=false" />
+      <Teleport :to="replayInCore ? '#desktop-replay-slot' : '#replay-home'" defer><ReplayEntry ref="replayEntry" :session-id="sessionId" :cursor="cursor" :eligible="finished && !busy && !uncertain" :audio-controls="replayAudio" :desktop="replayInCore" @close="closeReplayScene" @playing="replayPlaying=$event" /></Teleport>
+
       <RecordSettlement :session-id="sessionId" :update="update" :eligible="finished && !busy && !uncertain && !replayPlaying" />
 
       <section v-show="menuScene!=='game' && (!sessionId || update)" class="journal panel desktop-menu-journal" aria-label="村落紀事のメニュー">
-        <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ menuScene==='select'?'配役選択':menuScene==='replay'?'録画':'タイトル' }}</span></header>
-        <DesktopStartScene v-show="menuScene!=='replay'" :scene="menuScene==='select' ? 'select' : 'title'" :blocked="busy||(uncertain&&Boolean(sessionId))" @navigate="navigateMenu" @start="startConfiguration" />
+        <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ menuScene==='select'?'配役選択':menuScene==='replay'?'録画':menuScene==='records'?'戦績':menuScene==='help'?'説明':'タイトル' }}</span></header>
+        <RecordPage v-if="menuScene==='records'" desktop @close="closeCoreScene" />
+        <DesktopHelpScene :key="coreEntrySerial" v-if="menuScene==='help'" :initial-page="coreHelpPage" @close="closeCoreScene" />
+        <DesktopStartScene v-show="['title','select'].includes(menuScene)" :scene="menuScene==='select' ? 'select' : 'title'" :blocked="busy||(uncertain&&Boolean(sessionId))" @navigate="navigateMenu" @start="startConfiguration" />
         <section v-show="menuScene==='replay'" lang="ja" data-testid="desktop-replay"><div id="desktop-replay-slot"></div></section>
         <button v-if="update" class="quiet-button" data-testid="resume-current-game" :disabled="busy||uncertain" @click="menuScene='game'">{{finished?'現在の結末に戻る':'現在の対局に戻る'}}</button>
       </section>
@@ -286,6 +291,5 @@ function name(number) {
         </footer>
       </div>
     </main>
-    <HelpDialog v-if="helpPage" :initial-page="helpPage" @close="helpPage = ''" />
   </div>
 </template>

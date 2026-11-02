@@ -1,0 +1,31 @@
+/* Source client coordinates: InfoSceneHandler and RecordSceneHandler, 1280x720. */
+.desktop-information-scene{position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;overflow:hidden;font-family:"Takao Mincho","DejaVu Sans","Noto Sans CJK JP",sans-serif;color:white;line-height:1.2}
+.desktop-information-background,.desktop-information-background img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.desktop-information-scene .desktop-information-button{position:absolute;left:82.03125%;width:15.15625%;height:17.5%;margin:0;padding:0;border:0;border-radius:0;background:transparent;transition:none}
+.desktop-information-button .asset-image,.desktop-information-button img{width:100%;height:100%;display:block}
+.desktop-information-scene button:hover,.desktop-information-scene button:active{transform:none}
+.desktop-information-scene button:focus-visible,.desktop-help-body:focus-visible{outline:3px solid white;outline-offset:-3px}
+.desktop-record-title{position:absolute;left:2.34375%;top:2.777778%;width:15.625%;height:8.333333%}
+.desktop-record-title img,.desktop-record-label img,.desktop-record-faction img{width:100%;height:100%}
+.desktop-record-label{position:absolute;left:2.734375%;width:14.453125%;height:5.277778%}
+.desktop-information-scene .desktop-record-value{position:absolute;left:3.359375%;width:20.3125%;height:6.944444%;margin:0;padding:0;color:white;font-size:2.65625cqw;font-weight:bold;white-space:nowrap;line-height:1.2}
+.desktop-record-faction{position:absolute;left:3.90625%;width:5.46875%;height:3.888889%}
+.desktop-information-scene .desktop-record-faction-value{position:absolute;left:9.921875%;width:5.859375%;height:4.444444%;margin:0;padding:0;color:white;font-size:1.875cqw;font-weight:bold;white-space:nowrap}
+.desktop-record-next{top:34.722222%}.desktop-record-return{top:55.555556%}.desktop-record-exit{top:76.388889%}
+.desktop-record-status{position:absolute;left:3.90625%;top:25%;width:65%;font-size:1.875cqw;white-space:pre-wrap}
+.desktop-browser-notes{margin:12px 16px;color:#203e38;font-size:14px;user-select:text}
+.desktop-browser-notes pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.desktop-info-panel{position:absolute;left:.78125%;top:1.388889%;width:76.5625%;height:91.666667%}
+.desktop-info-panel img{width:100%;height:100%}
+.desktop-information-scene .desktop-help-choice{position:absolute;left:6.25%;width:17.34375%;height:6.944444%;padding:0;margin:0;border:0;border-radius:0;background:transparent;font:inherit;color:white;transition:none}
+.desktop-help-choice .asset-image,.desktop-help-choice img{position:absolute;inset:0;width:100%;height:100%}
+.desktop-help-choice span.desktop-help-choice-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 4px;font-size:1.5625cqw;font-weight:bold;line-height:1.05}
+.desktop-help-root .desktop-help-choice{width:17.1875%}
+.desktop-help-body{position:absolute;left:3.90625%;top:6.944444%;width:68.75%;height:87.5%;overflow:auto;white-space:pre-wrap;font-size:1.875cqw;font-weight:bold;color:white}
+.desktop-help-body h3{margin:0;font:inherit;line-height:1.4}
+.desktop-help-body p{margin:0;color:inherit;font:inherit;line-height:1.4}
+.desktop-help-return{top:55.555556%}.desktop-help-exit{top:77.777778%}
+
+.desktop-help-scene .desktop-information-button{height:17.638889%}
+
+.desktop-record-value:is([data-testid="record-play"],[data-testid="record-rate"]){width:18.75%}

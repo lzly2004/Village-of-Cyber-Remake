@@ -1,0 +1,5 @@
+/* Only game canvases: browser notes/forms retain native selection and editing. */
+.game-stage,.desktop-start-surface,.desktop-replay-canvas,.desktop-information-scene { -webkit-user-select:none;user-select:none; }
+.game-stage img,.desktop-start-surface img,.desktop-replay-canvas img,.desktop-information-scene img { -webkit-user-drag:none; }
+/* Explicit draggable=true instruction tools retain their existing drag handlers. */
+.game-stage input,.game-stage textarea,.desktop-information-scene input,.desktop-information-scene textarea { -webkit-user-select:text;user-select:text; }

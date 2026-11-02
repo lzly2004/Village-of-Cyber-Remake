@@ -19,7 +19,7 @@ const props = defineProps({
   readDisabled: { type: Boolean, default: false },
 })
 function readClick(event) {
-  if(!props.readDisabled && !event.target.closest('button,a,input') && !window.getSelection()?.toString())emit('read-continue')
+  if(!props.readDisabled && !event.target.closest('button,a,input'))emit('read-continue')
 }
 function readKey(event){if(!props.readDisabled)event.currentTarget.click()}
 // Only the already-public event's character keys. This is NOT the final image mapping.
