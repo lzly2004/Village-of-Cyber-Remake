@@ -1,7 +1,8 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import AssetImage from './AssetImage.vue'
-import { replayDay,replayFrame } from './replayPlayback.js'
+import { roles } from './labels.js'
+import { replayRoles,replayDay,replayFrame } from './replayPlayback.js'
 import { replayInformation,replayVotes } from './replayInformation.js'
 import { validateReplay } from './replayValidation.js'
 import { characterDisplayName } from './characterDisplay.js'
@@ -14,8 +15,9 @@ const frame=computed(()=>valid.value?replayFrame(recording,day.value):null)
 const info=computed(()=>valid.value?replayInformation(recording,day.value):null)
 const votes=computed(()=>info.value?replayVotes(info.value.current,day.value,round.value):null)
 const dateLocked=computed(()=>mode.value==='votes'&&round.value>0)
-const roleNames=['不明','占卜师','灵媒师','猎人','共有者','猫又','村人','人狼','狂人','狂信者','妖狐','背德者']
-const roleText=computed(()=>info.value?'一役職一\n'+info.value.groups.map(g=>'['+roleNames[g.role]+']\n'+g.players.map(p=>p.name).join('　')+'\n').join(''):'')
+const roleName=n=>n>0?(roles[replayRoles[n]]||'不明'):'不明'
+function accessiblePlayer(p){return characterDisplayName(p.character)+'（'+(info.value.terminal?'真の職業：'+(p.actualRole==='NONE'?'不明':roles[p.actualRole]||'不明'):'公称職業：'+p.claimText+(p.claimOrder?' '+p.claimOrder:''))+'）'}
+const roleText=computed(()=>info.value?'一役職一\n'+info.value.groups.map(g=>'['+roleName(g.role)+']\n'+g.players.map(p=>p.name).join('　')+'\n').join(''):'')
 const ballot=computed(()=>{
  if(!votes.value)return null
  const v=votes.value,extra=v.rule===0?'自由投票\n':v.rule===1?'グレラン：\n'+v.candidates.join(''):v.rule===2?'指定投票：\n'+v.candidates.join(','):''
@@ -34,7 +36,7 @@ onBeforeUnmount(()=>emit('playing',false))
    <AssetImage class="desktop-replay-background" name="images/PVBG.png" />
    <template v-if="valid">
     <div class="replay-avatar-list" role="region" aria-label="Replay人物一覧" tabindex="0" :style="{'--replay-columns':Math.ceil(frame.players.length/2)||1}">
-     <article v-for="(p,index) in frame.players" :key="p.playerIndex" class="replay-player-card" :style="{gridColumn:index%Math.ceil(frame.players.length/2)+1,gridRow:index<Math.ceil(frame.players.length/2)?1:2}" :data-player-index="p.playerIndex" :data-portrait="p.portrait" :data-departed="p.departed" :aria-label="characterDisplayName(p.character)+' '+roleNames[recording.daySnapshots[0].players[index].actualRole]" tabindex="0">
+     <article v-for="(p,index) in frame.players" :key="p.playerIndex" class="replay-player-card" :style="{gridColumn:index%Math.ceil(frame.players.length/2)+1,gridRow:index<Math.ceil(frame.players.length/2)?1:2}" :data-player-index="p.playerIndex" :data-portrait="p.portrait" :data-departed="p.departed" :aria-label="accessiblePlayer(p)" tabindex="0">
       <span class="player-portrait"><AssetImage class="portrait-image" :name="p.portrait" />
        <AssetImage v-if="p.claimIcon" class="claim-icon" :name="p.claimIcon" /><AssetImage v-if="p.deathIcon" class="death-marker" :name="p.deathIcon" />
        <AssetImage v-if="p.characterText" class="character-title-image" :name="p.characterText" />

@@ -129,3 +129,17 @@ test('source file import quota rejection cannot overwrite the selected slot; exp
  await modal.getByRole('button',{name:'書き込みを確定',exact:true}).click();await expect(modal).toHaveCount(0)
  await expect.poll(async()=>(await store(page))[0]?.replay).toEqual(incoming);expect((await store(page)).filter(Boolean)).toHaveLength(1)
 })
+
+test('Replay accessible names follow visible CO before terminal and use Japanese terminal roles',async({page})=>{
+ await page.goto('/');await seed(page);await open(page);await page.locator('[data-slot="0"]').click()
+ const cards=page.locator('.replay-player-card');await expect(cards).toHaveCount(replay.daySnapshots[0].players.length)
+ const roles=['未CO','占い師','霊能者','狩人','共有者','猫又','村人','人狼','狂人','狂信者','妖狐','背徳者']
+ const claims=await cards.evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label')))
+ // No exact true-role sentence on an ordinary date; original colored portraits remain unchanged.
+ expect(claims.every(t=>/（公称職業：.+）$/.test(t)&&!t.includes('真の職業'))).toBe(true)
+ for(let d=2;d<replay.totalDays;d++)await page.getByRole('button',{name:'次の日',exact:true}).click()
+ const last=replay.daySnapshots.find(s=>s.dayNumber===replay.totalDays)||replay.daySnapshots.at(-1)
+ for(const p of last.players){await expect(page.locator('.replay-player-card[data-player-index="'+p.playerIndex+'"]')).toHaveAttribute('aria-label',new RegExp('真の職業：'+roles[p.actualRole]))}
+ await expect(page.getByTestId('replay-role-groups')).not.toContainText('占卜师')
+ await expect(page.getByTestId('replay-role-groups')).not.toContainText('猎人')
+})
