@@ -29,7 +29,7 @@ async function inspect(page){
  })
 }
 async function openHistory(page){
- await page.getByRole('button',{name:'戦績を見る',exact:true}).click();await expect(page.getByRole('dialog',{name:'ブラウザーの戦績'}).getByTestId('record-play')).toBeVisible();await page.keyboard.press('Escape')
+ await page.getByRole('button',{name:'戦績を見る',exact:true}).click();await expect(page.getByTestId('desktop-records').getByTestId('record-play')).toBeVisible();await page.keyboard.press('Escape')
  await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click();await expect(library(page).getByRole('button',{name:'一覧を再読込',exact:true})).toBeEnabled();await expect(library(page).locator('.replay-entries')).toHaveCount(1)
 }
 async function seed(page,url){

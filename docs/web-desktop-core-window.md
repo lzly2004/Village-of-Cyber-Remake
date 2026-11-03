@@ -248,3 +248,10 @@ Replay复用日文角色表，普通日ARIA仅读当前frame公称CO，终局读
 失败分开保留：首次unit命令相对路径错误导致系统旧Node拒绝--test，随后沙箱内子进程配置读取stdout异常；正确工具链+允许的进程环境下224通过，未改测试来绕过。新增断言最初有Replay标签定位与重开后DOM仍在的错误前提，已按真实状态修正；恢复原fallback显示处刑后状态的产品反例已修复。新增帮助末条键盘滚动断言原先在滚动动画结束前采样，改用既定expect.poll等待末条，不抬超时。默认初次启动与第二次249通过后均因2GiB监护停止；用户释放内存并额外授权一次环境重试，最终完整256通过。失败日志保留，不记作产品成功或重试次数豁免。
 
 本轮没有本机full/check/FatJAR；现有同源15份oracle逐文件SHA与9809ec71源指纹复核，不重生成黄金。待最终head云端full24、回执/发布ZIP全部核验后，才给该head自助入口；不拿4497368旧包代替。用户整局试玩/独立新headCR、真实DPI/物理音频/容量与发布门待，不以测试绿灯关闭。猎人调查DEFERRED，无Java/规则修改。
+
+
+#### 云端337c2d0首次失败与窄范围补修
+
+run41616183664 attempt1在production-smoke失败：前端224、assets5、audio30、files30、默认256通过，真实发布包未构建，后续Java/gate等不能记作已跑。已在本机旧测试复现：experience.spec.js仍用role=dialog寻找「ブラウザーの戦績」，而04d410d已改为01内desktop-records场景；hosting.spec.js同一旧定位也一并替换。仅更新测试入口，保留1回、截图、Escape返回、真实整局、Replay交换和origin隔离断言，无产品源码变化、无提高超时或预算。
+
+修正后本机HTTPS托管完整7/7通过，含同一production无种子整局8.7秒及新战绩场景、主机/端口/协议隔离，hosting-corrected.log；不改系统信任。单独HTTP用例7.9秒完成，套件exit0/1passed后监护在收尾报低内存，故production-corrected.log不当作干净收尾的本机HTTP通过声明；最终独立HTTP以补修新head云端为准。此前256/15等最终产品源码未变，复用并注明来源，不为两处定位重跑无关本机全量。失败run及本机反例保留，不用它生成试玩候选。
