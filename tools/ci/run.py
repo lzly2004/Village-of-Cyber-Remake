@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import zipfile
+import importlib.util
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -69,6 +70,29 @@ def package_release(result_path, expected_head, directory):
     return {'report': 'build/ci/web-release.json', 'sha256': digest(target)}
 
 
+def package_preview(result_path, expected_head, directory):
+    output = ROOT / 'build/playtest/ci'
+    argv = [sys.executable, '-B', 'tools/build-playtest-preview.py', '--verified-result', str(result_path), '--output', str(output)]
+    with (directory / 'preview.stdout').open('wb') as out, (directory / 'preview.stderr').open('wb') as err:
+        code = subprocess.run(argv, cwd=ROOT, stdout=out, stderr=err).returncode
+    if code: raise ValueError('WEB_PREVIEW_BUILD_OR_SMOKE_FAILED')
+    report = json.loads((output / 'preview-report.json').read_text()); archive = output / 'vocr-preview.zip'
+    if (report['status'] != 'passed' or report['source_sha'] != expected_head or
+            report['verification']['tier'] != 'frontend' or report['verification']['javaFull'] is not False or
+            report['verification']['resultSha256'] != digest(result_path) or report['archive']['sha256'] != digest(archive) or
+            report['archive']['bytes'] != archive.stat().st_size or report['packaged_smoke']['status'] != 'passed' or
+            report['packaged_smoke']['tests'] != 1): raise ValueError('WEB_PREVIEW_REPORT_MISMATCH')
+    target = directory / 'web-preview.json'; target.write_bytes((output / 'preview-report.json').read_bytes())
+    return {'report': 'build/ci/web-preview.json', 'sha256': digest(target)}
+
+
+def package_tools(directory):
+    # The bundle imports only trusted stdlib-only modules from this exact checkout.
+    sys.path.insert(0, str(ROOT / 'tools'))
+    import playtest_bundle
+    return playtest_bundle.bundle(ROOT, directory / 'playtest-tools.zip')
+
+
 def main():
     directory = ROOT / 'build/ci'
     outcome = {'schema': 1, 'status': 'failed', 'run_id': os.environ.get('GITHUB_RUN_ID'),
@@ -81,6 +105,7 @@ def main():
         context = json.loads((directory / 'context.json').read_text())
         plan = json.loads((directory / 'plan.json').read_text())
         outcome['release_required'] = plan['plan']['tier'] == 'full'
+        outcome['preview_required'] = plan['plan']['tier'] == 'frontend'
         argv = ['bash', 'tools/verify.sh', '--base', context['base_sha'], '--json']
         if context['force_full']:
             argv.append('--full')
@@ -99,9 +124,15 @@ def main():
             outcome['fat_jar'] = jar_report(ROOT / 'build/libs/vocr-1.0.3.4-all.jar')
         if outcome['release_required']:
             outcome['web_release'] = package_release(result_path, result['tested_sha'], directory)
+            outcome['playtest_tools'] = package_tools(ROOT / 'build/releases/ci')
             if os.environ.get('GITHUB_OUTPUT'):
                 with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
                     output.write('release_ready=true\n')
+        if outcome['preview_required']:
+            outcome['web_preview'] = package_preview(result_path, result['tested_sha'], directory)
+            outcome['playtest_tools'] = package_tools(ROOT / 'build/playtest/ci')
+            if os.environ.get('GITHUB_OUTPUT'):
+                with open(os.environ['GITHUB_OUTPUT'], 'a') as output: output.write('preview_ready=true\n')
         outcome['status'] = 'passed'
         return 0
     except (OSError, ValueError, KeyError, subprocess.SubprocessError, zipfile.BadZipFile) as error:

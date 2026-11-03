@@ -11,7 +11,7 @@ defineProps({
 </script>
 
 <template>
-  <section class="panel public-information" aria-label="公開情報" lang="ja">
+  <section tabindex="-1" class="panel public-information" aria-label="公開情報" lang="ja">
     <header class="panel-heading"><span>公開情報</span><span>サーバーの最新の公開状態</span></header>
     <p v-if="!information" class="avoidance-help">このサーバーは公開情報の表示に対応していません。</p>
     <div v-else class="public-info-content">

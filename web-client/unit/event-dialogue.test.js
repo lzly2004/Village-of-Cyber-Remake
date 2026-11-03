@@ -123,3 +123,36 @@ for (const [label, value, data, diagnostic] of [
     assert.ok(!result.text.includes('Unknown'))
   })
 }
+
+// Shared local presentation clock: no game callbacks, fetch or storage are involved.
+import { createTypewriter } from '../src/typewriter.js'
+function controlledWriter() {
+  let now=0,id=0;const jobs=new Map(),states=[]
+  const writer=createTypewriter({publish:s=>states.push(s),schedule:(fn,ms)=>{jobs.set(++id,{at:now+ms,fn});return id},cancel:key=>jobs.delete(key)})
+  function advance(ms){const until=now+ms;for(;;){const next=[...jobs].sort((a,b)=>a[1].at-b[1].at)[0];if(!next||next[1].at>until)break;now=next[1].at;jobs.delete(next[0]);next[1].fn()}now=until}
+  return {writer,advance,states,jobs}
+}
+test('typewriter: 50ms boundaries, Unicode code points and line breaks are preserved',()=>{
+  const {writer,advance,states}=controlledWriter();writer.reset('村😀\n人');advance(49);assert.equal(states.at(-1).text,'');advance(1);assert.equal(states.at(-1).text,'村');advance(50);assert.equal(states.at(-1).text,'村😀');advance(100);assert.deepEqual(states.at(-1),{text:'村😀\n人',complete:true})
+  assert.match(read('src/main/java/com/vocr/ui/UIConstants.java'),/TYPEWRITER_DELAY_MS\s*=\s*50/)
+})
+test('typewriter: explicit reveal is local and late ticks cannot resurrect a reset or disposed line',()=>{
+  const {writer,advance,states,jobs}=controlledWriter();writer.reset('古い台詞');writer.reveal();assert.deepEqual(states.at(-1),{text:'古い台詞',complete:true});assert.equal(jobs.size,0);writer.reset('新');advance(49);assert.equal(states.at(-1).text,'');advance(1);assert.deepEqual(states.at(-1),{text:'新',complete:true});writer.reset('未完');writer.dispose();const count=states.length;advance(10000);assert.equal(states.length,count)
+})
+test('typewriter: paused and reduced-motion/empty lines have finite deterministic completion',()=>{
+  const {writer,advance,states}=controlledWriter();writer.reset('甲乙',{paused:true});advance(500);assert.equal(states.at(-1).text,'');writer.play();advance(50);assert.equal(states.at(-1).text,'甲');writer.pause();advance(500);assert.equal(states.at(-1).text,'甲');writer.play();advance(50);assert.deepEqual(states.at(-1),{text:'甲乙',complete:true});writer.reset('即時',{instant:true});assert.deepEqual(states.at(-1),{text:'即時',complete:true});writer.reset('');assert.deepEqual(states.at(-1),{text:'',complete:true})
+})
+
+test('typewriter: an obsolete callback cannot clear the replacement timer or double its cadence',()=>{
+  const {writer,jobs,states,advance}=controlledWriter()
+  writer.reset('旧');const obsolete=[...jobs.values()][0].fn
+  writer.reset('新文');obsolete();writer.play()
+  assert.equal(jobs.size,1)
+  advance(50);assert.deepEqual(states.at(-1),{text:'新',complete:false})
+  writer.pause();assert.equal(jobs.size,0)
+})
+
+test('typewriter: default clock is resolved when playback starts, allowing later clock instrumentation',()=>{
+  const savedSet=globalThis.setTimeout,savedClear=globalThis.clearTimeout,states=[];const writer=createTypewriter({publish:s=>states.push(s)});let callback
+  try{globalThis.setTimeout=(fn,ms)=>{assert.equal(ms,50);callback=fn;return 42};globalThis.clearTimeout=()=>{};writer.reset('字');assert.equal(typeof callback,'function');callback();assert.deepEqual(states.at(-1),{text:'字',complete:true});writer.dispose()}finally{globalThis.setTimeout=savedSet;globalThis.clearTimeout=savedClear}
+})

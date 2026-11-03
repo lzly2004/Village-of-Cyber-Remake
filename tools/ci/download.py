@@ -95,7 +95,7 @@ def validate(zip_path, run, artifact, expected_head, repository):
         # Original WF-004 bundles without stored evidence use their published rev4 fallback.
         # A modern release outcome must not lose release checks just by omitting evidence.json.
         outcome = evidence.load_json(archive.read('build/ci/outcome.json')) if 'build/ci/outcome.json' in names else {}
-        revision = stored.get('assembly_revision', 1) if stored is not None else (5 if outcome.get('release_required') else 4)
+        revision = stored.get('assembly_revision', 1) if stored is not None else (6 if outcome.get('preview_required') else 5 if outcome.get('release_required') else 4)
         report = evidence.assemble(archive.read, names, {'CI_EXPECTED_HEAD': expected_head,
                   'GITHUB_REPOSITORY': repository, 'GITHUB_RUN_ID': str(run['id']),
                   'GITHUB_RUN_ATTEMPT': str(run['run_attempt']),

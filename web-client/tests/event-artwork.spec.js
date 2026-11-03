@@ -1,4 +1,6 @@
-import {test,expect} from '@playwright/test'
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
+import {test,expect} from '../test-fixtures/presentation-test.js'
 import {readFileSync} from 'node:fs'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 const mapping=JSON.parse(readFileSync(new URL('../../src/main/resources/config/event_image_mapping.json',import.meta.url),'utf8'))
@@ -51,12 +53,13 @@ test('WEB-024 exact special, previous-left/current-right and triple swap use sou
 
 test('WEB-024 actual API event images preserve geometry across widths and refresh without changing dialogue/cursor',async({page,request})=>{
  await page.goto('/');const created=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/api/v1/games'))
- await page.getByRole('button',{name:'対局を始める'}).click();const data=await(await created).json()
+ await startDesktopGame(page);const data=await(await created).json()
  try{
   let cursor=0
   while(data.update.presentedEvents[cursor]?.stage!=='DAY_DIALOGUE'){
    expect(cursor).toBeLessThan(data.update.presentedEvents.length-1);await page.getByTestId('next-event').click();cursor++
   }
+  await completeLocalReading(page)
   await ready(page);const before=await characters(page);const state=await saved(page);const text=await page.getByTestId('event-dialogue').textContent()
   expect(before.some(a=>a.name==='images/'+source(data.update.presentedEvents[cursor].event))).toBe(true)
   for(const width of [1920,1440,1280,1024]){
@@ -91,6 +94,7 @@ test('WEB-024 unavailable or late prefix cannot replace authoritative state or r
  try{
   await expect(page.getByTestId('stage-art-status')).toContainText('表示情報が不足')
   await page.getByTestId('next-event').click();expect((await saved(page)).eventCursor).toBe(2)
+  await completeLocalReading(page)
   const text=await page.getByTestId('event-dialogue').textContent();release()
   await ready(page);await expect(page.getByTestId('stage-art-status')).toHaveCount(0)
   expect((await saved(page)).eventCursor).toBe(2);await expect(page.getByTestId('event-dialogue')).toHaveText(text)

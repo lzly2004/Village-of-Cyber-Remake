@@ -1,14 +1,20 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { test, expect } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 
-test('WEB-022/023 static manifest images decode at original dimensions; lobby requests no player assets', async ({ page, request }) => {
+test('WEB-022/023 static manifest images decode at original dimensions; title requests only menu assets', async ({ page, request }) => {
   const imageRequests = []
   page.on('request', req => { if (req.url().endsWith('.webp')) imageRequests.push(req.url()) })
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /一つひとつの発言/ })).toBeVisible()
+  await expect(page.getByTestId('desktop-title')).toBeVisible()
   await expect(page.locator('.player-row')).toHaveCount(0)
-  expect(imageRequests).toEqual([])
+  await page.waitForLoadState('networkidle')
+  const titleManifest=await (await request.get('/assets/images/manifest.json')).json()
+  const titleNames=['title_base_resized','titleLogo','startButton','continueButton','replayButton','recordButton','infoButton','collectionsButton']
+  const titleFiles=new Set(titleNames.map(name=>'/assets/images/'+titleManifest.images['images/'+name+'.png'].file))
+  expect(imageRequests.length).toBeGreaterThan(0)
+  expect(imageRequests.every(url=>titleFiles.has(new URL(url).pathname))).toBe(true)
   const response = await request.get('/assets/images/manifest.json')
   expect(response.ok()).toBe(true)
   expect(response.headers()['content-type']).toContain('application/json')
@@ -50,20 +56,22 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
   const event = { eventname: 'zco7', ch1: 'Abel', ch2: 'NONE', ch3: 'NONE' }
   snapshot.events = [event]; snapshot.presentedEvents = [{ stage: 'DAY_DIALOGUE', event }]; snapshot.nextEventCursor = 1
   const imageMapping = JSON.parse(readFileSync(new URL('../../src/main/resources/config/event_image_mapping.json', import.meta.url), 'utf8'))
-  const stageFiles = ['images/haikei3.png', 'images/' + imageMapping.Abel.zco7.default]
+  const stageFiles = ['images/haikei3.png', 'images/messageframe.png', 'images/' + imageMapping.Abel.zco7.default]
   await page.route('**/api/v1/games', route => route.fulfill({status:201,json:{
     sessionId: '00000000-0000-4000-8000-000000000023', update: snapshot,
   }}))
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /一つひとつの発言/ })).toBeVisible()
+  await expect(page.getByTestId('desktop-title')).toBeVisible()
   await page.waitForLoadState('networkidle')
-  expect(paths).toEqual([])
+  const menuNames=['title_base_resized','titleLogo','startButton','continueButton','replayButton','recordButton','infoButton','collectionsButton','PVBtitile',...Array.from({length:7},(_,i)=>'game'+(i+1))]
+  const menuFiles=menuNames.map(name=>'/assets/images/'+manifest.images['images/'+name+'.png'].file)
+  expect(paths.filter(path=>path.endsWith('.webp')).every(path=>menuFiles.includes(path))).toBe(true)
   const lobbyBytes = await page.evaluate(() => performance.getEntriesByType('navigation')[0].transferSize
     + performance.getEntriesByType('resource').reduce((sum, entry) => sum + entry.transferSize, 0))
   expect(lobbyBytes).toBeGreaterThan(0)
   expect(lobbyBytes).toBeLessThanOrEqual(1.5 * 1024 ** 2)
   const firstGame = await page.evaluate(() => performance.now())
-  await page.getByRole('button', {name:'対局を始める'}).click()
+  await startDesktopGame(page)
   const rows = page.locator('.player-row')
   await expect(rows).toHaveCount(44)
   await rows.first().scrollIntoViewIfNeeded()
@@ -74,7 +82,7 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
   const allowed = new Set(Array.from({length:44},(_,i)=>[
     '/assets/images/'+manifest.images['images/'+String(i+1).padStart(2,'0')+'s.png'].file,
     '/assets/images/'+manifest.images['images/'+(i+1)+'job.png'].file,
-  ]).flat().concat(stageFiles.map(name=>'/assets/images/'+manifest.images[name].file)))
+  ]).flat().concat(stageFiles.map(name=>'/assets/images/'+manifest.images[name].file),menuFiles))
   const requested = paths.filter(path=>path.endsWith('.webp'))
   expect(requested.length).toBeGreaterThan(0)
   expect(requested.length).toBeLessThan(90)
@@ -101,4 +109,36 @@ test('WEB-033 Replay code and database stay cold until explicit library entry',a
   await page.getByRole('button',{name:'Replay一覧',exact:true}).click()
   await expect(page.getByRole('heading',{name:'Replay一覧',exact:true})).toBeVisible()
   expect(chunks).toHaveLength(1);expect(await page.evaluate(()=>window.replayDbOpens)).toBeGreaterThan(0)
+})
+
+test('night/dawn and current result together obey the unchanged first-game transfer budget',async({page,request},info)=>{
+ const manifest=await(await request.get('/assets/images/manifest.json')).json()
+ const mapping=JSON.parse(readFileSync(new URL('../../src/main/resources/config/event_image_mapping.json',import.meta.url),'utf8'))
+ const snapshot=publicSnapshot(),event={eventname:'yjsw',ch1:'Abel',ch2:'NONE',ch3:'NONE'}
+ snapshot.events=[event];snapshot.presentedEvents=[{stage:'NIGHT_RESULT',event}];snapshot.nextEventCursor=1
+ await page.route('**/api/v1/games',r=>r.fulfill({status:201,json:{sessionId:'00000000-0000-4000-8000-000000000052',update:snapshot}}))
+ const paths=[];page.on('request',r=>{if(r.url().endsWith('.webp'))paths.push(new URL(r.url()).pathname)})
+ await page.goto('/');await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeEnabled()
+ await page.waitForLoadState('networkidle')
+ const since=await page.evaluate(()=>performance.now())
+ const wallStart=Date.now() // Base Playwright fixture: no clock installation or fast-forward.
+ await startDesktopGame(page)
+ await expect(page.getByTestId('day-start-continue')).toBeEnabled({timeout:12000})
+ const wallElapsedMs=Date.now()-wallStart
+ expect(wallElapsedMs).toBeGreaterThanOrEqual(9500)
+ // A now-enabled frame can still be typing: first require the complete local line.
+ await expect(page.getByTestId('day-start-text')).toHaveText(/^\d+日目になりました。$/)
+ await page.getByTestId('day-start-continue').click()
+ await expect(page.getByTestId('stage-character')).toHaveCount(1)
+ await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
+ await page.waitForLoadState('networkidle')
+ const stage=['images/komorebi000night01.png','images/komorebi002.png','images/haikei3.png','images/messageframe.png',...mapping.Abel.yjsw.default.map(n=>'images/'+n)]
+ const menu=['title_base_resized','titleLogo','startButton','continueButton','replayButton','recordButton','infoButton','collectionsButton','PVBtitile',...Array.from({length:7},(_,i)=>'game'+(i+1))].map(n=>'images/'+n+'.png')
+ const allowed=new Set([...menu,...stage,...Array.from({length:44},(_,i)=>'images/'+String(i+1).padStart(2,'0')+'s.png'),...Array.from({length:44},(_,i)=>'images/'+(i+1)+'job.png')].map(n=>'/assets/images/'+manifest.images[n].file))
+ expect(paths.every(p=>allowed.has(p))).toBe(true)
+ for(const name of stage)expect(paths).toContain('/assets/images/'+manifest.images[name].file)
+ const firstGameBytes=await page.evaluate(since=>performance.getEntriesByType('resource').filter(r=>r.startTime>=since).reduce((sum,r)=>sum+r.transferSize,0),since)
+ expect(firstGameBytes).toBeGreaterThan(0);expect(firstGameBytes).toBeLessThanOrEqual(3*1024**2)
+ console.info('Night/dawn first-game transfer: '+JSON.stringify({firstGameBytes,stageImages:stage.length,wallElapsedMs,virtualClock:false}))
+ await info.attach('night-first-game-transfer.json',{body:JSON.stringify({firstGameBytes,stageImages:stage.length,wallElapsedMs,virtualClock:false}),contentType:'application/json'})
 })

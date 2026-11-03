@@ -1,0 +1,55 @@
+/* ReplayBrowserHandler / ReplayPlayerHandler: 1280×720 source client coordinates. */
+.desktop-replay-shell.replay-library { padding:0; margin:0; border:0; background:transparent; }
+.desktop-replay-canvas { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; container-type:inline-size; font-family:"Takao Mincho","DejaVu Sans","Noto Sans CJK JP",sans-serif; color:#111; }
+.desktop-replay-background,.desktop-replay-background img { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; }
+.desktop-save-slot { position:absolute; left:7.03125%; width:60.15625%; height:23.611111%; border:0; margin:0; padding:0; background:transparent; cursor:pointer; text-align:left; font:inherit; }
+.desktop-save-slot:hover,.desktop-save-slot:active { transform:none; }
+.desktop-save-slot:focus-visible { outline:3px solid white; outline-offset:-3px; }
+.desktop-save-color { position:absolute;left:0;top:0;bottom:0;width:1.558442%;background:var(--slot-color); }
+.desktop-save-frame { position:absolute;left:1.558442%;right:0;top:0;width:98.441558%;height:100%; }
+.desktop-save-frame img { position:absolute;inset:0;width:100%;height:100%;object-fit:fill; }
+.desktop-save-description { position:absolute;left:3.896104%;right:3.896104%;top:8.823529%;bottom:8.823529%;white-space:pre-wrap;overflow:auto;font-size:1.71875cqw;font-weight:bold;color:white;line-height:1.35; }
+.desktop-save-empty { top:38.235294%;font-size:1.875cqw;color:gray; }
+.desktop-replay-canvas .desktop-art-button { position:absolute;left:82.03125%;width:15.15625%;height:17.5%;padding:0;margin:0;border:0;background:transparent;border-radius:0; }
+.replay-nav-next { top:34.722222%; }.replay-nav-back { top:55.555556%; }.replay-nav-title { top:76.388889%; }
+.desktop-replay-canvas .desktop-art-button:hover,.desktop-replay-canvas .desktop-art-button:active { transform:none; }
+.replay-browser-management { margin-top:12px;padding:8px;border-top:1px solid #d7dacc; }
+.replay-browser-management summary { cursor:pointer; }
+.replay-slot-confirm { max-width:min(90vw,560px);padding:24px;color:#111;background:#faf8f0;border:1px solid #334e48; }
+.replay-slot-confirm::backdrop { background:#0007; }
+.desktop-replay-player.replay-player { position:relative;width:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;overflow:visible;background:transparent; }
+.desktop-replay-player .replay-avatar-list { position:absolute;left:12.5%;right:32.8125%;top:0;height:27.222222%;display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,7.65625cqw);grid-template-columns:repeat(var(--replay-columns),5cqw);overflow:auto;gap:0;padding:0;margin:0; }
+.desktop-replay-player .replay-player-card { position:relative;display:block;width:5cqw;height:7.65625cqw;padding:0;margin:0;background:none; }
+.desktop-replay-player .player-portrait,.desktop-replay-player .portrait-image,.desktop-replay-player .portrait-image img { position:absolute;inset:0;width:5cqw;height:7.65625cqw; }
+.desktop-replay-player .character-title-image { position:absolute;left:0;top:6.09375cqw;width:5cqw;height:3.125cqw; }
+.desktop-replay-player .claim-icon { position:absolute;left:0;top:0; }
+.desktop-replay-player .death-marker { position:absolute;left:.390625cqw;top:.78125cqw; }
+.desktop-replay-board { position:absolute;left:0;top:27.5%;width:79.375%;height:67.5%; }
+.desktop-replay-board>.asset-image,.desktop-replay-board>.asset-image img { position:absolute;inset:0;width:100%;height:100%;object-fit:fill; }
+.desktop-replay-player .replay-information { position:absolute;left:3.937008%;right:3.937008%;top:6.17284%;bottom:2%;margin:0;padding:0;border:0;overflow:auto;font-size:1.875cqw;line-height:1.25;font-weight:bold; }
+.desktop-replay-player .replay-history-text { font:inherit;margin:0;color:#111;white-space:pre-wrap; }
+.desktop-replay-player .replay-role-groups h4,.desktop-replay-player .replay-role-groups p { margin:0;font:inherit;line-height:inherit;color:#111; }
+.desktop-replay-player .replay-role-groups h4::before {content:'['}.desktop-replay-player .replay-role-groups h4::after {content:']'}
+.desktop-replay-player .replay-population { display:none; }
+.desktop-replay-player .replay-round-button { top:1.388889%;left:82.8125%;width:7.578125%;height:8.75%; }
+.desktop-replay-player .replay-round-button.next { left:90.78125%; }
+.desktop-replay-player .replay-ballot-columns { display:grid;grid-template-columns:2fr 1fr;font-size:1.5625cqw;line-height:1.5;white-space:pre-wrap; }
+.desktop-replay-player .replay-ballot-columns pre { margin:0;font:inherit; }
+
+/* ReplayPlayerHandler uses a one-based avatar column and native board/calendar sizes. */
+.desktop-replay-player .replay-avatar-list{left:17.5%;right:32.8125%;}
+.desktop-replay-player .character-title-image{left:1.171875cqw;top:6.09375cqw;width:2.5cqw;height:1.5625cqw;}
+.desktop-replay-player .claim-icon{width:2.5cqw;height:1.875cqw;}
+.desktop-replay-player .death-marker{width:4.140625cqw;height:5.546875cqw;}
+.desktop-replay-player .desktop-calendar{left:68.75%;top:1.388889%;width:9.53125%;height:24.166667%;}
+.desktop-replay-player .desktop-calendar-text{left:8.196721%;top:8.62069%;font-size:1.5625cqw;line-height:1.2;width:81.967213%;}
+.desktop-replay-player .desktop-replay-board{position:absolute;left:0;top:27.5%;width:63.28125%;height:61.111111%;}
+.desktop-replay-player .desktop-replay-board img{width:100%;height:100%;object-fit:fill;}
+.desktop-replay-player .desktop-replay-information{left:3.125%;top:31.666667%;width:72.65625%;height:59.722222%;right:auto;bottom:auto;}
+.desktop-replay-player .replay-final-roles{font-size:1.71875cqw;}
+
+/* ReplayFileDialogs.addButtons: source x90/300, y20, 190×40, plain controls. */
+.desktop-replay-exchange{display:contents}
+.desktop-file-button{position:absolute;left:7.03125%;top:2.777778%;width:14.84375%;height:5.555556%;padding:0;border:1px solid #777;border-radius:2px;background:linear-gradient(#fff,#ddd);color:#111;font-size:1.015625cqw;font-weight:normal}
+.desktop-file-button.export{left:23.4375%}
+.desktop-file-button:hover,.desktop-file-button:active{transform:none}

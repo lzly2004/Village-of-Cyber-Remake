@@ -1,0 +1,908 @@
+{
+  "schema": 1,
+  "provenance": {
+    "kind": "actual Swing capture public DTO",
+    "producer": "tools/visual-baseline/DesktopBaselineTest.java",
+    "seed": 50050,
+    "configuration": "jianyi",
+    "source_head": "cd682cbc1b47ec2458439ba25dfb5527f2a58f05",
+    "production_java_changed": false,
+    "capture_scope": "temporary replay/in-memory record; audio disabled; no user files",
+    "producer_sha256": "0916beb75077517610ff21a8fcc7f9c122e439f6575fd602beead0e3b686b1de"
+  },
+  "vote": {
+    "revision": 1,
+    "phase": "DAY_DECISION",
+    "view": {
+      "configuration": "jianyi",
+      "gameDay": 2,
+      "aliveCount": 11,
+      "deathCount": 1,
+      "result": "NONE",
+      "players": [
+        {
+          "playerNumber": 1,
+          "character": "Matthäus",
+          "alive": false,
+          "deathReason": "NIGHT_DEATH",
+          "deathDay": 1,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 2,
+          "character": "Volker",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 1,
+          "comingOutDay": 2
+        },
+        {
+          "playerNumber": 3,
+          "character": "Abel",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 4,
+          "character": "Heinrich",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "ling",
+          "claimedRoleOrder": 1,
+          "comingOutDay": 2
+        },
+        {
+          "playerNumber": 5,
+          "character": "Beatrice",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 2,
+          "comingOutDay": 2
+        },
+        {
+          "playerNumber": 6,
+          "character": "Iwan",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 7,
+          "character": "Renate",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 8,
+          "character": "Kaja",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 9,
+          "character": "Samuel",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 10,
+          "character": "Chloe",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 3,
+          "comingOutDay": 2
+        },
+        {
+          "playerNumber": 11,
+          "character": "Till",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 12,
+          "character": "Eva",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        }
+      ]
+    },
+    "selections": {
+      "avoidanceEnabled": true,
+      "voteTargets": [],
+      "divination": {
+        "hiddenTargets": [],
+        "claimedActors": [
+          {
+            "playerNumber": 2,
+            "claimedRoleOrder": 1,
+            "targets": []
+          },
+          {
+            "playerNumber": 5,
+            "claimedRoleOrder": 2,
+            "targets": []
+          },
+          {
+            "playerNumber": 10,
+            "claimedRoleOrder": 3,
+            "targets": []
+          }
+        ]
+      },
+      "guard": {
+        "hiddenTargets": [],
+        "claimedActors": []
+      }
+    },
+    "legalVoteActions": [
+      {
+        "method": "FREE",
+        "candidates": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "method": "GREY",
+        "candidates": [
+          3,
+          6,
+          7,
+          8,
+          9,
+          11
+        ]
+      }
+    ],
+    "claimInquiry": {
+      "roles": [
+        "zhan",
+        "ling",
+        "lie",
+        "gong",
+        "mao"
+      ],
+      "players": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "legalTargetSelections": [
+      {
+        "type": "VOTE",
+        "targets": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "claimedActors": []
+      },
+      {
+        "type": "DIVINATION",
+        "targets": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "claimedActors": [
+          {
+            "playerNumber": 2,
+            "claimedRoleOrder": 1
+          },
+          {
+            "playerNumber": 5,
+            "claimedRoleOrder": 2
+          },
+          {
+            "playerNumber": 10,
+            "claimedRoleOrder": 3
+          }
+        ]
+      },
+      {
+        "type": "GUARD",
+        "targets": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "claimedActors": []
+      }
+    ],
+    "voteHistory": [],
+    "revealedRoles": [],
+    "publicInformation": {
+      "skillReports": [
+        {
+          "playerNumber": 2,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 1,
+          "exposed": false,
+          "results": [
+            {
+              "skillDay": 1,
+              "targetPlayerNumber": 10,
+              "color": "WHITE"
+            }
+          ]
+        },
+        {
+          "playerNumber": 4,
+          "claimedRole": "ling",
+          "claimedRoleOrder": 1,
+          "exposed": false,
+          "results": []
+        },
+        {
+          "playerNumber": 5,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 2,
+          "exposed": false,
+          "results": [
+            {
+              "skillDay": 1,
+              "targetPlayerNumber": 12,
+              "color": "WHITE"
+            }
+          ]
+        },
+        {
+          "playerNumber": 10,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 3,
+          "exposed": false,
+          "results": [
+            {
+              "skillDay": 1,
+              "targetPlayerNumber": 12,
+              "color": "WHITE"
+            }
+          ]
+        }
+      ],
+      "suspicion": {
+        "available": false,
+        "rows": []
+      },
+      "deathHistory": [
+        {
+          "day": 1,
+          "executions": [],
+          "nightDeaths": [
+            1
+          ]
+        }
+      ]
+    },
+    "eventCursor": 8,
+    "nextEventCursor": 8,
+    "events": [],
+    "presentedEvents": []
+  },
+  "settlement": {
+    "revision": 12,
+    "phase": "FINISHED",
+    "view": {
+      "configuration": "jianyi",
+      "gameDay": 6,
+      "aliveCount": 2,
+      "deathCount": 10,
+      "result": "WOLF_WIN",
+      "players": [
+        {
+          "playerNumber": 1,
+          "character": "Matthäus",
+          "alive": false,
+          "deathReason": "beiyao",
+          "deathDay": 1,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 2,
+          "character": "Volker",
+          "alive": false,
+          "deathReason": "chuxing",
+          "deathDay": 2,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 1,
+          "comingOutDay": 2
+        },
+        {
+          "playerNumber": 3,
+          "character": "Abel",
+          "alive": false,
+          "deathReason": "chuxing",
+          "deathDay": 3,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 4,
+          "character": "Heinrich",
+          "alive": false,
+          "deathReason": "chuxing",
+          "deathDay": 4,
+          "claimedRole": "ling",
+          "claimedRoleOrder": 1,
+          "comingOutDay": 2
+        },
+        {
+          "playerNumber": 5,
+          "character": "Beatrice",
+          "alive": false,
+          "deathReason": "chuxing",
+          "deathDay": 5,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 2,
+          "comingOutDay": 2
+        },
+        {
+          "playerNumber": 6,
+          "character": "Iwan",
+          "alive": false,
+          "deathReason": "beiyao",
+          "deathDay": 3,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 7,
+          "character": "Renate",
+          "alive": false,
+          "deathReason": "beiyao",
+          "deathDay": 2,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 8,
+          "character": "Kaja",
+          "alive": false,
+          "deathReason": "chuxing",
+          "deathDay": 6,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 9,
+          "character": "Samuel",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 10,
+          "character": "Chloe",
+          "alive": true,
+          "deathReason": "NONE",
+          "deathDay": 0,
+          "claimedRole": "zhan",
+          "claimedRoleOrder": 3,
+          "comingOutDay": 2
+        },
+        {
+          "playerNumber": 11,
+          "character": "Till",
+          "alive": false,
+          "deathReason": "beiyao",
+          "deathDay": 5,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        },
+        {
+          "playerNumber": 12,
+          "character": "Eva",
+          "alive": false,
+          "deathReason": "beiyao",
+          "deathDay": 4,
+          "claimedRole": "NONE",
+          "claimedRoleOrder": 0,
+          "comingOutDay": 0
+        }
+      ]
+    },
+    "selections": {
+      "avoidanceEnabled": false,
+      "voteTargets": [
+        8
+      ],
+      "divination": {
+        "hiddenTargets": [],
+        "claimedActors": [
+          {
+            "playerNumber": 10,
+            "claimedRoleOrder": 3,
+            "targets": []
+          }
+        ]
+      },
+      "guard": {
+        "hiddenTargets": [],
+        "claimedActors": []
+      }
+    },
+    "legalVoteActions": [],
+    "claimInquiry": {
+      "roles": [],
+      "players": []
+    },
+    "legalTargetSelections": [],
+    "voteHistory": [
+      {
+        "day": 2,
+        "method": "DESIGNATED",
+        "candidates": [
+          2
+        ],
+        "rounds": [
+          {
+            "round": 1,
+            "lines": [
+              {
+                "playerNumber": 2,
+                "receivedVotes": 10,
+                "targetPlayerNumber": 4
+              },
+              {
+                "playerNumber": 3,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 4,
+                "receivedVotes": 1,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 5,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 6,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 7,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 8,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 9,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 10,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 11,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              },
+              {
+                "playerNumber": 12,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 2
+              }
+            ],
+            "maximumVotes": 10,
+            "leaders": [
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "method": "DESIGNATED",
+        "candidates": [
+          3
+        ],
+        "rounds": [
+          {
+            "round": 1,
+            "lines": [
+              {
+                "playerNumber": 3,
+                "receivedVotes": 8,
+                "targetPlayerNumber": 4
+              },
+              {
+                "playerNumber": 4,
+                "receivedVotes": 1,
+                "targetPlayerNumber": 3
+              },
+              {
+                "playerNumber": 5,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 3
+              },
+              {
+                "playerNumber": 6,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 3
+              },
+              {
+                "playerNumber": 8,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 3
+              },
+              {
+                "playerNumber": 9,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 3
+              },
+              {
+                "playerNumber": 10,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 3
+              },
+              {
+                "playerNumber": 11,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 3
+              },
+              {
+                "playerNumber": 12,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 3
+              }
+            ],
+            "maximumVotes": 8,
+            "leaders": [
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "day": 4,
+        "method": "DESIGNATED",
+        "candidates": [
+          4
+        ],
+        "rounds": [
+          {
+            "round": 1,
+            "lines": [
+              {
+                "playerNumber": 4,
+                "receivedVotes": 6,
+                "targetPlayerNumber": 8
+              },
+              {
+                "playerNumber": 5,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 4
+              },
+              {
+                "playerNumber": 8,
+                "receivedVotes": 1,
+                "targetPlayerNumber": 4
+              },
+              {
+                "playerNumber": 9,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 4
+              },
+              {
+                "playerNumber": 10,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 4
+              },
+              {
+                "playerNumber": 11,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 4
+              },
+              {
+                "playerNumber": 12,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 4
+              }
+            ],
+            "maximumVotes": 6,
+            "leaders": [
+              4
+            ]
+          }
+        ]
+      },
+      {
+        "day": 5,
+        "method": "DESIGNATED",
+        "candidates": [
+          5
+        ],
+        "rounds": [
+          {
+            "round": 1,
+            "lines": [
+              {
+                "playerNumber": 5,
+                "receivedVotes": 4,
+                "targetPlayerNumber": 8
+              },
+              {
+                "playerNumber": 8,
+                "receivedVotes": 1,
+                "targetPlayerNumber": 5
+              },
+              {
+                "playerNumber": 9,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 5
+              },
+              {
+                "playerNumber": 10,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 5
+              },
+              {
+                "playerNumber": 11,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 5
+              }
+            ],
+            "maximumVotes": 4,
+            "leaders": [
+              5
+            ]
+          }
+        ]
+      },
+      {
+        "day": 6,
+        "method": "DESIGNATED",
+        "candidates": [
+          8
+        ],
+        "rounds": [
+          {
+            "round": 1,
+            "lines": [
+              {
+                "playerNumber": 8,
+                "receivedVotes": 2,
+                "targetPlayerNumber": 10
+              },
+              {
+                "playerNumber": 9,
+                "receivedVotes": 0,
+                "targetPlayerNumber": 8
+              },
+              {
+                "playerNumber": 10,
+                "receivedVotes": 1,
+                "targetPlayerNumber": 8
+              }
+            ],
+            "maximumVotes": 2,
+            "leaders": [
+              8
+            ]
+          }
+        ]
+      }
+    ],
+    "revealedRoles": [
+      {
+        "playerNumber": 1,
+        "actualRole": "lie"
+      },
+      {
+        "playerNumber": 2,
+        "actualRole": "renlang"
+      },
+      {
+        "playerNumber": 3,
+        "actualRole": "wu"
+      },
+      {
+        "playerNumber": 4,
+        "actualRole": "ling"
+      },
+      {
+        "playerNumber": 5,
+        "actualRole": "kuangren"
+      },
+      {
+        "playerNumber": 6,
+        "actualRole": "wu"
+      },
+      {
+        "playerNumber": 7,
+        "actualRole": "wu"
+      },
+      {
+        "playerNumber": 8,
+        "actualRole": "wu"
+      },
+      {
+        "playerNumber": 9,
+        "actualRole": "renlang"
+      },
+      {
+        "playerNumber": 10,
+        "actualRole": "zhan"
+      },
+      {
+        "playerNumber": 11,
+        "actualRole": "wu"
+      },
+      {
+        "playerNumber": 12,
+        "actualRole": "wu"
+      }
+    ],
+    "publicInformation": {
+      "skillReports": [],
+      "suspicion": {
+        "available": false,
+        "rows": []
+      },
+      "deathHistory": [
+        {
+          "day": 1,
+          "executions": [],
+          "nightDeaths": [
+            1
+          ]
+        },
+        {
+          "day": 2,
+          "executions": [
+            {
+              "playerNumber": 2,
+              "cause": "EXECUTION",
+              "prefixPlayers": []
+            }
+          ],
+          "nightDeaths": [
+            7
+          ]
+        },
+        {
+          "day": 3,
+          "executions": [
+            {
+              "playerNumber": 3,
+              "cause": "EXECUTION",
+              "prefixPlayers": []
+            }
+          ],
+          "nightDeaths": [
+            6
+          ]
+        },
+        {
+          "day": 4,
+          "executions": [
+            {
+              "playerNumber": 4,
+              "cause": "EXECUTION",
+              "prefixPlayers": []
+            }
+          ],
+          "nightDeaths": [
+            12
+          ]
+        },
+        {
+          "day": 5,
+          "executions": [
+            {
+              "playerNumber": 5,
+              "cause": "EXECUTION",
+              "prefixPlayers": []
+            }
+          ],
+          "nightDeaths": [
+            11
+          ]
+        }
+      ]
+    },
+    "eventCursor": 33,
+    "nextEventCursor": 33,
+    "events": [],
+    "presentedEvents": []
+  }
+}

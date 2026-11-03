@@ -37,7 +37,7 @@ onMounted(() => dialog.value.showModal())
       <button :aria-pressed="page === 'configurations'" @click="page = 'configurations'">配役説明</button>
     </nav>
     <section v-if="page === 'help'" aria-label="ヘルプ">
-      <p class="help-provenance">既存の中国語ヘルプを基にしたWeb版の日本語要約・補足です。原版の日本語原文ではありません。操作や保存の違いは「Web版の補足」に記載しています。</p>
+      <p class="help-provenance">既存の中国語ヘルプ36項目の日本語訳・補足です。原版の日本語原文ではありません。操作や保存の違いは「Web版の補足」に記載しています。</p>
       <div class="help-selectors">
         <label>分類<select aria-label="分類" :value="groupId" @change="chooseGroup"><option v-for="item in helpGroups" :key="item.id" :value="item.id">{{ item.title }}</option></select></label>
         <label>項目<select aria-label="項目" v-model="topicId"><option v-for="item in group.topics" :key="item.id" :value="item.id">{{ item.title }}</option></select></label>
@@ -56,7 +56,7 @@ onMounted(() => dialog.value.showModal())
           <dl><template v-for="(count, role) in item.roleCounts" :key="role"><dt>{{ roles[role] }}</dt><dd>{{ count }}人</dd></template></dl>
         </article>
       </div>
-      <p>役職は対局ごとに割り振られます。ここで配役を閲覧しても開村・投票は行いません。対局を始めるには閉じて配役を選び、「対局を始める」を押してください。</p>
+      <p>役職は対局ごとに割り振られます。ここで配役を閲覧しても開村・投票は行いません。対局を始めるには閉じてタイトルの「Start」から配役画像を選んでください。</p>
     </section>
   </dialog>
 </template>

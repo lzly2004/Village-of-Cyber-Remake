@@ -56,5 +56,5 @@ test('desktop-only saving/replay/drag explanations have explicit Web differences
     assert.ok(topic.webNote, id)
   }
   assert.match(helpGroups[0].topics[5].webNote, /サービス再起動・セッション解放後は再開できません/)
-  assert.match(helpGroups[0].topics[6].webNote, /未実装/)
+  assert.match(helpGroups[0].topics[6].webNote, /実装済み/);assert.match(helpGroups[0].topics[6].webNote, /自動保存ではありません/)
 })

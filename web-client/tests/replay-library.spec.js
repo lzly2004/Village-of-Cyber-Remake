@@ -1,4 +1,6 @@
-import { test, expect } from '@playwright/test'
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
+import { desktopVote } from '../test-fixtures/desktop-navigation.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { drainEvents } from './drain-events.js'
@@ -28,7 +30,7 @@ async function synthetic(page, response=file) {
 test('real finished game saves compatible v3 exactly once; search/detail/delete/reload stay local and preserve authority',async({page,request},info)=>{
   let replayReads=0
   page.on('request',req=>{if(req.url().includes('/replay?'))replayReads++})
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
+  await page.goto('/');await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   const id=(await saved(page)).sessionId
   try {
@@ -39,7 +41,7 @@ test('real finished game saves compatible v3 exactly once; search/detail/delete/
       await drainEvents(page)
       if(await page.locator('.settlement').count())break
       expect(++turns).toBeLessThan(40)
-      await page.getByTestId('vote-FREE').click();await expect(page.getByTestId('next-event')).toBeVisible()
+      await desktopVote(page,'FREE');await expect(page.getByTestId('next-event')).toBeVisible()
       await expect(page.getByTestId('save-replay')).toHaveCount(0)
     }
     expect(replayReads).toBe(0)
@@ -69,7 +71,7 @@ test('real finished game saves compatible v3 exactly once; search/detail/delete/
     await expect(rows(page)).toHaveCount(1)
     await page.screenshot({path:info.outputPath('replay-library.png'),fullPage:true})
     await request.delete('/api/v1/games/'+id)
-    await page.reload();await expect(page.getByRole('button',{name:'対局を始める'})).toBeVisible()
+    await page.reload();await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeVisible()
     await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click()
     await expect(rows(page)).toHaveCount(1)
     await rows(page).getByRole('button',{name:'削除',exact:true}).click()
@@ -133,7 +135,7 @@ for(const failure of ['invalid','network','html','storage','corrupt','hash'])tes
   if(failure==='html')await page.route('**/replay?*',route=>route.fulfill({body:'<b>DO_NOT_RENDER</b>',contentType:'text/html'}))
   if(failure==='storage')await page.evaluate(()=>{window.originalReplayOpen=indexedDB.open.bind(indexedDB);indexedDB.open=()=>{throw new DOMException('denied','SecurityError')}})
   if(['corrupt','hash'].includes(failure))await page.evaluate(async failure=>{
-    await new Promise((resolve,reject)=>{const req=indexedDB.open('vocr.replays.v1',1);req.onsuccess=()=>{const db=req.result,tx=db.transaction('recordings','readwrite'),s=tx.objectStore('recordings'),all=s.getAll();all.onsuccess=()=>{const entry=all.result[0];if(failure==='corrupt')entry.bytes=0;else entry.replay.daySnapshots[0].players[0].actualRole=2;s.put(entry)};tx.oncomplete=()=>{db.close();resolve()};tx.onabort=()=>reject(tx.error)}})
+    await new Promise((resolve,reject)=>{const req=indexedDB.open('vocr.replays.v1');req.onsuccess=()=>{const db=req.result,tx=db.transaction('recordings','readwrite'),s=tx.objectStore('recordings'),all=s.getAll();all.onsuccess=()=>{const entry=all.result[0];if(failure==='corrupt')entry.bytes=0;else entry.replay.daySnapshots[0].players[0].actualRole=2;s.put(entry)};tx.oncomplete=()=>{db.close();resolve()};tx.onabort=()=>reject(tx.error)}})
   },failure)
   const rawBefore=failure==='storage'?before:await rawEntries(page)
   await page.getByTestId('save-replay').click()
@@ -154,9 +156,9 @@ test('late read after session release is discarded without storing the previous 
   const sent=page.waitForRequest(r=>r.url().includes('/replay?'))
   await page.getByTestId('save-replay').click();await sent
   await page.route('**/api/v1/games/*',route=>route.request().method()==='DELETE'?route.fulfill({status:204}):route.continue())
-  await page.getByRole('button',{name:'新しい対局',exact:true}).click()
-  await page.getByRole('button',{name:'解放を確定',exact:true}).click()
-  await expect(page.getByRole('button',{name:'対局を始める'})).toBeVisible()
+  await page.locator('.session-footer').getByRole('button',{name:'タイトルに戻る',exact:true}).click()
+  await startDesktopGame(page)
+  await expect(page.getByTestId('next-event')).toBeVisible()
   proceed()
   await expect(library(page).getByRole('alert')).toContainText('SESSION_CHANGED')
   expect(await stored(page)).toHaveLength(0)
@@ -164,7 +166,7 @@ test('late read after session release is discarded without storing the previous 
 
 async function rawEntries(page) {
   return page.evaluate(async()=>new Promise((resolve,reject)=>{
-    const req=indexedDB.open('vocr.replays.v1',1)
+    const req=indexedDB.open('vocr.replays.v1')
     req.onsuccess=()=>{const db=req.result,tx=db.transaction('recordings','readonly'),get=tx.objectStore('recordings').getAll();get.onsuccess=()=>{db.close();resolve(get.result)};get.onerror=()=>reject(get.error)}
     req.onerror=()=>reject(req.error)
   }))
@@ -175,7 +177,7 @@ test('IndexedDB getter denied at boot still allows normal play and reports local
   await page.goto('/')
   await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click()
   await expect(library(page).getByRole('alert')).toContainText('STORAGE_UNAVAILABLE')
-  await page.getByRole('button',{name:'対局を始める'}).click()
+  await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   await request.delete('/api/v1/games/'+(await saved(page)).sessionId)
 })

@@ -1,4 +1,6 @@
-import { test, expect } from '@playwright/test'
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
+import { desktopVote } from '../test-fixtures/desktop-navigation.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { drainEvents } from './drain-events.js'
 import { readFileSync } from 'node:fs'
@@ -68,12 +70,12 @@ test('two real completed games accumulate, abandoning and replay import do not; 
   const ids=[]
   try {
     for(let game=0;game<2;game++){
-      await page.getByRole('button',{name:'対局を始める',exact:true}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+      await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
       const sid=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId);ids.push(sid)
       for(let turn=0;turn<40;turn++){
         await drainEvents(page)
         if(await page.locator('.settlement').count())break
-        await page.getByTestId('vote-FREE').click()
+        await desktopVote(page,'FREE')
       }
       await expect(page.locator('.settlement')).toBeVisible();await expect(status(page)).toContainText('保存しました')
       expect((await read(page)).totalPlayCnt).toBe(game+1)
@@ -81,7 +83,7 @@ test('two real completed games accumulate, abandoning and replay import do not; 
       await request.delete('/api/v1/games/'+sid)
       await page.evaluate(()=>sessionStorage.removeItem('vocr.guest.v1'));await page.reload()
     }
-    await page.getByRole('button',{name:'対局を始める',exact:true}).click();await expect(page.getByTestId('next-event')).toBeVisible();ids.push(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId))
+    await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible();ids.push(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId))
     expect((await read(page)).totalPlayCnt).toBe(2)
     const other=await context.newPage();await other.goto('/');expect((await read(other)).totalPlayCnt).toBe(2);await other.close()
     await page.evaluate(async file=>{const{createReplayStore}=await import('/src/replayStore.js');await createReplayStore().saveMany(file.filter(Boolean))},replayFile)
