@@ -131,3 +131,16 @@ test('scene-busy-title: in-flight CO disables title and cannot navigate or dupli
  await expect(page.getByRole('button',{name:'メニュー',exact:true})).toBeDisabled();await expect(page.getByTestId('desktop-title')).toBeHidden()
  finish();await expect(page.locator('.desktop-transient-tip')).toHaveText('占い師はいないようだ');expect(calls.map(c=>c.method)).toEqual(['POST'])
 })
+
+for(const input of ['mouse','keyboard'])test('replacement-'+input+': delayed release and creation admit only one replacement',async({page})=>{
+ const {snapshot,calls}=await mock(page);await page.goto('/');await startDesktopGame(page);await page.getByRole('button',{name:'メニュー',exact:true}).click();await page.getByTestId('title-start').click()
+ let releaseDelete,releaseCreate;const deleted=new Promise(r=>{releaseDelete=r}),created=new Promise(r=>{releaseCreate=r});let deletes=0,posts=0
+ await page.route('**/api/v1/games/'+id,async r=>{deletes++;await deleted;await r.fulfill({status:204})})
+ await page.route('**/api/v1/games',async r=>{posts++;await created;await r.fulfill({status:201,json:{sessionId:'00000000-0000-4000-8000-000000000055',update:snapshot}})})
+ const button=page.getByTestId('setup-tongchang')
+ if(input==='mouse')await button.dblclick();else{await button.focus();await page.keyboard.press('Enter');await page.keyboard.press('Enter')}
+ await expect.poll(()=>deletes).toBe(1);expect(posts).toBe(0);await expect(button).toBeDisabled()
+ releaseDelete();await expect.poll(()=>posts).toBe(1);await expect(page.getByTestId('title-start')).toBeDisabled();releaseCreate();await expect(page.getByTestId('desktop-vote-window')).toBeVisible()
+ expect(deletes).toBe(1);expect(posts).toBe(1);expect(calls[0].method).toBe('POST')
+ await expect(page.getByRole('alert')).toHaveCount(0)
+})

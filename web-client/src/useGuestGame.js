@@ -11,6 +11,7 @@ export function useGuestGame() {
   const update = shallowRef(null)
   const presentationHistory = shallowRef([])
   const completedVotePresentation = shallowRef(null)
+  const votePresentationBefore = shallowRef(null)
   let presentationVersion = 0
   function rememberPresentation(snapshot) {
     const version = ++presentationVersion
@@ -81,6 +82,7 @@ export function useGuestGame() {
     presentationVersion++
     presentationHistory.value = []
     completedVotePresentation.value = null
+    votePresentationBefore.value = null
     uncertain.value = false
     persist()
   }
@@ -220,6 +222,7 @@ export function useGuestGame() {
       const voteSession=sessionId.value, voteDay=update.value.view.gameDay
       // Keep only the already-public pre-vote display, matching the still-mounted Swing scene.
       const before={view:update.value.view,information:update.value.publicInformation}
+      votePresentationBefore.value={sessionId:voteSession,day:voteDay,before}
       const result = await request('/' + sessionId.value + '/votes', {
         method: 'POST', body: {
           expectedRevision: update.value.revision,
@@ -349,7 +352,7 @@ export function useGuestGame() {
   })
 
   return {
-    sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory, completedVotePresentation,
+    sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory, completedVotePresentation, votePresentationBefore,
     pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
     divinationTargets, selectedDivinationTargets, setDivinationTarget,
     guardTargets, selectedGuardTargets, setGuardTarget,

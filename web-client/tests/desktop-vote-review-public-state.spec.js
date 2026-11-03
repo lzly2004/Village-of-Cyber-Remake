@@ -26,3 +26,29 @@ test('vote result keeps the already displayed day and public roster until execut
  expect(await page.evaluate(()=>sessionStorage.getItem('vocr.guest.v1'))).toBe(stored)
  expect(writes).toEqual([])
 })
+
+test('reloaded vote review does not invent the missing pre-vote roster or show future population',async({page})=>{
+ const id='00000000-0000-4000-8000-000000000054',snapshot=publicSnapshot()
+ const vote={day:3,method:'FREE',candidates:[1,2],rounds:[{round:1,maximumVotes:4,leaders:[1],lines:[{playerNumber:1,targetPlayerNumber:2,receivedVotes:4},{playerNumber:2,targetPlayerNumber:1,receivedVotes:0}]}]}
+ snapshot.view.gameDay=4;snapshot.view.aliveCount=43;snapshot.view.deathCount=1;snapshot.view.players[0]={...snapshot.view.players[0],alive:false,deathDay:3,deathReason:'EXECUTION'}
+ snapshot.voteHistory=[vote];snapshot.events=[{eventname:'cxs',ch1:'Abel',ch2:'Erich',ch3:'NONE'}];snapshot.presentedEvents=[{stage:'EXECUTION',event:snapshot.events[0]}];snapshot.nextEventCursor=1
+ await page.addInitScript(({id})=>sessionStorage.setItem('vocr.guest.v1',JSON.stringify({sessionId:id,eventCursor:0})),{id})
+ await page.route('**/api/v1/games/'+id+'?**',r=>r.fulfill({json:snapshot}))
+ const writes=[];page.on('request',r=>{if(['POST','PUT','DELETE'].includes(r.method()))writes.push(r.url())});await page.goto('/')
+ const review=page.getByTestId('desktop-vote-review');await expect(review).toBeVisible();await expect(review).toContainText('3日目')
+ await expect(review.locator('.desktop-roster-row')).toHaveCount(0);await expect(review.locator('.desktop-calendar')).not.toContainText('43')
+ await expect(page.getByTestId('vote-recovery-diagnostic')).toBeVisible()
+ const before=await page.evaluate(()=>sessionStorage.getItem('vocr.guest.v1'));await page.getByTestId('vote-review-continue').click();await expect(page.getByTestId('next-event')).toBeVisible()
+ expect(await page.evaluate(()=>sessionStorage.getItem('vocr.guest.v1'))).toBe(before);expect(writes).toEqual([])
+})
+
+test('lost vote response followed by explicit synchronization retains the already displayed pre-vote visual',async({page})=>{
+ const id='00000000-0000-4000-8000-000000000056',before=publicSnapshot();before.view.gameDay=3;before.legalVoteActions=[{method:'FREE',candidates:[1,2]}]
+ const vote={day:3,method:'FREE',candidates:[1,2],rounds:[{round:1,maximumVotes:4,leaders:[1],lines:[{playerNumber:1,targetPlayerNumber:2,receivedVotes:4},{playerNumber:2,targetPlayerNumber:1,receivedVotes:0}]}]}
+ const e={eventname:'cxs',ch1:'Abel',ch2:'Erich',ch3:'NONE'},after={...before,revision:2,view:{...before.view,gameDay:4,aliveCount:43,deathCount:1,players:before.view.players.map((p,i)=>i? p:{...p,alive:false,deathDay:3,deathReason:'EXECUTION'})},voteHistory:[vote],events:[e],presentedEvents:[{stage:'EXECUTION',event:e}],nextEventCursor:1}
+ let calls=0;await page.route('**/api/v1/games',r=>r.fulfill({status:201,json:{sessionId:id,update:before}}));await page.route('**/api/v1/games/'+id+'?**',r=>r.fulfill({json:after}));await page.route('**/api/v1/games/'+id+'/votes',r=>{calls++;return r.abort('failed')})
+ await page.goto('/');await startDesktopGame(page);await page.getByTestId('vote').click();await page.getByTestId('vote-FREE').click();await expect(page.getByRole('alert')).toBeVisible();await expect(page.getByTestId('desktop-vote-review')).toHaveCount(0)
+ const saved=await page.evaluate(()=>sessionStorage.getItem('vocr.guest.v1'));await page.getByRole('button',{name:'再同期',exact:true}).click()
+ const review=page.getByTestId('desktop-vote-review');await expect(review).toBeVisible();await expect(review.locator('.desktop-calendar')).toContainText('生存者:44');await expect(review.locator('.desktop-roster-row').first().locator('.death-marker')).toHaveCount(0);await expect(page.getByTestId('vote-recovery-diagnostic')).toHaveCount(0)
+ await page.getByTestId('vote-review-continue').click();expect(calls).toBe(1);expect(await page.evaluate(()=>sessionStorage.getItem('vocr.guest.v1'))).toBe(saved)
+})

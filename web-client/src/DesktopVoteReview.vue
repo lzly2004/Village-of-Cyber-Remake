@@ -14,7 +14,7 @@ function next(){if(props.blocked)return;if(index.value+1<props.vote.rounds.lengt
 <template>
  <section class="desktop-vote-review" aria-label="投票結果" data-testid="desktop-vote-review">
   <AssetImage class="vote-background" name="images/komorebi002yuu.png" />
-  <DesktopRoster :players="players" :markers="markers" />
+  <DesktopRoster v-if="players?.length" :players="players" :markers="markers" />
   <DesktopCalendar :day="day" :alive="alive" :dead="dead" />
   <button class="desktop-art-button desktop-music-button" aria-label="ゲーム画面の曲を切替" :disabled="blocked" @click="emit('music')"><AssetImage name="images/musicBtn.png" /></button>
   <button class="desktop-art-button desktop-result-menu" data-no-click-sound aria-label="メニュー" :disabled="blocked" @click="emit('menu')"><AssetImage name="images/IntroTitle.png" /></button>

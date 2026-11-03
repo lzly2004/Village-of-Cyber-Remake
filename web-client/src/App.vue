@@ -30,7 +30,7 @@ import { useNightDayPresentation } from './useNightDayPresentation.js'
 import { configurations, configurationName, roles, claimRoleNames, stages } from './labels'
 
 const {
-  sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory, completedVotePresentation,
+  sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory, completedVotePresentation, votePresentationBefore,
   pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
   divinationTargets, selectedDivinationTargets, setDivinationTarget,
   guardTargets, selectedGuardTargets, setGuardTarget,
@@ -46,7 +46,7 @@ const {phase:presentationPhase,artwork:preludeArtwork,text:dayStartText,complete
 }))
 const reviewedVotes=new Set()
 let reviewSession=''
-watch([sessionId,completedVotePresentation,update,currentEvent,busy,uncertain],()=>{
+watch([sessionId,completedVotePresentation,votePresentationBefore,update,currentEvent,busy,uncertain],()=>{
   if(reviewSession!==sessionId.value){reviewSession=sessionId.value;reviewedVotes.clear();voteReview.value=null;voteReviewVisual.value=null}
   if(busy.value||uncertain.value||!update.value)return
   const explicit=completedVotePresentation.value
@@ -54,7 +54,8 @@ watch([sessionId,completedVotePresentation,update,currentEvent,busy,uncertain],(
     currentEvent.value?.stage==='EXECUTION'?update.value.voteHistory.at(-1):null
   if(!vote||reviewedVotes.has(vote.day))return
   if(!update.value.voteHistory.some(v=>v.day===vote.day))return
-  voteReviewVisual.value=explicit?.vote===vote?explicit.before:null
+  const remembered=votePresentationBefore.value
+  voteReviewVisual.value=explicit?.vote===vote?explicit.before:remembered?.sessionId===sessionId.value&&remembered.day===vote.day?remembered.before:null
   voteReview.value=vote
 },{flush:'sync'})
 function continueVoteReview(){if(busy.value||uncertain.value||!voteReview.value)return;reviewedVotes.add(voteReview.value.day);voteReview.value=null;voteReviewVisual.value=null}
@@ -147,8 +148,8 @@ async function startConfiguration(value){
 const players = computed(() => update.value?.view.players || [])
 const skillMarkers=computed(()=>publicSkillMarkers(update.value?.publicInformation,players.value,update.value?.view.gameDay))
 function shortName(number){const player=players.value.find(p=>p.playerNumber===number);return characters[player?.character]?.shortName || String(number)}
-const voteReviewPlayers=computed(()=>voteReviewVisual.value?.view.players || players.value)
-const voteReviewMarkers=computed(()=>publicSkillMarkers(voteReviewVisual.value?.information || update.value?.publicInformation,voteReviewPlayers.value,voteReview.value?.day))
+const voteReviewPlayers=computed(()=>voteReviewVisual.value?.view.players || [])
+const voteReviewMarkers=computed(()=>publicSkillMarkers(voteReviewVisual.value?.information,voteReviewPlayers.value,voteReview.value?.day))
 const audioUpdate=computed(()=>voteReviewVisual.value?{...update.value,view:voteReviewVisual.value.view}:update.value)
 const claimCandidates = computed(() => players.value.filter(player => claimPlayers.value.includes(player.playerNumber)))
 const voteTargets = computed(() => update.value?.selections.voteTargets || [])
@@ -230,7 +231,7 @@ function name(number) {
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
             <GameStage :key="(voteReview ? 'vote-review-' : currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!voteReview && !finished && !decisionWindow && !['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :read-test-id="['day-text','error'].includes(presentationPhase) ? 'day-start-continue' : readingStep==='primary' && controlledFrame===0 && readingComplete ? 'execution-continue' : 'next-event'" :read-disabled="busy || uncertain || (presentationPhase==='event' && !readingVisible)" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="!voteReview && Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="voteReview ? null : currentEvent?.event" :stage="currentEvent?.stage" :artwork="voteReview ? {mode:'deferred'} : artwork">
               <template #scene-overlay>
-                <DesktopVoteReview v-if="voteReview" :vote="voteReview" :players="voteReviewPlayers" :markers="voteReviewMarkers" :day="voteReview.day" :alive="voteReviewVisual?.view.aliveCount ?? update.view.aliveCount" :dead="voteReviewVisual?.view.deathCount ?? update.view.deathCount" :player-name="shortName" :blocked="busy||uncertain" @continue="continueVoteReview" @menu="openGameMenu" @music="switchDesktopMusic" />
+                <DesktopVoteReview v-if="voteReview" :vote="voteReview" :players="voteReviewPlayers" :markers="voteReviewMarkers" :day="voteReview.day" :alive="voteReviewVisual?.view.aliveCount" :dead="voteReviewVisual?.view.deathCount" :player-name="shortName" :blocked="busy||uncertain" @continue="continueVoteReview" @menu="openGameMenu" @music="switchDesktopMusic" />
                 <DesktopVoteWindow v-if="decisionWindow" :update="update" :players="players" :bindings="orderBindings" :player-name="shortName" :vote-targets="voteTargets" :legal-targets="legalTargets" :toggle-target="toggleTarget" :markers="skillMarkers" :day="update.view.gameDay" :alive="update.view.aliveCount" :dead="update.view.deathCount" :blocked="busy" @menu="openGameMenu" @music="switchDesktopMusic">
                   <template #avoidance>            <button class="desktop-art-button" role="switch" aria-label="投票回避CO"
               :aria-checked="update.selections.avoidanceEnabled" :disabled="!canDecide"
@@ -252,6 +253,7 @@ function name(number) {
               </div>
 
             </GameStage>
+            <p v-if="voteReview && !voteReviewVisual" class="stage-reading-help" role="status" lang="ja" data-testid="vote-recovery-diagnostic">再読込後の投票結果です。投票前の人物・人数表示は復元できないため省略しています。処刑の確認や投票の再送はしていません。</p>
           </section>
 
           <section v-if="!voteReview && !decisionWindow" class="players panel" aria-label="公开玩家列表" lang="zh-CN">
