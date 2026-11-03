@@ -2,7 +2,7 @@
    Coordinates use the 1280x720 stage, not browser/device pixels. Font distribution
    remains a separate confirmed baseline; only existing system fallbacks are used. */
 .stage-surface { container-type: inline-size; }
-.game-stage { font-family: "Takao Mincho", "Noto Sans CJK JP", "Yu Gothic", sans-serif; }
+.game-stage { font-family: "Takao Mincho", "DejaVu Sans", "Noto Sans CJK JP", "Yu Gothic", sans-serif; }
 .desktop-message { position: absolute; left: 20.3125%; bottom: 0; width: 59.375%; height: 31.944444%; background: #344a52; color: white; }
 .desktop-message .message-frame { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
 .desktop-message .message-frame img { width: 100%; height: 100%; object-fit: fill; max-width: none; max-height: none; }

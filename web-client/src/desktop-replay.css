@@ -1,6 +1,6 @@
 /* ReplayBrowserHandler / ReplayPlayerHandler: 1280×720 source client coordinates. */
 .desktop-replay-shell.replay-library { padding:0; margin:0; border:0; background:transparent; }
-.desktop-replay-canvas { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; container-type:inline-size; font-family:"Takao Mincho","Noto Sans CJK JP",sans-serif; color:#111; }
+.desktop-replay-canvas { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; container-type:inline-size; font-family:"Takao Mincho","DejaVu Sans","Noto Sans CJK JP",sans-serif; color:#111; }
 .desktop-replay-background,.desktop-replay-background img { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; }
 .desktop-save-slot { position:absolute; left:7.03125%; width:60.15625%; height:23.611111%; border:0; margin:0; padding:0; background:transparent; cursor:pointer; text-align:left; font:inherit; }
 .desktop-save-slot:hover,.desktop-save-slot:active { transform:none; }

@@ -211,7 +211,7 @@ test('WEB-050 public actor tools and 44 selection targets remain keyboard access
 test('WEB-021 CSS zoom stress keeps stage ratio, readable text and controls within the viewport', async ({ page, request }) => {
   const { id } = await synthetic(page, request, snapshot => manyPlayers(snapshot, true))
   try {
-    for (const zoom of [1.25, 2]) {
+    for (const zoom of [1.25, 1.5, 2]) {
       await page.evaluate(zoom => { document.body.style.zoom = String(zoom) }, zoom)
       await expectContainedStage(page)
       expect(await page.locator('.vote-information-content').evaluate(node => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(14)

@@ -1,5 +1,5 @@
 /* StartSceneHandler / GameSceneHandler.renderSelect: original 1280×720 client coordinates. */
-.desktop-start-surface { position:relative; width:100%; min-width:0; aspect-ratio:16/9; overflow:hidden; container-type:inline-size; color:#111; }
+.desktop-start-surface { position:relative; width:100%; min-width:0; aspect-ratio:16/9; overflow:hidden; container-type:inline-size; color:#111; font-family:"Takao Mincho","DejaVu Sans","Noto Sans CJK JP",sans-serif; }
 .desktop-start-background,.desktop-start-background img { position:absolute; inset:0; width:100%; height:100%; }
 .desktop-title-logo { position:absolute; left:46.875%; top:27.777778%; width:43.28125%; height:19.166667%; }
 .desktop-title-logo img { width:100%; height:100%; }
