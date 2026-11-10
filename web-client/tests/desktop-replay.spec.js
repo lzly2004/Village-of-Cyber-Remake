@@ -16,7 +16,7 @@ test('source three-slot pages, file buttons and coordinates; extra browser manag
  // ReplayBrowserHandler.getPeiyiColor indexes directly by ordinal, not enum name.
  await expect(page.locator('[data-slot="0"] .desktop-save-color')).toHaveCSS('background-color','rgb(93, 174, 90)')
  await expect(page.locator('.replay-browser-management')).not.toHaveAttribute('open','')
- for(const width of [1440,1024,800]){
+ for(const width of [1440,1024,800,768]){
   await page.setViewportSize({width,height:1000})
   const a=await page.getByTestId('desktop-replay-browser').boundingBox(),b=await page.locator('[data-slot="0"]').boundingBox(),next=await page.getByRole('button',{name:'次の保存枠'}).boundingBox()
   expect(Math.abs((b.x-a.x)/a.width*1280-90)).toBeLessThan(1);expect(Math.abs((b.y-a.y)/a.height*720-80)).toBeLessThan(1)
@@ -69,7 +69,7 @@ test('slot save and replacement require confirmation; cancel is zero request and
 })
 
 
-test('44 native Replay portraits, vote text and last person remain keyboard reachable at narrow widths',async({page})=>{
+test('44 native Replay portraits fit simultaneously without scrollbars and remain keyboard reachable at narrow widths',async({page})=>{
  const large=structuredClone(replay);large.peiyiName='daxing';large.peiyiOrdinal=7
  for(const s of large.daySnapshots){
   const sample=s.players[0]
@@ -80,11 +80,18 @@ test('44 native Replay portraits, vote text and last person remain keyboard reac
  await page.goto('/');await page.evaluate(async r=>{const{createReplayStore}=await import('/src/replayStore.js');await createReplayStore().save(r)},large);await open(page)
  await page.locator('[data-slot="0"]').click();const player=page.getByTestId('desktop-replay-player')
  await expect(player.locator('.replay-player-card')).toHaveCount(44)
- for(const width of [1440,1024,800]){
+ for(const width of [1440,1024,800,768]){
   await page.setViewportSize({width,height:1000})
+  const geometry=await player.locator('.replay-avatar-list').evaluate(el=>{
+   const b=el.getBoundingClientRect(),canvas=el.closest('.desktop-replay-canvas').getBoundingClientRect()
+   return {noX:el.scrollWidth<=el.clientWidth+1,noY:el.scrollHeight<=el.clientHeight+1,
+    cards:[...el.children].map(card=>{const a=card.getBoundingClientRect();return a.left>=b.left-1&&a.right<=b.right+1&&a.top>=b.top-1&&a.bottom<=b.bottom+1&&a.bottom<=canvas.bottom})}
+  })
+  expect(geometry.noX).toBe(true);expect(geometry.noY).toBe(true);expect(geometry.cards.every(Boolean)).toBe(true)
   const last=player.locator('.replay-player-card').last();await last.focus();await expect(last).toBeFocused()
   expect(await last.evaluate(el=>{const a=el.getBoundingClientRect(),b=el.parentElement.getBoundingClientRect();return a.left>=b.left-1&&a.right<=b.right+1})).toBe(true)
   expect(await player.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true)
+  if(width===800)await capture(page,'roster-44-all-visible-800')
  }
  await page.getByRole('button',{name:'投票結果',exact:true}).click();await expect(page.getByTestId('replay-votes')).toContainText('音楽：44票')
  await page.keyboard.press('Escape');await expect(page.locator('[data-slot="0"]')).toBeFocused()
@@ -142,4 +149,34 @@ test('Replay accessible names follow visible CO before terminal and use Japanese
  for(const p of last.players){await expect(page.locator('.replay-player-card[data-player-index="'+p.playerIndex+'"]')).toHaveAttribute('aria-label',new RegExp('真の職業：'+roles[p.actualRole]))}
  await expect(page.getByTestId('replay-role-groups')).not.toContainText('占卜师')
  await expect(page.getByTestId('replay-role-groups')).not.toContainText('猎人')
+})
+
+// Synthetic valid recordings cover each actual configuration count; no live API or game writes.
+test('all seven configuration rosters fit at once with proportional portrait overlays',async({page})=>{
+ const {configurations}=await import('../src/labels.js')
+ for(const configuration of configurations){
+  const sampleReplay=structuredClone(replay)
+  sampleReplay.peiyiName=configuration.value;sampleReplay.peiyiOrdinal=configurations.indexOf(configuration)+1
+  for(const snapshot of sampleReplay.daySnapshots){
+   const template=snapshot.players[0]
+   snapshot.aliveCount=configuration.playerCount
+   snapshot.players=Array.from({length:configuration.playerCount},(_,i)=>({...template,playerIndex:i+1,characterNumber:i+1,actualRole:6,claimedRole:i===0?1:0,comingOutDay:i===0?1:-1,claimedRoleOrder:i===0?1:0,skillTarget:0,skillTargets:[],deathDay:0,deathReason:0,nonHumanMarked:false}))
+   snapshot.voteRounds=[];snapshot.greyTargetCharNums=[];snapshot.designatedTargetCharNums=[]
+  }
+  await page.goto('/');await page.evaluate(async value=>{const {createReplayStore}=await import('/src/replayStore.js');await createReplayStore().save(value)},sampleReplay)
+  await open(page);const slot=page.locator('[data-slot="0"]');await slot.click();const canvas=page.getByTestId('desktop-replay-player')
+  await expect(canvas.locator('.replay-player-card')).toHaveCount(configuration.playerCount)
+  for(const width of [1440,800,768]){
+   await page.setViewportSize({width,height:1000})
+   const metrics=await canvas.locator('.replay-avatar-list').evaluate(el=>{
+    const box=el.getBoundingClientRect()
+    return {noX:el.scrollWidth<=el.clientWidth+1,noY:el.scrollHeight<=el.clientHeight+1,inside:[...el.children].every(card=>{const b=card.getBoundingClientRect();return b.left>=box.left-1&&b.right<=box.right+1&&b.top>=box.top-1&&b.bottom<=box.bottom+1}),ratios:[...el.querySelectorAll('.claim-icon')].map(icon=>icon.getBoundingClientRect().width/icon.closest('article').getBoundingClientRect().width)}
+   })
+   expect(metrics.noX).toBe(true);expect(metrics.noY).toBe(true);expect(metrics.inside).toBe(true)
+   for(const ratio of metrics.ratios)expect(ratio).toBeCloseTo(.5,2)
+   if(configuration.value==='daxing'&&width===800)await capture(page,'roster-daxing-all-visible-800')
+  }
+  await page.keyboard.press('Escape');await page.getByTestId('replay-return').click()
+  await page.evaluate(()=>new Promise((resolve,reject)=>{const request=indexedDB.deleteDatabase('vocr.replays.v1');request.onsuccess=resolve;request.onerror=reject;request.onblocked=reject}))
+ }
 })

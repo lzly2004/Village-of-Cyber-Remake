@@ -53,3 +53,24 @@
 .desktop-file-button{position:absolute;left:7.03125%;top:2.777778%;width:14.84375%;height:5.555556%;padding:0;border:1px solid #777;border-radius:2px;background:linear-gradient(#fff,#ddd);color:#111;font-size:1.015625cqw;font-weight:normal}
 .desktop-file-button.export{left:23.4375%}
 .desktop-file-button:hover,.desktop-file-button:active{transform:none}
+
+/* Full roster stays visible: preserve 64:98 portraits, scale every overlay with them.
+   At 1280, the native x224..860 roster area is 636px; large rosters share it. */
+.desktop-replay-player .replay-avatar-list {
+  --replay-avatar-width:min(5cqw,calc(49.6875cqw / var(--replay-columns)));
+  grid-template-columns:repeat(var(--replay-columns),var(--replay-avatar-width));
+  grid-template-rows:repeat(2,calc(var(--replay-avatar-width) * 98 / 64));
+  overflow:visible;
+  min-width:0;
+}
+.desktop-replay-player .replay-player-card {
+  width:var(--replay-avatar-width);height:calc(var(--replay-avatar-width) * 98 / 64);
+  min-width:0;min-height:0;
+}
+.desktop-replay-player .player-portrait,
+.desktop-replay-player .portrait-image,
+.desktop-replay-player .portrait-image img {width:100%;height:100%;}
+.desktop-replay-player .character-title-image {left:23.4375%;top:79.591837%;width:50%;height:20.408163%;}
+.desktop-replay-player .character-title-image img {width:100%;height:100%;}
+.desktop-replay-player .claim-icon {width:50%;height:24.489796%;}
+.desktop-replay-player .death-marker {left:7.8125%;top:10.204082%;width:82.8125%;height:72.44898%;}
