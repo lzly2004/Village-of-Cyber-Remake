@@ -2,7 +2,8 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
 import { createHash } from 'node:crypto'
-import { helpGroups, helpSourceHashes } from '../src/helpContent.js'
+import { createHelpGroups, helpSourceHashes } from '../src/helpContent.js'
+import { helpGroups } from '../test-fixtures/help-source.js'
 import { configurations, roles } from '../src/labels.js'
 const read = path => readFileSync(new URL('../../' + path, import.meta.url), 'utf8')
 
@@ -14,12 +15,14 @@ test('all five Java help groups and all 36 topics are accounted for; originals c
   const expected = []
   for (const group of helpGroups) {
     expected.push('Info' + group.id + '.txt')
+    assert.equal(group.title, read('src/main/resources/help/Info' + group.id + '.txt').replaceAll('\r\n', '\n'))
     group.topics.forEach((topic, i) => {
       assert.equal(topic.id, group.id + '-' + (i + 1))
       assert.equal(topic.source, 'Info' + topic.id + '-1.txt')
       expected.push('Info' + topic.id + '.txt', topic.source)
       assert.ok(topic.title && topic.body)
-      assert.ok(topic.body.match(/[ぁ-んァ-ン]/), topic.id)
+      assert.equal(topic.title, read('src/main/resources/help/Info' + topic.id + '.txt').replaceAll('\r\n', '\n'))
+      assert.equal(topic.body, read('src/main/resources/help/' + topic.source).replaceAll('\r\n', '\n'))
     })
   }
   const actual = readdirSync(new URL('../../src/main/resources/help/', import.meta.url)).filter(n => /^Info.*\.txt$/.test(n)).sort()
@@ -28,7 +31,7 @@ test('all five Java help groups and all 36 topics are accounted for; originals c
   assert.deepEqual(Object.keys(helpSourceHashes).sort(), actual)
   for (const file of actual) {
     const normalized = read('src/main/resources/help/' + file).replaceAll('\r\n', '\n')
-    assert.equal(createHash('sha256').update(normalized).digest('hex'), helpSourceHashes[file], file + ' needs translation/source review')
+    assert.equal(createHash('sha256').update(normalized).digest('hex'), helpSourceHashes[file], file + ' needs source review')
   }
 })
 
@@ -55,6 +58,8 @@ test('desktop-only saving/replay/drag explanations have explicit Web differences
     const topic = helpGroups.flatMap(g => g.topics).find(t => t.id === id)
     assert.ok(topic.webNote, id)
   }
-  assert.match(helpGroups[0].topics[5].webNote, /サービス再起動・セッション解放後は再開できません/)
-  assert.match(helpGroups[0].topics[6].webNote, /実装済み/);assert.match(helpGroups[0].topics[6].webNote, /自動保存ではありません/)
+  assert.match(helpGroups[0].topics[5].webNote, /服务重启、会话过期或释放后不能续局/)
+  assert.match(helpGroups[0].topics[6].webNote, /右键并确认保存/);assert.match(helpGroups[0].topics[6].webNote, /不会自动保存/)
 })
+
+ test("missing desktop source is diagnosed instead of silently substituting a translation", () => { assert.throws(() => createHelpGroups({}), /HELP_SOURCE_MISSING/) })

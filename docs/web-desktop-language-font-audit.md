@@ -8,7 +8,7 @@
 | 对话、日数 | UIConstants、DialogueBox、DialogueDayHandler / GameStage/useEventReading、夜晨组件 | 26逻辑字号、50ms逐字、点击补全再继续；人物与框体位置沿已确认基线，禁选/原生拖图 |
 | 指示、票型 | GameSceneHandler / DesktopVoteWindow、DesktopVoteReview | 原版信息板/人物印/日历/按钮；回顾本地继续不确认处刑；刷新缺投票前快照的降级明确在外侧说明 |
 | 结算 | EndAnimeHandler / SettlementBoard | 公称/真职业、死亡日/原因、存活/胜利文案保留源行为，不伪造新死因 |
-| Info | UI INFO_SCENE、资源help77文件 / DesktopHelpScene | 原三级导航与背景、20逻辑按钮/24正文；36项完整日文译文替换原摘要，源中文原件与Web差异在画布外可查 |
+| Info | UI INFO_SCENE、资源help77文件 / DesktopHelpScene | 原三级导航与背景、20逻辑按钮/24正文；2026-11-10按用户更正：5类/36项分类、标题与正文直接复用77份桌面中文文件，不再维护日文摘要或译文；Web专有差异单列 |
 | Record | RecordSceneHandler / RecordPage | 原标签/数字布局、34/24字号与八页循环；总览无current，五位胜率沿只读聚合，加载/错误不当0 |
 | Replay列表/播放 | ReplayBrowserHandler、ReplayPlayerHandler / ReplayLibrary、DesktopReplayPlayer | 九槽/图片坐标、文件导入导出/取消不写、颜色和标记；日文角色、普通日CO和终局真职业ARIA分开 |
 
@@ -30,3 +30,7 @@
 - 无人CO、失败/不确定、只读面板、迁移期间CO禁用等既有契约保持。猎人AI日记疑点只登记，不改变说明或投影去掩盖它。
 
 逐PNG哈希侧车在build/verify/desktop-closeout，旧Swing源采集在build/web050/desktop-parity-baseline；同一截图既不能冒充源Swing，也不能冒充用户目视。必要浏览器差异继续由场景矩阵记录并交用户确认。
+
+## 2026-11-10 INFO 语言纠偏
+
+用户要求“还原桌面”优先于此前广义日文化。INFO 的中文不是遗漏翻译，而是桌面原文；删除独立日文帮助正文，使用 Vite raw 构建导入同一批文件。`helpContent` 仅组装层级和单列 Web 差异，不进行翻译；`helpSources` 是静态资源加载器，不是服务或翻译引擎。各级源文件逐字比对，中文区 lang=zh-CN。桌面原件/Java未改；原日文译文通过历史提交仍可追溯，但不在当前产品中维护第二份。此决定不等于把原版日文台词/图片/角色名改成中文，也不删除桌面没有的浏览器错误提示。

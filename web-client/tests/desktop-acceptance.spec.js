@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test'
 import {readFileSync,mkdirSync,writeFileSync} from 'node:fs'
 import {execFileSync} from 'node:child_process'
 import {createHash} from 'node:crypto'
-import {helpGroups} from '../src/helpContent.js'
+import {helpGroups} from '../test-fixtures/help-source.js'
 const replay=JSON.parse(readFileSync(new URL('../../src/test/resources/replay/exchange-v3.json',import.meta.url)))[0]
 const output=new URL('../../build/verify/desktop-closeout/',import.meta.url)
 async function capture(page,node,name){

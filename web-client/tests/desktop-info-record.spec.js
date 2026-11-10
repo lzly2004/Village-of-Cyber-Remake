@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-import {helpGroups} from '../src/helpContent.js'
+import {helpGroups} from '../test-fixtures/help-source.js'
 test('game frame double clicks and outside selections never swallow reads; title artwork cannot native-drag',async({page})=>{
  await page.goto('/')
  await expect(page.locator('[data-testid=desktop-title] img').first()).toBeVisible()
@@ -22,7 +22,7 @@ test('records uses source images and next/return/title inside journal, zero API 
  await scene.getByTestId('record-next').click();await expect(scene.getByTestId('record-current')).toHaveText('1');await scene.getByTestId('record-return').click();await expect(scene.getByTestId('record-current')).toHaveCount(0)
  await scene.getByTestId('record-title-return').click();await expect(page.getByTestId('desktop-title')).toBeVisible();expect(writes).toEqual([])
 })
-test('help source hierarchy preserves every Japanese topic and no game creation, with title return',async({page})=>{
+test('help source hierarchy preserves every original Chinese topic and no game creation, with title return',async({page})=>{
  const calls=[];page.on('request',r=>{if(r.url().includes('/api/'))calls.push(r.method())});await page.goto('/');await page.getByTestId('title-help').click();const scene=page.getByTestId('desktop-help');await expect(scene).toBeVisible()
  for(const group of helpGroups){
   await scene.getByRole('button',{name:group.title,exact:true}).click()
@@ -50,7 +50,7 @@ test('record and Info source geometry and assets stay intact at three viewport s
   expect(await help.locator('.desktop-help-choice-text').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize)/el.closest('.desktop-information-scene').getBoundingClientRect().width*1280)).toBeCloseTo(20,1)
   near(await sourceRect(help.locator('.desktop-info-panel'),'[data-testid=desktop-help]'),{x:10,y:10,w:980,h:660})
   expect(await help.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true)
-  await help.screenshot({path:info.outputPath('help-'+width+'.png')});if(width===1440){await help.getByRole('button',{name:helpGroups[0].title,exact:true}).click();await help.screenshot({path:info.outputPath('help-group.png')});await help.getByRole('button',{name:helpGroups[0].topics[0].title,exact:true}).click();await expect(help.getByRole('heading',{name:helpGroups[0].topics[0].title,exact:true})).toBeVisible();await help.screenshot({path:info.outputPath('help-topic.png')})}await help.getByTestId('help-title-return').click()
+  await help.screenshot({path:info.outputPath('help-'+width+'.png')});if(width===1440){await help.getByRole('button',{name:helpGroups[0].title,exact:true}).click();await help.screenshot({path:info.outputPath('help-group.png')});await help.getByRole('button',{name:helpGroups[0].topics[0].title,exact:true}).click();await expect(help.getByTestId('desktop-help-body')).toHaveText(helpGroups[0].topics[0].body);await help.screenshot({path:info.outputPath('help-topic.png')})}await help.getByTestId('help-title-return').click()
  }
 })
 

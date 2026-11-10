@@ -2,12 +2,12 @@ import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { completeLocalReading } from '../test-fixtures/presentation-test.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
-import { helpGroups } from '../src/helpContent.js'
+import { helpGroups } from '../test-fixtures/help-source.js'
 import { configurations, roles } from '../src/labels.js'
 
 const saved = page => page.evaluate(() => sessionStorage.getItem('vocr.guest.v1'))
 
-test('Japanese guide covers every help topic and source; native hierarchy closes back to its opener', async ({ page }) => {
+test('Desktop Chinese guide covers every help topic and source; native hierarchy closes back to its opener', async ({ page }) => {
   const media = [], writes = []
   page.on('request', req => {
     if (/\.mp3(?:\?|$)/.test(req.url())) media.push(req.url())
@@ -18,16 +18,17 @@ test('Japanese guide covers every help topic and source; native hierarchy closes
   const before=await saved(page),opener=page.getByRole('button',{name:'遊び方・ヘルプ',exact:true})
   await opener.focus();await page.keyboard.press('Enter')
   const scene=page.getByTestId('desktop-help'),notes=page.locator('.desktop-browser-notes')
-  await expect(scene).toBeVisible();await notes.locator('summary').click()
-  await expect(notes).toContainText('原版の日本語原文ではありません')
+  await expect(scene).toBeVisible();await expect(scene.locator('..')).toHaveAttribute('lang','zh-CN');await notes.locator('summary').click()
+  await expect(notes).toContainText('直接复用桌面版帮助原文')
   for(const group of helpGroups){
     await scene.getByRole('button',{name:group.title,exact:true}).click()
     for(const topic of group.topics){
       await scene.getByRole('button',{name:topic.title,exact:true}).click()
-      await expect(scene.getByRole('heading',{name:topic.title,exact:true})).toBeVisible()
+      await expect(scene.getByTestId('desktop-help-body')).toBeVisible()
       await expect(scene.getByTestId('desktop-help-body')).toHaveText(topic.body)
       const original=readFileSync(new URL('../../src/main/resources/help/'+topic.source,import.meta.url),'utf8').replaceAll('\r\n','\n')
-      await expect(notes.locator('pre')).toHaveText(original)
+      await expect(scene.getByTestId('desktop-help-body')).toHaveText(original)
+      await expect(notes).toContainText(topic.source)
       if(topic.webNote)await expect(notes).toContainText(topic.webNote)
       await scene.getByTestId('help-return').click()
     }
