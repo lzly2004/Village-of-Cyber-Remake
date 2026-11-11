@@ -356,7 +356,7 @@ public class ReplayPlayerHandler implements SceneHandler {
         DebugLogger.info("[ReplayPlayerHandler] infoArea: day=" + day
                 + ", playerSum=" + playerSum + ", resultLen=" + result.length());
 
-        JTextArea infoText = TextareaSimpleFactory.createBoldTitleTextArea(Color.BLACK, 24, result);
+        JTextPane infoText = ReplayGuardTextPane.create(result, ReplayGuardHistory.lines(ui.currentReplaySave, day));
         JScrollPane scrollPane = new JScrollPane(infoText);
         UIHelpers.configureScrollPane(scrollPane);
         int panelW = boardIcon != null ? 200 + boardIcon.getIconWidth() - 80 : 500;

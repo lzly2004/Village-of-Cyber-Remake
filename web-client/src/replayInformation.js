@@ -21,6 +21,41 @@ export function visibleReplaySkill(replay,playerIndex,skillDay,visibleDay) {
   return {value:p?.skillTarget || 0,sourceDay:snapshot?.dayNumber ?? null,history:false,missing:!p}
 }
 
+// Completed Replay may use the whole recording to identify eventual hunter claims,
+// but targets remain bounded by the displayed date's existing skill-history contract.
+export function replayGuardLines(replay,day,diagnose=()=>{}) {
+  const people=new Map(),lastDays=new Map(),coDays=new Map(),claimed=new Set()
+  for(const snapshot of replay.daySnapshots)for(const p of snapshot.players || []) {
+    if(snapshot.dayNumber>=(lastDays.get(p.playerIndex) ?? -1)){people.set(p.playerIndex,p);lastDays.set(p.playerIndex,snapshot.dayNumber)}
+    if(p.claimedRole===3){claimed.add(p.playerIndex);if(p.comingOutDay>0)coDays.set(p.playerIndex,Math.min(coDays.get(p.playerIndex) ?? Infinity,p.comingOutDay))}
+  }
+  const exact=(id,d)=>replay.daySnapshots.find(s=>s.dayNumber===d)?.players.find(p=>p.playerIndex===id)
+  const marked=(id,d)=>{const p=exact(id,d);if(!p)diagnose('exposure','SKILL_RECORD_MISSING',d,replay.daySnapshots.find(s=>s.dayNumber===d)?.dayNumber ?? null);return !!p?.nonHumanMarked}
+  const result=[]
+  for(const person of [...people.values()].sort((a,b)=>a.playerIndex-b.playerIndex)) {
+    const id=person.playerIndex
+    if(person.actualRole!==3&&!claimed.has(id))continue
+    const visible=replay.daySnapshots.filter(s=>s.dayNumber<=day+1&&s.players.some(p=>p.playerIndex===id)).sort((a,b)=>b.dayNumber-a.dayNumber)[0]?.players.find(p=>p.playerIndex===id)
+    const announced=coDays.has(id)?coDays.get(id)<=day:visible?.claimedRole===3
+    // No guard action on opening night; a pre-action death is not missing data.
+    const diedBeforeFirstGuard=person.deathDay===1||(person.deathDay===2&&[1,2,3].includes(person.deathReason))
+    if(!announced&&diedBeforeFirstGuard)continue
+    let text=shortName(person.characterNumber)+' : ',any=false,exposed=false
+    for(let skillDay=2;skillDay<day;skillDay++){
+      if(person.deathDay>0&&skillDay>=person.deathDay)break
+      const target=visibleReplaySkill(replay,id,skillDay,day).value
+      if(target!==0){const targetId=target>people.size?target-people.size:target;text+=shortName(people.get(targetId)?.characterNumber || targetId)+'→';any=true}
+      exposed ||= marked(id,skillDay)
+    }
+    exposed ||= marked(id,day)
+    if(exposed)text+='破绽→'
+    text=trimArrow(text)
+    if(!announced&&!any&&day>2)text+='（記録なし）'
+    result.push({playerIndex:id,text:text+'\n',unannounced:!announced})
+  }
+  return result
+}
+
 export function replayInformation(replay,requestedDay) {
   const day=replayDay(replay,requestedDay),count=replay.daySnapshots[0].players.length
   const diagnostics=[],seen=new Set()
@@ -44,7 +79,7 @@ export function replayInformation(replay,requestedDay) {
   if(!baseRecord.snapshot && day<replay.totalDays) diagnose('claims','AVATAR_NEXT_DAY_MISSING',day+1,base?.dayNumber ?? null)
   const sections={1:'',2:'',3:''}
   for(const [index,actor] of (base?.players || []).entries()) {
-    if(![1,2,3].includes(actor.claimedRole)) continue
+    if(![1,2].includes(actor.claimedRole)) continue
     let line=shortName(actor.characterNumber)+' : ',exposed=false
     const start=actor.claimedRole===3 ? 2 : 1
     for(let skillDay=start;skillDay<day;skillDay++) {
@@ -65,6 +100,8 @@ export function replayInformation(replay,requestedDay) {
     if(exposed) line+='破绽→'
     sections[actor.claimedRole]+=trimArrow(line)+'\n'
   }
+  const guardLines=replayGuardLines(replay,day,diagnose)
+  sections[3]=guardLines.map(line=>line.text).join('')
   let executions='',bodies=''
   for(let d=1;d<day;d++) {
     const s=snapshot(d+1,'deaths')
@@ -103,7 +140,7 @@ export function replayInformation(replay,requestedDay) {
       icons.push({day:d,sourceDay:s.dayNumber,actor:p.playerIndex,name:shortName(p.characterNumber),role,order,target,targetName:playerName(s,target),black,icon})
     }
   }
-  return {day,terminal:day>=replay.totalDays,normalText,groups,icons,diagnostics,current}
+  return {day,terminal:day>=replay.totalDays,normalText,beforeGuards:normalText.slice(0,normalText.lastIndexOf('[護衛先]\n')+'[護衛先]\n'.length),guardLines,groups,icons,diagnostics,current}
 }
 
 export function replayVotes(snapshot,day,requestedRound=0) {

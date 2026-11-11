@@ -48,7 +48,7 @@ onBeforeUnmount(()=>emit('playing',false))
     <AssetImage class="desktop-replay-board" name="images/frame #19252.png" />
     <section class="replay-information desktop-replay-information" aria-label="Replay情報・履歴" tabindex="0">
      <pre v-if="info.terminal" class="replay-history-text replay-final-roles" data-testid="replay-role-groups">{{roleText}}</pre>
-     <pre v-else-if="mode==='info'" class="replay-history-text" data-testid="replay-normal-info">{{info.normalText}}</pre>
+     <pre v-else-if="mode==='info'" class="replay-history-text" data-testid="replay-normal-info">{{info.beforeGuards}}<span v-for="line in info.guardLines" :key="line.playerIndex" class="replay-guard-line" :class="{'replay-unannounced-guard':line.unannounced}" :data-guard-player="line.playerIndex" :data-guard-state="line.unannounced?'unannounced':'announced'" :aria-label="(line.unannounced?'未CO：':'CO済み：')+line.text">{{line.text}}</span></pre>
      <div v-else-if="ballot" class="replay-ballot-columns" data-testid="replay-votes"><pre>{{ballot.title+ballot.lines.slice(0,10).join('\n')}}</pre><pre>{{'\n\n'+ballot.lines.slice(10).join('\n')}}</pre></div>
     </section>
     <button v-if="day<frame.lastDay" class="desktop-art-button replay-nav-next" aria-label="次の日" :disabled="dateLocked" @click="changeDay(1)"><AssetImage name="images/PVBnext.png" /></button>

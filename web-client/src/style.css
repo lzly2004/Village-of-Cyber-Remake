@@ -284,3 +284,7 @@ h2 { font-size: 27px; font-weight: 500; line-height: 1.5; margin: 23px 0; }
 .record-metrics > div { padding: .8rem; border: 1px solid #b1beb0; min-width: 0; }
 .record-metrics dd { margin: .5rem 0 0; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
 .record-page :focus-visible { outline: 3px solid #c28931; outline-offset: 2px; }
+
+/* Replay-only unpublished hunter histories; readable gray, with a non-color accessible label. */
+.replay-guard-line { color:#000000; }
+.replay-guard-line.replay-unannounced-guard { color:#666666; }
