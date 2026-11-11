@@ -1,6 +1,8 @@
 # 桌面场景与动作对照（WEB-050）
 
-初始场景闭环基线：`3c3ffda`；当前追加误选和Info/Record的基线为`4497368`。目标仍是启动—终局—标题—再次开局闭环。状态按实现/验证分别更新，计划不等于通过。每行同时核对显示、动作、声音和返回。桌面源码位于 `src/main/java/com/vocr/ui/`，素材名位于 `com/vocr/resources/UiImage.java`。
+当前版本与交付状态见[迁移收尾状态](web-migration-status-2026-11-11.md)；下列历史测试计数仅适用于各自批次。Replay头像免滚动、中文INFO及淡色护卫已本地实现，最新统一Web候选仍待交付。
+
+初始场景闭环基线：`3c3ffda`；误选和Info/Record批次历史基线为`4497368`。目标仍是启动—终局—标题—再次开局闭环。状态按实现/验证分别更新，计划不等于通过。每行同时核对显示、动作、声音和返回。桌面源码位于 `src/main/java/com/vocr/ui/`，素材名位于 `com/vocr/resources/UiImage.java`。
 
 | ID / 测试 | 桌面入口 / 源码符号 | 显示、动作、声音与返回 | Web 对应 / 当前状态 |
 |---|---|---|---|
@@ -13,7 +15,7 @@
 | dialogue-frame | DialogueController / DayStartAnime | 框体首次补全文字、再次推进；日数继续只属本地；无附加续读按钮或图片比例标签 | GameStage.message-surface / night-day / desktop-dialogue；不确认或伪造服务器事件 |
 | replay-file-native | ReplayFileDialogs.addButtons/importFile/exportFile | 源x90/300,y20,190×40；导入选录像→目标槽→覆盖确认；导出一局到九槽文件0位；无CLICK；取消零写入 | DesktopReplayExchange；desktop-replay原位按钮、取消、配额回滚与显式重试、导出原文和零API断言；浏览器批量管理留核心外 |
 | scene-record-return | StartSceneHandler.render.btnRecord / RecordSceneHandler | CLICK进入战绩；返回标题，不能删除本地记录 | RecordPage.desktop：01内原版标题/数据图片与坐标，Next循环八页、Return回总览、Title回标题；浏览器刷新说明在画布外。desktop-info-record / statistics / scene-entry-return，本机分级已验，新候选完整试玩待 |
-| scene-help-return | StartSceneHandler.render.btnInfo / InfoSceneHandler | CLICK进入说明、INFO BGM；返回START_MENU | DesktopHelpScene：01内PVBG/原面板、五分类→主题→正文、原版返回/标题坐标与INFO BGM；help / desktop-info-record。36主题完整日文译文，原文/配役及Web差异在画布外；完整语言人工复检仍开放 |
+| scene-help-return | StartSceneHandler.render.btnInfo / InfoSceneHandler | CLICK进入说明、INFO BGM；返回START_MENU | DesktopHelpScene：01内PVBG/原面板、五分类→主题→正文、原版返回/标题坐标与INFO BGM；help / desktop-info-record。2026-11-10起直接复用桌面中文分类、主题和正文，移除独立日文译文；配役及Web差异单列；完整语言人工复检仍开放 |
 | scene-live-title | VoteButtonPanel.create.menuBtn | 直接回START_SCENE，无确认；不确认事件、不投票 | 已改为直接标题；scene-live-title / scene-finished-title-second-game |
 | scene-finished-title | EndAnimeHandler.render.nextBtn | 直接回START_SCENE；不弹活局退出确认 | 已改为直接标题；scene-live-title / scene-finished-title-second-game |
 | claim-empty-role | GameSceneVoteHandler.handleRoleCo | 请求成功events为空→GameStrings对应职业提示；createTishi(300,300,500,200)、1000ms非阻塞；CLICK | 已修复；scene-claim-role-empty-* / scene-claim-events / scene-claim-error-* |
@@ -30,7 +32,7 @@
 | Replay存储/浏览器管理 | IndexedDB v2新增独立九槽映射，旧录像原样迁移；同一录像可由多个槽引用。管理区按内容去重，删除该录像会清空引用它的槽；导出保持既有九元素交换格式，整库按管理顺序导出，不承诺保存本地空洞布局。管理区导入/搜索/诊断及原有详细检查播放器位于核心场景外；主菜单槽位播放使用桌面场景 | A09/A10继续按原格式验证；A06/A07尚未通过，战绩/说明主布局本批对齐，完整语言/字体门仍开放 |
 | 声音手势 | 初始无声，用户启用；浏览器后台停止；主菜单/帮助/对局BGM互斥 | A08仍未通过 |
 | 既有适配 | 1280×720逻辑坐标、窄屏按同一16:9等比缩放、长内容内部/页面滚动；字体系统回退；指示/记录同板；头像防裁切适配 | A07/046继续开放；不提高预算、不删反裁切断言 |
-| 战绩/说明的浏览器补充 | IDB数据范围、刷新/错误说明、配役清单与中文来源保存在画布外默认折叠区；Escape回进入前场景，原版Title按钮回标题；活局不被销毁或推进 | A06/A07不因此放行；源中文帮助保留；本轮完整日文译文及差异见[语言/字体核对](web-desktop-language-font-audit.md)，字体/DPI仍开放 |
+| 战绩/说明的浏览器补充 | IDB数据范围、刷新/错误说明、配役清单与中文来源保存在画布外默认折叠区；Escape回进入前场景，原版Title按钮回标题；活局不被销毁或推进 | A06/A07不因此放行；源中文帮助保留；历史语言/字体核对见[记录](web-desktop-language-font-audit.md)，其中日文帮助译文方案已由直接复用桌面中文替代；字体/DPI仍开放 |
 
 ## 验证与交付
 
