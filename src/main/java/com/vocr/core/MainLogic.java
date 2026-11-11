@@ -232,10 +232,11 @@ public class MainLogic implements MainLogicInterface
         //4,猎人工作逻辑
         int lietarget = zhenlie(ctx.getHunter());
         ctx.recordSkillTarget(ctx.getHunter(), ctx.getGameDay(), lietarget);
-        // 假猎人日记必须与真猎人一样，在当夜死亡公开前确定。
-        fabricator.prepareFakeHunterDiaries();
+        // 假猎结算前仅记演员；报告在死体已知后生成，且不在晚CO时重编。
+        List<Integer> diaryActors = fabricator.prepareFakeHunterDiaries();
         //5,死体逻辑，并且返回当天夜间死体
         dielogic(wolf[0],wolf[1],zhantarget,lietarget);
+        fabricator.completeFakeHunterDiaries(diaryActors, ctx.getDiebody());
         ctx.setEndResult(judgeend());
         if(ctx.getEndResult() != GameResult.NONE) //游戏结束
         {

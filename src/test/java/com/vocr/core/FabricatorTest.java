@@ -36,12 +36,12 @@ class FabricatorTest
                 context, suspicion, new SeerDiviner(context, suspicion), hunterGuarder);
 
         context.getRandom().startRecording();
-        fabricator.prepareFakeHunterDiaries();
+        fabricator.completeFakeHunterDiaries(fabricator.prepareFakeHunterDiaries(), List.of());
         assertEquals(0, context.getSkillTarget(plannedSeer, 2));
         assertEquals(0, context.getSkillTarget(plannedMedium, 2));
 
         context.clearNonHumanPlan(plannedSeer);
-        fabricator.prepareFakeHunterDiaries();
+        fabricator.completeFakeHunterDiaries(fabricator.prepareFakeHunterDiaries(), List.of());
         assertTrue(context.getSkillTarget(plannedSeer, 2) > 0,
                 "占卜计划被取消后，当夜空闲技能槽应开始保存潜在假猎人日记");
         assertTrue(context.getRandom().stopRecording().isEmpty(), "潜在日记不得改变主游戏随机序列");
