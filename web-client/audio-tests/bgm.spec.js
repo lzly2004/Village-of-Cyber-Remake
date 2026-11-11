@@ -2,6 +2,7 @@ import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test, expect } from '@playwright/test'
 import { completeNativeReading } from '../test-fixtures/native-reading.js'
 import { readFileSync } from 'node:fs'
+import { helpGroups } from '../test-fixtures/help-source.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 const manifest=JSON.parse(readFileSync(new URL('../public/assets/audio/manifest.json',import.meta.url),'utf8'))
 const id='00000000-0000-4000-8000-000000000027'
@@ -257,7 +258,7 @@ test('desktop title, help, retained live game and replay select exclusive tracks
  expect(await page.evaluate(()=>window.menuEffectPlays)).toBe(effects)
  await page.getByTestId('title-help').click();await expect(ui(page)).toHaveAttribute('data-track','INFO')
  const afterHelpEntry=await page.evaluate(()=>window.menuEffectPlays)
- await page.getByTestId('desktop-help').getByRole('button',{name:'電脳村について',exact:true}).click()
+ await page.getByTestId('desktop-help').getByRole('button',{name:helpGroups[0].title,exact:true}).click()
  await page.getByTestId('help-return').click()
  expect(await page.evaluate(()=>window.menuEffectPlays)).toBe(afterHelpEntry)
  await page.getByTestId('help-title-return').click()
