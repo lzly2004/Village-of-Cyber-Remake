@@ -33,11 +33,11 @@ class FullGameCharacterizationTest
 {
     private static final Map<peiyi, String> EXPECTED_TRACES = Map.of(
             peiyi.jianyi, "2488b2ec83f04d81d24c385ed2b57d2c47058a966b9fcdc1759b7f98b71ce7a7",
-            peiyi.tongchang, "4113e381ca0f065dacc3e02f71f6b584b1e099ff1c212a0824a60a106484c3d4",
+            peiyi.tongchang, "1ac309bdbacda4c7a69fa56a186a44adf31e8d68e768f86da833630289040751",
             peiyi.yaoohu, "4c17c0bfc779bba3d85e824de9991110921c4a056502b85944ef144369bfe02c",
             peiyi.kuangxin, "ed478cd65345e7b1ff3b2793036bc5cd83f621cd6173bc32934b1a9e4a97f0c5",
-            peiyi.beide, "fbfd198ffab15a199148dee0b81244d3e3d7c6dc375faaa5239b7a0f3fed45f2",
-            peiyi.maoyou, "dfdd0ca288b1120940acb3668a44756df78b2befb5b0a2b461177c085882ba6a",
+            peiyi.beide, "8cc88486630823aa6186f936c30bf0a50c2c1f2f1bb1007323b655b92c8f8017",
+            peiyi.maoyou, "150193e1bef65859b258243be750141adac9efd128a3740fa45a5729dc17dfc6",
             peiyi.daxing, "b05a1621af07f5ca72d84e39f74c073d8ac7935276ae9ceb3638fbe081c85d31"
     );
 

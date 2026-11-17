@@ -235,16 +235,20 @@ public class MainLogic implements MainLogicInterface
         // 假猎结算前仅记演员；报告在死体已知后生成，且不在晚CO时重编。
         List<Integer> diaryActors = fabricator.prepareFakeHunterDiaries();
         //5,死体逻辑，并且返回当天夜间死体
-        dielogic(wolf[0],wolf[1],zhantarget,lietarget);
+        // Desktop skips all dawn notices when this night ends the game. Keep them
+        // unpublished until that decision so Web consumes the same presentation.
+        dielogicCarrier.execute(wolf[0],wolf[1],zhantarget,lietarget,false);
         fabricator.completeFakeHunterDiaries(diaryActors, ctx.getDiebody());
         ctx.setEndResult(judgeend());
         if(ctx.getEndResult() != GameResult.NONE) //游戏结束
         {
+            ctx.clearPendingEvents(); // Discard notices only; death facts and Replay remain intact.
             executionManager.recordReplayDailySnapshot(ctx.getGameDay() + 1);
             executionManager.recordReplayGameEnd(ctx.getEndResult().getValue(), ctx.getGameDay());
             executionManager.presentGameEnd(ctx.getEndResult());
             return;//胜负已分
         }
+        deliverEvents();
         //6,非人占灵猎编造结果逻辑
         frlying();
         // Replay系统: 记录每日快照（录制下一天的开始状态）

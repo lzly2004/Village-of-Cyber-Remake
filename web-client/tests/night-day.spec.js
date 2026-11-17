@@ -9,9 +9,9 @@ const url=n=>'/assets/images/'+manifest.images['images/'+n].file
 const p=(stage,eventname,ch1='Abel')=>({stage,event:{eventname,ch1,ch2:'NONE',ch3:'NONE'}})
 const key='vocr.guest.v1',id='00000000-0000-4000-8000-000000000052'
 const phase=page=>page.getByTestId('game-stage')
-async function setup(page,list,{terminal=false}={}){
+async function setup(page,list,{terminal=false,result='VILLAGE_WIN'}={}){
  const snap=publicSnapshot();snap.presentedEvents=list;snap.events=list.map(p=>p.event);snap.nextEventCursor=list.length
- if(terminal){snap.phase='FINISHED';snap.view.result='VILLAGE_WIN'}
+ if(terminal){snap.phase='FINISHED';snap.view.result=result}
  await page.route('**/api/v1/games',async r=>{if(frozen.has(page)){const now=Date.now();await page.clock.install({time:new Date(now)});await page.clock.setFixedTime(new Date(now));await page.clock.pauseAt(new Date(now));await page.clock.setSystemTime(new Date(now))}await r.fulfill({status:201,json:{sessionId:id,update:snap}})})
  await page.route('**/api/v1/games/'+id+'?**',r=>{const cursor=Number(new URL(r.request().url()).searchParams.get('eventCursor'));return r.fulfill({json:{...snap,eventCursor:cursor,events:snap.events.slice(cursor),presentedEvents:snap.presentedEvents.slice(cursor)}})})
  await page.goto('/');await startDesktopGame(page)
@@ -71,13 +71,17 @@ test('same-night multiple deaths do not repeat; next execution-to-night does',as
  await click(page,'next-event');await ready(page,'event')
  await click(page,'next-event');await ready(page,'night');expect(JSON.parse(await saved(page)).eventCursor).toBe(3)
 })
-test('execution-to-public-settlement has night only; no early settlement scene or role reveal',async({page})=>{
- await clock(page);await setup(page,[p('EXECUTION','cxs'),p('SETTLEMENT','crsl')],{terminal:true})
+for (const [result,event,background] of [
+ ['VILLAGE_WIN','crsl','endVillage.png'],
+ ['WOLF_WIN','rlsl','endWolf.png'],
+ ['FOX_WIN','yhsl','endFox.png'],
+]) test(`execution-to-${result} has night only; no dawn death notice or early role reveal`,async({page})=>{
+ await clock(page);await setup(page,[p('EXECUTION','cxs'),p('SETTLEMENT',event)],{terminal:true,result})
  await click(page,'next-event');await ready(page,'night')
  await expect(page.locator('.settlement')).toHaveCount(0);await expect(page.getByTestId('settlement-board')).toHaveCount(0)
  await expect(page.getByTestId('event-dialogue')).toHaveCount(0)
  await page.clock.runFor(7000);await ready(page,'event')
- await expect(page.getByTestId('stage-background')).toHaveAttribute('href',url('endVillage.png'))
+ await expect(page.getByTestId('stage-background')).toHaveAttribute('href',url(background))
  await expect(page.getByTestId('day-start-continue')).toHaveCount(0);expect(JSON.parse(await saved(page)).eventCursor).toBe(1)
 })
 test('refresh replays local first-night presentation without moving saved cursor',async({page})=>{
