@@ -131,6 +131,10 @@ test('night/dawn and current result together obey the unchanged first-game trans
  await page.getByTestId('day-start-continue').click()
  await expect(page.getByTestId('stage-character')).toHaveCount(1)
  await expect(page.getByTestId('stage-artwork')).toHaveAttribute('data-art-ready','true')
+ // Night-death dialogue appears two seconds after the artwork is ready.
+ // networkidle alone can finish before that timer mounts the lazy frame image.
+ await expect(page.getByTestId('desktop-message')).toBeVisible()
+ await expect.poll(()=>page.locator('.message-frame img').evaluateAll(images=>images.length===1&&images[0].complete&&images[0].naturalWidth>0)).toBe(true)
  await page.waitForLoadState('networkidle')
  const stage=['images/komorebi000night01.png','images/komorebi002.png','images/haikei3.png','images/messageframe.png',...mapping.Abel.yjsw.default.map(n=>'images/'+n)]
  const menu=['title_base_resized','titleLogo','startButton','continueButton','replayButton','recordButton','infoButton','collectionsButton','PVBtitile',...Array.from({length:7},(_,i)=>'game'+(i+1))].map(n=>'images/'+n+'.png')

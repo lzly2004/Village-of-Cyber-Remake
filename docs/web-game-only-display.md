@@ -21,6 +21,12 @@
 
 本批不运行桌面完整test/check、FatJAR、full24或发布包，不推送/合流/部署。双端源码同步与最终提交见build/web050/game-only/windows-sync-receipt.json；未实施Windows原生运行，不要求用户为Web样式重玩桌面。
 
+## 云端候选补验
+
+首次推送fb485f2的运行44292414613在assets第5项失败：测试在立绘ready后仅等待networkidle，早于死亡场景既有2秒延迟显示台词，因而未观察到messageframe请求。官方验证包SHA256为2c63d048277eff6d92bbc23cff142ccd40ffe3a1e1178b660e8d259b8d5ea97e，完整失败日志和trace保留于build/web050/game-only/publication/failed-evidence。只补测试对话框可见及图片解码等待，不改生产时序或预算。
+
+修正后静态资源5项通过；真实夜晨耗时9717ms、首局传输623157字节，保留3MiB上限及全素材请求断言。最初沙箱内预览服务无法启动，获准在回环地址执行后通过；未启动JVM、未重跑本机全量。Data盘仍只读，本次测试源修改暂不能同步Windows，未动其存档或工程。修正后云端结果待核验，不将失败轮记作通过。
+
 ## 截图
 
 本机真实浏览器截图在build/verify/game-only/：title-full-page.png为包含外围的完整页面，title-game-only.png为纯游戏主菜单，game-game-only.png为公开测试快照局内；game-full-page.png及dialogue-game-only.png为真实后端首夜的完整页面和纯窗口。不是AI生成图；局内静态截图使用公开测试快照，真实首夜推进由独立实际后端用例验证。
