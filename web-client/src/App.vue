@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, defineAsyncComponent, h, nextTick } from 'vue'
+import { computed, ref, watch, defineAsyncComponent, h, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useGuestGame } from './useGuestGame'
 import PublicInformationPanel from './PublicInformationPanel.vue'
 import VoteHistoryPanel from './VoteHistoryPanel.vue'
@@ -63,6 +63,29 @@ const decisionWindow = computed(()=>!voteReview.value && update.value?.phase==='
 const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value && !voteReview.value)
 const artwork = computed(() => preludeArtwork.value || sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
 const audioControl = ref(null)
+const gameOnly = ref(false)
+const gameOnlyScale = ref(1)
+let outsideScroll = 0, consumedEscape = false
+function resizeGameOnly(){gameOnlyScale.value=Math.min(window.innerWidth/1280,window.innerHeight/720)}
+async function enterGameOnly(){
+  outsideScroll=window.scrollY;resizeGameOnly();gameOnly.value=true
+  await nextTick()
+  document.querySelector('main')?.focus({preventScroll:true})
+}
+async function restoreGameShell(){
+  gameOnly.value=false
+  await nextTick()
+  window.scrollTo({top:outsideScroll,behavior:'instant'})
+  if(!document.querySelector('dialog[open]'))document.querySelector('[data-testid="game-only-enter"]')?.focus({preventScroll:true})
+}
+function gameOnlyEscape(event){
+  if(event.key!=='Escape'||(!gameOnly.value&&!(consumedEscape&&event.repeat)))return
+  event.preventDefault();event.stopImmediatePropagation();consumedEscape=true
+  if(gameOnly.value)restoreGameShell()
+}
+function releaseGameOnlyEscape(event){if(event.key==='Escape')consumedEscape=false}
+onMounted(()=>{window.addEventListener('resize',resizeGameOnly);window.addEventListener('keydown',gameOnlyEscape,true);window.addEventListener('keyup',releaseGameOnlyEscape,true)})
+onBeforeUnmount(()=>{window.removeEventListener('resize',resizeGameOnly);window.removeEventListener('keydown',gameOnlyEscape,true);window.removeEventListener('keyup',releaseGameOnlyEscape,true)})
 const reading = useEventReading(()=>({key:sessionId.value+':'+cursor.value,
   enabled:presentationPhase.value==='event' && !voteReview.value,current:currentEvent.value,artwork:artwork.value,
   blocked:busy.value||uncertain.value}))
@@ -175,7 +198,7 @@ function name(number) {
 </script>
 
 <template>
-  <div class="app-shell" @click.capture="clickSound">
+  <div class="app-shell" :class="{'game-only':gameOnly}" :style="{'--game-only-scale':gameOnlyScale}" @click.capture="clickSound">
     <aside class="sidebar">
       <a class="brand" href="/" aria-label="電脳村ホーム"><span class="brand-mark">村</span><span>電脳村<small>VILLAGE OF CYBER</small></span></a>
       <div class="sidebar-caption">まずは、声に耳を。</div>
@@ -192,8 +215,9 @@ function name(number) {
       <div class="side-footer"><span class="status-dot"></span>ローカル試遊<p>セッションは一時保存です。通信のない状態が30分続くか、開村から24時間経過すると無効になります。サービス再起動・解放でも無効になります。<br>画像・音声に対応。終局Replayはこのブラウザーに保存できます。</p></div>
     </aside>
 
-    <main>
-      <header class="topbar"><span>電脳村リメイク / Web試遊版</span><span class="build-tag">デスクトップ表示 · 050（調整中）</span></header>
+    <main tabindex="-1">
+      <div class="game-only-entry web-shell-only"><button class="quiet-button" data-testid="game-only-enter" aria-describedby="game-only-help" @click="enterGameOnly">仅显示游戏窗口</button><small id="game-only-help">Esc 恢复外围界面</small></div>
+      <header class="topbar web-shell-only"><span>電脳村リメイク / Web試遊版</span><span class="build-tag">デスクトップ表示 · 050（調整中）</span></header>
       <div v-if="notice" class="notice" role="alert" lang="zh-CN">{{ notice }}</div>
       <div v-if="storageWarning" class="notice" role="status" lang="zh-CN">{{ storageWarning }}</div>
 
@@ -203,12 +227,12 @@ function name(number) {
       <RecordSettlement :session-id="sessionId" :update="update" :eligible="finished && !busy && !uncertain && !replayPlaying" />
 
       <section v-show="menuScene!=='game' && (!sessionId || update)" class="journal panel desktop-menu-journal" aria-label="村落紀事のメニュー">
-        <header class="panel-heading"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ menuScene==='select'?'配役選択':menuScene==='replay'?'録画':menuScene==='records'?'戦績':menuScene==='help'?'説明':'タイトル' }}</span></header>
+        <header class="panel-heading web-shell-only"><span class="eyebrow">01 / 村落纪事</span><span class="pill">{{ menuScene==='select'?'配役選択':menuScene==='replay'?'録画':menuScene==='records'?'戦績':menuScene==='help'?'説明':'タイトル' }}</span></header>
         <RecordPage v-if="menuScene==='records'" desktop @close="closeCoreScene" />
         <DesktopHelpScene :key="coreEntrySerial" v-if="menuScene==='help'" :initial-page="coreHelpPage" @close="closeCoreScene" />
         <DesktopStartScene v-show="['title','select'].includes(menuScene)" :scene="menuScene==='select' ? 'select' : 'title'" :blocked="busy||(uncertain&&Boolean(sessionId))" @navigate="navigateMenu" @start="startConfiguration" />
         <section v-show="menuScene==='replay'" lang="ja" data-testid="desktop-replay"><div id="desktop-replay-slot"></div></section>
-        <button v-if="update" class="quiet-button" data-testid="resume-current-game" :disabled="busy||uncertain" @click="menuScene='game'">{{finished?'現在の結末に戻る':'現在の対局に戻る'}}</button>
+        <button v-if="update" class="quiet-button web-shell-only" data-testid="resume-current-game" :disabled="busy||uncertain" @click="menuScene='game'">{{finished?'現在の結末に戻る':'現在の対局に戻る'}}</button>
       </section>
 
       <section v-if="!update && sessionId" class="restoring" aria-live="polite">
@@ -219,7 +243,7 @@ function name(number) {
       </section>
 
       <div v-if="update" v-show="menuScene==='game'">
-        <section class="game-heading">
+        <section class="game-heading web-shell-only">
           <div><span class="eyebrow">THE VILLAGE JOURNAL</span><h1>{{ configurationName(update.view.configuration) }}村 <span>第 {{ update.view.gameDay }} 日</span></h1></div>
           <div class="population"><strong>{{ update.view.aliveCount }}<small> 生存</small></strong><span>{{ update.view.deathCount }} 人離場</span></div>
         </section>
@@ -227,7 +251,7 @@ function name(number) {
         <div class="game-layout">
           <section class="journal panel" aria-labelledby="journal-label">
             <span id="journal-label" class="visually-hidden" lang="zh-CN">事件展示</span>
-            <header class="panel-heading"><span class="eyebrow" lang="zh-CN">01 / 村落纪事</span><span class="pill" :lang="currentEvent ? 'zh-CN' : 'ja'">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
+            <header class="panel-heading web-shell-only"><span class="eyebrow" lang="zh-CN">01 / 村落纪事</span><span class="pill" :lang="currentEvent ? 'zh-CN' : 'ja'">{{ currentEvent ? stages[currentEvent.stage] : finished ? '対局終了' : '昼の指示' }}</span></header>
             <!-- Each event/display mode gets a fresh scroller; old native keyboard animation cannot follow it. -->
             <GameStage :key="(voteReview ? 'vote-review-' : currentEvent ? 'event-' : finished ? 'finished-' : 'decision-') + cursor + ':' + presentationPhase" :data-presentation-phase="presentationPhase" :reading="!voteReview && !finished && !decisionWindow && !['night','dawn'].includes(presentationPhase) && (presentationPhase!=='event' || !currentEvent || readingVisible)" :message="Boolean(currentEvent) || ['day-text','error'].includes(presentationPhase)" :speaker="presentationPhase==='event' && currentEvent?.event?.eventname!=='wsw' ? characterDisplayName(currentEvent?.event?.ch1) : ''" :frame-index="controlledFrame" :review-allowed="readingStep==='consequence' && readingComplete" :read-test-id="['day-text','error'].includes(presentationPhase) ? 'day-start-continue' : readingStep==='primary' && controlledFrame===0 && readingComplete ? 'execution-continue' : 'next-event'" :read-disabled="busy || uncertain || (presentationPhase==='event' && !readingVisible)" :data-reading-step="readingStep" :data-reading-complete="readingComplete" :data-reading-length="Array.from(readingFullText).length" :data-reading-blocking="!voteReview && Boolean(currentEvent) && presentationPhase==='event' && !busy && !uncertain && (!readingComplete || (readingStep==='primary' && controlledFrame===0))" @read-continue="advanceReading" :event-key="sessionId + ':' + cursor" @art-ready="artReady" @art-failed="stageFailed" @consequence="audioControl?.transition($event)" :event="voteReview ? null : currentEvent?.event" :stage="currentEvent?.stage" :artwork="voteReview ? {mode:'deferred'} : artwork">
               <template #scene-overlay>
@@ -253,11 +277,11 @@ function name(number) {
               </div>
 
             </GameStage>
-            <p v-if="voteReview && !voteReviewVisual" class="stage-reading-help" role="status" lang="ja" data-testid="vote-recovery-diagnostic">再読込後の投票結果です。投票前の人物・人数表示は復元できないため省略しています。処刑の確認や投票の再送はしていません。</p>
+            <p v-if="voteReview && !voteReviewVisual" class="stage-reading-help web-shell-only" role="status" lang="ja" data-testid="vote-recovery-diagnostic">再読込後の投票結果です。投票前の人物・人数表示は復元できないため省略しています。処刑の確認や投票の再送はしていません。</p>
           </section>
 
-          <section v-if="!voteReview && !decisionWindow" class="players panel" aria-label="公开玩家列表" lang="zh-CN">
-            <header class="panel-heading"><span class="eyebrow" lang="zh-CN">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
+          <section v-if="!voteReview && !decisionWindow" class="players panel web-shell-only" aria-label="公开玩家列表" lang="zh-CN">
+            <header class="panel-heading web-shell-only"><span class="eyebrow" lang="zh-CN">02 / 村中玩家</span><span>{{ players.length }} 人</span></header>
             <p id="player-list-help" class="list-help">名单较长时可在列表内滚动。按 Tab 聚焦列表后可用方向键；继续按 Tab 可逐个选择候补。</p>
             <div class="player-list" role="region" aria-label="公开玩家列表滚动区域" lang="zh-CN" tabindex="0" aria-describedby="player-list-help">
               <label v-for="player in players" :key="player.playerNumber" class="player-row" :data-player-number="player.playerNumber" :title="characterDisplayName(player.character) + ' · ' + playerVisual(player).roleText + ' ' + playerVisual(player).orderText" :class="{ departed: !player.alive, selected: voteTargets.includes(player.playerNumber) }">
@@ -271,27 +295,34 @@ function name(number) {
           </section>
         </div>
 
-        <button v-if="!voteReview && currentEvent && readingStep==='waiting-image'" class="quiet-button image-reading-fallback" data-testid="read-without-image" :disabled="busy || uncertain" @click="reading.imageFailed()">画像なしで文章を読む</button>
+        <button v-if="!voteReview && currentEvent && readingStep==='waiting-image'" class="quiet-button image-reading-fallback web-shell-only" data-testid="read-without-image" :disabled="busy || uncertain" @click="reading.imageFailed()">画像なしで文章を読む</button>
 
-        <details v-if="currentEvent" class="display-details" lang="ja">
+        <details v-if="currentEvent" class="display-details web-shell-only" lang="ja">
               <summary>表示情報・読み方</summary>
               <p>未確認 {{ pending.length }} 件 · {{ currentEvent.stage }} · イベント {{ cursor + 1 }}</p>
               <p>台詞・叙述は既存リソースを使用しています。COと報告は公開発言であり、真偽を保証しません。</p>
               <p>文章の表示中に対話枠を押すと全文を表示します。読み終わってからもう一度押すと進みます。</p>
               <p v-if="readingDiagnostic" role="status">表示診断：{{ readingDiagnostic }}。画像なしでも文章を読めます。</p>
         </details>
-        <small v-if="presentationDiagnostic" class="visual-diagnostic" role="status" lang="ja">場面表示診断：{{ presentationDiagnostic }}</small>
+        <small v-if="presentationDiagnostic" class="visual-diagnostic web-shell-only" role="status" lang="ja">場面表示診断：{{ presentationDiagnostic }}</small>
 
-        <PublicInformationPanel v-if="!voteReview && !decisionWindow && (update.phase === 'DAY_DECISION' || finished)" :information="update.publicInformation" :players="players" :finished="finished" :player-name="name" />
-        <VoteHistoryPanel v-if="!voteReview && !decisionWindow" :history="update.voteHistory" :player-name="name" />
+        <PublicInformationPanel class="web-shell-only" v-if="!voteReview && !decisionWindow && (update.phase === 'DAY_DECISION' || finished)" :information="update.publicInformation" :players="players" :finished="finished" :player-name="name" />
+        <VoteHistoryPanel class="web-shell-only" v-if="!voteReview && !decisionWindow" :history="update.voteHistory" :player-name="name" />
 
-        <footer class="session-footer">
+        <footer class="session-footer web-shell-only">
           <span>一時セッション・このタブを再読み込みして再開できます。</span>
           <button v-if="finished" class="quiet-button" :disabled="busy||uncertain" @click="openGameMenu">タイトルに戻る</button>
           <button v-else-if="!confirmingExit" class="quiet-button" :disabled="busy" @click="confirmingExit = true">試遊を終了</button>
           <div v-else-if="!finished" class="exit-confirm"><span>解放すると、この対局は再開できません。</span><button class="quiet-button" :disabled="busy" @click="confirmingExit = false">対局を残す</button><button class="danger-button" :disabled="busy" @click="release().then(() => confirmingExit = false)">解放を確定</button></div>
         </footer>
       </div>
+      <section v-if="gameOnly && (notice || storageWarning || uncertain || !audioControl?.status?.enabled || audioControl?.status?.error || (!voteReview && currentEvent && readingStep==='waiting-image'))" class="game-only-status" data-testid="game-only-status" aria-label="ゲームの状態">
+        <p v-if="notice" role="alert" lang="zh-CN">{{notice}}</p><p v-if="storageWarning" role="status" lang="zh-CN">{{storageWarning}}</p>
+        <button v-if="sessionId && (notice || uncertain)" :disabled="busy" @click="refresh">再同期</button>
+        <button v-if="!audioControl?.status?.enabled" :disabled="audioControl?.status?.status==='unlocking'" data-testid="game-only-enable-audio" @click="audioControl?.enable()">音楽を有効にする</button>
+        <p v-if="audioControl?.status?.error" role="status">音声を再生できません。Escで音声設定を確認できます。</p>
+        <button v-if="!voteReview && currentEvent && readingStep==='waiting-image'" :disabled="busy || uncertain" @click="reading.imageFailed()">画像なしで文章を読む</button>
+      </section>
     </main>
   </div>
 </template>

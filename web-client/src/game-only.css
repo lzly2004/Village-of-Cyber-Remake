@@ -1,0 +1,19 @@
+/* Transitional shell toggle. Components stay mounted; the original canvas keeps 1280×720 coordinates. */
+.game-only-entry { display:flex; justify-content:flex-end; align-items:center; gap:14px; padding:10px 0; }
+.game-only-entry small { color:#6d7c74; font-size:12px; }
+.app-shell.game-only { position:fixed; inset:0; display:block; height:100dvh; min-height:0; overflow:hidden; background:#111; }
+.game-only main { position:absolute; left:50%; top:50%; width:1280px; height:720px; max-width:none; padding:0; margin:0; transform:translate(-50%,-50%) scale(var(--game-only-scale)); outline:none; }
+.game-only .sidebar,.game-only .web-shell-only,
+.game-only #replay-home,.game-only main > .notice,
+.game-only .desktop-browser-notes,.game-only .replay-browser-management { display:none !important; }
+.game-only .journal,.game-only .desktop-replay-shell { border:0; background:transparent; margin:0; overflow:visible; }
+.game-only .game-layout { display:block; }
+.game-only .stage-surface { max-width:none; }
+.game-only .desktop-replay-player { padding:0; margin:0; border:0; }
+.game-only .restoring { min-height:720px; margin:0; padding:80px; background:#fbfcf7; }
+.game-only-status,.game-only main > .notice:has([role="alert"]),.game-only .desktop-replay-shell > p[role] { position:absolute; z-index:100; top:12px; left:12px; max-width:800px; max-height:320px; overflow:auto; padding:8px 12px; margin:0; background:#fff4e3; color:#263e36; border:1px solid #b5802b; font-size:16px; line-height:1.5; }
+.game-only main > .notice:has([role="alert"]) { display:block !important; top:auto; bottom:12px; }
+.game-only main > .notice:has([role="alert"]) > p { display:none; }
+.game-only-status p { margin:0 0 6px; }
+.game-only-status button { padding:4px 12px; margin-right:8px; }
+.game-only .desktop-replay-shell { position:relative; }
