@@ -18,7 +18,7 @@ const query = ref(''), configuration = ref(''), result = ref(''), removing = ref
 const slots=ref(Array(9).fill(null)),slotPage=ref(0),slotIntent=ref(null)
 const slotDialog=ref(null)
 let playbackOpener
-function playEntry(entry,event){playbackOpener=event.currentTarget;playing.value=JSON.parse(JSON.stringify(entry.replay))}
+function playEntry(entry,event){playbackOpener=event.currentTarget;message.value='';playing.value=JSON.parse(JSON.stringify(entry.replay))}
 async function closePlayback(){playing.value=null;await nextTick();if(playbackOpener?.isConnected)playbackOpener.focus({preventScroll:true})}
 let slotOpener
 watch(slotIntent,async(value)=>{if(value){await nextTick();slotDialog.value?.showModal()}else{await nextTick();if(slotOpener?.isConnected)slotOpener.focus({preventScroll:true})}})

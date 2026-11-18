@@ -57,6 +57,23 @@ async function finished(page){
  await page.route('**/api/v1/games/'+id+'/replay?**',r=>r.fulfill({json:[replay,...Array(8).fill(null)]}))
  await page.goto('/');await expect(page.getByTestId('settlement-board')).toBeVisible();await page.getByTestId('settlement-board').getByRole('button',{name:'タイトルに戻る'}).click();await open(page)
 }
+for(const gameOnly of [false,true])test(`save notice is consumed on playback entry and does not return after closing (game-only=${gameOnly})`,async({page})=>{
+ await finished(page)
+ if(gameOnly)await page.getByTestId('game-only-enter').click()
+ const shell=page.locator('.desktop-replay-shell'),notice=shell.locator(':scope > [role="status"]')
+ await page.locator('[data-slot="0"]').click({button:'right'})
+ await page.getByRole('button',{name:'保存を確定',exact:true}).click()
+ await expect(notice).toHaveText('Replayをこのブラウザーに保存しました。')
+ const before=await store(page),authority=await page.evaluate(key=>sessionStorage.getItem(key),key),writes=[]
+ page.on('request',r=>{if(r.url().includes('/api/')&&r.method()!=='GET')writes.push(r.method())})
+ await page.locator('[data-slot="0"]').click()
+ await expect(page.getByTestId('desktop-replay-player')).toBeVisible();await expect(notice).toHaveCount(0)
+ await page.getByRole('button',{name:'次の日',exact:true}).click();await expect(notice).toHaveCount(0)
+ await page.getByRole('button',{name:'前の日',exact:true}).click()
+ await page.getByRole('button',{name:'Replayを閉じる',exact:true}).click()
+ await expect(page.getByTestId('desktop-replay-browser')).toBeVisible();await expect(notice).toHaveCount(0)
+ expect(await store(page)).toEqual(before);expect(await page.evaluate(key=>sessionStorage.getItem(key),key)).toBe(authority);expect(writes).toEqual([])
+})
 test('slot save and replacement require confirmation; cancel is zero request and existing recording stays unchanged',async({page})=>{
  await finished(page);await page.getByRole('button',{name:'次の保存枠',exact:true}).click();await page.getByRole('button',{name:'次の保存枠',exact:true}).click();let reads=0;page.on('request',r=>{if(r.url().includes('/replay?'))reads++})
  await page.locator('[data-slot="6"]').click({button:'right'});await expect(page.getByRole('dialog',{name:'保存確認'})).toBeVisible()
