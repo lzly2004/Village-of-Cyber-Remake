@@ -1,14 +1,17 @@
-import { test, expect } from '@playwright/test'
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
+import { desktopVote } from '../test-fixtures/desktop-navigation.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { drainEvents } from '../tests/drain-events.js'
 
-// Real production runWeb, built UI, no routes/fixtures/seed selection or outcome hunting.
+// Real production runWeb and built UI; no API mocks, seed selection or outcome hunting.
+// Only local presentation time/continue is handled by the journey fixture; rules stay real.
 test('unseeded production game restores, reaches settlement and opens local records/replay', async ({ page, request }, info) => {
   const errors = []
   page.on('pageerror', error => errors.push(error.name))
   await page.goto('/')
-  await expect(page.getByRole('button', { name: '対局を始める', exact: true })).toBeEnabled()
+  await expect(page.locator('[data-testid="title-start"], [data-testid="setup-jianyi"]')).toBeEnabled()
   const created = page.waitForResponse(r => r.request().method() === 'POST' && new URL(r.url()).pathname === '/api/v1/games')
-  await page.getByRole('button', { name: '対局を始める', exact: true }).click()
+  await startDesktopGame(page)
   const response = await created
   expect(response.status()).toBe(201)
   expect(Object.keys(response.request().postDataJSON())).toEqual(['configuration'])
@@ -24,14 +27,15 @@ test('unseeded production game restores, reaches settlement and opens local reco
       await drainEvents(page)
       if (await page.locator('.settlement').count()) break
       await expect(page.getByRole('region', { name: 'ローカル戦績保存' })).toHaveCount(0)
-      await expect(page.getByTestId('vote-FREE')).toBeEnabled()
-      await page.getByTestId('vote-FREE').click()
+      await expect(page.getByTestId('desktop-vote-window')).toHaveAttribute('data-command-blocked','false')
+      await desktopVote(page,'FREE')
     }
     expect(turns, 'a single unseeded game must converge without replacing it').toBeLessThan(80)
     await expect(page.locator('.settlement')).toBeVisible()
     await expect(page.getByRole('region', { name: 'ローカル戦績保存' })).toContainText('保存しました')
     await page.getByRole('button', { name: '戦績を見る', exact: true }).click()
-    const records = page.getByRole('dialog', { name: 'ブラウザーの戦績' })
+    const records = page.getByTestId('desktop-records')
+    await expect(records).toBeVisible()
     await expect(records.getByTestId('record-play')).toHaveText('1回')
     await page.screenshot({ path: info.outputPath('production-records.png') })
     await page.keyboard.press('Escape')

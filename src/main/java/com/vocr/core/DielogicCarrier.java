@@ -27,6 +27,12 @@ class DielogicCarrier
 
     public void execute(int wolf, int wolfbite, int zhantarget, int lietarget)
     {
+        execute(wolf, wolfbite, zhantarget, lietarget, true);
+    }
+
+    /** Ordinary nights wait for the caller's victory check before publishing notices. */
+    void execute(int wolf, int wolfbite, int zhantarget, int lietarget, boolean publishNotices)
+    {
         ArrayList<Integer> diebody = new ArrayList<>();
         ctx.clearPendingEvents();
 
@@ -36,7 +42,7 @@ class DielogicCarrier
         shuffleAndLogEvents(diebody);
         handleFakeSeerExposure(diebody);
 
-        deliverEvents.run();
+        if (publishNotices) deliverEvents.run();
     }
 
     private void handleWolfBite(int wolf, int wolfbite, int lietarget, ArrayList<Integer> diebody)

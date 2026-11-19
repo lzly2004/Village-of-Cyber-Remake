@@ -38,13 +38,12 @@ final class ReplayTextFormatter
                             replay, seerResults, player, index, playerSum, 1, day, true);
                     case 2 -> appendSkillResults(
                             replay, mediumResults, player, index, playerSum, 1, day, true);
-                    case 3 -> appendSkillResults(
-                            replay, hunterResults, player, index, playerSum, 2, day, false);
                     default -> { }
                 }
             }
         }
 
+        for (var line : ReplayGuardHistory.lines(replay, day)) hunterResults.append(line.text());
         appendDeathHistory(replay, day, playerSum, executions, nightDeaths);
 
         return new StringBuilder()

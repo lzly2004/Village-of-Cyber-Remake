@@ -43,7 +43,7 @@ watch([() => props.name, visible], async ([name, ready]) => {
 <template>
   <span ref="element" class="asset-image" :data-image-state="state">
     <img v-if="asset && state === 'ready'" :key="asset.url" :src="asset.url" :width="asset.width" :height="asset.height"
-      alt="" aria-hidden="true" decoding="async" @error="imageError">
+      alt="" aria-hidden="true" draggable="false" decoding="async" @error="imageError">
     <span v-else-if="state === 'failed'" class="asset-diagnostic" role="img" aria-label="表示診断：画像を表示できません">画像未表示</span>
     <span v-else class="asset-placeholder" aria-hidden="true">…</span>
   </span>

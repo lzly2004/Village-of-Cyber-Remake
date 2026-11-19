@@ -33,7 +33,7 @@ const rules={0:'自由投票',1:'グレラン',2:'指定投票','-1':'投票方�
         <button class="quiet-button" :aria-pressed="mode==='votes'" :disabled="!votes" @click="show('votes')">投票結果</button>
       </div>
       <p v-if="!votes">この日の投票記録はありません。</p>
-      <pre v-if="mode==='info'" class="replay-history-text" data-testid="replay-normal-info">{{ info.normalText.replaceAll('破绽','破綻') }}</pre>
+      <pre v-if="mode==='info'" class="replay-history-text" data-testid="replay-normal-info">{{ info.beforeGuards.replaceAll('破绽','破綻') }}<span v-for="line in info.guardLines" :key="line.playerIndex" class="replay-guard-line" :class="{'replay-unannounced-guard':line.unannounced}" :data-guard-player="line.playerIndex" :data-guard-state="line.unannounced?'unannounced':'announced'" :aria-label="(line.unannounced?'未CO：':'CO済み：')+line.text">{{line.text.replaceAll('破绽','破綻')}}</span></pre>
       <div v-else-if="votes" class="replay-votes" data-testid="replay-votes">
         <nav class="claim-actions" aria-label="Replay投票回切替">
           <button class="quiet-button" :disabled="votes.index===0" @click="round=votes.index-1">前の投票回</button>

@@ -1,0 +1,210 @@
+{
+  "delivery_head": "44973680c32bfd70ea1a7e39d58219a3739ba817",
+  "base": "f961bee3063ac79ecc76ba0234a9694687f8a599",
+  "validation_sha": "6516ae17b6459f5e934cd3c521bd131b0159dac8",
+  "validation_tree": "74984803aefef6be5f7269ac41f07ff580bda725",
+  "non_document_files_equal": [
+    {
+      "path": "tools/guarded-process.py",
+      "sha256": "47fb4f37396d79590a7b954ecc55d3bacd1ad694f3a896dae0f7f83b659c05f3",
+      "bytes": 6974
+    },
+    {
+      "path": "tools/playtest_bundle.py",
+      "sha256": "0456d09654b200557a3383cefc417935ddacad58e755f034c8824f831a728e13",
+      "bytes": 1695
+    },
+    {
+      "path": "tools/playtest_runtime.py",
+      "sha256": "2804bd8f26f05c82ae08f52aa1cedb75f5fd0cf4a8a6f97c2c48e2bb2c624f1a",
+      "bytes": 11609
+    },
+    {
+      "path": "tools/playtest_stopped.py",
+      "sha256": "7f96eeb071d1ca5c53a1dc126040459de09d4dff8f1ddb8191db3b0720b2a32b",
+      "bytes": 3545
+    },
+    {
+      "path": "tools/tests/test_guarded_process.py",
+      "sha256": "cdab64477cf7ab98116c5e451384bf8e681ce80a887df3d64cfe932f1477b237",
+      "bytes": 11604
+    },
+    {
+      "path": "tools/tests/test_playtest.py",
+      "sha256": "194b44eebf6f23281cd1ed15041eb402a8ce5fec119437969839b16ee64d089d",
+      "bytes": 23061
+    },
+    {
+      "path": "tools/visual-baseline/DesktopReplayBaselineTest.java",
+      "sha256": "b88cc337f18152c85e92b786cd4e4fe8d1f21397f2f93756138e6d43400bbbd1",
+      "bytes": 3565
+    },
+    {
+      "path": "web-client/asset-tests/images.spec.js",
+      "sha256": "fde2b9d393f3e457991f0392530068a832253d1ebc34b227e04be3151aa2f7de",
+      "bytes": 10294
+    },
+    {
+      "path": "web-client/audio-tests/bgm.spec.js",
+      "sha256": "34d9f3d25764f0d6eb42875faeae6dd23114f6402a9dfa8481b200a39d22b8fe",
+      "bytes": 18971
+    },
+    {
+      "path": "web-client/audio-tests/sound.spec.js",
+      "sha256": "92482c0767f8672650beaba1cd82f578bf5c778a4ead626db422dc66c7cd9695",
+      "bytes": 19228
+    },
+    {
+      "path": "web-client/hosting-tests/hosting.spec.js",
+      "sha256": "a6c2aff59dbdf48ec951d9163c052a18bf16837bf7e404848a2cbb5a14cf1db8",
+      "bytes": 10021
+    },
+    {
+      "path": "web-client/package.json",
+      "sha256": "511c6f39da17398717555e6a7920252931cbb5969b8720a82bbfbc8a88f227e3",
+      "bytes": 1623
+    },
+    {
+      "path": "web-client/src/App.vue",
+      "sha256": "c5bf8de1837995888d44e3102ab86e93ba75d2796f5db44776232ff9880cdf90",
+      "bytes": 26274
+    },
+    {
+      "path": "web-client/src/DesktopReplayExchange.vue",
+      "sha256": "b2f07c6452f3322229d4f6fe84851389ba48caa94a11bd6d92648935b867b288",
+      "bytes": 6346
+    },
+    {
+      "path": "web-client/src/DesktopReplayPlayer.vue",
+      "sha256": "ee56e66766afc3e7495f9e764357b8e6b922bc90bd7f1387c6d876b0ad5933e0",
+      "bytes": 7574
+    },
+    {
+      "path": "web-client/src/GameStage.vue",
+      "sha256": "ac8fcbfa7e8313a2eb567631d108fde2b07b76308f2212e45e60cf482292bda9",
+      "bytes": 4577
+    },
+    {
+      "path": "web-client/src/ReplayEntry.vue",
+      "sha256": "70139eae7f9c3280683fc0b9c5fcfc46f6a610248accc994c6d99701f3807172",
+      "bytes": 1831
+    },
+    {
+      "path": "web-client/src/ReplayLibrary.vue",
+      "sha256": "08940596a747eee621978ab85202a938c192f0cb23ce64f6a91e5d9ba402bbdd",
+      "bytes": 19122
+    },
+    {
+      "path": "web-client/src/StageArtwork.vue",
+      "sha256": "9b6f3dbe0ffeb415a1cd3011219822ce387280ed18b99f8937073358995b0093",
+      "bytes": 3657
+    },
+    {
+      "path": "web-client/src/desktop-dialogue.css",
+      "sha256": "a15be64ed3ba3d66f7cfe91c29651fdf5f4946ff8232b64e6367dc6c08ae4086",
+      "bytes": 20176
+    },
+    {
+      "path": "web-client/src/desktop-replay.css",
+      "sha256": "7877829c93816f6d60dd3d5601c204cd51b2b401b77ba0a276709876736c85b2",
+      "bytes": 6082
+    },
+    {
+      "path": "web-client/src/replaySlots.js",
+      "sha256": "5e58800d50b136ef614925822d6a6c6ad5f2eac1c826be53837841533d48b4a3",
+      "bytes": 986
+    },
+    {
+      "path": "web-client/src/replayStore.js",
+      "sha256": "ea909e318b55fd343aa9f090c9a8414e5d02ddcd266120206a5b8be5747bf63e",
+      "bytes": 9043
+    },
+    {
+      "path": "web-client/src/requestRecovery.js",
+      "sha256": "5aa55abbb28df818d6595058712045b48022f963129bbb1c4035623d0301013e",
+      "bytes": 2207
+    },
+    {
+      "path": "web-client/src/style.css",
+      "sha256": "ff087a89f7b86f1eca0e4b988e607b2db3595210bf4d26e6996893f5936d227f",
+      "bytes": 25342
+    },
+    {
+      "path": "web-client/src/useGuestGame.js",
+      "sha256": "92cc0aa0d0e9d500969dacbb21c6f0daa2d9fb4b22afd658566404b12702b942",
+      "bytes": 15374
+    },
+    {
+      "path": "web-client/src/useNightDayPresentation.js",
+      "sha256": "0d1343b77557b95c1b91fa932baa19de140b61c5164469a81a77c40052f5f421",
+      "bytes": 3104
+    },
+    {
+      "path": "web-client/tests/desktop-replay.spec.js",
+      "sha256": "25aaa67688c77839bbc1983b6ec73eb5195d1691839cd2ee35cea84a12c12ec0",
+      "bytes": 13334
+    },
+    {
+      "path": "web-client/tests/night-day.spec.js",
+      "sha256": "01ce4a7a26265a3ed5b7f850fbe10e3e2273a85d9e4e25c625da07cc31bd8994",
+      "bytes": 13948
+    },
+    {
+      "path": "web-client/tests/replay-files.spec.js",
+      "sha256": "faf9b4f593b51c4ecbb95c37fcad3611fa2311c5c392d1e69fb061315a9619f9",
+      "bytes": 15296
+    },
+    {
+      "path": "web-client/tests/replay-information.spec.js",
+      "sha256": "7f13e0d5246a9bb8fce88439497a7380cc34bb4b694017fdae3485fc1c4ca993",
+      "bytes": 11553
+    },
+    {
+      "path": "web-client/tests/replay-library.spec.js",
+      "sha256": "b95671bddd368e51e8db7c359ef78a2b52e376eca5605a625e1ed3c4504e39ae",
+      "bytes": 12422
+    },
+    {
+      "path": "web-client/tests/replay-playback.spec.js",
+      "sha256": "1aaadb79111eea801e0d83a55c6450653961621ae28158d6f0571d6f0e8c03bc",
+      "bytes": 13134
+    },
+    {
+      "path": "web-client/tests/replay-slots.spec.js",
+      "sha256": "3ecd6e0d0d17f639a3ebce648b258d9e71e9e25810e799db1a3a4ac4b91a51c3",
+      "bytes": 4782
+    },
+    {
+      "path": "web-client/tests/request-recovery.spec.js",
+      "sha256": "44d0078dd262aad8caec354e7f005e1beead00da0467de0332e66ddc5fa64652",
+      "bytes": 22047
+    },
+    {
+      "path": "web-client/tests/scene-artwork.spec.js",
+      "sha256": "fea07b5afe83568e4ef1304be1d8a414a4343469e13b537c20af52af7a5eafba",
+      "bytes": 20315
+    },
+    {
+      "path": "web-client/unit/replay-slots.test.js",
+      "sha256": "cea75d5a94e4cdaa8f4931bd926a0fdfa0050e5d690f32c6445374192ff9e979",
+      "bytes": 1358
+    },
+    {
+      "path": "web-client/unit/request-recovery.test.js",
+      "sha256": "1c171d16f7dc4ecc5fa87eb5d8a2fda3a42512ffaffd84bae888b7cbde54a845",
+      "bytes": 5086
+    }
+  ],
+  "document_files": [
+    "docs/superpowers/plans/2026-11-01-web-050-replay-runtime-dialogue.md",
+    "docs/web-desktop-core-window.md",
+    "docs/web-desktop-scene-matrix.md",
+    "docs/web-playtest.md",
+    "开发任务清单.md"
+  ],
+  "different_commit_and_document_tree": true,
+  "cloud_validation": "not_run",
+  "delivery_files": 43,
+  "delivery_commits": 4,
+  "provenance": "Coder local validation snapshot statement; archived original file hashes rechecked against delivery_head Git objects on 2026-11-03. Not independent authentication of the local snapshot or a remote CI run."
+}

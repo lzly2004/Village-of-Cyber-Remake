@@ -191,10 +191,52 @@ def release_evidence(read, get, files, outcome, result, environment):
             'scope': 'report and upload identity bound here; download/check the separate binary before use'}
 
 
-def assemble(read, names, environment, *, assembly_revision=5):
+def preview_evidence(read, get, files, outcome, result, environment):
+    if result['plan'].get('tier') != 'frontend':
+        if (outcome or {}).get('preview_required') or (outcome or {}).get('web_preview'):
+            raise ValueError('UNEXPECTED_PREVIEW_FOR_NONFRONTEND_PLAN')
+        return {'status': 'not_built', 'reason': 'not_frontend_tier'}
+    if not outcome or outcome.get('status') != 'passed':
+        return {'status': 'failed', 'reason': 'preview_build_or_smoke_not_completed'}
+    package = get('build/ci/web-preview.json'); upload = get('build/ci/preview-upload.json')
+    if not upload and environment.get('CI_JOB_STATUS') == 'failure':
+        return {'status': 'failed', 'reason': 'preview_upload_not_completed'}
+    pointer = outcome.get('web_preview') or {}
+    if (outcome.get('preview_required') is not True or not package or not upload or
+            pointer.get('report') != 'build/ci/web-preview.json' or pointer.get('sha256') != files['build/ci/web-preview.json']['sha256'] or
+            package.get('status') != 'passed' or package.get('source_sha') != result['tested_sha'] or
+            package.get('verification', {}).get('resultSha256') != outcome.get('result_sha256') or
+            package['verification'].get('tier') != 'frontend' or package['verification'].get('javaFull') is not False or
+            package.get('packaged_smoke', {}).get('status') != 'passed' or package['packaged_smoke'].get('tests') != 1):
+        raise ValueError('PREVIEW_VERIFICATION_MISMATCH')
+    smoke = package['packaged_smoke']; name = smoke.get('log', '')
+    if not re.fullmatch(r'build/verify/preview-smoke-[0-9a-f]{32}/packaged-smoke\.log', name):
+        raise ValueError('PREVIEW_SMOKE_LOG_INVALID')
+    raw = read(name); files[name] = {'sha256': digest(raw), 'bytes': len(raw)}
+    if (digest(raw) != smoke.get('sha256') or not re.search(r'\b1 passed\b', raw.decode(errors='replace')) or
+            re.search(r'\b\d+ (failed|skipped|flaky|interrupted)\b', raw.decode(errors='replace'))):
+        raise ValueError('PREVIEW_SMOKE_LOG_MISMATCH')
+    archive = package.get('archive') or {}
+    if (archive.get('name') != 'vocr-preview.zip' or type(archive.get('bytes')) is not int or archive['bytes'] <= 0 or
+            not re.fullmatch(r'[0-9a-f]{64}', archive.get('sha256', '')) or
+            not re.fullmatch(r'[0-9a-f]{64}', package.get('manifest_sha256', ''))):
+        raise ValueError('PREVIEW_ARCHIVE_IDENTITY_INVALID')
+    repo, run, attempt = (environment.get(k) for k in ('GITHUB_REPOSITORY', 'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT'))
+    identity = upload.get('id')
+    if (upload.get('repository') != repo or upload.get('run_id') != run or upload.get('attempt') != attempt or
+            upload.get('tested_head') != result['tested_sha'] or upload.get('artifact_name') != 'preview-' + str(run) + '-' + str(attempt) or
+            not isinstance(identity, str) or not identity.isdigit() or int(identity) <= 0 or
+            not re.fullmatch(r'[0-9a-f]{64}', upload.get('digest', '')) or
+            upload.get('url') != 'https://github.com/' + str(repo) + '/actions/runs/' + str(run) + '/artifacts/' + identity):
+        raise ValueError('PREVIEW_UPLOAD_IDENTITY_MISMATCH')
+    return {'status': 'passed', 'report': package, 'artifact': upload,
+            'scope': 'internal complete playable preview; not Java full or release approval'}
+
+
+def assemble(read, names, environment, *, assembly_revision=6):
     """read(names) can be filesystem or a bounded ZIP reader; no extraction/execution."""
     # Reproduce published reports exactly: revision 1 duplicates; revision 2 null diff diagnostics.
-    if type(assembly_revision) is not int or assembly_revision not in (1, 2, 3, 4, 5):
+    if type(assembly_revision) is not int or assembly_revision not in (1, 2, 3, 4, 5, 6):
         raise ValueError("UNSUPPORTED_ASSEMBLY_REVISION")
     names = set(map(safe_path, names))
     files = {}
@@ -224,6 +266,8 @@ def assemble(read, names, environment, *, assembly_revision=5):
               'files': files, 'first_failure': None, 'fat_jar': (outcome or {}).get('fat_jar')}
     if assembly_revision >= 5:
         report['web_release'] = {'status': 'not_built', 'reason': 'verification_not_completed'}
+    if assembly_revision >= 6:
+        report['web_preview'] = {'status': 'not_built', 'reason': 'verification_not_completed'}
     if assembly_revision >= 2:
         report['assembly_revision'] = assembly_revision
     repo, run = report['ci']['repository'], report['ci']['run_id']
@@ -320,6 +364,13 @@ def assemble(read, names, environment, *, assembly_revision=5):
                 report['first_failure'] = {'suite': 'web-release', 'case': None,
                                           'first_error': short((outcome or {}).get('reason', 'Release build or smoke failed.'))}
                 return report
+        if assembly_revision >= 6:
+            report['web_preview'] = preview_evidence(read, get, files, outcome, result, environment)
+            if report['web_preview']['status'] == 'failed':
+                report['status'] = 'failed'
+                report['first_failure'] = {'suite': 'web-preview', 'case': None,
+                                          'first_error': short((outcome or {}).get('reason', 'Preview build or upload failed.'))}
+                return report
         if (not outcome or outcome.get('status') != 'passed' or actual != planned or not actual or
                 any(s['status'] != 'passed' for s in result['suites']) or
                 environment.get('CI_JOB_STATUS') == 'failure'):
@@ -371,12 +422,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--receipt', action='store_true'); mode.add_argument('--release-upload', action='store_true')
+    mode.add_argument('--preview-upload', action='store_true')
     args = parser.parse_args()
     d = ROOT / 'build/ci'
     try:
         if os.environ.get('GITHUB_ACTIONS') != 'true':
             raise ValueError('GITHUB_ACTIONS_CONTEXT_REQUIRED')
-        if args.receipt or args.release_upload:
+        if args.receipt or args.release_upload or args.preview_upload:
             values = {k: os.environ.get('CI_ARTIFACT_' + k.upper()) for k in ('id', 'url', 'digest')}
             if not values['id'] or not values['id'].isdigit() or not re.fullmatch(r'[0-9a-f]{64}', values['digest'] or ''):
                 raise ValueError('ARTIFACT_UPLOAD_RECEIPT_MISSING')
@@ -388,16 +440,17 @@ def main():
             if values['url'] != expected:
                 raise ValueError('ARTIFACT_RECEIPT_URL_MISMATCH')
             value = {'schema': 1, 'repository': repo, 'run_id': run, 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
-                     'artifact_name': ('release-' if args.release_upload else 'verify-') + run + '-' + os.environ['GITHUB_RUN_ATTEMPT'], **values,
+                     'artifact_name': ('release-' if args.release_upload else 'preview-' if args.preview_upload else 'verify-') + run + '-' + os.environ['GITHUB_RUN_ATTEMPT'], **values,
                      'digest_algorithm': 'sha256', 'tested_head': os.environ['CI_EXPECTED_HEAD'],
                      'note': 'Post-upload receipt; not embedded in the artifact it describes.'}
-            (d/('release-upload.json' if args.release_upload else 'receipt.json')).write_text(json.dumps(value, indent=2)+'\n')
+            (d/('release-upload.json' if args.release_upload else 'preview-upload.json' if args.preview_upload else 'receipt.json')).write_text(json.dumps(value, indent=2)+'\n')
             content = '\nEvidence artifact: ' + expected + '\n\nZIP SHA-256: `' + values['digest'] + '`\n'
         else:
             names = ['build/ci/'+n+'.json' for n in ('context', 'plan', 'outcome', 'tools')
                      if (d/(n+'.json')).is_file()]
             names += ['build/ci/'+n for n in ('verify.stdout','verify.stderr','plan.stderr','release.stdout','release.stderr',
-                                             'web-release.json','release-upload.json') if (d/n).is_file()]
+                                             'web-release.json','release-upload.json','web-preview.json','preview-upload.json',
+                                             'preview.stdout','preview.stderr') if (d/n).is_file()]
             names += [p.relative_to(ROOT).as_posix() for p in (ROOT/'build/verify').rglob('*')
                       if p.is_file() and not p.is_symlink()]
             names += [p.relative_to(ROOT).as_posix() for p in (ROOT/'build/test-results/test').glob('TEST-*.xml')]

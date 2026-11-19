@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.fail;
 class FullGameCharacterizationTest
 {
     private static final Map<peiyi, String> EXPECTED_TRACES = Map.of(
-            peiyi.jianyi, "04c36c8ec0e35dae35e729588349f8fdce84042ea75a50876cc7837b8586e3ab",
-            peiyi.tongchang, "406d56900acecd2b5c0de374118b0d6d48c47290a958455145ee5dadc2ef163b",
-            peiyi.yaoohu, "24bf491cd2036520178d4cb05cad0639811de55f4ed4c0eab521a4bf8d1bd3eb",
-            peiyi.kuangxin, "ac0486689e71c493c19444e34473c47fb8183e6d3d73c7aa6df38c930394dfe5",
-            peiyi.beide, "0484354a0f4d6ab12c5f4e9e1b000a0b0d4e1e617ea5c63496e00aedb03ff62c",
-            peiyi.maoyou, "13ce25f949b4dc92ad7969967c2b342317ac36f55214e25997d274c197a44de2",
-            peiyi.daxing, "29e7a2a524961b2f558c9c7b0ed60c42c17ff2b4c01044e53557ba15f189dd1e"
+            peiyi.jianyi, "2488b2ec83f04d81d24c385ed2b57d2c47058a966b9fcdc1759b7f98b71ce7a7",
+            peiyi.tongchang, "1ac309bdbacda4c7a69fa56a186a44adf31e8d68e768f86da833630289040751",
+            peiyi.yaoohu, "4c17c0bfc779bba3d85e824de9991110921c4a056502b85944ef144369bfe02c",
+            peiyi.kuangxin, "ed478cd65345e7b1ff3b2793036bc5cd83f621cd6173bc32934b1a9e4a97f0c5",
+            peiyi.beide, "8cc88486630823aa6186f936c30bf0a50c2c1f2f1bb1007323b655b92c8f8017",
+            peiyi.maoyou, "150193e1bef65859b258243be750141adac9efd128a3740fa45a5729dc17dfc6",
+            peiyi.daxing, "b05a1621af07f5ca72d84e39f74c073d8ac7935276ae9ceb3638fbe081c85d31"
     );
 
     @TempDir

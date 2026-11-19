@@ -1,4 +1,5 @@
-import { test,expect } from '@playwright/test'
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
+import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { spawn } from 'node:child_process'
 import http from 'node:http'
@@ -23,12 +24,12 @@ async function caddy(config,ready){
 }
 async function inspect(page){
  return page.evaluate(async()=>{
-  const rows=async(name,store)=>new Promise((resolve,reject)=>{const q=indexedDB.open(name,1);q.onsuccess=()=>{const db=q.result;if(!db.objectStoreNames.contains(store)){db.close();reject(Error('STORE_NOT_INITIALIZED'));return}const t=db.transaction(store),r=t.objectStore(store).getAll();r.onsuccess=()=>resolve(r.result);t.oncomplete=()=>db.close();t.onabort=()=>reject(t.error)};q.onerror=()=>reject(q.error)})
+  const rows=async(name,store)=>new Promise((resolve,reject)=>{const q=indexedDB.open(name);q.onsuccess=()=>{const db=q.result;if(!db.objectStoreNames.contains(store)){db.close();reject(Error('STORE_NOT_INITIALIZED'));return}const t=db.transaction(store),r=t.objectStore(store).getAll();r.onsuccess=()=>resolve(r.result);t.oncomplete=()=>db.close();t.onabort=()=>reject(t.error)};q.onerror=()=>reject(q.error)})
   return {guest:sessionStorage.getItem('vocr.guest.v1'),preference:localStorage.getItem('vocr.audio.v1'),records:await rows('vocr.records.v1','results'),replays:await rows('vocr.replays.v1','recordings')}
  })
 }
 async function openHistory(page){
- await page.getByRole('button',{name:'戦績を見る',exact:true}).click();await expect(page.getByRole('dialog',{name:'ブラウザーの戦績'}).getByTestId('record-play')).toBeVisible();await page.keyboard.press('Escape')
+ await page.getByRole('button',{name:'戦績を見る',exact:true}).click();await expect(page.getByTestId('desktop-records').getByTestId('record-play')).toBeVisible();await page.keyboard.press('Escape')
  await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click();await expect(library(page).getByRole('button',{name:'一覧を再読込',exact:true})).toBeEnabled();await expect(library(page).locator('.replay-entries')).toHaveCount(1)
 }
 async function seed(page,url){
@@ -37,7 +38,7 @@ async function seed(page,url){
  await library(page).getByLabel('録画ファイルを選ぶ').setInputFiles({name:'fixture.json',mimeType:'application/json',buffer:replay})
  const preview=library(page).getByRole('group',{name:'取り込みの確認（未保存）'});await preview.getByRole('checkbox').first().check();await preview.getByRole('button',{name:'選択した録画の取り込みを確定',exact:true}).click();await expect(library(page).locator('.replay-entries > li')).toHaveCount(1)
  await page.evaluate(()=>localStorage.setItem('vocr.audio.v1',JSON.stringify({version:1,bgmVolume:23,soundVolume:41,muted:true})))
- await page.getByRole('button',{name:'対局を始める',exact:true}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+ await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
  return inspect(page)
 }
 async function emptyOrigin(page,url){

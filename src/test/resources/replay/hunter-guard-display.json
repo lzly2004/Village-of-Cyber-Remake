@@ -1,0 +1,1477 @@
+{
+  "source": "Synthetic completed Replay for display only, not a real played game; targets do not establish correct hunter AI",
+  "replay": {
+    "version": 3,
+    "slotIndex": 0,
+    "saveTime": "2026/11/10 18:30:00",
+    "peiyiName": "jianyi",
+    "peiyiOrdinal": 1,
+    "peiyiVillageCount": 0,
+    "totalVillageCount": 0,
+    "totalDays": 7,
+    "endResult": 1,
+    "totalEvents": 13,
+    "daySnapshots": [
+      {
+        "dayNumber": 2,
+        "aliveCount": 12,
+        "players": [
+          {
+            "playerIndex": 1,
+            "characterNumber": 1,
+            "actualRole": 3,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 2,
+            "characterNumber": 2,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 3,
+            "characterNumber": 3,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 4,
+            "characterNumber": 4,
+            "actualRole": 8,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 5,
+            "characterNumber": 5,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 6,
+            "characterNumber": 6,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 7,
+            "characterNumber": 7,
+            "actualRole": 1,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 8,
+            "characterNumber": 8,
+            "actualRole": 2,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 9,
+            "characterNumber": 9,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 10,
+            "characterNumber": 10,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 11,
+            "characterNumber": 11,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 12,
+            "characterNumber": 12,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          }
+        ],
+        "voteRounds": [],
+        "dailyVotingRule": -1,
+        "greyTargetCharNums": [],
+        "designatedTargetCharNums": []
+      },
+      {
+        "dayNumber": 3,
+        "aliveCount": 12,
+        "players": [
+          {
+            "playerIndex": 1,
+            "characterNumber": 1,
+            "actualRole": 3,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 5,
+            "skillTargets": [
+              0,
+              0,
+              5
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 2,
+            "characterNumber": 2,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 6,
+            "skillTargets": [
+              0,
+              0,
+              6
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 3,
+            "characterNumber": 3,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 7,
+            "skillTargets": [
+              0,
+              0,
+              7
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 4,
+            "characterNumber": 4,
+            "actualRole": 8,
+            "claimedRole": 3,
+            "claimedRoleOrder": 1,
+            "comingOutDay": 2,
+            "skillTarget": 7,
+            "skillTargets": [
+              0,
+              0,
+              7
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 5,
+            "characterNumber": 5,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 6,
+            "characterNumber": 6,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 7,
+            "characterNumber": 7,
+            "actualRole": 1,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 8,
+            "characterNumber": 8,
+            "actualRole": 2,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 9,
+            "characterNumber": 9,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 10,
+            "characterNumber": 10,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 11,
+            "characterNumber": 11,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 12,
+            "characterNumber": 12,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          }
+        ],
+        "voteRounds": [],
+        "dailyVotingRule": -1,
+        "greyTargetCharNums": [],
+        "designatedTargetCharNums": []
+      },
+      {
+        "dayNumber": 4,
+        "aliveCount": 12,
+        "players": [
+          {
+            "playerIndex": 1,
+            "characterNumber": 1,
+            "actualRole": 3,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 6,
+            "skillTargets": [
+              0,
+              0,
+              5,
+              6
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 2,
+            "characterNumber": 2,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 7,
+            "skillTargets": [
+              0,
+              0,
+              6,
+              7
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 3,
+            "characterNumber": 3,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 8,
+            "skillTargets": [
+              0,
+              0,
+              7,
+              8
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 4,
+            "characterNumber": 4,
+            "actualRole": 8,
+            "claimedRole": 3,
+            "claimedRoleOrder": 1,
+            "comingOutDay": 2,
+            "skillTarget": 8,
+            "skillTargets": [
+              0,
+              0,
+              7,
+              8
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 5,
+            "characterNumber": 5,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 6,
+            "characterNumber": 6,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 7,
+            "characterNumber": 7,
+            "actualRole": 1,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 8,
+            "characterNumber": 8,
+            "actualRole": 2,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 9,
+            "characterNumber": 9,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 10,
+            "characterNumber": 10,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 11,
+            "characterNumber": 11,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 12,
+            "characterNumber": 12,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          }
+        ],
+        "voteRounds": [],
+        "dailyVotingRule": -1,
+        "greyTargetCharNums": [],
+        "designatedTargetCharNums": []
+      },
+      {
+        "dayNumber": 5,
+        "aliveCount": 12,
+        "players": [
+          {
+            "playerIndex": 1,
+            "characterNumber": 1,
+            "actualRole": 3,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 7,
+            "skillTargets": [
+              0,
+              0,
+              5,
+              6,
+              7
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 2,
+            "characterNumber": 2,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 8,
+            "skillTargets": [
+              0,
+              0,
+              6,
+              7,
+              8
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 3,
+            "characterNumber": 3,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 9,
+            "skillTargets": [
+              0,
+              0,
+              7,
+              8,
+              9
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 4,
+            "characterNumber": 4,
+            "actualRole": 8,
+            "claimedRole": 3,
+            "claimedRoleOrder": 1,
+            "comingOutDay": 2,
+            "skillTarget": 9,
+            "skillTargets": [
+              0,
+              0,
+              7,
+              8,
+              9
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 5,
+            "characterNumber": 5,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 6,
+            "characterNumber": 6,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 7,
+            "characterNumber": 7,
+            "actualRole": 1,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 8,
+            "characterNumber": 8,
+            "actualRole": 2,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 9,
+            "characterNumber": 9,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 10,
+            "characterNumber": 10,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 11,
+            "characterNumber": 11,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 12,
+            "characterNumber": 12,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          }
+        ],
+        "voteRounds": [],
+        "dailyVotingRule": -1,
+        "greyTargetCharNums": [],
+        "designatedTargetCharNums": []
+      },
+      {
+        "dayNumber": 6,
+        "aliveCount": 11,
+        "players": [
+          {
+            "playerIndex": 1,
+            "characterNumber": 1,
+            "actualRole": 3,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              5,
+              6,
+              7,
+              0
+            ],
+            "deathDay": 5,
+            "deathReason": 4,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 2,
+            "characterNumber": 2,
+            "actualRole": 7,
+            "claimedRole": 3,
+            "claimedRoleOrder": 2,
+            "comingOutDay": 5,
+            "skillTarget": 9,
+            "skillTargets": [
+              0,
+              0,
+              6,
+              7,
+              8,
+              9
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 3,
+            "characterNumber": 3,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 10,
+            "skillTargets": [
+              0,
+              0,
+              7,
+              8,
+              9,
+              10
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 4,
+            "characterNumber": 4,
+            "actualRole": 8,
+            "claimedRole": 3,
+            "claimedRoleOrder": 1,
+            "comingOutDay": 2,
+            "skillTarget": 10,
+            "skillTargets": [
+              0,
+              0,
+              7,
+              8,
+              9,
+              10
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 5,
+            "characterNumber": 5,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 6,
+            "characterNumber": 6,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 7,
+            "characterNumber": 7,
+            "actualRole": 1,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 8,
+            "characterNumber": 8,
+            "actualRole": 2,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 9,
+            "characterNumber": 9,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 10,
+            "characterNumber": 10,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 11,
+            "characterNumber": 11,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 12,
+            "characterNumber": 12,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          }
+        ],
+        "voteRounds": [],
+        "dailyVotingRule": -1,
+        "greyTargetCharNums": [],
+        "designatedTargetCharNums": []
+      },
+      {
+        "dayNumber": 7,
+        "aliveCount": 11,
+        "players": [
+          {
+            "playerIndex": 1,
+            "characterNumber": 1,
+            "actualRole": 3,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              5,
+              6,
+              7,
+              0,
+              0
+            ],
+            "deathDay": 5,
+            "deathReason": 4,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 2,
+            "characterNumber": 2,
+            "actualRole": 7,
+            "claimedRole": 3,
+            "claimedRoleOrder": 2,
+            "comingOutDay": 5,
+            "skillTarget": 10,
+            "skillTargets": [
+              0,
+              0,
+              6,
+              7,
+              8,
+              9,
+              10
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 3,
+            "characterNumber": 3,
+            "actualRole": 7,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 11,
+            "skillTargets": [
+              0,
+              0,
+              7,
+              8,
+              9,
+              10,
+              11
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 4,
+            "characterNumber": 4,
+            "actualRole": 8,
+            "claimedRole": 3,
+            "claimedRoleOrder": 1,
+            "comingOutDay": 2,
+            "skillTarget": 11,
+            "skillTargets": [
+              0,
+              0,
+              7,
+              8,
+              9,
+              10,
+              11
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 5,
+            "characterNumber": 5,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 6,
+            "characterNumber": 6,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 7,
+            "characterNumber": 7,
+            "actualRole": 1,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 8,
+            "characterNumber": 8,
+            "actualRole": 2,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 9,
+            "characterNumber": 9,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 10,
+            "characterNumber": 10,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 11,
+            "characterNumber": 11,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          },
+          {
+            "playerIndex": 12,
+            "characterNumber": 12,
+            "actualRole": 6,
+            "claimedRole": 0,
+            "claimedRoleOrder": 0,
+            "comingOutDay": -1,
+            "skillTarget": 0,
+            "skillTargets": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "deathDay": 0,
+            "deathReason": 0,
+            "nonHumanMarked": false
+          }
+        ],
+        "voteRounds": [],
+        "dailyVotingRule": -1,
+        "greyTargetCharNums": [],
+        "designatedTargetCharNums": []
+      }
+    ],
+    "rawRecords": [
+      "DAILY_SNAPSHOT|day=2|alive=12",
+      "STATE|day=2|{1:n=1,r=3,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{2:n=2,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{3:n=3,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{4:n=4,r=8,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{5:n=5,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{6:n=6,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{7:n=7,r=1,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{8:n=8,r=2,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{9:n=9,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{10:n=10,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{11:n=11,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}{12:n=12,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0}",
+      "DAILY_SNAPSHOT|day=3|alive=12",
+      "STATE|day=3|{1:n=1,r=3,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=5,sh=0/0/5}{2:n=2,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=6,sh=0/0/6}{3:n=3,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=7,sh=0/0/7}{4:n=4,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=2,st=7,sh=0/0/7}{5:n=5,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0}{6:n=6,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0}{7:n=7,r=1,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0}{8:n=8,r=2,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0}{9:n=9,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0}{10:n=10,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0}{11:n=11,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0}{12:n=12,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0}",
+      "DAILY_SNAPSHOT|day=4|alive=12",
+      "STATE|day=4|{1:n=1,r=3,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=6,sh=0/0/5/6}{2:n=2,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=7,sh=0/0/6/7}{3:n=3,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=8,sh=0/0/7/8}{4:n=4,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=2,st=8,sh=0/0/7/8}{5:n=5,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0}{6:n=6,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0}{7:n=7,r=1,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0}{8:n=8,r=2,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0}{9:n=9,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0}{10:n=10,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0}{11:n=11,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0}{12:n=12,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0}",
+      "DAILY_SNAPSHOT|day=5|alive=12",
+      "STATE|day=5|{1:n=1,r=3,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=7,sh=0/0/5/6/7}{2:n=2,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=8,sh=0/0/6/7/8}{3:n=3,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=9,sh=0/0/7/8/9}{4:n=4,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=2,st=9,sh=0/0/7/8/9}{5:n=5,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0}{6:n=6,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0}{7:n=7,r=1,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0}{8:n=8,r=2,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0}{9:n=9,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0}{10:n=10,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0}{11:n=11,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0}{12:n=12,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0}",
+      "DAILY_SNAPSHOT|day=6|alive=11",
+      "STATE|day=6|{1:n=1,r=3,cr=0,cro=0,dd=5,wd=4,nm=0,cod=-1,st=0,sh=0/0/5/6/7/0}{2:n=2,r=7,cr=3,cro=2,dd=0,wd=0,nm=0,cod=5,st=9,sh=0/0/6/7/8/9}{3:n=3,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=10,sh=0/0/7/8/9/10}{4:n=4,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=2,st=10,sh=0/0/7/8/9/10}{5:n=5,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0}{6:n=6,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0}{7:n=7,r=1,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0}{8:n=8,r=2,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0}{9:n=9,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0}{10:n=10,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0}{11:n=11,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0}{12:n=12,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0}",
+      "DAILY_SNAPSHOT|day=7|alive=11",
+      "STATE|day=7|{1:n=1,r=3,cr=0,cro=0,dd=5,wd=4,nm=0,cod=-1,st=0,sh=0/0/5/6/7/0/0}{2:n=2,r=7,cr=3,cro=2,dd=0,wd=0,nm=0,cod=5,st=10,sh=0/0/6/7/8/9/10}{3:n=3,r=7,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=11,sh=0/0/7/8/9/10/11}{4:n=4,r=8,cr=3,cro=1,dd=0,wd=0,nm=0,cod=2,st=11,sh=0/0/7/8/9/10/11}{5:n=5,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0/0}{6:n=6,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0/0}{7:n=7,r=1,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0/0}{8:n=8,r=2,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0/0}{9:n=9,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0/0}{10:n=10,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0/0}{11:n=11,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0/0}{12:n=12,r=6,cr=0,cro=0,dd=0,wd=0,nm=0,cod=-1,st=0,sh=0/0/0/0/0/0/0}",
+      "END|result=VILLAGE_WIN|day=7"
+    ]
+  },
+  "expected": {
+    "3": [
+      {
+        "playerIndex": 1,
+        "text": "青年 : 情報\n",
+        "unannounced": true
+      },
+      {
+        "playerIndex": 2,
+        "text": "研究 : 少年\n",
+        "unannounced": true
+      },
+      {
+        "playerIndex": 4,
+        "text": "教師 : 宝石\n",
+        "unannounced": false
+      }
+    ],
+    "5": [
+      {
+        "playerIndex": 1,
+        "text": "青年 : 情報→少年→宝石\n",
+        "unannounced": true
+      },
+      {
+        "playerIndex": 2,
+        "text": "研究 : 少年→宝石→旅人\n",
+        "unannounced": false
+      },
+      {
+        "playerIndex": 4,
+        "text": "教師 : 宝石→旅人→少女\n",
+        "unannounced": false
+      }
+    ],
+    "6": [
+      {
+        "playerIndex": 1,
+        "text": "青年 : 情報→少年→宝石\n",
+        "unannounced": true
+      },
+      {
+        "playerIndex": 2,
+        "text": "研究 : 少年→宝石→旅人→少女\n",
+        "unannounced": false
+      },
+      {
+        "playerIndex": 4,
+        "text": "教師 : 宝石→旅人→少女→陶芸\n",
+        "unannounced": false
+      }
+    ]
+  }
+}

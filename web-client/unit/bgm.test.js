@@ -151,3 +151,20 @@ test('dispose cancels pending unlock immediately and reports a failed close rath
   const q=rig();await q.player.enable();q.context.close=()=>Promise.reject(Error('close failed'))
   q.player.dispose();await tick();assert.equal(q.states.at(-1).error,'BGM_RELEASE_FAILED')
 })
+
+test('desktop vote-result review keeps day playlist until local continue, without selecting execution sound',()=>{
+ const update={phase:'FINISHED',view:{gameDay:3,aliveCount:8,result:'WOLF_WIN'}}
+ assert.equal(bgmScene({sessionId:'test',update,currentEvent:null,finished:false,voteReviewing:true,presentationPhase:'event'}).playlist,'NORMAL_GAME_PLAYLIST')
+ assert.equal(bgmScene({sessionId:'test',update,currentEvent:{stage:'EXECUTION'},finished:false,voteReviewing:false,presentationPhase:'event'}).id,null)
+ assert.equal(bgmScene({sessionId:'test',update,currentEvent:null,finished:true,voteReviewing:false,presentationPhase:'event'}).id,'DEFEAT_SCREEN')
+})
+
+// Title navigation is a presentation choice, never a game-state change.
+test('local desktop menu scenes override retained live-game BGM without private reads',()=>{
+ const update={phase:'DAY_DECISION',view:{gameDay:3,aliveCount:12}}
+ assert.equal(bgmScene({update,menuMusic:'START_MENU'}).id,'START_MENU')
+ assert.equal(bgmScene({update,menuMusic:'START_MENU',uncertain:true}).id,null)
+ assert.equal(bgmScene({update,menuMusic:'INFO'}).id,'INFO')
+ assert.equal(bgmScene({update,menuMusic:'REPLAY_BROWSER'}).id,'REPLAY_BROWSER')
+ assert.equal(bgmScene({update,menuMusic:null}).id,'EMOTIONALLY_UNSTABLE')
+})

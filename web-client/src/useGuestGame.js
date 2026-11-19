@@ -10,6 +10,8 @@ export function useGuestGame() {
   const cursor = ref(0)
   const update = shallowRef(null)
   const presentationHistory = shallowRef([])
+  const completedVotePresentation = shallowRef(null)
+  const votePresentationBefore = shallowRef(null)
   let presentationVersion = 0
   function rememberPresentation(snapshot) {
     const version = ++presentationVersion
@@ -79,6 +81,8 @@ export function useGuestGame() {
     update.value = null
     presentationVersion++
     presentationHistory.value = []
+    completedVotePresentation.value = null
+    votePresentationBefore.value = null
     uncertain.value = false
     persist()
   }
@@ -122,7 +126,10 @@ export function useGuestGame() {
   async function handleError(error, operation) {
     if (error instanceof ReadFailure) { error = error.cause; operation = 'read' }
     const kind = recoveryKind(error, operation)
-    if (kind === 'limited') {
+    if (kind === 'playtest-stopped') {
+      uncertain.value = Boolean(sessionId.value)
+      notice.value = error.message + ' 请回到试玩终端查看停止原因；不会自动重试。'
+    } else if (kind === 'limited') {
       if (operation === 'read') uncertain.value = Boolean(sessionId.value)
       notice.value = operation === 'read'
         ? '读取暂被限流，已保留本局与确认游标；请稍后主动重新同步。'
@@ -157,7 +164,7 @@ export function useGuestGame() {
     busy.value = true
     notice.value = ''
     try {
-      await action()
+      return await action()
     } catch (error) {
       try {
         await handleError(error, operation)
@@ -212,6 +219,10 @@ export function useGuestGame() {
     const action = update.value?.legalVoteActions.find(action => action.method === method)
     if (!canDecide.value || !action) return
     return run(async () => {
+      const voteSession=sessionId.value, voteDay=update.value.view.gameDay
+      // Keep only the already-public pre-vote display, matching the still-mounted Swing scene.
+      const before={view:update.value.view,information:update.value.publicInformation}
+      votePresentationBefore.value={sessionId:voteSession,day:voteDay,before}
       const result = await request('/' + sessionId.value + '/votes', {
         method: 'POST', body: {
           expectedRevision: update.value.revision,
@@ -221,6 +232,10 @@ export function useGuestGame() {
       })
       if (typeof result?.voteCompleted !== 'boolean') throw new Error('投票响应无法确认')
       await accept(result.update)
+      if(result.voteCompleted && sessionId.value===voteSession && update.value.revision===result.update.revision){
+        const completed=result.update.voteHistory.find(item=>item.day===voteDay)
+        if(completed)completedVotePresentation.value={sessionId:voteSession,vote:completed,before}
+      }
       if (!result.voteCompleted) notice.value = '投票被回避 CO 中断。读完新发言后，请重新确认投票目标。'
     })
   }
@@ -228,9 +243,13 @@ export function useGuestGame() {
   function askClaimRole(role) {
     if (!canDecide.value || !claimRoles.value.includes(role)) return
     return run(async () => {
-      await accept(await request('/' + sessionId.value + '/claims/by-role', {
+      const id = sessionId.value
+      const snapshot = await request('/' + id + '/claims/by-role', {
         method: 'POST', body: { expectedRevision: update.value.revision, role },
-      }))
+      })
+      await accept(snapshot)
+      if (sessionId.value === id && update.value === snapshot && !uncertain.value)
+        return { kind: snapshot.nextEventCursor > cursor.value ? 'events' : 'empty' }
     })
   }
 
@@ -289,9 +308,13 @@ export function useGuestGame() {
     if (!canAskClaimPlayers.value) return
     const players = [...claimPlayerDraft.value]
     return run(async () => {
-      await accept(await request('/' + sessionId.value + '/claims/by-players', {
+      const id = sessionId.value
+      const snapshot = await request('/' + id + '/claims/by-players', {
         method: 'POST', body: { expectedRevision: update.value.revision, players },
-      }))
+      })
+      await accept(snapshot)
+      if (sessionId.value === id && update.value === snapshot && !uncertain.value)
+        return { kind: snapshot.nextEventCursor > cursor.value ? 'events' : 'empty' }
     })
   }
 
@@ -300,7 +323,14 @@ export function useGuestGame() {
       await request('/' + sessionId.value, { method: 'DELETE' })
       forget()
       notice.value = '已结束这次试玩，可以开始新的一局。'
+      return true
     })
+  }
+
+  async function startReplacing(configuration) {
+    if (busy.value || (uncertain.value && sessionId.value)) return
+    if (sessionId.value && await release() !== true) return
+    return start(configuration)
   }
 
   onMounted(() => {
@@ -322,11 +352,11 @@ export function useGuestGame() {
   })
 
   return {
-    sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory,
+    sessionId, cursor, update, busy, uncertain, notice, storageWarning, presentationHistory, completedVotePresentation, votePresentationBefore,
     pending, currentEvent, canDecide, canVote, alternativeVotes, claimRoles, claimPlayers, claimPlayerDraft, canAskClaimPlayers,
     divinationTargets, selectedDivinationTargets, setDivinationTarget,
     guardTargets, selectedGuardTargets, setGuardTarget,
     setClaimedTarget,
-    start, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
+    start, startReplacing, nextEvent, toggleTarget, vote, askClaimRole, toggleClaimPlayer, askClaimPlayers, setAvoidance, refresh, release,
   }
 }

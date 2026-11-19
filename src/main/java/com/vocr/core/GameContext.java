@@ -322,12 +322,22 @@ class GameContext implements GameContextView
         skillState.recordPlannedDivinationResult(player, target);
     }
 
+    /** 预检实际 CO 的整局唯一狼猎限制，不把预定计划占位当成已完成 CO。 */
+    boolean canClaimRole(int player, int role)
+    {
+        validateClaim(player, role, getGameDay());
+        return gs.gc[player].actualRole != 7 || role != 3
+                || claimState.canRegisterWolfHunter(player);
+    }
+
     /**
      * 原子登记一次主动 CO：职业、首次 CO 日、同职业顺位和候补列表一起更新。
      */
     void registerClaim(int player, int role)
     {
         validateClaim(player, role, getGameDay());
+        if (gs.gc[player].actualRole == 7 && role == 3)
+            claimState.registerWolfHunter(player);
         GameCharacter character = gs.gc[player];
         character.recordClaimIdentity(role, getGameDay());
 
