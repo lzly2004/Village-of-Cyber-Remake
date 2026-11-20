@@ -52,6 +52,7 @@ public final class GuestGameServer implements AutoCloseable
         return thread;
     });
     private boolean started;
+    private volatile boolean maintenanceHealthy = true;
 
     private final class Entry
     {
@@ -124,6 +125,14 @@ public final class GuestGameServer implements AutoCloseable
             config.routes.after(ctx -> {
                 GuestRequestLimits.Lease lease = ctx.attribute("vocr.requestLease");
                 if (lease != null) lease.close();
+            });
+            // Liveness/readiness only: never acquire or refresh a guest session.
+            // Admission and no-store headers above also apply to health probes.
+            config.routes.get("/api/v1/health", ctx -> {
+                boolean ready;
+                synchronized (this) { ready = started && !closed && maintenanceHealthy; }
+                ctx.status(ready ? 200 : 503).contentType("application/json; charset=utf-8")
+                        .result(ready ? "{\"status\":\"ok\"}" : "{\"status\":\"unavailable\"}");
             });
             config.routes.post("/api/v1/games", ctx -> {
                 CreateGame request = read(ctx, CreateGame.class);
@@ -243,12 +252,18 @@ public final class GuestGameServer implements AutoCloseable
             if (started) throw new IllegalStateException("游客服务已经启动");
             app.start(port);
             started = true;
-            reaper.scheduleWithFixedDelay(() -> {
-                try { reapExpired(); }
-                catch (RuntimeException error) { WebDiagnostics.write(REAP_FAILED); }
-            }, 1, 1, TimeUnit.MINUTES);
+            reaper.scheduleWithFixedDelay(this::runMaintenance, 1, 1, TimeUnit.MINUTES);
         }
         return this;
+    }
+
+    // Package-local so failure/recovery can be checked without waiting a minute.
+    void runMaintenance() {
+        try { reapExpired(); maintenanceHealthy = true; }
+        catch (RuntimeException error) {
+            maintenanceHealthy = false;
+            WebDiagnostics.write(REAP_FAILED);
+        }
     }
 
     public int port() { return app.port(); }
