@@ -87,3 +87,11 @@ test('proxy preserves upstream API status/headers and strips forged forwarding h
  }finally{logs=await proxy.stop();await new Promise(resolve=>upstream.close(resolve))}
  expect(logs).not.toContain('synthetic-capability');expect(logs).not.toContain('synthetic-secret')
 })
+
+// Operational readiness travels through the actual TLS proxy without creating a guest.
+test('health through trusted Caddy is fixed, uncached and contains no session data',async()=>{
+ const response=await network('https://localhost:18443/api/v1/health')
+ expect(response.status).toBe(200)
+ expect([...new Set(response.headers['cache-control'].split(',').map(value=>value.trim()))]).toEqual(['no-store'])
+ expect(response.body).toBe('{"status":"ok"}')
+})

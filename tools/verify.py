@@ -25,7 +25,7 @@ COMMANDS = {
     'audit-tests': ['python3', '-B', 'tools/tests/test_ci_inputs.py', '-v'],
     'verify-tests': ['python3', '-B', 'tools/tests/test_verify.py', '-v'],
     'ci-tests': ['python3', '-B', 'tools/tests/test_ci_workflow.py', '-v'],
-    'release-tests': ['python3', '-B', 'tools/tests/test_web_release.py', '-v'],
+    'release-tests': ['python3', '-B', '-m', 'unittest', 'discover', '-s', 'tools/tests', '-p', 'test_web_[ru]*.py', '-v'],
     'hosting-tests': ['python3', '-B', '-m', 'unittest', 'discover', '-s', 'tools/tests', '-p', 'test_web_h*.py', '-v'],
     'hosting-smoke': ['python3', '-B', 'tools/hosting-smoke.py'],
     'image-tool-tests': ['python3', '-B', 'tools/tests/test_web_images.py', '-v'],
