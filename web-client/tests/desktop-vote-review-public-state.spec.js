@@ -1,5 +1,5 @@
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/shell-test.js'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 
 test('vote result keeps the already displayed day and public roster until execution is continued',async({page})=>{

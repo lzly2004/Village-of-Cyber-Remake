@@ -63,10 +63,11 @@ const decisionWindow = computed(()=>!voteReview.value && update.value?.phase==='
 const finished = computed(() => update.value?.phase === 'FINISHED' && !currentEvent.value && !voteReview.value)
 const artwork = computed(() => preludeArtwork.value || sceneArtwork(presentationHistory.value, cursor.value, currentEvent.value, update.value?.view.result, finished.value))
 const audioControl = ref(null)
-const gameOnly = ref(false)
+const gameOnly = ref(true)
 const gameOnlyScale = ref(1)
 let outsideScroll = 0, consumedEscape = false
 function resizeGameOnly(){gameOnlyScale.value=Math.min(window.innerWidth/1280,window.innerHeight/720)}
+resizeGameOnly()
 async function enterGameOnly(){
   outsideScroll=window.scrollY;resizeGameOnly();gameOnly.value=true
   await nextTick()
@@ -79,9 +80,15 @@ async function restoreGameShell(){
   if(!document.querySelector('dialog[open]'))document.querySelector('[data-testid="game-only-enter"]')?.focus({preventScroll:true})
 }
 function gameOnlyEscape(event){
-  if(event.key!=='Escape'||(!gameOnly.value&&!(consumedEscape&&event.repeat)))return
-  event.preventDefault();event.stopImmediatePropagation();consumedEscape=true
-  if(gameOnly.value)restoreGameShell()
+  if(event.key!=='Escape')return
+  if(consumedEscape&&event.repeat){event.preventDefault();event.stopImmediatePropagation();return}
+  if(!gameOnly.value)return
+  consumedEscape=true
+  // Let the browser dispatch the modal's cancel event, but keep this key from
+  // reaching scene navigation. A held key cannot then reveal the outer shell.
+  if(document.querySelector('dialog[open]')){event.stopImmediatePropagation();return}
+  event.preventDefault();event.stopImmediatePropagation()
+  restoreGameShell()
 }
 function releaseGameOnlyEscape(event){if(event.key==='Escape')consumedEscape=false}
 onMounted(()=>{window.addEventListener('resize',resizeGameOnly);window.addEventListener('keydown',gameOnlyEscape,true);window.addEventListener('keyup',releaseGameOnlyEscape,true)})

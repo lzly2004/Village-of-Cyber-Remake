@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/shell-test.js'
 import {publicSnapshot} from '../test-fixtures/public-players.js'
 import {startDesktopGame} from '../test-fixtures/desktop-start.js'
 import {mkdirSync,writeFileSync} from 'node:fs'

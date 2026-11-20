@@ -1,3 +1,4 @@
+import {showShell} from '../test-fixtures/shell-test.js'
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { desktopVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
@@ -41,7 +42,7 @@ test('completion waits for acknowledgement, persists across refresh/resync and n
 })
 test('independent tabs serialize duplicate settlement; conflicting result and corrupt row fail without overwrite',async({page,context})=>{
   await page.goto('/')
-  const second=await context.newPage();await second.goto('/')
+  const second=await context.newPage();await second.goto('/');await showShell(second)
   const put=(p,result='VILLAGE_WIN')=>p.evaluate(async({id,result})=>{const{createRecordStore}=await import('/src/recordStore.js');try{return await createRecordStore().record({sessionId:id,configuration:'jianyi',result})}catch(e){return e.code}},{id,result})
   const both=await Promise.all([put(page),put(second)]);expect(both.filter(r=>r.duplicate===false)).toHaveLength(1);expect(both.filter(r=>r.duplicate===true)).toHaveLength(1)
   expect((await read(second)).totalPlayCnt).toBe(1)
@@ -85,7 +86,7 @@ test('two real completed games accumulate, abandoning and replay import do not; 
     }
     await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible();ids.push(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId))
     expect((await read(page)).totalPlayCnt).toBe(2)
-    const other=await context.newPage();await other.goto('/');expect((await read(other)).totalPlayCnt).toBe(2);await other.close()
+    const other=await context.newPage();await other.goto('/');await showShell(other);expect((await read(other)).totalPlayCnt).toBe(2);await other.close()
     await page.evaluate(async file=>{const{createReplayStore}=await import('/src/replayStore.js');await createReplayStore().saveMany(file.filter(Boolean))},replayFile)
     expect((await read(page)).totalPlayCnt).toBe(2)
     const raw=await page.evaluate(()=>new Promise(resolve=>{const q=indexedDB.open('vocr.records.v1');q.onsuccess=()=>{const db=q.result,t=db.transaction('results'),r=t.objectStore('results').getAll();r.onsuccess=()=>resolve(JSON.stringify(r.result));t.oncomplete=()=>db.close()}}))

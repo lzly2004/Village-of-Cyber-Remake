@@ -1,3 +1,4 @@
+import {showShell} from '../test-fixtures/shell-test.js'
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
 const dialog=page=>page.getByRole('region',{name:'ブラウザーの戦績',exact:true})
@@ -49,7 +50,7 @@ test('fixed result script renders all eight desktop statistics and survives reop
   await page.screenshot({path:info.outputPath('statistics-fixed-results.png')})
   await page.keyboard.press('Escape');await expect(opener(page)).toBeFocused()
   await page.reload();await open(page);await metrics(page,{play:'16回',rate:'62.50000%',max:'3回'})
-  const other=await context.newPage();await other.goto('/');await open(other);await metrics(other,{play:'16回'});await other.close()
+  const other=await context.newPage();await other.goto('/');await showShell(other);await open(other);await metrics(other,{play:'16回'});await other.close()
 })
 test('empty ledger is zero, source keyboard order and every metric remain reachable without clipping',async({page},info)=>{
   await page.goto('/');await opener(page).focus();await page.keyboard.press('Enter')
@@ -85,7 +86,7 @@ test('viewing and refreshing during a live game does not read/write authority, m
 })
 test('refresh reads committed cross-tab results, corruption removes stale totals without deleting data',async({page,context})=>{
   await page.goto('/');await put(page,'jianyi','VILLAGE_WIN',1);await open(page);await metrics(page,{play:'1回'})
-  const other=await context.newPage();await other.goto('/');await put(other,'jianyi','WOLF_WIN',2)
+  const other=await context.newPage();await other.goto('/');await showShell(other);await put(other,'jianyi','WOLF_WIN',2)
   await metrics(page,{play:'1回'});await refresh(page);await metrics(page,{play:'2回',rate:'50.00000%'})
   await other.evaluate(()=>new Promise((resolve,reject)=>{const q=indexedDB.open('vocr.records.v1');q.onsuccess=()=>{const db=q.result,t=db.transaction('results','readwrite');t.objectStore('results').add({id:'bad',configuration:'jianyi',result:'VILLAGE_WIN'});t.oncomplete=()=>{db.close();resolve()};t.onabort=()=>reject(t.error)}}))
   await refresh(page);await expect(dialog(page).getByRole('alert')).toContainText('INVALID_HISTORY');await expect(dialog(page).getByTestId('record-play')).toHaveCount(0)

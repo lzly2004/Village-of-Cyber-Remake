@@ -1,4 +1,4 @@
-import { test as base, expect } from '@playwright/test'
+import { test as base, expect } from './shell-test.js'
 import { completeVoteReview } from './desktop-navigation.js'
 
 // Legacy business/geometry journeys explicitly opt into completing the new local

@@ -1,16 +1,17 @@
 # 桌面场景与动作对照（WEB-050）
 
-当前版本与交付状态见[迁移收尾状态](web-migration-status-2026-11-11.md)；下列历史测试计数仅适用于各自批次。Replay头像免滚动、中文INFO、淡色护卫及纯窗口模式已随f754a07统一交付并得到用户整局总体反馈；终局夜实际遇到且正常。回放提示补修f6e09f5待小候选局部确认，不将f754a07反馈记到新head。
+当前版本与交付状态见[迁移收尾状态](web-migration-status-2026-11-11.md)；下列历史测试计数仅适用于各自批次。Replay头像免滚动、中文INFO、淡色护卫及纯窗口模式已随f754a07统一交付并得到用户整局总体反馈；终局夜实际遇到且正常。回放提示补修已随fe64e1c由用户局部验收成功。本轮默认纯窗口入口按用户确认规则实施，其人工验收仍待，不将旧反馈记到新head。
 
 初始场景闭环基线：`3c3ffda`；误选和Info/Record批次历史基线为`4497368`。目标仍是启动—终局—标题—再次开局闭环。状态按实现/验证分别更新，计划不等于通过。每行同时核对显示、动作、声音和返回。桌面源码位于 `src/main/java/com/vocr/ui/`，素材名位于 `com/vocr/resources/UiImage.java`。
 
 | ID / 测试 | 桌面入口 / 源码符号 | 显示、动作、声音与返回 | Web 对应 / 当前状态 |
 |---|---|---|---|
+| game-only / default canvas | 浏览器包装边界，复用已验收原画布 | 首次/刷新默认仅游戏；Esc主动恢复外围，原生确认先取消；场景往返/异常不切模式，声音及会话保持挂载 | App.gameOnly；game-only.spec专用base fixture验证默认几何、刷新、原生弹窗/重复键、声音恢复、终局→菜单→第二局；本轮实施，人工待确认 |
 | scene-title | StartSceneHandler.render | TITLE_BACKGROUND、TITLE_LOGO；START_MENU BGM；六按钮按插入顺序，见 UIConstants.START_BTN_* | DesktopStartScene，已实现；scene-title / 最终16项专项 |
 | scene-select | StartSceneHandler.render.btnStart → GameSceneHandler.renderSelect | 无CLICK（setButtonSceneTransitionNoSound）；七配役图片按钮；返回图片1050,560，116×76；选择时CLICK并且创建一局 | DesktopStartScene，已实现；scene-title / 最终16项专项 |
 | scene-noop | StartSceneHandler.render.btnContinue/btnCollections | 可见可点，CLICK后空操作；不伪造读档/图鉴 | 已实现；scene-title / scene-entry-return |
 | scene-replay-return | StartSceneHandler.render.btnSave / ReplayBrowserHandler.doRender | CLICK进入录像；返回标题。三槽/页、九个固定槽；左键已占槽播放，空槽不响；右键确认保存，取消零写入；原版翻页/标题图片 | ReplayLibrary核心场景已实现；desktop-replay / replay-slots；f754a07 full24通过并已交付；文件/回放专项历史证据保留 |
-| replay-player-native | ReplayPlayerHandler / ReplayTextFormatter | 原版背景、两排头像/结果球、日期牌、信息/票型/终局职业、按日/按轮及返回 | 主菜单进入DesktopReplayPlayer；desktop-replay覆盖日期锁、44人末项和返回焦点；f754a07已实际回放；残留提示已本地补修，046正式组合验收仍开放 |
+| replay-player-native | ReplayPlayerHandler / ReplayTextFormatter | 原版背景、两排头像/结果球、日期牌、信息/票型/终局职业、按日/按轮及返回 | 主菜单进入DesktopReplayPlayer；desktop-replay覆盖日期锁、44人末项和返回焦点；f754a07已实际回放；残留提示已随fe64e1c局部验收通过，046正式组合验收仍开放 |
 | native-selection | GameStage / DesktopHelpScene / RecordPage | 01游戏画布禁止原生文本误选与图片拖动；明确保留指定工具拖放、表单编辑和画布外诊断复制 | desktop-info-record / desktop-voting-parity；不全页拦截复制/右键 |
 | dialogue-frame | DialogueController / DayStartAnime | 框体首次补全文字、再次推进；日数继续只属本地；无附加续读按钮或图片比例标签 | GameStage.message-surface / night-day / desktop-dialogue；不确认或伪造服务器事件 |
 | replay-file-native | ReplayFileDialogs.addButtons/importFile/exportFile | 源x90/300,y20,190×40；导入选录像→目标槽→覆盖确认；导出一局到九槽文件0位；无CLICK；取消零写入 | DesktopReplayExchange；desktop-replay原位按钮、取消、配额回滚与显式重试、导出原文和零API断言；浏览器批量管理留核心外 |
@@ -47,4 +48,4 @@
 
 ## 本轮收尾基线（2026-11-19）
 
-上文标明日期/计数的段落是历史批次证据。当前已交付且用户已正常整局试玩的是f754a07，云端run44329192581/full24通过；用户表示整体无大问题，并确认实际夜间终局直接胜利正常，新增唯一反馈为回放保存提示残留。f6e09f5已局部修复，验证边界见[窗口记录](web-game-only-display.md)末节及当前[收尾清单](web-migration-status-2026-11-11.md)。不再笼统记“最新候选未试玩”，也不将总体反馈扩写成所有场景人工逐项销项。正式默认入口、046语言/字体/浏览器/DPI/键盘/音频和其他A/Q门仍开放；PR未Ready/合流，044尚未开始。
+上文标明日期/计数的段落是历史批次证据。当前已交付且用户已正常整局试玩的是f754a07，云端run44329192581/full24通过；用户表示整体无大问题，并确认实际夜间终局直接胜利正常，新增唯一反馈为回放保存提示残留。fe64e1c已局部验收通过；本轮默认纯窗口入口及验证边界见[窗口记录](web-game-only-display.md)末节及当前[收尾清单](web-migration-status-2026-11-11.md)。不再笼统记“最新候选未试玩”，也不将总体反馈扩写成所有场景人工逐项销项。默认纯窗口入口本轮实施后仍待新候选人工确认；046语言/字体/浏览器/DPI/键盘/音频和其他A/Q门仍开放；PR未Ready/合流，044尚未开始。

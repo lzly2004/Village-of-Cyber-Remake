@@ -1,3 +1,4 @@
+import {showShell} from '../test-fixtures/shell-test.js'
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { desktopVote, desktopVoteConfirmation, desktopSelectionIfAvailable, expectNoEnabledVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
@@ -258,7 +259,7 @@ test('two pages sharing one capability conflict once; local reading makes no bac
   try{
     await drainEvents(page);const local=await saved(page)
     await other.addInitScript(({key,local})=>sessionStorage.setItem(key,JSON.stringify(local)),{key,local})
-    await other.goto('/')
+    await other.goto('/');await showShell(other)
     await expect(other.getByTestId('desktop-vote-window')).toBeVisible()
     await desktopSelectionIfAvailable(other)
     await expect(other.locator('.player-row:not(.departed)').getByRole('checkbox').first()).toBeEnabled()

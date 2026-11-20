@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/shell-test.js'
 import {readFileSync,mkdirSync,writeFileSync} from 'node:fs'
 import {createHash} from 'node:crypto'
 import {desktopClaims,desktopHome,desktopSelection,desktopClaimPlayers} from '../test-fixtures/desktop-navigation.js'

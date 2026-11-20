@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/shell-test.js'
 import {readFileSync,mkdirSync,writeFileSync} from 'node:fs'
 import {execFileSync} from 'node:child_process'
 import {createHash} from 'node:crypto'

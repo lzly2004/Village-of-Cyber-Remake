@@ -1,3 +1,4 @@
+import {showShell} from '../test-fixtures/shell-test.js'
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test, expect, preparePresentation } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
@@ -8,7 +9,7 @@ const begin = page => page.locator('[data-testid="title-start"], [data-testid="s
 const saved = page => page.evaluate(key => JSON.parse(sessionStorage.getItem(key)), key)
 async function start(page) {
   await preparePresentation(page)
-  await page.goto('/')
+  await page.goto('/');await showShell(page)
   await expect(page.locator('.side-footer')).toContainText('30分')
   await expect(page.locator('.side-footer')).toContainText('24時間')
   await startDesktopGame(page)
@@ -111,7 +112,7 @@ test('capacity rejection does not create or automatically replay; explicit retry
   })
   let id
   try {
-    await page.goto('/')
+    await page.goto('/');await showShell(page)
     await startDesktopGame(page)
     await expect(page.getByRole('alert')).toContainText('未创建新局')
     await expect(begin(page)).toBeEnabled()
@@ -129,7 +130,7 @@ for (const stored of [JSON.stringify({ sessionId: '../not-a-credential', eventCu
     await page.addInitScript(({ key, stored }) => sessionStorage.setItem(key, stored), { key, stored })
     const calls = []
     page.on('request', req => { if (req.url().includes('/api/v1/games')) calls.push(req.url()) })
-    await page.goto('/')
+    await page.goto('/');await showShell(page)
     await expect(page.getByRole('alert')).toContainText('重新开局')
     expect(await saved(page)).toBeNull()
     expect(calls).toEqual([])

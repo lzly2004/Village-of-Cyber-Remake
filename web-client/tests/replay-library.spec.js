@@ -1,3 +1,4 @@
+import {showShell} from '../test-fixtures/shell-test.js'
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { desktopVote } from '../test-fixtures/desktop-navigation.js'
 import { test, expect } from '../test-fixtures/presentation-test.js'
@@ -89,7 +90,7 @@ test('synthetic final event gate, duplicate/capacity and concurrent multi-tab tr
   await expect(page.getByTestId('save-replay')).toHaveCount(0)
   await page.getByTestId('next-event').click()
   await page.getByTestId('save-replay').click();await expect(rows(page)).toHaveCount(1)
-  const other=await context.newPage();await other.goto('/')
+  const other=await context.newPage();await other.goto('/');await showShell(other)
   const write=async(target,n)=>target.evaluate(async({file,n})=>{
     const{createReplayStore}=await import('/src/replayStore.js')
     const replay=structuredClone(file[0]);replay.rawRecords.unshift('# fixture '+n);replay.totalEvents++

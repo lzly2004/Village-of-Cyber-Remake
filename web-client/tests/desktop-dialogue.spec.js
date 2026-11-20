@@ -1,5 +1,5 @@
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/shell-test.js'
 import {mkdirSync,writeFileSync} from 'node:fs'
 import {createHash} from 'node:crypto'
 import {publicSnapshot} from '../test-fixtures/public-players.js'

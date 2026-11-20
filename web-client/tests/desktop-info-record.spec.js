@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/shell-test.js'
 import {helpGroups} from '../test-fixtures/help-source.js'
 test('game frame double clicks and outside selections never swallow reads; title artwork cannot native-drag',async({page})=>{
  await page.goto('/')

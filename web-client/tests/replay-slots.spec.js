@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/shell-test.js'
 import {readFileSync} from 'node:fs'
 const replay=JSON.parse(readFileSync(new URL('../../src/test/resources/replay/exchange-v3.json',import.meta.url)))[0]
 async function run(page,fn,arg){return page.evaluate(async({fn,arg})=>{const m=await import('/src/replayStore.js');return Function('m','arg','return ('+fn+')(m,arg)')(m,arg)},{fn:fn.toString(),arg})}

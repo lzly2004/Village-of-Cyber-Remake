@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from '../test-fixtures/shell-test.js'
 import {readFileSync} from 'node:fs'
 const fixture=JSON.parse(readFileSync(new URL('../../src/test/resources/replay/hunter-guard-display.json',import.meta.url)))
 test('Replay guard histories dim until CO, include true unclaimed hunter and exclude never-claiming fake; read-only navigation',async({page},info)=>{
