@@ -24,8 +24,8 @@
 | claim-failure | Web独有网络错误 | 请求失败不是无人CO，保留错误/不确定/同步语义；不自动重试，不确认游标 | 保留useGuestGame.handleError；scene-claim-error |
 | scene-second-game | GameSceneHandler.renderSelect.startNewGame | 再次选择配役创建新局，进入夜/晨/对话；CLICK | 已验证：scene-finished-title-second-game / scene-replacement-failure；真实seed4201 gate追加同一闭环 |
 | game-only | Web过渡期入口 / App.enterGameOnly、gameOnlyEscape | 原1280×720画布居中等比适配；外围与入口隐藏；Esc恢复且不串关闭子场景；必要音频/恢复在画布内 | 已实现；game-only.spec四项、f754a07 full24及用户总体试玩反馈；真实跨浏览器/DPI仍归046 |
-| replay-save-notice | Web本地保存反馈 / ReplayLibrary.playEntry | 保存成功消息属于槽位操作；进入播放时消费，切日及返回不复活；错误反馈保留 | f6e09f5已本地补修；desktop-replay.spec正常/纯窗口新增两例；小候选局部人工确认待 |
-| release-default-game-only | 正式Web入口（用户最终呈现要求） | 默认只呈现游戏画面，过渡外围仅属开发期工具 | 未实施，050收尾缺口；当前按钮模式不能充当正式默认入口完成证明 |
+| replay-save-notice | Web本地保存反馈 / ReplayLibrary.playEntry | 保存成功消息属于槽位操作；进入播放时消费，切日及返回不复活；错误反馈保留 | f6e09f5补修已随fe64e1c交付；desktop-replay.spec正常/纯窗口新增两例；用户已局部验收成功，销项 |
+| release-default-game-only | 正式Web入口（用户最终呈现要求） | 默认只呈现游戏画面，过渡外围仅属开发期工具 | 98b6713已本地实现并完成分级验证；尚未推送或生成新试玩候选，人工确认待；验证边界见[显示记录](web-game-only-display.md)末节 |
 
 ## 必须保留的浏览器差异（非桌面豁免）
 
