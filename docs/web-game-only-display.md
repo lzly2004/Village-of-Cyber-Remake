@@ -50,3 +50,12 @@
 前序fe64e1c已由用户局部验收成功，Replay保存/导入提示残留销项；本轮新默认入口人工体验尚未验收。当前验证记录集中于build/web050/default-game-only/，完成结果另记其verification.json。Windows Data仍只读，不将本地源码改动冒充双端同步或已发布。
 
 本批本机分级验收（2026-11-20）：单测231、生产构建/预算、相关mock场景31通过；默认首轮267通过，新增1项因误查隐藏外围成功提示失败，改为检查实际账本后1项补验通过，未改产品或削弱会话/零写入断言。Web017JourneyTest 8项及同源oracle核对通过。gate首轮6通过、简易mixed一次120秒超时后运行中断；源码/超时均未改，同项32.8秒复验通过，剩余8项全通过，覆盖15个方向门。超时trace记录投票历史按钮在点击期间脱离DOM，根因尚未确定；保留偶发风险，不冒充一次完整默认/gate全绿。源码字节、日志SHA与所有失败证据见build/web050/default-game-only/verification.json。当前仅本地完成，未云端发布或人工验收；现有CI策略因test-fixtures路径将选择full24，本批没有改策略。
+
+
+## 2026-11-22 统一候选的独立套件补修
+
+6ff42b7首次云端full24（run44994873275/attempt1）在assets停止：3项通过，2项因默认纯窗口隐藏外围玩家表/Replay入口而超时，未生成发布包。官方失败验证包SHA256为7c2f0de70b0554d826759905a4c0e0f5e740d914a674574bbbf75e4ca22d32e9，回执及原日志保留于build/web045/publication/attempt1-failure。
+
+补修只使两条资源测试在操作辅助面板前通过真实Esc路径显示外围，bgm/sound独立套件使用既有shell-test前提；专用默认入口和真实墙钟夜晨资源用例仍使用原生fixture。不改产品、预算、声音、存储或玩法，不放宽懒加载、资源量、零写入及音频生命周期断言。production/gate/hosting等既有套件已继承shell-test，无需重复适配。复验结果集中于build/web045/publication的assets-shell-recheck.log和audio-shell-recheck.log，后续云端结果按新精确head另核验，失败轮不计通过。
+
+本机受影响套件复验：assets 5/5（26.3秒）、audio 30/30（1.9分钟），单worker、无JVM。真实夜晨墙钟10090ms，首局510145字节、夜晨首局566961字节，预算仍为3MiB。未重跑无关Java全量。

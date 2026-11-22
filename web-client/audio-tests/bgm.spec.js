@@ -1,5 +1,5 @@
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../test-fixtures/shell-test.js'
 import { completeNativeReading } from '../test-fixtures/native-reading.js'
 import { readFileSync } from 'node:fs'
 import { helpGroups } from '../test-fixtures/help-source.js'

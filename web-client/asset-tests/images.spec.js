@@ -1,6 +1,7 @@
 import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { test, expect } from '@playwright/test'
+import { showShell } from '../test-fixtures/shell-test.js'
 import { readFileSync } from 'node:fs'
 
 test('WEB-022/023 static manifest images decode at original dimensions; title requests only menu assets', async ({ page, request }) => {
@@ -70,6 +71,8 @@ test('WEB-023 cold lobby and first game obey transfer budgets; only visible publ
     + performance.getEntriesByType('resource').reduce((sum, entry) => sum + entry.transferSize, 0))
   expect(lobbyBytes).toBeGreaterThan(0)
   expect(lobbyBytes).toBeLessThanOrEqual(1.5 * 1024 ** 2)
+  // This case measures the optional auxiliary roster, reached by the real Esc path.
+  await showShell(page)
   const firstGame = await page.evaluate(() => performance.now())
   await startDesktopGame(page)
   const rows = page.locator('.player-row')
@@ -105,6 +108,7 @@ test('WEB-033 Replay code and database stay cold until explicit library entry',a
   page.on('request',r=>{if(/ReplayLibrary-[^/]+\.js$/.test(new URL(r.url()).pathname))chunks.push(r.url())})
   await page.addInitScript(()=>{window.replayDbOpens=0;const open=indexedDB.open.bind(indexedDB);indexedDB.open=(...args)=>{window.replayDbOpens++;return open(...args)}})
   await page.goto('/');await page.waitForLoadState('networkidle')
+  await showShell(page)
   expect(chunks).toHaveLength(0);expect(await page.evaluate(()=>window.replayDbOpens)).toBe(0)
   await page.getByRole('button',{name:'Replay一覧',exact:true}).click()
   await expect(page.getByRole('heading',{name:'Replay一覧',exact:true})).toBeVisible()
