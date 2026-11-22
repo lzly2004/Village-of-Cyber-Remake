@@ -74,16 +74,18 @@ class GameSnapshotRecordWriterTest
         try
         {
             while (context.getGameDay() < 2) context.incrementGameDay();
-            fabricator.prepareFakeHunterDiaries();
+            fabricator.completeFakeHunterDiaries(fabricator.prepareFakeHunterDiaries(), List.of());
             firstTarget = context.getSkillTarget(fakeHunter, 2);
             assertTrue(firstTarget > 0);
 
-            // 目标是在护卫记录确定后才于当夜死亡；历史必须保留这个当时合法的选择。
+            // 第一夜报告保存后，此目标在后续夜死亡；不得因此重写更早日记。
+            context.incrementGameDay();
             context.recordDeath(firstTarget, whyDie.beiyao);
-            for (int skillDay = 3; skillDay <= 8; skillDay++)
+            fabricator.completeFakeHunterDiaries(fabricator.prepareFakeHunterDiaries(), List.of(firstTarget));
+            for (int skillDay = 4; skillDay <= 8; skillDay++)
             {
                 context.incrementGameDay();
-                fabricator.prepareFakeHunterDiaries();
+                fabricator.completeFakeHunterDiaries(fabricator.prepareFakeHunterDiaries(), List.of());
                 assertTrue(context.getSkillTarget(fakeHunter, skillDay) > 0);
             }
             assertTrue(context.getRandom().stopRecording().isEmpty(), "假猎人日记不得消耗主游戏随机序列");
@@ -153,7 +155,7 @@ class GameSnapshotRecordWriterTest
 
     private static GameStatus createStatus()
     {
-        GameStatus status = new GameStatus();
+        GameStatus status = new GameStatus(new GameRandom(20260912L));
         status.startGame(peiyi.jianyi);
         return status;
     }

@@ -75,15 +75,14 @@ final class ClaimResponsePlanner
             if (ctx.getActualRole(player) < 7)
             {
                 if (ctx.getActualRole(player) == role)
-                    responses.add(new IntPair(player, role));
+                    addResponse(responses, player, role);
                 continue;
             }
             NonHumanPlan plan = ctx.getNonHumanPlan(player);
             if (plan.claimsRole(role))
             {
-                if (gameDay == 2)
+                if (addResponse(responses, player, role) && gameDay == 2)
                     ctx.recordSkillTarget(player, 1, ctx.getPlannedDivinationResult(player));
-                responses.add(new IntPair(player, role));
                 continue;
             }
             if (role < 3 || role == 4 || plan != NonHumanPlan.NONE) continue;
@@ -95,7 +94,7 @@ final class ClaimResponsePlanner
                     int probability = probabilityCalculator.maolieco(0, 3, getP1(7), getP2(7));
                     if (ctx.getRandom().probabilityJudge(probability))
                     {
-                        responses.add(new IntPair(player, role));
+                        addResponse(responses, player, role);
                         ctx.markWolfClaimedRole(role);
                     }
                     break;
@@ -104,7 +103,7 @@ final class ClaimResponsePlanner
                             ctx.getActualRole(player) - 7, 3,
                             getP1(ctx.getActualRole(player)), getP2(ctx.getActualRole(player)))))
                     {
-                        responses.add(new IntPair(player, role));
+                        addResponse(responses, player, role);
                     }
                     break;
             }
@@ -124,14 +123,14 @@ final class ClaimResponsePlanner
             if (ctx.getClaimedRole(player) != 0) continue;
             if (ctx.getActualRole(player) < 7)
             {
-                responses.add(new IntPair(player, ctx.getActualRole(player)));
+                addResponse(responses, player, ctx.getActualRole(player));
             }
             else if (ctx.getNonHumanPlan(player).isClaimPlan())
             {
                 NonHumanPlan plan = ctx.getNonHumanPlan(player);
                 if (plan == NonHumanPlan.CLAIM_SEER)
                     ctx.recordSkillTarget(player, 1, ctx.getPlannedDivinationResult(player));
-                responses.add(new IntPair(player, plan.claimedRole()));
+                addResponse(responses, player, plan.claimedRole());
             }
             else
             {
@@ -141,28 +140,28 @@ final class ClaimResponsePlanner
                     case 7:
                         if (ctx.isWolfClaimedHunter() && ctx.isWolfClaimedCat())
                         {
-                            responses.add(new IntPair(player, 6));
+                            addResponse(responses, player, 6);
                             break;
                         }
                         probability = probabilityCalculator.maolieco(0, 2, getP1(7), getP2(7));
                         if (!ctx.getRandom().probabilityJudge(probability))
                         {
-                            responses.add(new IntPair(player, 6));
+                            addResponse(responses, player, 6);
                             break;
                         }
                         if (ctx.isWolfClaimedHunter())
                         {
                             // 如果猫又已明确出局，不能 CO 猫。
                             if (ctx.getActualRoleIndex(5) != 0 && !ctx.isCatDefinitivelyOut())
-                                responses.add(new IntPair(player, 5));
+                                addResponse(responses, player, 5);
                             else
-                                responses.add(new IntPair(player, 6));
+                                addResponse(responses, player, 6);
                             ctx.markWolfClaimedRole(5);
                             break;
                         }
                         if (ctx.isWolfClaimedCat())
                         {
-                            responses.add(new IntPair(player, 3));
+                            addResponse(responses, player, 3);
                             ctx.markWolfClaimedRole(3);
                             break;
                         }
@@ -172,7 +171,7 @@ final class ClaimResponsePlanner
                             option = ctx.getRandom().weightedIndex(
                                     new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
                                             50 + 50 * ctx.getLies().size())));
-                        responses.add(new IntPair(player, 3 + 2 * option));
+                        addResponse(responses, player, 3 + 2 * option);
                         break;
                     case 8:
                     case 9:
@@ -182,7 +181,7 @@ final class ClaimResponsePlanner
                                 getP1(ctx.getActualRole(player)), getP2(ctx.getActualRole(player)));
                         if (!ctx.getRandom().probabilityJudge(probability))
                         {
-                            responses.add(new IntPair(player, 6));
+                            addResponse(responses, player, 6);
                             break;
                         }
                         option = 0;
@@ -191,12 +190,27 @@ final class ClaimResponsePlanner
                             option = ctx.getRandom().weightedIndex(
                                     new ArrayList<>(List.of(50 + 50 * ctx.getMaos().size(),
                                             50 + 50 * ctx.getLies().size())));
-                        responses.add(new IntPair(player, 3 + 2 * option));
+                        addResponse(responses, player, 3 + 2 * option);
                         break;
                 }
             }
         }
         return responses;
+    }
+
+    /** 同一批规划先占狼猎名额；实际登记仍由 COManager/GameContext 再检查。 */
+    private boolean addResponse(List<IntPair> responses, int player, int role)
+    {
+        if (!ctx.canClaimRole(player, role)) return false;
+        if (ctx.getActualRole(player) == 7 && role == 3)
+        {
+            if (responses.stream().anyMatch(response -> response.second() == 3
+                    && ctx.getActualRole(response.first()) == 7))
+                return false;
+            ctx.markWolfClaimedRole(3);
+        }
+        responses.add(new IntPair(player, role));
+        return true;
     }
 
     private int deathCounterP2()

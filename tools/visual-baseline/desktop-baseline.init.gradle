@@ -1,0 +1,9 @@
+// Explicit opt-in test source; normal test/CI discovery remains unchanged.
+allprojects { target ->
+    target.afterEvaluate {
+        target.sourceSets.test.java.srcDir(new File(target.projectDir, 'tools/visual-baseline'))
+        target.tasks.named('test') {
+            systemProperty 'vocr.baseline.source', System.getenv('VOCR_BASELINE_SOURCE_SHA') ?: 'unrecorded'
+        }
+    }
+}

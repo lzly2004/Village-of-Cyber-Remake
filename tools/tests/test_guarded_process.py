@@ -65,6 +65,12 @@ class ChildIdentityTest(unittest.TestCase):
             self.assertEqual(78, guard.run(["must-not-run"]))
             launch.assert_not_called()
 
+    def test_changed_parent_refuses_before_launch(self):
+        with mock.patch.object(guard, 'enable_subreaper'), mock.patch.object(guard.os, 'getppid', return_value=321), \
+                mock.patch.object(guard.subprocess, 'Popen') as launch:
+            self.assertEqual(78, guard.run(['must-not-run'], memory_reader=lambda:8388608, parent_pid=322))
+            launch.assert_not_called()
+
     def test_unreadable_child_list_fails_without_any_signal_fallback(self):
         process = mock.Mock(pid=123456)
         process.poll.return_value = 0
@@ -96,6 +102,27 @@ class IsolatedProcessTest(unittest.TestCase):
             process = self.launch(sys.executable, "-c", "raise SystemExit({})".format(code))
             out, err = process.communicate(timeout=6)
             self.assertEqual(code, process.returncode, (out, err))
+
+    def test_coordinator_exit_notifies_guard_and_cleans_workload(self):
+        # A separate coordinator really exits while its guardian owns a fake sleeper.
+        # Sentinel is its sibling, never in the guardian's tree. No JVM or OOM.
+        with tempfile.TemporaryDirectory() as d:
+            proof=Path(d)/'child.json'; ready=Path(d)/'guard-ready'
+            workload="import os,pathlib,time; pathlib.Path(%r).write_text(str(os.getpid())); time.sleep(30)" % str(proof)
+            code=("import os,subprocess,sys,time,pathlib\n"
+                  "p=subprocess.Popen([sys.executable,'-B',sys.argv[1],'--watch-parent='+str(os.getpid()),'--',sys.executable,'-c',sys.argv[2]],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)\n"
+                  "pathlib.Path(sys.argv[3]).write_text(str(p.pid))\n"
+                  "while not pathlib.Path(sys.argv[4]).exists(): time.sleep(.02)\n"
+                  "os._exit(0)\n")
+            coordinator=subprocess.Popen([sys.executable,'-B','-c',code,str(TOOLS/'guarded-process.py'),workload,str(ready),str(proof)])
+            try:
+                coordinator.wait(timeout=5)
+                pid=int(proof.read_text()); deadline=time.monotonic()+6
+                while Path('/proc/'+str(pid)).exists() and time.monotonic()<deadline:time.sleep(.05)
+                self.assertFalse(Path('/proc/'+str(pid)).exists(),'guardian must reap its own workload after parent exit')
+                self.assertIsNone(self.sentinel.poll())
+            finally:
+                if coordinator.poll() is None:coordinator.terminate();coordinator.wait(timeout=6)
 
     def test_actual_sibling_pid_is_rejected_by_kernel_child_check(self):
         code = ("import runpy,signal,sys; g=runpy.run_path(sys.argv[1]); "

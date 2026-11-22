@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { configurations, roles } from './labels.js'
-import { helpGroups } from './helpContent.js'
+import { helpGroups } from './helpSources.js'
 const props = defineProps({ initialPage: { type: String, default: 'help' } })
 const emit = defineEmits(['close'])
 const dialog = ref(null)
@@ -10,8 +10,6 @@ const groupId = ref('1')
 const topicId = ref('1-1')
 const group = computed(() => helpGroups.find(item => item.id === groupId.value))
 const topic = computed(() => group.value.topics.find(item => item.id === topicId.value))
-const originals = import.meta.glob('../../src/main/resources/help/Info*-*-1.txt', { query: '?raw', import: 'default', eager: true })
-const original = computed(() => originals['../../src/main/resources/help/' + topic.value.source])
 function chooseGroup(event) {
   groupId.value = event.target.value
   topicId.value = group.value.topics[0].id
@@ -30,22 +28,22 @@ onMounted(() => dialog.value.showModal())
 </script>
 
 <template>
-  <dialog ref="dialog" class="help-dialog" aria-labelledby="help-dialog-title" lang="ja" @keydown="keepFocus" @close="emit('close')">
+  <dialog ref="dialog" class="help-dialog" aria-labelledby="help-dialog-title" lang="zh-CN" @keydown="keepFocus" @close="emit('close')">
     <header class="help-dialog-heading"><h2 id="help-dialog-title">電脳村ガイド</h2><button class="quiet-button" autofocus @click="dialog.close()">閉じる</button></header>
     <nav class="help-tabs" aria-label="ガイドのページ">
       <button :aria-pressed="page === 'help'" @click="page = 'help'">遊び方・ヘルプ</button>
       <button :aria-pressed="page === 'configurations'" @click="page = 'configurations'">配役説明</button>
     </nav>
     <section v-if="page === 'help'" aria-label="ヘルプ">
-      <p class="help-provenance">既存の中国語ヘルプを基にしたWeb版の日本語要約・補足です。原版の日本語原文ではありません。操作や保存の違いは「Web版の補足」に記載しています。</p>
+      <p class="help-provenance">直接复用桌面版帮助原文。浏览器专有的操作和保存差异单列在“网页版补充”。</p>
       <div class="help-selectors">
         <label>分類<select aria-label="分類" :value="groupId" @change="chooseGroup"><option v-for="item in helpGroups" :key="item.id" :value="item.id">{{ item.title }}</option></select></label>
         <label>項目<select aria-label="項目" v-model="topicId"><option v-for="item in group.topics" :key="item.id" :value="item.id">{{ item.title }}</option></select></label>
       </div>
       <article :key="topic.id" class="help-article" tabindex="0" aria-label="ヘルプ本文">
-        <h3>{{ topic.title }}</h3><p>{{ topic.body }}</p>
-        <aside v-if="topic.webNote" class="notice"><strong>Web版の補足</strong><p>{{ topic.webNote }}</p></aside>
-        <details><summary>参照した原文（中国語・デスクトップ版）</summary><p>出典：help/{{ topic.source }}</p><pre lang="zh-CN" v-if="typeof original === 'string'">{{ original }}</pre><p v-else role="status">表示診断：原文を読み込めません（HELP_SOURCE_MISSING）。</p></details>
+        <p>{{ topic.body }}</p>
+        <aside v-if="topic.webNote" class="notice"><strong>网页版补充</strong><p>{{ topic.webNote }}</p></aside>
+        <p>来源：help/{{ topic.source }}（正文直接使用原文。）</p>
       </article>
     </section>
     <section v-else aria-label="配役説明">
@@ -56,7 +54,7 @@ onMounted(() => dialog.value.showModal())
           <dl><template v-for="(count, role) in item.roleCounts" :key="role"><dt>{{ roles[role] }}</dt><dd>{{ count }}人</dd></template></dl>
         </article>
       </div>
-      <p>役職は対局ごとに割り振られます。ここで配役を閲覧しても開村・投票は行いません。対局を始めるには閉じて配役を選び、「対局を始める」を押してください。</p>
+      <p>役職は対局ごとに割り振られます。ここで配役を閲覧しても開村・投票は行いません。対局を始めるには閉じてタイトルの「Start」から配役画像を選んでください。</p>
     </section>
   </dialog>
 </template>

@@ -1,4 +1,6 @@
-import { test,expect } from '@playwright/test'
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
+import { completeLocalReading } from '../test-fixtures/presentation-test.js'
+import { test,expect } from '../test-fixtures/presentation-test.js'
 import { readFileSync } from 'node:fs'
 import { replayId } from '../src/replayStore.js'
 const fixture=JSON.parse(readFileSync(new URL('../../src/test/resources/replay/exchange-v3.json',import.meta.url),'utf8'))[0]
@@ -8,7 +10,7 @@ const rows=page=>library(page).locator('.replay-entries > li')
 async function seed(page,replay=fixture) {
   const id=await replayId(replay)
   await page.evaluate(async entry=>new Promise((resolve,reject)=>{
-    const r=indexedDB.open('vocr.replays.v1',1)
+    const r=indexedDB.open('vocr.replays.v1')
     r.onupgradeneeded=()=>r.result.createObjectStore('recordings',{keyPath:'id'})
     r.onsuccess=()=>{const db=r.result,tx=db.transaction('recordings','readwrite');tx.objectStore('recordings').put(entry);tx.oncomplete=()=>{db.close();resolve()};tx.onabort=()=>reject(tx.error)}
     r.onerror=()=>reject(r.error)
@@ -37,11 +39,12 @@ async function completeCards(page) {
 const saved=page=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')))
 
 test('frozen desktop dates/portraits play read-only beside a real running game, Escape and refresh preserve authority and local records',async({page,request},info)=>{
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click()
+  await page.goto('/');await startDesktopGame(page)
   await expect(page.getByTestId('next-event')).toBeVisible()
   const credentials=await saved(page),path='/api/v1/games/'+credentials.sessionId+'?eventCursor='+credentials.eventCursor
   try{
     const before=await(await request.get(path)).json()
+    await completeLocalReading(page)
     const current=await page.getByTestId('event-dialogue').textContent()
     await seed(page)
     let writes=0,reads=0,audio=0
@@ -135,7 +138,7 @@ test('an already-open recording stays detached when another tab deletes it; clos
 
 test('lazy Replay module failure is bounded and leaves the current game usable',async({page,request})=>{
   await page.route('**/src/ReplayLibrary.vue*',r=>r.abort())
-  await page.goto('/');await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+  await page.goto('/');await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
   const before=await saved(page)
   try{
     await library(page).getByRole('button',{name:'Replay一覧',exact:true}).click()
@@ -160,9 +163,8 @@ test('lazy save intent cannot attach to a different session when the module arri
   let reads=0;page.on('request',r=>{if(r.url().includes('/replay?'))reads++})
   await page.goto('/')
   await page.getByTestId('save-replay').click()
-  await page.getByRole('button',{name:'新しい対局',exact:true}).click()
-  await page.getByRole('button',{name:'解放を確定',exact:true}).click()
-  await page.getByRole('button',{name:'対局を始める'}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+  await page.locator('.session-footer').getByRole('button',{name:'タイトルに戻る',exact:true}).click()
+  await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
   const current=await saved(page)
   try{
     resume()
@@ -178,7 +180,7 @@ test('timed-out lazy save does not auto-save when the chunk eventually arrives',
   snapshot.events=[];snapshot.presentedEvents=[];snapshot.eventCursor=0;snapshot.nextEventCursor=0
   await page.route('**/api/v1/games/'+id+'?**',r=>r.fulfill({json:snapshot}))
   await page.addInitScript(id=>sessionStorage.setItem('vocr.guest.v1',JSON.stringify({sessionId:id,eventCursor:0})),id)
-  await page.clock.install()
+  // Clock is already installed by the local-presentation fixture.
   let resume,held=false,reads=0
   const gate=new Promise(resolve=>{resume=resolve})
   await page.route('**/src/ReplayLibrary.vue*',async r=>{const response=await r.fetch();held=true;await gate;await r.fulfill({response})})

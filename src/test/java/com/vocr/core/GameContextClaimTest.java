@@ -20,23 +20,27 @@ class GameContextClaimTest
     void registerClaim_shouldAtomicallyUpdateIdentityOrderAndCandidateList(int role)
     {
         GameContext context = createContext();
+        // 本例验证职业顺位；不随机挑中两个狼而触发另有专例覆盖的狼猎限制。
+        List<Integer> players = java.util.stream.IntStream.rangeClosed(1, context.getPlayerSum())
+                .filter(player -> context.getActualRole(player) != 7).limit(2).boxed().toList();
+        int first = players.get(0), second = players.get(1);
 
-        context.registerClaim(1, role);
-        context.registerClaim(1, role);
+        context.registerClaim(first, role);
+        context.registerClaim(first, role);
 
-        assertEquals(role, context.getClaimedRole(1));
-        assertEquals(context.getGameDay(), context.getComingOutDay(1));
-        assertEquals(1, context.getClaimedRoleOrder(1));
+        assertEquals(role, context.getClaimedRole(first));
+        assertEquals(context.getGameDay(), context.getComingOutDay(first));
+        assertEquals(1, context.getClaimedRoleOrder(first));
         assertEquals(1, context.getClaimedRoleOrderCount(role));
-        assertEquals(List.of(1), candidates(context, role));
+        assertEquals(List.of(first), candidates(context, role));
 
         context.incrementGameDay();
-        context.registerClaim(2, role);
+        context.registerClaim(second, role);
 
-        assertEquals(2, context.getComingOutDay(2));
-        assertEquals(2, context.getClaimedRoleOrder(2));
+        assertEquals(2, context.getComingOutDay(second));
+        assertEquals(2, context.getClaimedRoleOrder(second));
         assertEquals(2, context.getClaimedRoleOrderCount(role));
-        assertEquals(List.of(1, 2), candidates(context, role));
+        assertEquals(List.of(first, second), candidates(context, role));
     }
 
     @Test

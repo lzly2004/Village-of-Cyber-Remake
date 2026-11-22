@@ -24,6 +24,8 @@ final class ClaimState
     private final ArrayList<Integer> hunterCandidates = new ArrayList<>();
     private final ArrayList<Integer> catCandidates = new ArrayList<>();
     private boolean wolfClaimedHunter;
+    // 与预定计划占位分开：实际首次狼猎一经登记，死亡或移除候补都不释放。
+    private int wolfHunterClaimant;
     private boolean wolfClaimedCat;
 
     ClaimState(int playerSum)
@@ -111,6 +113,20 @@ final class ClaimState
                 + Math.max(0, mediumCandidates.size() - 1)
                 + Math.max(0, hunterCandidates.size() - 1)
                 + Math.max(0, catCandidates.size() - 1);
+    }
+
+    boolean canRegisterWolfHunter(int player)
+    {
+        validatePlayer(player);
+        return wolfHunterClaimant == 0 || wolfHunterClaimant == player;
+    }
+
+    void registerWolfHunter(int player)
+    {
+        if (!canRegisterWolfHunter(player))
+            throw new IllegalStateException("本局已有其他人狼 CO 猎人");
+        wolfHunterClaimant = player;
+        wolfClaimedHunter = true;
     }
 
     boolean isWolfClaimedHunter()

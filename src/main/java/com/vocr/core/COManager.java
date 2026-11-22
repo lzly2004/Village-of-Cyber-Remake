@@ -48,6 +48,8 @@ class COManager
     {
         int gd = ctx.getGameDay();
         if (ctx.getDeathReason(num) != whyDie.NONE) return;
+        // 在身份、顺位、怀疑度和事件发生任何写入之前拒绝第二名狼猎。
+        if (!ctx.canClaimRole(num, zhi)) return;
 
         DebugLogger.log("进入役职co:num,zhi:" + num + "," + zhi + ",初日技能情况：" + ctx.getSkillTarget(num, 1));
         if (ctx.getPeiyi() != peiyi.daxing && ctx.getPeiyi() != peiyi.maoyou && zhi == 5) return;
@@ -194,17 +196,18 @@ class COManager
 
     public void processMaoLieCo(int num, boolean isHumanWolf, List<Integer> diebody)
     {
-        if (isHumanWolf)
-        {
-            if ((ctx.getActualRoleIndex(3) < 1 || ctx.isWolfClaimedHunter() || ctx.getClaimedRoleAskDay(3) > 0)
-                    && (ctx.getActualRoleIndex(5) < 1 || ctx.isWolfClaimedCat() || ctx.getClaimedRoleAskDay(5) > 0))
-                return;
-        }
-        // 如果猫又已明确出局，不能CO猫
-        if (ctx.getActualRoleIndex(3) < 1 || (isHumanWolf && ctx.isWolfClaimedHunter()) || ctx.getClaimedRoleAskDay(3) > 0
-                || ctx.isCatDefinitivelyOut())
-            processActualCo(num, 3, diebody);
-        else if (ctx.getActualRoleIndex(5) < 1 || (isHumanWolf && ctx.isWolfClaimedCat()) || ctx.getClaimedRoleAskDay(5) > 0)
+        boolean hunterAvailable = ctx.getActualRoleIndex(3) > 0
+                && ctx.getClaimedRoleAskDay(3) == 0
+                && (!isHumanWolf || !ctx.isWolfClaimedHunter())
+                && ctx.canClaimRole(num, 3);
+        boolean catAvailable = ctx.getActualRoleIndex(5) > 0
+                && ctx.getClaimedRoleAskDay(5) == 0
+                && !ctx.isCatDefinitivelyOut()
+                && (!isHumanWolf || !ctx.isWolfClaimedCat());
+        if (!hunterAvailable && !catAvailable) return;
+        if (!hunterAvailable)
+            processActualCo(num, 5, diebody);
+        else if (!catAvailable)
             processActualCo(num, 3, diebody);
         else
             processActualCo(num, 3 + 2 * ctx.getRandom().weightedIndex(

@@ -30,7 +30,22 @@ class HunterGuarder
     int guard(int num, IntUnaryOperator boundedRandom)
     {
         if (ctx.getDeathReason(num) != whyDie.NONE) return 0;
+        return selectTarget(num, boundedRandom);
+    }
 
+    /** 本夜演员名单中的假猎即使刚死亡仍可保留报告；目标只限其他活人。 */
+    int guardForDiary(int num, IntUnaryOperator boundedRandom)
+    {
+        boolean hasTarget = false;
+        for (int player = 1; player <= ctx.getPlayerSum(); player++)
+            if (player != num && ctx.isAlive(player)) { hasTarget = true; break; }
+        if (!hasTarget) return 0;
+        int target = selectTarget(num, boundedRandom);
+        return target != num && ctx.isAlive(target) ? target : 0;
+    }
+
+    private int selectTarget(int num, IntUnaryOperator boundedRandom)
+    {
         int n = ctx.getPlayerSum();
         int gd = ctx.getGameDay();
         DebugLogger.log("猎人编号：" + num + " 当前游戏日期：" + gd);

@@ -1,6 +1,8 @@
 import { ReplayError, REPLAY_LIMITS, validateReplay } from './replayValidation.js'
+import { replaySlotLayout } from './replaySlots.js'
 export const REPLAY_DB = 'vocr.replays.v1'
 const STORE = 'recordings'
+const SLOTS = 'slot-layout'
 const encode = text => new TextEncoder().encode(text)
 const canonical = value => Array.isArray(value) ? value.map(canonical)
   : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(k => [k, canonical(value[k])])) : value
@@ -30,13 +32,14 @@ export function createReplayStore(indexedDB) {
       try {
         const provider = indexedDB === undefined ? globalThis.indexedDB : indexedDB
         if (!provider) throw new ReplayError('STORAGE_UNAVAILABLE')
-        request = provider.open(REPLAY_DB,1)
+        request = provider.open(REPLAY_DB,2)
       } catch (error) { fail(error); return }
       request.onblocked = () => fail(new ReplayError('STORAGE_BLOCKED'))
       request.onerror = () => fail(request.error)
       request.onupgradeneeded = () => {
         if (settled) { request.transaction.abort(); return }
-        request.result.createObjectStore(STORE,{keyPath:'id'})
+        if(!request.result.objectStoreNames.contains(STORE))request.result.createObjectStore(STORE,{keyPath:'id'})
+        if(!request.result.objectStoreNames.contains(SLOTS))request.result.createObjectStore(SLOTS,{keyPath:'key'})
       }
       request.onsuccess = () => {
         const db = request.result
@@ -52,7 +55,7 @@ export function createReplayStore(indexedDB) {
     try {
       return await new Promise((resolve,reject) => {
         let result, problem
-        const tx = db.transaction(STORE,mode), store = tx.objectStore(STORE)
+        const tx = db.transaction([STORE,SLOTS],mode), store = tx.objectStore(STORE)
         const timer = setTimeout(() => {
           problem = new ReplayError('STORAGE_TIMEOUT')
           try { tx.abort() } catch { reject(problem) }
@@ -61,7 +64,7 @@ export function createReplayStore(indexedDB) {
         tx.onabort = () => { clearTimeout(timer); reject(classify(problem || tx.error)) }
         tx.onerror = () => { /* onabort supplies the final transaction result */ }
         tx.oncomplete = () => { clearTimeout(timer); resolve(result) }
-        try { operation(store, value => { result = value }, fail) } catch (error) { fail(error) }
+        try { operation(store, value => { result = value }, fail, tx.objectStore(SLOTS)) } catch (error) { fail(error) }
       })
     } catch (error) { throw classify(error) } finally { db.close() }
   }
@@ -86,24 +89,56 @@ export function createReplayStore(indexedDB) {
       const id=await replayId(replay)
       incoming.push({id,savedAt:new Date().toISOString(),bytes:encode(JSON.stringify(replay)).length,replay})
     }
+    return mutateSlots((entries,layout,store)=>{
+      const existing=new Set(entries.map(e=>e.id)),additions=new Map()
+      for(const entry of incoming)if(!existing.has(entry.id))additions.set(entry.id,entry)
+      if(entries.length+additions.size>REPLAY_LIMITS.entries || entries.reduce((n,e)=>n+e.bytes,0)+[...additions.values()].reduce((n,e)=>n+e.bytes,0)>REPLAY_LIMITS.libraryBytes)throw new ReplayError('LIBRARY_FULL')
+      for(const entry of additions.values()){
+        const slot=layout.ids.indexOf(null)
+        if(slot<0)throw new ReplayError('LIBRARY_FULL')
+        layout.ids[slot]=entry.id;store.add(entry)
+      }
+      return {added:additions.size,duplicates:incoming.length-additions.size,ids:incoming.map(e=>e.id)}
+    })
+  }
+  async function mutateSlots(action) {
     for(let attempt=0;attempt<5;attempt++){
       const verified=new Map((await list()).map(e=>[e.id,JSON.stringify(e)]))
-      try{return await transaction('readwrite',(store,done,fail)=>{
+      try{return await transaction('readwrite',(store,done,fail,slots)=>{
         const get=store.getAll()
         get.onsuccess=()=>{
-          try{
-            const entries=get.result
-            if(entries.length!==verified.size || entries.some(e=>verified.get(e.id)!==JSON.stringify(e)))throw new ReplayError('LIBRARY_CHANGED')
-            const additions=new Map()
-            for(const entry of incoming)if(!verified.has(entry.id))additions.set(entry.id,entry)
-            if(entries.length+additions.size>REPLAY_LIMITS.entries || entries.reduce((n,e)=>n+e.bytes,0)+[...additions.values()].reduce((n,e)=>n+e.bytes,0)>REPLAY_LIMITS.libraryBytes)throw new ReplayError('LIBRARY_FULL')
-            for(const entry of additions.values())store.add(entry)
-            done({added:additions.size,duplicates:incoming.length-additions.size,ids:incoming.map(e=>e.id)})
-          }catch(error){fail(error)}
+          const read=slots.get('layout')
+          read.onsuccess=()=>{try{
+              const entries=get.result
+              if(entries.length!==verified.size || entries.some(e=>verified.get(e.id)!==JSON.stringify(e)))throw new ReplayError('LIBRARY_CHANGED')
+              const layout=replaySlotLayout(entries,read.result)
+              const result=action(entries,layout,store)
+              if(JSON.stringify(layout)!==JSON.stringify(read.result))slots.put(layout)
+              done(result)
+            }catch(error){fail(error)}}
         }
       })}catch(error){if(error.code!=='LIBRARY_CHANGED')throw error}
     }
     throw new ReplayError('LIBRARY_CHANGED')
+  }
+  async function listSlots(){return mutateSlots((entries,layout)=>layout.ids.map(id=>id===null?null:entries.find(e=>e.id===id)))}
+  async function saveToSlot(replay,slot,expectedId) {
+    if(!Number.isInteger(slot)||slot<0||slot>8 || (expectedId!==null&&!/^[0-9a-f]{64}$/.test(expectedId)))throw new ReplayError('INVALID_SLOT')
+    replay=structuredClone(validateReplay(replay,{extensions:true}))
+    const id=await replayId(replay), entry={id,savedAt:new Date().toISOString(),bytes:encode(JSON.stringify(replay)).length,replay}
+    return mutateSlots((entries,layout,store)=>{
+      if(layout.ids[slot]!==expectedId)throw new ReplayError('SLOT_CHANGED')
+      if(expectedId===id)return {duplicate:true,id,slot}
+      // Multiple desktop slots may refer to the same recording; content remains deduplicated.
+      const reused=entries.some(e=>e.id===id)
+      const oldStillUsed=layout.ids.some((value,index)=>index!==slot&&value===expectedId)
+      const remaining=entries.filter(e=>e.id!==expectedId||oldStillUsed)
+      if(remaining.reduce((n,e)=>n+e.bytes,0)+(reused?0:entry.bytes)>REPLAY_LIMITS.libraryBytes)throw new ReplayError('LIBRARY_FULL')
+      if(expectedId!==null&&!oldStillUsed)store.delete(expectedId)
+      if(!reused)store.add(entry)
+      layout.ids[slot]=id
+      return {duplicate:false,reused,id,slot}
+    })
   }
   async function save(replay) {
     const result=await saveMany([replay])
@@ -127,7 +162,7 @@ export function createReplayStore(indexedDB) {
   }
   async function remove(id) {
     if (!/^[0-9a-f]{64}$/.test(id)) throw new ReplayError('INVALID_LIBRARY')
-    return transaction('readwrite',(store,done) => { store.delete(id); done(null) })
+    return mutateSlots((_entries,layout,store)=>{store.delete(id);layout.ids=layout.ids.map(value=>value===id?null:value);return null})
   }
-  return { list, save, saveMany, remove, backup }
+  return { list, listSlots, saveToSlot, save, saveMany, remove, backup }
 }

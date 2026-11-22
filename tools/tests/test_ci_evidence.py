@@ -46,7 +46,19 @@ class Fixture:
         self.outcome['result_sha256']=E.digest(self.files['build/verify/run/result.json'])
         self.files['build/ci/outcome.json']=json.dumps(self.outcome).encode()
 
-    def report(self,env=None):return E.assemble(self.files.__getitem__,self.files,env or ENV)
+    def report(self,env=None):return E.assemble(self.files.__getitem__,self.files,env or ENV,assembly_revision=5)
+
+    def preview_fixture(self):
+        self.result['plan']['tier']='frontend';self.plan['plan']['tier']='frontend';self.outcome['preview_required']=True;self.sync()
+        log='build/verify/preview-smoke-'+('d'*32)+'/packaged-smoke.log';self.files[log]=b'  1 passed (1s)\n'
+        report={'status':'passed','source_sha':HEAD,'archive':{'name':'vocr-preview.zip','bytes':123,'sha256':'a'*64},
+                'manifest_sha256':'b'*64,'verification':{'tier':'frontend','javaFull':False,'resultSha256':self.outcome['result_sha256']},
+                'packaged_smoke':{'status':'passed','tests':1,'log':log,'sha256':E.digest(self.files[log])}}
+        data=json.dumps(report).encode();self.files['build/ci/web-preview.json']=data
+        self.outcome['web_preview']={'report':'build/ci/web-preview.json','sha256':E.digest(data)}
+        self.files['build/ci/preview-upload.json']=json.dumps({'repository':'owner/repo','run_id':'123','attempt':'2',
+            'tested_head':HEAD,'artifact_name':'preview-123-2','id':'9','digest':'c'*64,
+            'url':'https://github.com/owner/repo/actions/runs/123/artifacts/9'}).encode();self.sync()
 
     def proof(self,directory,extra=None):
         p=Path(directory)/'proof.zip'
@@ -238,6 +250,7 @@ class EvidenceTest(Fixture, unittest.TestCase):
         self.assertIsNone(r['remote_fetch_http_status_counts']);self.assertIsNone(r['account_usage'])
 
     def test_real_producer_cli_reads_only_evidence_not_tools_cache(self):
+        self.preview_fixture()
         with tempfile.TemporaryDirectory() as t:
             root=Path(t)
             for name,data in self.files.items():
@@ -306,7 +319,7 @@ class DownloadTest(Fixture, unittest.TestCase):
             self.files['build/ci/evidence.json']=json.dumps(legacy).encode()
             p,r,a=self.proof(t);value=D.validate(p,r,a,HEAD,'owner/repo')
             value.pop('download_proof');self.assertEqual(legacy,value)
-            for revision in [0,6,True,None,2.0]:
+            for revision in [0,7,True,None,2.0]:
                 self.files['build/ci/evidence.json']=json.dumps({**legacy,'assembly_revision':revision}).encode()
                 p,r,a=self.proof(t)
                 with self.subTest(revision=revision),self.assertRaisesRegex(ValueError,'UNSUPPORTED_ASSEMBLY_REVISION'):
@@ -409,6 +422,45 @@ class ProgressTest(unittest.TestCase):
                 self.assertEqual(exit_code,r.returncode);self.assertEqual({'status':'fixture'},json.loads((root/'out').read_text()))
                 self.assertEqual('suite_started\n',(root/'err').read_text());self.assertEqual('suite_started\n',display.getvalue())
 
+
+
+class PreviewEvidenceTest(Fixture, unittest.TestCase):
+    def modern(self, env=None): return E.assemble(self.files.__getitem__, self.files, env or ENV, assembly_revision=6)
+
+    def test_preview_evidence_binds_actual_smoke_and_upload_and_offline_recomputes(self):
+        self.preview_fixture(); report = self.modern()
+        self.assertEqual(6, report['assembly_revision']); self.assertEqual('passed', report['web_preview']['status'])
+        self.assertEqual('not_built', report['web_release']['status'])
+        self.assertFalse(report['web_preview']['report']['verification']['javaFull'])
+        self.files['build/ci/evidence.json'] = json.dumps(report).encode()
+        with tempfile.TemporaryDirectory() as d:
+            p, r, a = self.proof(d); actual = D.validate(p, r, a, HEAD, 'owner/repo'); actual.pop('download_proof')
+            self.assertEqual(report, actual)
+
+    def test_missing_preview_report_upload_or_changed_smoke_never_passes(self):
+        for name in ['build/ci/web-preview.json', 'build/ci/preview-upload.json',
+                     'build/verify/preview-smoke-' + 'd' * 32 + '/packaged-smoke.log']:
+            self.setUp(); self.preview_fixture(); del self.files[name]
+            with self.subTest(name=name), self.assertRaises((ValueError, KeyError)): self.modern()
+        self.setUp(); self.preview_fixture()
+        name = 'build/verify/preview-smoke-' + 'd' * 32 + '/packaged-smoke.log'; self.files[name] = b'1 failed\n'
+        with self.assertRaisesRegex(ValueError, 'SMOKE_LOG_MISMATCH'): self.modern()
+
+    def test_preview_cannot_claim_full_or_another_head_or_attempt(self):
+        for field, value in [('source_sha', BASE), ('verification', {'tier': 'full', 'javaFull': True, 'resultSha256': 'a' * 64})]:
+            self.setUp(); self.preview_fixture(); p = json.loads(self.files['build/ci/web-preview.json']); p[field] = value
+            raw = json.dumps(p).encode(); self.files['build/ci/web-preview.json'] = raw
+            self.outcome['web_preview']['sha256'] = E.digest(raw); self.sync()
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'PREVIEW_VERIFICATION_MISMATCH'): self.modern()
+        self.setUp(); self.preview_fixture(); p = json.loads(self.files['build/ci/preview-upload.json']); p['attempt'] = '3'
+        self.files['build/ci/preview-upload.json'] = json.dumps(p).encode()
+        with self.assertRaisesRegex(ValueError, 'PREVIEW_UPLOAD_IDENTITY_MISMATCH'): self.modern()
+
+    def test_preview_upload_failure_is_failure_and_revision_five_stays_exact(self):
+        self.preview_fixture(); del self.files['build/ci/preview-upload.json']
+        value = self.modern({**ENV, 'CI_JOB_STATUS': 'failure'})
+        self.assertEqual('failed', value['status']); self.assertEqual('web-preview', value['first_failure']['suite'])
+        legacy = self.report(); self.assertNotIn('web_preview', legacy)
 
 
 if __name__=='__main__':unittest.main()

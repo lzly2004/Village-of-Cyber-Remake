@@ -1,3 +1,4 @@
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
 import { test as base, expect } from '@playwright/test'
 import { publicInformationDiagnostics } from '../tests/public-information-diagnostics.js'
 const test = base.extend({
@@ -12,7 +13,7 @@ test('DIAGNOSTIC_PROBE: intentional public-info evidence capture', async ({page,
   let id
   try {
     await page.goto('/')
-    await page.getByRole('button',{name:'対局を始める'}).click()
+    await startDesktopGame(page)
     await diagnostics.step('first event visible', () => expect(page.getByTestId('next-event')).toBeVisible())
     id = await page.evaluate(() => JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId)
     diagnostics.snapshot(await (await request.get('/api/v1/games/'+id)).json())

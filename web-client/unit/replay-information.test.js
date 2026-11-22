@@ -79,7 +79,9 @@ test('vote display preserves array-position lookup, same-day dead voters and abs
 test('source locks both skill starts, history zero precedence and independent icon path',()=>{
   const formatter=read('../../src/main/java/com/vocr/ui/ReplayTextFormatter.java')
   assert.match(formatter,/mediumResults, player, index, playerSum, 1, day, true/)
-  assert.match(formatter,/hunterResults, player, index, playerSum, 2, day, false/)
+  const guard=read('../../src/main/java/com/vocr/ui/ReplayGuardHistory.java')
+  assert.match(guard,/int skillDay = 2; skillDay < day; skillDay\+\+/)
+  assert.match(guard,/getVisibleSkillTarget\(id, skillDay, day\)/)
   assert.match(formatter,/findSnapshot\(replay, skillDay\)/)
   const save=read('../../src/main/java/com/vocr/replay/ReplaySave.java')
   assert.match(save,/int historyCutoffDay = visibleDay \+ 1/)
@@ -97,4 +99,49 @@ test('034 O-1 missing exposure array entry produces a bounded diagnosis; public 
   r.daySnapshots[1].players=[]
   assert.throws(()=>validateReplay(r),/INVALID_REPLAY/)
   assert.ok(replayInformation(r,3).diagnostics.some(d=>d.section==='exposure'&&d.code==='SKILL_RECORD_MISSING'))
+})
+
+const guardFixture=JSON.parse(read('../../src/test/resources/replay/hunter-guard-display.json'))
+test('hunter guard rows match shared desktop cases before/after CO and stop at death, without writes',()=>{
+ const replay=structuredClone(guardFixture.replay),before=JSON.stringify(replay)
+ validateReplay(replay)
+ for(const [day,expected] of Object.entries(guardFixture.expected))assert.deepEqual(replayInformation(replay,Number(day)).guardLines,expected)
+ assert.equal(JSON.stringify(replay),before)
+})
+test('real hunter CO day changes the whole line and navigating back restores gray',()=>{
+ const replay=structuredClone(guardFixture.replay)
+ for(const s of replay.daySnapshots)if(s.dayNumber>=5){s.players[0].claimedRole=3;s.players[0].comingOutDay=4}
+ assert.equal(replayInformation(replay,3).guardLines[0].unannounced,true)
+ assert.equal(replayInformation(replay,4).guardLines[0].unannounced,false)
+ assert.equal(replayInformation(replay,4).guardLines[0].text,'青年 : 情報→少年\n')
+ assert.equal(replayInformation(replay,3).guardLines[0].unannounced,true)
+})
+test('future snapshots cannot fill an unavailable pre-CO diary; old st fallback uses only the exact skill day',()=>{
+ const replay=structuredClone(guardFixture.replay)
+ for(const s of replay.daySnapshots)if(s.dayNumber<=4){s.players[0].skillTargets=[];s.players[0].skillTarget=0}
+ assert.equal(replayInformation(replay,3).guardLines[0].text,'青年 : （記録なし）\n')
+ replay.daySnapshots=replay.daySnapshots.filter(s=>s.dayNumber!==3)
+ assert.equal(replayInformation(replay,3).guardLines[0].text,'青年 : （記録なし）\n')
+})
+test('legacy missing CO dates use only the then-visible claim, never an eventual claim to remove gray early',()=>{
+ const replay=structuredClone(guardFixture.replay)
+ for(const s of replay.daySnapshots)s.players[1].comingOutDay=-1
+ assert.equal(replayInformation(replay,3).guardLines.find(p=>p.playerIndex===2).unannounced,true)
+ assert.equal(replayInformation(replay,5).guardLines.find(p=>p.playerIndex===2).unannounced,false)
+})
+test('unclaimed hunter executed before the first guard opportunity has no row',()=>{
+ for(const [deathDay,deathReason] of [[1,4],[2,1],[2,2],[2,3]]){
+ const replay=structuredClone(guardFixture.replay)
+ for(const s of replay.daySnapshots){Object.assign(s.players[0],{deathDay:s.dayNumber>deathDay?deathDay:0,deathReason:s.dayNumber>deathDay?deathReason:0,skillTargets:[],skillTarget:0})}
+ const before=JSON.stringify(replay)
+ for(const day of [3,4,7])assert.equal(replayInformation(replay,day).guardLines.some(p=>p.playerIndex===1),false)
+ assert.equal(JSON.stringify(replay),before)
+ }
+})
+test('death after one guard night keeps the recorded target or reports an unavailable diary',()=>{
+ const replay=structuredClone(guardFixture.replay)
+ for(const s of replay.daySnapshots)Object.assign(s.players[0],{deathDay:s.dayNumber>=4?3:0,deathReason:s.dayNumber>=4?1:0})
+ assert.equal(replayInformation(replay,4).guardLines[0].text,'青年 : 情報\n')
+ for(const s of replay.daySnapshots)Object.assign(s.players[0],{skillTargets:[],skillTarget:0})
+ assert.equal(replayInformation(replay,4).guardLines[0].text,'青年 : （記録なし）\n')
 })

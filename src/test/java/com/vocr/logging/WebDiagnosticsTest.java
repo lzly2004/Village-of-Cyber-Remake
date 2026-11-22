@@ -18,7 +18,24 @@ class WebDiagnosticsTest
             DebugLogger.error("PRIVATE_DEBUG_PROBE");
             WebDiagnostics.write(WebDiagnostics.Event.REQUEST_FAILED);
         } finally {System.setErr(previous);DebugLogger.getInstance().setEnabled(enabled);}
-        assertEquals("[HTTP] REQUEST_FAILED"+System.lineSeparator(),bytes.toString(StandardCharsets.UTF_8));
+        String line=bytes.toString(StandardCharsets.UTF_8).strip();
+        assertTrue(line.startsWith("[HTTP] REQUEST_FAILED time="));
+        assertTrue(line.endsWith(" level=ERROR"));
+    }
+
+    @Test void everyFixedEventIsOneBoundedTimestampedRecord() {
+        var bytes=new ByteArrayOutputStream(); PrintStream previous=System.err;
+        try(var capture=new PrintStream(bytes,true,StandardCharsets.UTF_8)) {
+            System.setErr(capture);
+            for(var event:WebDiagnostics.Event.values()) WebDiagnostics.write(event);
+        } finally {System.setErr(previous);}
+        var lines=bytes.toString(StandardCharsets.UTF_8).lines().toList();
+        assertEquals(WebDiagnostics.Event.values().length,lines.size());
+        for(var line:lines) {
+            assertTrue(line.length()<240);
+            assertTrue(line.endsWith(" level=ERROR") || line.endsWith(" level=WARN"),line);
+            java.time.Instant.parse(line.substring(line.lastIndexOf(" time=")+6,line.lastIndexOf(" level=")));
+        }
     }
 
     @Test void publicInputSurfaceAcceptsOnlyFixedEventsAndValidatedNumericPort() {

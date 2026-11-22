@@ -44,7 +44,7 @@
 - [x] 证书失败/上游关闭、请求包含合成秘密的日志检查；不记真实会话ID到测试日志/trace；证书过期/真实公网/多用户留待正式验收。
 
 ### 3. 统一验证、CI与兼容
-**Files:** tools/verify.py、tools/verify-tiers.json、tools/web_release.py、tools/ci/bootstrap.py、tools/ci/toolchain.json、相关契约测试/CI缓存。
+**Files:** tools/verify.py、tools/verify-tiers.json、tools/web_release.py、tools/ci/bootstrap.py、tools/hosting-toolchain.json、相关契约测试/CI缓存。
 - [x] full增加hosting-tests与hosting-smoke（22→24），现有22项和包内smoke不删不替；CI固定Caddy版本/归档/二进制SHA，记录工具信息。
 - [x] 新发布仅接受24项完整同次结果；读取旧042包保留22项声明兼容、旧证据1—5可精确复算；写入与读取的约束分开验证。
 - [x] 契约单测、真实定向与本轮另获批准的full24/打包已通过；最终源码快照同源oracle/15gate通过，未推送或合流。独立CR须在获准发布后由用户转交，尚未发生。

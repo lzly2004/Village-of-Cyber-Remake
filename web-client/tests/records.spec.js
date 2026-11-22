@@ -1,4 +1,7 @@
-import { test, expect } from '@playwright/test'
+import {showShell} from '../test-fixtures/shell-test.js'
+import { startDesktopGame } from '../test-fixtures/desktop-start.js'
+import { desktopVote } from '../test-fixtures/desktop-navigation.js'
+import { test, expect } from '../test-fixtures/presentation-test.js'
 import { publicSnapshot } from '../test-fixtures/public-players.js'
 import { drainEvents } from './drain-events.js'
 import { readFileSync } from 'node:fs'
@@ -39,7 +42,7 @@ test('completion waits for acknowledgement, persists across refresh/resync and n
 })
 test('independent tabs serialize duplicate settlement; conflicting result and corrupt row fail without overwrite',async({page,context})=>{
   await page.goto('/')
-  const second=await context.newPage();await second.goto('/')
+  const second=await context.newPage();await second.goto('/');await showShell(second)
   const put=(p,result='VILLAGE_WIN')=>p.evaluate(async({id,result})=>{const{createRecordStore}=await import('/src/recordStore.js');try{return await createRecordStore().record({sessionId:id,configuration:'jianyi',result})}catch(e){return e.code}},{id,result})
   const both=await Promise.all([put(page),put(second)]);expect(both.filter(r=>r.duplicate===false)).toHaveLength(1);expect(both.filter(r=>r.duplicate===true)).toHaveLength(1)
   expect((await read(second)).totalPlayCnt).toBe(1)
@@ -68,12 +71,12 @@ test('two real completed games accumulate, abandoning and replay import do not; 
   const ids=[]
   try {
     for(let game=0;game<2;game++){
-      await page.getByRole('button',{name:'対局を始める',exact:true}).click();await expect(page.getByTestId('next-event')).toBeVisible()
+      await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible()
       const sid=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId);ids.push(sid)
       for(let turn=0;turn<40;turn++){
         await drainEvents(page)
         if(await page.locator('.settlement').count())break
-        await page.getByTestId('vote-FREE').click()
+        await desktopVote(page,'FREE')
       }
       await expect(page.locator('.settlement')).toBeVisible();await expect(status(page)).toContainText('保存しました')
       expect((await read(page)).totalPlayCnt).toBe(game+1)
@@ -81,9 +84,9 @@ test('two real completed games accumulate, abandoning and replay import do not; 
       await request.delete('/api/v1/games/'+sid)
       await page.evaluate(()=>sessionStorage.removeItem('vocr.guest.v1'));await page.reload()
     }
-    await page.getByRole('button',{name:'対局を始める',exact:true}).click();await expect(page.getByTestId('next-event')).toBeVisible();ids.push(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId))
+    await startDesktopGame(page);await expect(page.getByTestId('next-event')).toBeVisible();ids.push(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('vocr.guest.v1')).sessionId))
     expect((await read(page)).totalPlayCnt).toBe(2)
-    const other=await context.newPage();await other.goto('/');expect((await read(other)).totalPlayCnt).toBe(2);await other.close()
+    const other=await context.newPage();await other.goto('/');await showShell(other);expect((await read(other)).totalPlayCnt).toBe(2);await other.close()
     await page.evaluate(async file=>{const{createReplayStore}=await import('/src/replayStore.js');await createReplayStore().saveMany(file.filter(Boolean))},replayFile)
     expect((await read(page)).totalPlayCnt).toBe(2)
     const raw=await page.evaluate(()=>new Promise(resolve=>{const q=indexedDB.open('vocr.records.v1');q.onsuccess=()=>{const db=q.result,t=db.transaction('results'),r=t.objectStore('results').getAll();r.onsuccess=()=>resolve(JSON.stringify(r.result));t.oncomplete=()=>db.close()}}))

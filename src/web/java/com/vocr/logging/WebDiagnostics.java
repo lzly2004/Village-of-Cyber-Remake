@@ -21,7 +21,9 @@ public final class WebDiagnostics
     }
 
     public static void write(Event event) {
-        System.err.println(Objects.requireNonNull(event).message);
+        Event fixed=Objects.requireNonNull(event);
+        String level=fixed == Event.INVALID_PORT ? "WARN" : "ERROR";
+        System.err.println(fixed.message + " time=" + java.time.Instant.now() + " level=" + level);
     }
 
     public static void listening(int port) {
